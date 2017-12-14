@@ -1,0 +1,47 @@
+{% if modal_to_display == "new_pub_form" %}
+<div id="new_pub_modal" class="modal" style="display:block;">
+{% else %}
+<div id="new_pub_modal" class="modal" style="display:none;">
+{% endif %}
+    <div class="modal-content">
+        <form method="post" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="modal-header">
+                <span class="close modal_close_button">×</span>
+                <h2>New Pub</h2>
+            </div>
+            <div class="modal-body">
+                <table align="center">
+                {% for field in new_pub_form %}
+                    <tr>
+                        <td> 
+                            <label style="float:left"> 
+                                {{ field.label }}: 
+                            </label> 
+                        </td>
+                        <td class="form_element_cell"> 
+                            {{ field }} 
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td> </td>
+                        <td class="error_entry"> {{ field.errors }} </td>
+                        <td> </td>
+                    </tr>
+                {% endfor %}
+                </table>
+            </div>
+            <div class="modal-footer">
+                <div class="loader" id="new_pub_button_loader"> </div>
+                <input type="submit" value="Create Pub" name="new_pub" id="new_pub_button" class="button_with_loader">
+            </div>
+        </form>
+
+    </div>
+
+</div>

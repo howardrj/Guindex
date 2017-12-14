@@ -1,0 +1,49 @@
+{% if modal_to_display == "new_guinness_form" %}
+<div id="new_guinness_modal" class="modal" style="display:block;">
+{% else %}
+<div id="new_gunness_modal" class="modal" style="display:none;">
+{% endif %}
+    <div class="modal-content">
+        <form method="post" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="modal-header">
+                <span class="close modal_close_button">×</span>
+                <h2>New Guinness</h2>
+            </div>
+            <div class="modal-body">
+                <table align="center">
+                {% for field in new_guinness_form %}
+                    <tr>
+                        {% if field.is_hidden == False %}
+                        <td> 
+                            <label style="float:left"> 
+                                {{ field.label }}: 
+                            </label> 
+                        </td>
+                        {% else %}
+                        <td> </td>
+                        {% endif %}
+                        <td class="form_element_cell"> 
+                            {{ field }} 
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td> </td>
+                        <td class="error_entry"> {{ field.errors }} </td>
+                        <td> </td>
+                    </tr>
+                {% endfor %}
+                </table>
+            </div>
+            <div class="modal-footer">
+                <div class="loader" id="new_guinness_button_loader"> </div>
+                <input type="submit" value="Create Guinness" name="new_guinness" id="new_guinness_button" class="button_with_loader">
+            </div>
+        </form>
+    </div>
+</div>

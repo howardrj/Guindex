@@ -1,0 +1,52 @@
+/***************/
+/* Logout link */
+/***************/
+
+#corner_info {
+    position: absolute;
+    left: 20px; 
+    top: 20px;
+    text-align: center;
+}
+
+#logout_link {
+    text-decoration: none;
+    font-size: 40px;
+    color: black;
+}
+
+#username {
+    margin-top: 5px; 
+}
+
+/******************/
+/* Add pub button */
+/******************/
+
+#add_new_pub_div {
+    position: relative;
+    font-size: 17px;
+    margin-left:  auto;
+    margin-right: auto;
+    text-align: center;
+    font-family: "Oswald";
+    width: 100px;
+    margin-bottom: 40px;
+    margin-top: -50px;
+}
+
+#new_pub_modal_open_button {
+    display: block;
+    text-decoration: none;
+    color: black;
+    font-size: 40px;
+}
+
+#new_pub_modal_open_button:hover {
+    cursor: pointer;
+    cursor: hand;
+}
+
+#new_pub_modal_open_button > i {
+    pointer-events: none;
+}

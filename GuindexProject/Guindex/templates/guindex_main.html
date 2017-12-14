@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+    <head>
+        <title> {{ user_profile_parameters.PROJECT_TITLE }} | {{ username }} </title>
+        <link rel="stylesheet" type="text/css" href="{% static "css/global.css" %}" /> 
+        <link rel="stylesheet" type="text/css" href="{% static "css/guindex.css" %}" /> 
+        <link rel="stylesheet" type="text/css" href="{% static "css/jquery.datetimepicker.min.css" %}" /> 
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Oswald" />
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+        <link rel="icon" href="{% static "images/favicon.png" %}"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script type="text/javascript" src="{% static "javascript/modals_utils.js" %}" defer></script>
+        <script type="text/javascript" src="{% static "javascript/cookie.js" %}" defer> </script>
+        <script type="text/javascript" src="{% static "javascript/loader.js" %}" defer></script>
+        <script type="text/javascript" src="{% static "javascript/tabs.js" %}" defer></script>
+        <script type="text/javascript" src="{% static "javascript/dropdown.js" %}" defer></script>
+    </head>
+
+    <body>
+
+        <h1> {{ user_profile_parameters.PROJECT_TITLE }} </h1>
+
+        <div id="corner_info">
+            <a href="/logout/" id="logout_link">
+                <i class="fa fa-sign-out needs_description" aria-hidden="true" data-description_text="Logout"></i>
+            </a>
+            <h4 id="username"> {{ username }} </h4>
+        </div>
+
+        {% include "new_pub_form.html" %}
+        {% include "new_guinness_form.html" %}
+
+        {% if modal_to_display == "warning" %}
+            {% include "warning.html" %}
+        {% endif %}
+
+        <div id="centered_content_div">
+
+            <div id="add_new_pub_div">
+                <a id="new_pub_modal_open_button" data-description_text="Add a new pub" class="modal_open_button needs_description"> 
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                </a>
+                Add New Pub
+            </div>
+
+            <!-- Table goes here -->
+
+        </div>
+        
+    </body>
+
+</html>
