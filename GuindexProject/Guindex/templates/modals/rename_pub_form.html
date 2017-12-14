@@ -1,7 +1,7 @@
-{% if modal_to_display == "new_guinness_form" %}
-<div id="new_guinness_modal" class="modal" style="display:block;">
+{% if modal_to_display == "rename_pub_form" %}
+<div id="rename_pub_modal" class="modal" style="display:block;">
 {% else %}
-<div id="new_guinness_modal" class="modal" style="display:none;">
+<div id="rename_pub_modal" class="modal" style="display:none;">
 {% endif %}
     <div class="modal-content">
         <form method="post" enctype="multipart/form-data">
@@ -10,11 +10,11 @@
 
             <div class="modal-header">
                 <span class="close modal_close_button">×</span>
-                <h2>New Guinness</h2>
+                <h2>Rename Pub</h2>
             </div>
             <div class="modal-body">
                 <table align="center">
-                {% for field in new_guinness_form %}
+                {% for field in rename_pub_form %}
                     <tr>
                         {% if field.is_hidden == False %}
                         <td> 
@@ -41,8 +41,8 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <div class="loader" id="new_guinness_button_loader"> </div>
-                <input type="submit" value="Add Price" name="new_guinness" id="new_guinness_button" class="button_with_loader">
+                <div class="loader" id="rename_pub_button_loader"> </div>
+                <input type="submit" value="Rename" name="rename_pub" id="rename_pub_button" class="button_with_loader">
             </div>
         </form>
     </div>

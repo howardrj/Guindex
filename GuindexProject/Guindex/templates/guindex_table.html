@@ -1,0 +1,88 @@
+<div id="guindex_table_container">
+
+    <div class="search_container">
+        <div class="search_icon">
+            <i class="fa fa-search search"></i>
+        </div>
+        <input type="text" class="search_bar" id="pubs_search_bar" placeholder="Search Pubs..." autocomplete="off" maxlength="{{ guindex_parameters.MAX_PUB_NAME_LEN }}"/>
+    </div>
+
+    <table align="left" id="guindex_table"> 
+        <colgroup>
+            <col style="width:20%">
+            <col style="width:40%">
+            <col style="width:20%">
+            <col style="width:20%">
+        </colgroup>
+
+        <tr class="first_row">
+            <td> <span class="sortable_column_header"> PUB NAME &#9650; </span></td>
+            <td> <span class="sortable_column_header"> PRICE </span></td>
+            <td> <span class="sortable_column_header"> CREATOR </span></td>
+            <td> <span class="sortable_column_header timestamp_column"> DATE CREATED </span></td>
+        </tr>
+
+        {% for pub in pubs %} 
+        <tr>
+            <td>
+                <span class="pub_name">
+                    <span class="payload">{{ pub.name }}</span>
+                </span>
+                <div class="edit_button_container">
+                
+                    <div class="rename_pub_button_container">
+                        <i class="fa fa-pencil-square-o rename_pub_button needs_description"
+                           data-description_text="Rename pub"
+                           data-pub_id="{{ pub.id }}"
+                           data-pub_name="{{ pub.name}}"
+                           aria-hidden="true">
+                        </i>
+                    </div>
+
+                    <div class="delete_pub_button_container">
+                        <i class="fa fa-trash-o delete_pub_button needs_description"
+                           data-description_text="Delete pub"
+                           data-pub_id="{{ pub.id }}"
+                           data-pub_name="{{ pub.name}}"
+                           aria-hidden="true">
+                        </i>
+                    </div>
+
+                </div>
+            </td>
+            <td>
+                {% for guinness in pub.guini %}
+                    <span class="guinness_price">
+                        &euro;<span class="payload">{{ guinness.price }}</span>
+                    </span>
+                {% empty %}
+                    TBD
+                {% endfor %}
+                <div class="new_guinness_button_container">
+                    <i class="fa fa-plus new_guinness_button needs_description"
+                       data-description_text="Add new Guinness price for this pub"
+                       data-pub_id="{{ pub.id }}"
+                       data-pub_name="{{ pub.name}}"
+                       aria-hidden="true">
+                    </i>
+                </div>
+            </td>
+            <td class="payload">
+                {{ pub.creator }}
+            </td>
+            <td class="payload">
+                {{ pub.creationDate|date:"D d M Y" }} {{ pub.creationDate|date:"H:i" }}
+            </td>
+        </tr>
+        {% endfor %}
+
+        {% if pubs|length > 0 %}
+        <tr id="guindex_table_last_row" style="display:none" class="last_row">
+        {% else %}
+        <tr id="guindex_table_last_row" class="last_row">
+        {% endif %}
+            <td colspan="4" align="center"> No Pubs </td>
+        </tr>
+    </table>
+
+</div>

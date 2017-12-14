@@ -55,6 +55,9 @@ def getPubs():
         pub_dict['name']         = pub.name
         pub_dict['guini']        = pub.getGuini()
 
+        if len(pub_dict['guini']): # TODO Fix this. Just take first Gunness object for now
+            pub_dict['guini'] = pub_dict['guini'][0:1]
+
         pub_list.append(pub_dict.copy())
 
     return sorted(pub_list, key = lambda k: k['name'], reverse = False)

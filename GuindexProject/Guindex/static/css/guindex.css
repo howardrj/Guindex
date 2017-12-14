@@ -1,3 +1,10 @@
+/**************/
+/* Main hader */
+/**************/
+#guindex_header {
+    margin-bottom: 0px;
+}
+
 /***************/
 /* Logout link */
 /***************/
@@ -19,6 +26,19 @@
     margin-top: 5px; 
 }
 
+/******************************************/
+/* Div containing main table and controls */
+/******************************************/
+
+#centered_content_div {
+    width: 85%;
+    margin: 0 auto;
+    max-width: 1250px;
+    min-width: 800px; 
+    overflow: visible;
+    display: table;
+}
+
 /******************/
 /* Add pub button */
 /******************/
@@ -31,8 +51,6 @@
     text-align: center;
     font-family: "Oswald";
     width: 100px;
-    margin-bottom: 40px;
-    margin-top: -50px;
 }
 
 #new_pub_modal_open_button {
@@ -49,4 +67,103 @@
 
 #new_pub_modal_open_button > i {
     pointer-events: none;
+}
+
+/***************************/
+/* Guindex Table Container */
+/***************************/
+#guindex_table_container
+{
+    text-align:center;
+    margin: 20px auto;
+    display: table;
+}
+
+/**************/
+/* Search bar */
+/**************/
+
+.search_container {
+    width: 50%;
+    overflow: hidden;
+    position: relative;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.search_bar {
+    width: 95%;
+}
+
+.search_icon {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+}
+
+/*****************/
+/* Guindex Table */
+/*****************/
+#guindex_table {
+    position: relative;
+    width: 99.2%;
+    left: 5px;
+    margin: 42px 0;
+    border: 2px solid black;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    border-collapse: collapse;
+    display: table;
+    table-layout: fixed;
+} 
+
+#guindex_table tr {
+    border-bottom: 1px solid black;
+}
+
+#guindex_table td {
+    font-family: "Oswald";
+    font-size: 16px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 5px;
+}    
+
+#guindex_table i {
+    font-size: 20px;
+}
+
+.first_row > td > .sortable_column:hover {
+    cursor: hand;
+    cursor: pointer;
+}
+
+/*****************************/
+/* Add Guinness price button */
+/*****************************/
+.guinness_price {
+    display: block;
+}
+
+.new_guinness_button:hover {
+    cursor: hand;
+    cursor: pointer;
+}
+
+/*******************/
+/* Edit Pub Button */
+/*******************/
+.pub_name {
+    display: block;
+}
+
+.edit_button_container {
+}
+
+.rename_pub_button_container, .delete_pub_button_container {
+    display: inline-block;
+}
+
+.rename_pub_button:hover, .delete_pub_button:hover {
+    cursor: hand;
+    cursor: pointer;
 }

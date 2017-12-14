@@ -77,13 +77,91 @@ class NewPubForm(ModelForm):
             raise
 
 
+class RenamePubForm(ModelForm):
+
+    pub = forms.CharField(label = "", widget = forms.HiddenInput())
+
+    class Meta:
+        model = Pub
+        fields = ['name']
+
+    def __init__(self, *args, **kwargs):
+
+        logger.debug("RenamePubForm constructor called")
+
+        # RenamePubForm has user as member variable
+        self.userProfile = kwargs.pop('userProfile', None)
+        self.pub         = kwargs.pop('pub', None)
+
+        # Access base class constructor
+        super(RenamePubForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        """
+            Note that if a required field is blank in form,
+            it will be not be found in cleaned_data.
+            If it is not required an empty stirng will be placed
+            in cleaned_data.
+            Some browsers won't let us get this far!
+        """
+
+        logger.debug("Cleaning data - %s", self.cleaned_data)
+
+        pub_id   = self.cleaned_data.get('pub')
+        new_name = self.cleaned_data.get('name')
+
+        try:
+            pub_id = int(pub_id)
+        except:
+            logger.error("Pub id %s is not an integer", pub_id)
+            msg = "Pub id %s is invalid" % pub_id
+            self.add_error('pub', msg)
+            return self.cleaned_data
+
+        try:
+            pub = Pub.objects.get(id = pub_id)
+            self.pub = pub
+        except ObjectDoesNotExist:
+            logger.error("No pub with id %d exists", pub_id)
+            msg = "No pub with id %d exists" % pub_id
+            self.add_error('pub', msg)
+            return self.cleaned_data
+
+        try:
+            Pub.objects.get(name = new_name)
+            logger.error("Pub with name %s already exists. Can't use this name", new_name)
+            msg = "A pub already exists with this name."
+            self.add_error('name', msg)
+        except ObjectDoesNotExist:
+            logger.debug("Pub name %s has not been taken yet", new_name)
+
+        return self.cleaned_data
+
+    def save(self):
+
+        logger.info("Renaming pub using data - %s", self.cleaned_data)
+
+        self.pub.name = self.cleaned_data.get('name')
+
+        try:
+            self.pub.full_clean()
+        except:
+            logger.error("Pub object data could not be validated")
+            raise
+        try:
+            self.pub.save()
+        except:
+            logger.error("Pub object could not be saved")
+            raise
+
+
 class NewGuinnessForm(ModelForm):
 
     pub = forms.CharField(label = "", widget = forms.HiddenInput())
 
     class Meta:
         model = Guinness
-        fields = ['price', 'pub']
+        fields = ['price']
 
     def __init__(self, *args, **kwargs):
 
@@ -119,17 +197,12 @@ class NewGuinnessForm(ModelForm):
             return self.cleaned_data
 
         try:
-            Pub.objects.get(id = pub_id)
+            pub = Pub.objects.get(id = pub_id)
+            self.pub = pub
         except ObjectDoesNotExist:
             logger.error("No pub with id %d exists", pub_id)
             msg = "No pub with id %d exists" % pub_id
             self.add_error('pub', msg)
-            return self.cleaned_data
-
-        if not price.isnumeric():
-            logger.error("Price is not numeric")
-            msg = "Invalid price format"
-            self.add_error('price', msg)
             return self.cleaned_data
 
         return self.cleaned_data
