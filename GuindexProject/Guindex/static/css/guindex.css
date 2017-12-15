@@ -132,7 +132,7 @@
     font-size: 20px;
 }
 
-.first_row > td > .sortable_column:hover {
+.first_row > td > .sortable_column_header:hover {
     cursor: hand;
     cursor: pointer;
 }

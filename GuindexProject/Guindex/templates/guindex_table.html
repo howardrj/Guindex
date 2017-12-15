@@ -16,7 +16,7 @@
         </colgroup>
 
         <tr class="first_row">
-            <td> <span class="sortable_column_header"> PUB NAME &#9650; </span></td>
+            <td> <span class="sortable_column_header"> PUB NAME &#9660; </span></td>
             <td> <span class="sortable_column_header"> PRICE </span></td>
             <td> <span class="sortable_column_header"> CREATOR </span></td>
             <td> <span class="sortable_column_header timestamp_column"> DATE CREATED </span></td>
@@ -56,7 +56,7 @@
                         &euro;<span class="payload">{{ guinness.price }}</span>
                     </span>
                 {% empty %}
-                    TBD
+                    <span class="payload">TBD</span>
                 {% endfor %}
                 <div class="new_guinness_button_container">
                     <i class="fa fa-plus new_guinness_button needs_description"
@@ -67,11 +67,11 @@
                     </i>
                 </div>
             </td>
-            <td class="payload">
-                {{ pub.creator }}
+            <td>
+                <span class="payload">{{ pub.creator }}</span>
             </td>
-            <td class="payload">
-                {{ pub.creationDate|date:"D d M Y" }} {{ pub.creationDate|date:"H:i" }}
+            <td>
+                <span class="payload">{{ pub.creationDate|date:"D d M Y" }} {{ pub.creationDate|date:"H:i" }}</span>
             </td>
         </tr>
         {% endfor %}

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Pub(models.Model):
 
-    creator      = models.OneToOneField(UserProfile)
+    creator      = models.ForeignKey(UserProfile)
     creationDate = models.DateTimeField(auto_now_add = True)
     name         = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN, default = "")
 
@@ -44,10 +44,10 @@ class Pub(models.Model):
 
 class Guinness(models.Model):
 
-    creator      = models.OneToOneField(UserProfile)
+    creator      = models.ForeignKey(UserProfile)
     creationDate = models.DateTimeField(auto_now_add = True)
     price        = models.DecimalField(decimal_places = 2, max_digits = 6)
-    pub          = models.ForeignKey(Pub)
+    pub          = models.ForeignKey(Pub, unique = False)
 
     def __unicode__(self):
 
