@@ -49,14 +49,13 @@ def getPubs():
 
         pub_dict = {}
 
-        pub_dict['id']           = str(pub.id)
-        pub_dict['creator']      = pub.creator.user.username
-        pub_dict['creationDate'] = pub.creationDate
-        pub_dict['name']         = pub.name
-        pub_dict['guini']        = pub.getGuini()
-
-        if len(pub_dict['guini']): # TODO Fix this. Just take first Gunness object for now
-            pub_dict['guini'] = pub_dict['guini'][0:1]
+        pub_dict['id']             = str(pub.id)
+        pub_dict['creator']        = pub.creator.user.username
+        pub_dict['creationDate']   = pub.creationDate
+        pub_dict['name']           = pub.name
+        pub_dict['first_guinness'] = pub.getFirstVerifiedGuinness()
+        pub_dict['last_guinness']  = pub.getLastVerifiedGuinness()
+        pub_dict['map_link']       = pub.mapLink
 
         pub_list.append(pub_dict.copy())
 

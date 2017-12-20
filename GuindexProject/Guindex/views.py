@@ -120,7 +120,7 @@ def handleNewPubRequest(userProfile, postData):
         except:
             logger.error("Failed to save form")
             modal_to_display = "warning"
-            warning_text = "Failed to save new Pub object"
+            warning_text = "Failed to save new Pub object."
 
     else:
         logger.error("UserProfile %s: New pub form data was invalid", userProfile)

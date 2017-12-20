@@ -13,13 +13,16 @@ class Pub(models.Model):
 
     creator      = models.ForeignKey(UserProfile)
     creationDate = models.DateTimeField(auto_now_add = True)
-    name         = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN, default = "")
+    name         = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN, default = "", unique = True)
+    longitude    = models.DecimalField(decimal_places = 7, max_digits = 12, default = 0.0)
+    latitude     = models.DecimalField(decimal_places = 7, max_digits = 12, default = 0.0)
+    mapLink      = models.TextField(default = "")
 
     def __unicode__(self):
 
         return "'%s(%d)'" % (self.name, self.id)
 
-    def getGuini(self):
+    def getGuini(self, newestFirst):
         """
             Returns list of Guinness objects belonging to this pub
             sorted by creation date
@@ -39,7 +42,25 @@ class Pub(models.Model):
 
             guini_list.append(guin_dict.copy())
 
-        return sorted(guini_list, key = lambda k: k['creationDate'], reverse = False)
+        return sorted(guini_list, key = lambda k: k['creationDate'], reverse = newestFirst)
+
+    def getFirstVerifiedGuinness(self):
+        """
+            Return most recently verified Guinness object.
+        """
+
+        guini = self.getGuini(True)
+
+        return guini[0] if len(guini) else None
+
+    def getLastVerifiedGuinness(self):
+        """
+            Return most recently verified Guinness object.
+        """
+
+        guini = self.getGuini(False)
+
+        return guini[0] if len(guini) else None
 
 
 class Guinness(models.Model):
@@ -47,7 +68,7 @@ class Guinness(models.Model):
     creator      = models.ForeignKey(UserProfile)
     creationDate = models.DateTimeField(auto_now_add = True)
     price        = models.DecimalField(decimal_places = 2, max_digits = 6)
-    pub          = models.ForeignKey(Pub, unique = False)
+    pub          = models.ForeignKey(Pub)
 
     def __unicode__(self):
 

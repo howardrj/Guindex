@@ -7,26 +7,34 @@
         <input type="text" class="search_bar" id="pubs_search_bar" placeholder="Search Pubs..." autocomplete="off" maxlength="{{ guindex_parameters.MAX_PUB_NAME_LEN }}"/>
     </div>
 
-    <table align="left" id="guindex_table"> 
+    <table align="left" id="guindex_table" class="guindex_table"> 
         <colgroup>
-            <col style="width:20%">
-            <col style="width:40%">
-            <col style="width:20%">
-            <col style="width:20%">
+            <col style="width:30%">
+            <col style="width:14%">
+            <col style="width:14%">
+            <col style="width:14%">
+            <col style="width:14%">
+            <col style="width:14%">
         </colgroup>
 
         <tr class="first_row">
             <td> <span class="sortable_column_header"> PUB NAME &#9660; </span></td>
             <td> <span class="sortable_column_header"> PRICE </span></td>
-            <td> <span class="sortable_column_header"> CREATOR </span></td>
-            <td> <span class="sortable_column_header timestamp_column"> DATE CREATED </span></td>
+            <td> <span class="sortable_column_header"> FIRST ADDED BY </span></td>
+            <td> <span class="sortable_column_header timestamp_column"> FIRST ADDED DATE </span></td>
+            <td> <span class="sortable_column_header"> LAST VERIFIED BY </span></td>
+            <td> <span class="sortable_column_header timestamp_column"> LAST VERIFIED DATE </span></td>
         </tr>
 
         {% for pub in pubs %} 
         <tr>
+
+            <!-- PUB NAME CELL -->
             <td>
                 <span class="pub_name">
-                    <span class="payload">{{ pub.name }}</span>
+                    <a href="{{ pub.mapLink }}" target="_blank" class="pub_link">
+                        <span class="payload">{{ pub.name }}</span>
+                    </a>
                 </span>
                 <div class="edit_button_container">
                 
@@ -50,14 +58,16 @@
 
                 </div>
             </td>
+
+            <!-- CURRENT PRICE CELL -->
             <td>
-                {% for guinness in pub.guini %}
-                    <span class="guinness_price">
-                        &euro;<span class="payload">{{ guinness.price }}</span>
-                    </span>
-                {% empty %}
-                    <span class="payload">TBD</span>
-                {% endfor %}
+                <span class="guinness_price">
+                    {% if pub.last_guinness %}
+                        &euro;<span class="payload">{{ pub.last_guinness.price }}</span>
+                    {% else %}
+                        <span class="payload"> TBD </span>
+                    {% endif %}
+                </span>
                 <div class="new_guinness_button_container">
                     <i class="fa fa-plus new_guinness_button needs_description"
                        data-description_text="Add new Guinness price for this pub"
@@ -67,11 +77,41 @@
                     </i>
                 </div>
             </td>
+
+            <!-- FIRST ADDED BY CELL -->
             <td>
-                <span class="payload">{{ pub.creator }}</span>
+                {% if pub.first_guinness %}
+                    <span class="payload" class="needs_description" data-description_text="First added with a price of &euro {{ pub.first_guinness.creator }}.">{{ pub.first_guinness.creator }}</span>
+                {% else %}
+                    <span class="payload"> TBD </span>
+                {% endif %}
             </td>
+
+            <!-- FIRST ADDED DATE CELL -->
             <td>
-                <span class="payload">{{ pub.creationDate|date:"D d M Y" }} {{ pub.creationDate|date:"H:i" }}</span>
+                {% if pub.first_guinness %}
+                    <span class="payload">{{ pub.first_guinness.creationDate|date:"D d M Y" }}</span>
+                {% else %}
+                    <span class="payload"> TBD </span>
+                {% endif %}
+            </td>
+
+            <!-- LAST VERIFIED BY CELL -->
+            <td>
+                {% if pub.last_guinness %}
+                    <span class="payload">{{ pub.last_guinness.creator }}</span>
+                {% else %}
+                    <span class="payload"> TBD </span>
+                {% endif %}
+            </td>
+
+            <!-- LAST VERIFIED DATE CELL -->
+            <td>
+                {% if pub.last_guinness %}
+                    <span class="payload">{{ pub.last_guinness.creationDate|date:"D d M Y" }}</span>
+                {% else %}
+                    <span class="payload"> TBD </span>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
@@ -81,7 +121,7 @@
         {% else %}
         <tr id="guindex_table_last_row" class="last_row">
         {% endif %}
-            <td colspan="4" align="center"> No Pubs </td>
+            <td colspan="6" align="center"> No Pubs </td>
         </tr>
     </table>
 

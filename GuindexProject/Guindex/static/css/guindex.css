@@ -137,6 +137,10 @@
     cursor: pointer;
 }
 
+td {
+    overflow: scroll;
+}
+
 /*****************************/
 /* Add Guinness price button */
 /*****************************/
@@ -166,4 +170,12 @@
 .rename_pub_button:hover, .delete_pub_button:hover {
     cursor: hand;
     cursor: pointer;
+}
+
+/************/
+/* Pub Link */
+/************/
+.pub_link {
+    text-decoration: none;
+    color: inherit;
 }

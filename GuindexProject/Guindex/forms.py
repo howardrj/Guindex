@@ -13,7 +13,7 @@ class NewPubForm(ModelForm):
 
     class Meta:
         model = Pub
-        fields = ['name']
+        fields = ['name', 'latitude', 'longitude']
 
     def __init__(self, *args, **kwargs):
 
@@ -29,7 +29,7 @@ class NewPubForm(ModelForm):
         """
             Note that if a required field is blank in form,
             it will be not be found in cleaned_data.
-            If it is not required an empty stirng will be placed
+            If it is not required an empty string will be placed
             in cleaned_data.
             Some browsers won't let us get this far!
         """
@@ -37,9 +37,26 @@ class NewPubForm(ModelForm):
         logger.debug("Cleaning data - %s", self.cleaned_data)
 
         pub_name = self.cleaned_data.get('name')
+        latitude = self.cleaned_data.get('latitude')
+        latitude = self.cleaned_data.get('longitude')
 
-        if not pub_name:
-            logger.debug("No pub name was provided in form")
+        if not self.userProfile.is_staff:
+            logger.error("Only staff members can create a new pub")
+            msg = "Only staff members can create a new pub"
+            self.add_error('name', msg)
+            return self.cleaned_data
+
+        if not pub_name or not latitude or not longitude:
+
+            if not pub_name:
+                logger.debug("No pub name was provided in form")
+
+            if not latitude:
+                logger.debug("No latitude was provided in form")
+
+            if not longitude:
+                logger.debug("No longitude was provided in form")
+
             return self.cleaned_data
 
         try:
@@ -54,6 +71,18 @@ class NewPubForm(ModelForm):
         except ObjectDoesNotExist:
             logger.info("No pub with the name %s exists yet. Creating a new pub object", pub_name)
 
+        if not (latitude >= -90 and latitude <= 90):
+            logger.error("Latitude %f not in range", latitude)
+
+            msg = "Latitude must be in range %d - %d" % (-90, 90)
+            self.add_error('latitude', msg)
+
+        if not (longitude >= -180 and longitude <= 180):
+            logger.error("Longitude %f not in range", longitude)
+
+            msg = "Latitude must be in range %d - %d" % (-180, 180)
+            self.add_error('longitude', msg)
+
         return self.cleaned_data
 
     def save(self):
@@ -62,14 +91,18 @@ class NewPubForm(ModelForm):
 
         pub = Pub()
 
-        pub.name = self.cleaned_data.get('name')
-        pub.creator = self.userProfile
+        pub.creator   = self.userProfile
+        pub.name      = self.cleaned_data.get('name')
+        pub.latitude  = self.cleaned_data.get('latitude')
+        pub.longitude = self.cleaned_data.get('longitude')
+        pub.mapLink   = "https://www.google.ie/maps/@%f,%f" % (pub.latitude, pub.longitude)
 
         try:
             pub.full_clean()
         except:
             logger.error("Pub object data could not be validated")
             raise
+
         try:
             pub.save()
         except:
@@ -100,7 +133,7 @@ class RenamePubForm(ModelForm):
         """
             Note that if a required field is blank in form,
             it will be not be found in cleaned_data.
-            If it is not required an empty stirng will be placed
+            If it is not required an empty string will be placed
             in cleaned_data.
             Some browsers won't let us get this far!
         """
@@ -109,6 +142,12 @@ class RenamePubForm(ModelForm):
 
         pub_id   = self.cleaned_data.get('pub')
         new_name = self.cleaned_data.get('name')
+
+        if not self.userProfile.is_staff:
+            logger.error("Only staff members can rename a pub")
+            msg = "Only staff members can rename a pub"
+            self.add_error('name', msg)
+            return self.cleaned_data
 
         try:
             pub_id = int(pub_id)
@@ -148,6 +187,7 @@ class RenamePubForm(ModelForm):
         except:
             logger.error("Pub object data could not be validated")
             raise
+
         try:
             self.pub.save()
         except:
@@ -178,7 +218,7 @@ class NewGuinnessForm(ModelForm):
         """
             Note that if a required field is blank in form,
             it will be not be found in cleaned_data.
-            If it is not required an empty stirng will be placed
+            If it is not required an empty string will be placed
             in cleaned_data.
             Some browsers won't let us get this far!
         """
@@ -222,6 +262,7 @@ class NewGuinnessForm(ModelForm):
         except:
             logger.error("Guinness object data could not be validated")
             raise
+
         try:
             guinness.save()
         except:
