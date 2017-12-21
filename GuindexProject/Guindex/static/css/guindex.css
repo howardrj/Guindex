@@ -33,7 +33,7 @@
 #centered_content_div {
     width: 85%;
     margin: 0 auto;
-    max-width: 1250px;
+    max-width: 1200px;
     min-width: 800px; 
     overflow: visible;
     display: table;
@@ -138,7 +138,7 @@
 }
 
 td {
-    overflow: scroll;
+    overflow: auto;
 }
 
 /*****************************/
@@ -178,4 +178,36 @@ td {
 .pub_link {
     text-decoration: none;
     color: inherit;
+}
+
+/******************/
+/* Controls Table */
+/******************/
+
+#controls_container {
+    position:relative;
+    display:block;
+    margin: 20px auto;
+    text-align: center;
+    overflow: visible;
+    box-sizing: border-box;
+    z-index: 5;
+    font-family: "Oswald";
+}
+
+#controls_container a {
+    width: 120px;
+}
+
+/******************************************************/
+/* Container of tab content displayed by control tabs */
+/******************************************************/
+
+#tab_content_container {
+    position:relative;
+    display: block;
+    width: calc(100%);
+    margin: 0 auto;
+    box-sizing: border-box;
+    overflow:auto;
 }

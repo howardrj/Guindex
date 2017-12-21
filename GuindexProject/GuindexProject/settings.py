@@ -28,7 +28,7 @@ DEBUG = True
 # Enable timezone support
 USE_TZ = True
 
-ALLOWED_HOSTS = ['45.79.148.4', 'guindex.com', '127.0.0.1', '172.28.5.22']
+ALLOWED_HOSTS = ['45.79.148.4', 'guindex.ie', 'www.guindex.ie', '127.0.0.1', '172.28.5.22']
 
 # Application definition
 

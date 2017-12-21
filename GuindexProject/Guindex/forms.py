@@ -40,7 +40,7 @@ class NewPubForm(ModelForm):
         latitude = self.cleaned_data.get('latitude')
         latitude = self.cleaned_data.get('longitude')
 
-        if not self.userProfile.is_staff:
+        if not self.userProfile.user.is_staff:
             logger.error("Only staff members can create a new pub")
             msg = "Only staff members can create a new pub"
             self.add_error('name', msg)
@@ -143,7 +143,7 @@ class RenamePubForm(ModelForm):
         pub_id   = self.cleaned_data.get('pub')
         new_name = self.cleaned_data.get('name')
 
-        if not self.userProfile.is_staff:
+        if not self.userProfile.user.is_staff:
             logger.error("Only staff members can rename a pub")
             msg = "Only staff members can rename a pub"
             self.add_error('name', msg)

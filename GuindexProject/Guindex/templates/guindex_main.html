@@ -27,6 +27,8 @@
 
         <h1 id="guindex_header"> {{ user_profile_parameters.PROJECT_TITLE }} </h1>
 
+        {% include "guindex_controls.html" %}
+
         <div id="corner_info">
             <a href="/logout/" id="logout_link">
                 <i class="fa fa-sign-out needs_description" aria-hidden="true" data-description_text="Logout"></i>
@@ -45,16 +47,12 @@
 
         <div id="centered_content_div">
 
-            <div id="add_new_pub_div">
-                <a id="new_pub_modal_open_button" data-description_text="Add a new pub" class="modal_open_button needs_description"> 
-                    <i class="fa fa-plus" aria-hidden="true"></i>
-                </a>
-                Add New Pub
+            <div id="tab_content_container">
+                {% include "guindex_table.html" %}
+                {% include "guindex_stats.html" %}
+                {% include "user_contributions.html" %}
+                {% include "user_settings.html" %}
             </div>
-
-            <!-- Table goes here -->
-
-            {% include "guindex_table.html" %}
 
         </div>
         

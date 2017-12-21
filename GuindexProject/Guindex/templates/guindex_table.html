@@ -1,128 +1,137 @@
-<div id="guindex_table_container">
-
-    <div class="search_container">
-        <div class="search_icon">
-            <i class="fa fa-search search"></i>
-        </div>
-        <input type="text" class="search_bar" id="pubs_search_bar" placeholder="Search Pubs..." autocomplete="off" maxlength="{{ guindex_parameters.MAX_PUB_NAME_LEN }}"/>
+<div id="guindex_table_content" class="tabcontent" style="display:block">
+    <div id="add_new_pub_div">
+        <a id="new_pub_modal_open_button" data-description_text="Add a new pub" class="modal_open_button needs_description"> 
+            <i class="fa fa-plus" aria-hidden="true"></i>
+        </a>
+        Add New Pub
     </div>
 
-    <table align="left" id="guindex_table" class="guindex_table"> 
-        <colgroup>
-            <col style="width:30%">
-            <col style="width:14%">
-            <col style="width:14%">
-            <col style="width:14%">
-            <col style="width:14%">
-            <col style="width:14%">
-        </colgroup>
+    <div id="guindex_table_container">
 
-        <tr class="first_row">
-            <td> <span class="sortable_column_header"> PUB NAME &#9660; </span></td>
-            <td> <span class="sortable_column_header"> PRICE </span></td>
-            <td> <span class="sortable_column_header"> FIRST ADDED BY </span></td>
-            <td> <span class="sortable_column_header timestamp_column"> FIRST ADDED DATE </span></td>
-            <td> <span class="sortable_column_header"> LAST VERIFIED BY </span></td>
-            <td> <span class="sortable_column_header timestamp_column"> LAST VERIFIED DATE </span></td>
-        </tr>
+        <div class="search_container">
+            <div class="search_icon">
+                <i class="fa fa-search search"></i>
+            </div>
+            <input type="text" class="search_bar" id="pubs_search_bar" placeholder="Search Pubs..." autocomplete="off" maxlength="{{ guindex_parameters.MAX_PUB_NAME_LEN }}"/>
+        </div>
 
-        {% for pub in pubs %} 
-        <tr>
+        <table align="left" id="guindex_table" class="guindex_table"> 
+            <colgroup>
+                <col style="width:20%">
+                <col style="width:16%">
+                <col style="width:16%">
+                <col style="width:16%">
+                <col style="width:16%">
+                <col style="width:16%">
+            </colgroup>
 
-            <!-- PUB NAME CELL -->
-            <td>
-                <span class="pub_name">
-                    <a href="{{ pub.mapLink }}" target="_blank" class="pub_link">
-                        <span class="payload">{{ pub.name }}</span>
-                    </a>
-                </span>
-                <div class="edit_button_container">
-                
-                    <div class="rename_pub_button_container">
-                        <i class="fa fa-pencil-square-o rename_pub_button needs_description"
-                           data-description_text="Rename pub"
+            <tr class="first_row">
+                <td> <span class="sortable_column_header"> PUB NAME &#9660; </span></td>
+                <td> <span class="sortable_column_header"> PRICE </span></td>
+                <td> <span class="sortable_column_header"> FIRST ADDED BY </span></td>
+                <td> <span class="sortable_column_header timestamp_column"> FIRST ADDED DATE </span></td>
+                <td> <span class="sortable_column_header"> LAST VERIFIED BY </span></td>
+                <td> <span class="sortable_column_header timestamp_column"> LAST VERIFIED DATE </span></td>
+            </tr>
+
+            {% for pub in pubs %} 
+            <tr>
+
+                <!-- PUB NAME CELL -->
+                <td>
+                    <span class="pub_name">
+                        <a href="{{ pub.mapLink }}" target="_blank" class="pub_link">
+                            <span class="payload">{{ pub.name }}</span>
+                        </a>
+                    </span>
+                    <div class="edit_button_container">
+                    
+                        <div class="rename_pub_button_container">
+                            <i class="fa fa-pencil-square-o rename_pub_button needs_description"
+                               data-description_text="Rename pub"
+                               data-pub_id="{{ pub.id }}"
+                               data-pub_name="{{ pub.name}}"
+                               aria-hidden="true">
+                            </i>
+                        </div>
+
+                        <div class="delete_pub_button_container">
+                            <i class="fa fa-trash-o delete_pub_button needs_description"
+                               data-description_text="Delete pub"
+                               data-pub_id="{{ pub.id }}"
+                               data-pub_name="{{ pub.name}}"
+                               aria-hidden="true">
+                            </i>
+                        </div>
+
+                    </div>
+                </td>
+
+                <!-- CURRENT PRICE CELL -->
+                <td>
+                    <span class="guinness_price">
+                        {% if pub.last_guinness %}
+                            &euro;<span class="payload">{{ pub.last_guinness.price }}</span>
+                        {% else %}
+                            <span class="payload"> TBD </span>
+                        {% endif %}
+                    </span>
+                    <div class="new_guinness_button_container">
+                        <i class="fa fa-plus new_guinness_button needs_description"
+                           data-description_text="Add new Guinness price for this pub"
                            data-pub_id="{{ pub.id }}"
                            data-pub_name="{{ pub.name}}"
                            aria-hidden="true">
                         </i>
                     </div>
+                </td>
 
-                    <div class="delete_pub_button_container">
-                        <i class="fa fa-trash-o delete_pub_button needs_description"
-                           data-description_text="Delete pub"
-                           data-pub_id="{{ pub.id }}"
-                           data-pub_name="{{ pub.name}}"
-                           aria-hidden="true">
-                        </i>
-                    </div>
-
-                </div>
-            </td>
-
-            <!-- CURRENT PRICE CELL -->
-            <td>
-                <span class="guinness_price">
-                    {% if pub.last_guinness %}
-                        &euro;<span class="payload">{{ pub.last_guinness.price }}</span>
+                <!-- FIRST ADDED BY CELL -->
+                <td>
+                    {% if pub.first_guinness %}
+                        <span class="payload" class="needs_description" data-description_text="First added with a price of &euro {{ pub.first_guinness.creator }}.">{{ pub.first_guinness.creator }}</span>
                     {% else %}
                         <span class="payload"> TBD </span>
                     {% endif %}
-                </span>
-                <div class="new_guinness_button_container">
-                    <i class="fa fa-plus new_guinness_button needs_description"
-                       data-description_text="Add new Guinness price for this pub"
-                       data-pub_id="{{ pub.id }}"
-                       data-pub_name="{{ pub.name}}"
-                       aria-hidden="true">
-                    </i>
-                </div>
-            </td>
+                </td>
 
-            <!-- FIRST ADDED BY CELL -->
-            <td>
-                {% if pub.first_guinness %}
-                    <span class="payload" class="needs_description" data-description_text="First added with a price of &euro {{ pub.first_guinness.creator }}.">{{ pub.first_guinness.creator }}</span>
-                {% else %}
-                    <span class="payload"> TBD </span>
-                {% endif %}
-            </td>
+                <!-- FIRST ADDED DATE CELL -->
+                <td>
+                    {% if pub.first_guinness %}
+                        <span class="payload">{{ pub.first_guinness.creationDate|date:"D d M Y" }}</span>
+                    {% else %}
+                        <span class="payload"> TBD </span>
+                    {% endif %}
+                </td>
 
-            <!-- FIRST ADDED DATE CELL -->
-            <td>
-                {% if pub.first_guinness %}
-                    <span class="payload">{{ pub.first_guinness.creationDate|date:"D d M Y" }}</span>
-                {% else %}
-                    <span class="payload"> TBD </span>
-                {% endif %}
-            </td>
+                <!-- LAST VERIFIED BY CELL -->
+                <td>
+                    {% if pub.last_guinness %}
+                        <span class="payload">{{ pub.last_guinness.creator }}</span>
+                    {% else %}
+                        <span class="payload"> TBD </span>
+                    {% endif %}
+                </td>
 
-            <!-- LAST VERIFIED BY CELL -->
-            <td>
-                {% if pub.last_guinness %}
-                    <span class="payload">{{ pub.last_guinness.creator }}</span>
-                {% else %}
-                    <span class="payload"> TBD </span>
-                {% endif %}
-            </td>
+                <!-- LAST VERIFIED DATE CELL -->
+                <td>
+                    {% if pub.last_guinness %}
+                        <span class="payload">{{ pub.last_guinness.creationDate|date:"D d M Y" }}</span>
+                    {% else %}
+                        <span class="payload"> TBD </span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
 
-            <!-- LAST VERIFIED DATE CELL -->
-            <td>
-                {% if pub.last_guinness %}
-                    <span class="payload">{{ pub.last_guinness.creationDate|date:"D d M Y" }}</span>
-                {% else %}
-                    <span class="payload"> TBD </span>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
+            {% if pubs|length > 0 %}
+            <tr id="guindex_table_last_row" style="display:none" class="last_row">
+            {% else %}
+            <tr id="guindex_table_last_row" class="last_row">
+            {% endif %}
+                <td colspan="6" align="center"> No Pubs </td>
+            </tr>
+        </table>
 
-        {% if pubs|length > 0 %}
-        <tr id="guindex_table_last_row" style="display:none" class="last_row">
-        {% else %}
-        <tr id="guindex_table_last_row" class="last_row">
-        {% endif %}
-            <td colspan="6" align="center"> No Pubs </td>
-        </tr>
-    </table>
-
+    </div>
 </div>
