@@ -1,4 +1,5 @@
 import logging
+from decimal import *
 
 from django import forms
 from django.forms import ModelForm
@@ -36,9 +37,9 @@ class NewPubForm(ModelForm):
 
         logger.debug("Cleaning data - %s", self.cleaned_data)
 
-        pub_name = self.cleaned_data.get('name')
-        latitude = self.cleaned_data.get('latitude')
-        latitude = self.cleaned_data.get('longitude')
+        pub_name  = self.cleaned_data.get('name')
+        latitude  = self.cleaned_data.get('latitude')
+        longitude = self.cleaned_data.get('longitude')
 
         if not self.userProfile.user.is_staff:
             logger.error("Only staff members can create a new pub")
@@ -51,11 +52,20 @@ class NewPubForm(ModelForm):
             if not pub_name:
                 logger.debug("No pub name was provided in form")
 
+                msg = "Valid pub name required"
+                self.add_error('name', msg)
+
             if not latitude:
                 logger.debug("No latitude was provided in form")
 
+                msg = "Valid latitude required"
+                self.add_error('latitude', msg)
+
             if not longitude:
                 logger.debug("No longitude was provided in form")
+                
+                msg = "Valid longitude required"
+                self.add_error('longitude', msg)
 
             return self.cleaned_data
 
@@ -71,16 +81,18 @@ class NewPubForm(ModelForm):
         except ObjectDoesNotExist:
             logger.info("No pub with the name %s exists yet. Creating a new pub object", pub_name)
 
-        if not (latitude >= -90 and latitude <= 90):
+        print("Latitude = %s" % latitude)
+
+        if latitude < Decimal(-90) or latitude > Decimal(90):
             logger.error("Latitude %f not in range", latitude)
 
-            msg = "Latitude must be in range %d - %d" % (-90, 90)
+            msg = "Latitude must be in range %d:%d" % (-90, 90)
             self.add_error('latitude', msg)
 
-        if not (longitude >= -180 and longitude <= 180):
+        if longitude < Decimal(-180) or longitude > Decimal(180):
             logger.error("Longitude %f not in range", longitude)
 
-            msg = "Latitude must be in range %d - %d" % (-180, 180)
+            msg = "Latitude must be in range %d:%d" % (-180, 180)
             self.add_error('longitude', msg)
 
         return self.cleaned_data
@@ -226,7 +238,6 @@ class NewGuinnessForm(ModelForm):
         logger.debug("Cleaning data - %s", self.cleaned_data)
 
         pub_id = self.cleaned_data.get('pub')
-        price  = self.cleaned_data.get('price')
 
         try:
             pub_id = int(pub_id)

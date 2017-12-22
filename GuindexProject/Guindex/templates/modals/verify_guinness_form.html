@@ -1,0 +1,31 @@
+{% if modal_to_display == "verify_guinness_form" %}
+<div id="verify_guinness_modal" class="modal" style="display:block;">
+{% else %}
+<div id="verify_guinness_modal" class="modal" style="display:none;">
+{% endif %}
+    <div class="modal-content">
+        <form method="post" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="modal-header">
+                <span class="close modal_close_button">×</span>
+                <h2>Verify Price</h2>
+            </div>
+
+            <div class="modal-body">
+                
+                <p> You are about to verify the price of &euro;<span id="guinness_price" style="font-weight: 900"></span> for <span id="pub_name" style="font-weight: 900"></span>.
+                <p> Click to confirm. </p>
+
+                <input type="hidden" name="pub_id" id="pub_id" value=""/ style="display: none">
+              
+            </div>
+            <div class="modal-footer">
+
+                <div class="loader" id="verify_guinness_price_button_loader"> </div>
+                <input type="submit" value="Confirm" name="verify_guinness" id="verify_guinness_price_button" class="button_with_loader">
+            </div>
+        </form>
+    </div>
+</div>

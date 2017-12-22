@@ -19,6 +19,7 @@
         <script type="text/javascript" src="{% static "javascript/add_guinness.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/rename_pub.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/delete_pub.js" %}" defer></script>
+        <script type="text/javascript" src="{% static "javascript/verify_guinness.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/search.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/sorting.js" %}" defer></script>
     </head>
@@ -40,6 +41,7 @@
         {% include "new_guinness_form.html" %}
         {% include "rename_pub_form.html" %}
         {% include "delete_pub_form.html" %}
+        {% include "verify_guinness_form.html" %}
 
         {% if modal_to_display == "warning" %}
             {% include "warning.html" %}

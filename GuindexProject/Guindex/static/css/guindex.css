@@ -163,11 +163,11 @@ td {
 .edit_button_container {
 }
 
-.rename_pub_button_container, .delete_pub_button_container {
+.guindex_button_container {
     display: inline-block;
 }
 
-.rename_pub_button:hover, .delete_pub_button:hover {
+.guindex_button_container:hover {
     cursor: hand;
     cursor: pointer;
 }

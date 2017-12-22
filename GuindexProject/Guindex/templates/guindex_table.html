@@ -40,13 +40,13 @@
                 <!-- PUB NAME CELL -->
                 <td>
                     <span class="pub_name">
-                        <a href="{{ pub.mapLink }}" target="_blank" class="pub_link">
+                        <a href="{{ pub.map_link }}" target="_blank" class="pub_link">
                             <span class="payload">{{ pub.name }}</span>
                         </a>
                     </span>
                     <div class="edit_button_container">
                     
-                        <div class="rename_pub_button_container">
+                        <div class="guindex_button_container">
                             <i class="fa fa-pencil-square-o rename_pub_button needs_description"
                                data-description_text="Rename pub"
                                data-pub_id="{{ pub.id }}"
@@ -55,7 +55,7 @@
                             </i>
                         </div>
 
-                        <div class="delete_pub_button_container">
+                        <div class="guindex_button_container">
                             <i class="fa fa-trash-o delete_pub_button needs_description"
                                data-description_text="Delete pub"
                                data-pub_id="{{ pub.id }}"
@@ -76,13 +76,29 @@
                             <span class="payload"> TBD </span>
                         {% endif %}
                     </span>
-                    <div class="new_guinness_button_container">
-                        <i class="fa fa-plus new_guinness_button needs_description"
-                           data-description_text="Add new Guinness price for this pub"
-                           data-pub_id="{{ pub.id }}"
-                           data-pub_name="{{ pub.name}}"
-                           aria-hidden="true">
-                        </i>
+
+                    <div class="guinness_price_container">
+
+                        <div class="guindex_button_container">
+                            <i class="fa fa-plus new_guinness_button needs_description"
+                               data-description_text="Add new Guinness price for this pub"
+                               data-pub_id="{{ pub.id }}"
+                               data-pub_name="{{ pub.name}}"
+                               aria-hidden="true">
+                            </i>
+                        </div>
+
+                        {% if pub.last_guinness %}
+                        <div class="guindex_button_container">
+                            <i class="fa fa-check verify_guinness_button needs_description"
+                               data-description_text="Verify current price"
+                               data-pub_id="{{ pub.id }}"
+                               data-pub_name="{{ pub.name}}"
+                               data-pub_price="{{ pub.last_guinness.price }}"
+                               aria-hidden="true">
+                            </i>
+                        </div>
+                        {% endif %}
                     </div>
                 </td>
 
