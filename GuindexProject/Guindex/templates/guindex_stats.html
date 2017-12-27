@@ -1,3 +1,18 @@
 <div id="guindex_stats_content" class="tabcontent">
 
+    <table align="center" id="guindex_stats_table" class="guindex_table"> 
+        <colgroup>
+            <col style="width:50%">
+            <col style="width:50%">
+        </colgroup>
+
+        {% for stat in statistics %}
+        <tr>
+            <td> {{ stat.title }} </td>
+            <td> {{ stat.value }} </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
 </div>

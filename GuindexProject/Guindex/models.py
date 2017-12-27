@@ -1,9 +1,11 @@
 import logging
 
 from django.db import models
+from django.utils import timezone
 
 from GuindexParameters import GuindexParameters
 
+from UserProfile.UserProfilePlugin import UserProfilePlugin
 from UserProfile.models import UserProfile
 
 logger = logging.getLogger(__name__)
@@ -11,9 +13,7 @@ logger = logging.getLogger(__name__)
 
 class Pub(models.Model):
 
-    creator         = models.ForeignKey(UserProfile)
-    creationDate    = models.DateTimeField(auto_now_add = True)
-    name            = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN, default = "", unique = True)
+    name            = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN, default = "")
     longitude       = models.DecimalField(decimal_places = 7, max_digits = 12, default = 0.0)
     latitude        = models.DecimalField(decimal_places = 7, max_digits = 12, default = 0.0)
     mapLink         = models.TextField(default = "")
@@ -68,7 +68,7 @@ class Pub(models.Model):
 class Guinness(models.Model):
 
     creator      = models.ForeignKey(UserProfile)
-    creationDate = models.DateTimeField(auto_now_add = True)
+    creationDate = models.DateTimeField(default = timezone.now)
     price        = models.DecimalField(decimal_places = 2, max_digits = 6)
     pub          = models.ForeignKey(Pub)
 
@@ -105,18 +105,6 @@ class StatisticsSingleton(models.Model):
         obj, created = cls.objects.get_or_create(pk = 1)
         return obj
 
-
-class GuindexUser(models.Model):
-    """
-        Class to keep track of settings and user contributions.
-    """
-
-    userProfile          = models.OneToOneField(UserProfile) # Not really a plugin
-    emailAlerts          = models.BooleanField(default = False)
-    telegramAlerts       = models.BooleanField(default = False)
-    pubsVisited          = models.IntegerField(default = True)
-    originalPrices       = models.IntegerField(default = True)
-    currentVerifications = models.IntegerField(default = True)
 
 
 class UserContribution(models.Model):

@@ -103,7 +103,6 @@ class NewPubForm(ModelForm):
 
         pub = Pub()
 
-        pub.creator   = self.userProfile
         pub.name      = self.cleaned_data.get('name')
         pub.latitude  = self.cleaned_data.get('latitude')
         pub.longitude = self.cleaned_data.get('longitude')

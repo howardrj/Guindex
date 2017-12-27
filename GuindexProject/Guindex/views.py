@@ -1,7 +1,8 @@
 import logging
+import json
 
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -104,7 +105,10 @@ def guindex(request):
                     'new_guinness_form'      : new_guinness_form,
                     'username'               : user_profile.user.username,
                     'user_profile_parameters': user_profile_parameters,
-                    'guindex_parameters'     : guindex_parameters}
+                    'guindex_parameters'     : guindex_parameters,
+                    'using_email_alerts'     : user_profile.usingEmailAlerts,
+                    'using_telegram_alerts'  : user_profile.telegramuser.usingTelegramAlerts,
+                    }
 
     return render(request, 'guindex_main.html', context_dict)
 
@@ -349,3 +353,61 @@ def handleVerifyGuinnessRequest(userProfile, postData):
         return modal_to_display, warning_text
 
     return modal_to_display, warning_text
+
+
+@login_required
+def guindexAlertSettings(request):
+
+    logger.info("Received %s request to %s", request.method, request.get_full_path())
+
+    try:
+        user_profile = GuindexUtils.getUserProfileFromUser(request.user)
+        logger.debug("Found UserProfile %s with user '%s'", user_profile, request.user)
+    except:
+        logger.error("Could not retrieve UserProfile with user '%s'. Raising 404 exception", request.user)
+
+        error_message = "No UserProfile exists with user '%s'" % request.user
+
+        context_dict = {'user_profile_parameters': UserProfileParameters.getParameters(),
+                        'message'                : error_message}
+
+        return render(request, 'error_404.html', context_dict)
+
+    if request.method == "POST" and request.is_ajax():
+
+        try:
+            using_email = json.loads(request.body)['usingEmail']
+        except:
+            logger.error("Failed to load email setting")
+            raise Http404("Failed to load email setting")
+
+        try:
+            using_telegram = json.loads(request.body)['usingTelegram']
+        except:
+            logger.error("Failed to load telegram setting")
+            raise Http404("Failed to load telegram setting")
+
+        logger.debug("Apllying settings email: %s, telegram: %s", using_email, using_telegram)
+
+        user_profile.usingEmailAlerts = using_email
+
+        try:
+            user_profile.save()
+        except:
+            logger.error("Failed to save updated UserProfile")
+            raise Http404("Failed to save updated UserProfile")
+
+        user_profile.telegramuser.usingTelegramAlerts = using_telegram
+
+        try:
+            user_profile.telegramuser.save()
+        except:
+            logger.error("Failed to save updated TelegramUser")
+            raise Http404("Failed to save updated TelegramUser")
+
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    else:
+        logger.error("Received invalid request type")
+
+        return render(request, 'error_404.html', {'user_profile_parameters': UserProfileParameters.getParameters()})
