@@ -1,12 +1,14 @@
 import logging
 import time
+import math
+from decimal import Decimal
 
 from django.core.management.base import BaseCommand
 
-from Guindex.models import Pub, Guinness, StatisticsSingleton
+from Guindex.models import Pub, StatisticsSingleton
 from Guindex.GuindexParameters import GuindexParameters
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__.split('.')[-1])
 
 
 class Command(BaseCommand):
@@ -80,16 +82,97 @@ class Command(BaseCommand):
 
     def calculateNumberOfPubs(self, statsSingleton): 
 
+        statsSingleton.pubsInDb = len(Pub.objects.all())
+
+        logger.info("%d", statsSingleton.pubsInDb)
+
     def calculateCheapestPub(self, statsSingleton):
+             
+        cheapest_pub = None
+
+        for pub_index, pub in enumerate(Pub.objects.all()): 
+
+            if pub_index == 0:
+                cheapest_pub = pub
+
+            if not pub.getLastVerifiedGuinness():
+                continue
+            elif pub.getLastVerifiedGuinness()['price'] < cheapest_pub.getLastVerifiedGuinness()['price']:
+                cheapest_pub = pub
+
+        statsSingleton.cheapestPub = cheapest_pub
+
+        logger.info("%s", statsSingleton.cheapestPub)
 
     def calculateDearestPub(self, statsSingleton):
 
+        dearest_pub = None
+
+        for pub_index, pub in enumerate(Pub.objects.all()): 
+
+            if pub_index == 0:
+                dearest_pub = pub
+
+            if not pub.getLastVerifiedGuinness():
+                continue
+            elif pub.getLastVerifiedGuinness()['price'] > dearest_pub.getLastVerifiedGuinness()['price']:
+                dearest_pub = pub
+
+        statsSingleton.dearestPub = dearest_pub
+        
+        logger.info("%s", statsSingleton.dearestPub)
+
     def calculateAveragePrice(self, statsSingleton):
+
+        visited_pubs = 0
+        sum_total    = 0
+
+        for pub in Pub.objects.all(): 
+
+            if pub.getLastVerifiedGuinness():
+                visited_pubs = visited_pubs + 1
+                sum_total    = sum_total + pub.getLastVerifiedGuinness()['price']
+
+        statsSingleton.averagePrice = Decimal(sum_total / visited_pubs)
+
+        logger.info("%s", statsSingleton.averagePrice)
 
     def calculateStandardDeviation(self, statsSingleton):
 
+        variance_tmp = 0
+
+        for pub in Pub.objects.all(): 
+
+            if pub.getLastVerifiedGuinness():
+                variance_tmp = variance_tmp + math.pow((pub.getLastVerifiedGuinness()['price'] - statsSingleton.averagePrice), 2)
+
+        variance = Decimal(variance_tmp) / statsSingleton.averagePrice    
+
+        statsSingleton.standardDevation = variance.sqrt()
+
+        logger.info("%s", statsSingleton.standardDevation)
+
     def calculatePercentageVisited(self, statsSingleton):
+
+        visited_pubs = 0
+
+        for pub in Pub.objects.all(): 
+
+            if pub.getLastVerifiedGuinness() or not pub.servingGuinness:
+                visited_pubs = visited_pubs + 1
+
+        statsSingleton.percentageVisited = Decimal(visited_pubs) / statsSingleton.pubsInDb
+
+        logger.info("%s", statsSingleton.percentageVisited)
 
     def calculateClosedPubs(self, statsSingleton):
 
+        statsSingleton.closedPubs = len(Pub.objects.filter(closed = True))
+
+        logger.info("%d", statsSingleton.closedPubs)
+
     def calculateNotServingGuinness(self, statsSingleton):
+
+        statsSingleton.notServingGuinness = len(Pub.objects.filter(servingGuinness = False))
+
+        logger.info("%d", statsSingleton.notServingGuinness)

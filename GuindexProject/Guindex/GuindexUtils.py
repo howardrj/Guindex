@@ -91,7 +91,7 @@ def getStats():
     stats_list.append(stats_dict.copy())
 
     stats_dict['title'] = 'Average Price'
-    stats_dict['value'] = '€%.2f' % stats_singleton.averagePrice
+    stats_dict['value'] = u'€%.2f' % stats_singleton.averagePrice
 
     stats_list.append(stats_dict.copy())
 
@@ -99,7 +99,7 @@ def getStats():
     if not stats_singleton.cheapestPub:
         stats_dict['value'] = 'TBD'
     else:
-        stats_dict['value'] = '€%.2f (%s)' % (stats_singleton.cheapestPub.getLastVerifiedGuinness()['price'], stats_singleton.cheapestPub.name)
+        stats_dict['value'] = u'€%.2f (%s)' % (stats_singleton.cheapestPub.getLastVerifiedGuinness()['price'], stats_singleton.cheapestPub.name)
 
     stats_list.append(stats_dict.copy())
     
@@ -107,7 +107,7 @@ def getStats():
     if not stats_singleton.dearestPub:
         stats_dict['value'] = 'TBD'
     else:
-        stats_dict['value'] = '€%.2f (%s)' % (stats_singleton.dearestPub.getLastVerifiedGuinness()['price'], stats_singleton.dearestPub.name)
+        stats_dict['value'] = u'€%.2f (%s)' % (stats_singleton.dearestPub.getLastVerifiedGuinness()['price'], stats_singleton.dearestPub.name)
 
     stats_list.append(stats_dict.copy())
     
