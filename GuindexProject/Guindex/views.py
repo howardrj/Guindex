@@ -395,6 +395,10 @@ def guindexAlertSettings(request):
 
         user_profile.telegramuser.usingTelegramAlerts = using_telegram
 
+        if not user_profile.telegramuser.activated and using_telegram:
+            logger.error("Telegram account has not yet been activated. Can't set this alert option")
+            raise Http404("Telegram account has not been activated yet")
+
         try:
             user_profile.telegramuser.save()
         except:

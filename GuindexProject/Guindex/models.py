@@ -107,6 +107,25 @@ class StatisticsSingleton(models.Model):
         return obj
 
 
+class AlertsSingleton(models.Model):
+    """
+        This is a singleton class to store useful paramters for the alert script.
+    """
+
+    lastAlertCheck = models.DateTimeField(auto_now = True)
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(AlertsSingleton, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk = 1)
+        return obj
+
 
 class UserContribution(models.Model):
 
