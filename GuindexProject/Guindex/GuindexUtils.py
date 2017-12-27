@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from Guindex.models import Pub
+from Guindex.models import Pub, StatisticsSingleton
 
 from UserProfile.models import UserProfile
 
@@ -69,3 +70,61 @@ def getPubs():
             pub_list.append(pub_dict.copy())
 
     return sorted(pub_list, key = lambda k: k['name'], reverse = False)
+
+
+def getStats():
+
+    stats_singleton = StatisticsSingleton.load()
+
+    stats_list = []
+
+    stats_dict = {}
+
+    stats_dict['title'] = 'Number of Pubs in Database'
+    stats_dict['value'] = stats_singleton.pubsInDb 
+
+    stats_list.append(stats_dict.copy())
+
+    stats_dict['title'] = 'Percentage Visited'
+    stats_dict['value'] = '%.2f%%' % stats_singleton.percentageVisited
+
+    stats_list.append(stats_dict.copy())
+
+    stats_dict['title'] = 'Average Price'
+    stats_dict['value'] = '€%.2f' % stats_singleton.averagePrice
+
+    stats_list.append(stats_dict.copy())
+
+    stats_dict['title'] = 'Cheapest Pint'
+    if not stats_singleton.cheapestPub:
+        stats_dict['value'] = 'TBD'
+    else:
+        stats_dict['value'] = '€%.2f (%s)' % (stats_singleton.cheapestPub.getLastVerifiedGuinness()['price'], stats_singleton.cheapestPub.name)
+
+    stats_list.append(stats_dict.copy())
+    
+    stats_dict['title'] = 'Dearest Pint'
+    if not stats_singleton.dearestPub:
+        stats_dict['value'] = 'TBD'
+    else:
+        stats_dict['value'] = '€%.2f (%s)' % (stats_singleton.dearestPub.getLastVerifiedGuinness()['price'], stats_singleton.dearestPub.name)
+
+    stats_list.append(stats_dict.copy())
+    
+    stats_dict['title'] = 'Closed Pubs'
+    stats_dict['value'] = stats_singleton.closedPubs
+
+    stats_list.append(stats_dict.copy())
+
+    stats_dict['title'] = 'Not Serving Guinness'
+    stats_dict['value'] = stats_singleton.notServingGuinness
+
+    stats_list.append(stats_dict.copy())
+
+    stats_dict['title'] = 'Last Calculated'
+    stats_dict['value'] = stats_singleton.lastCalculated
+
+    stats_list.append(stats_dict.copy())
+
+    return stats_list
+

@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 from django.db import models
 from django.utils import timezone
@@ -83,15 +84,15 @@ class StatisticsSingleton(models.Model):
         Statistics are calculated in the background and wriiten to this singleton
     """
 
-    cheapestPub       = models.ForeignKey(Pub)
-    dearestPub        = models.ForeignKey(Pub)
-    averagePrice      = models.DecimalField(decimal_places = 2, max_digits = 6)
-    standardDevation  = models.DecimalField(decimal_places = 3, max_digits = 12)
-    percentageVisited = models.DecimalField(decimal_places = 2, max_digits = 5)
-    closedPubs        = models.IntegerField()
-
-    class Meta:
-        abstract = True
+    pubsInDb           = models.IntegerField(default = 0)
+    cheapestPub        = models.ForeignKey(Pub, null = True, related_name = 'cheapest_pub')
+    dearestPub         = models.ForeignKey(Pub, null = True, related_name = 'dearest_pub')
+    averagePrice       = models.DecimalField(decimal_places = 2, max_digits = 6,  default = Decimal('0.0'))
+    standardDevation   = models.DecimalField(decimal_places = 3, max_digits = 12, default = Decimal('0.0'))
+    percentageVisited  = models.DecimalField(decimal_places = 2, max_digits = 5,  default = Decimal('0.0'))
+    closedPubs         = models.IntegerField(default = 0)
+    notServingGuinness = models.IntegerField(default = 0)
+    lastCalculated     = models.DateTimeField(auto_now = True)
 
     def save(self, *args, **kwargs):
         self.pk = 1

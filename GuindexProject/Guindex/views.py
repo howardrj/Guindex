@@ -92,20 +92,16 @@ def guindex(request):
 
             return render(request, 'error_404.html', context_dict)
 
-    pubs = GuindexUtils.getPubs()
-
-    guindex_parameters      = GuindexParameters.getParameters()
-    user_profile_parameters = UserProfileParameters.getParameters()
-
-    context_dict = {'pubs'                   : pubs,
+    context_dict = {'pubs'                   : GuindexUtils.getPubs(),
+                    'stats'                  : GuindexUtils.getStats(),
                     'modal_to_display'       : modal_to_display,
                     'warning_text'           : warning_text,
                     'new_pub_form'           : new_pub_form,
                     'rename_pub_form'        : rename_pub_form,
                     'new_guinness_form'      : new_guinness_form,
                     'username'               : user_profile.user.username,
-                    'user_profile_parameters': user_profile_parameters,
-                    'guindex_parameters'     : guindex_parameters,
+                    'user_profile_parameters': UserProfileParameters.getParameters(),
+                    'guindex_parameters'     : GuindexParameters.getParameters(),
                     'using_email_alerts'     : user_profile.usingEmailAlerts,
                     'using_telegram_alerts'  : user_profile.telegramuser.usingTelegramAlerts,
                     }
