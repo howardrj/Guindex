@@ -75,6 +75,8 @@ def getPubs():
 
 def getStats():
 
+    logger.debug("Retrieving stats")
+
     stats_singleton = StatisticsSingleton.load()
 
     stats_list = []
@@ -127,9 +129,13 @@ def getStats():
 
     stats_list.append(stats_dict.copy())
 
+    logger.debug("Returning stats list - %s", stats_list)
+
     return stats_list
 
 def getPersonalContributions(userProfile):
+
+    logger.debug("Retrieving personal contributions")
 
     contribution_list = [] 
 
@@ -150,10 +156,14 @@ def getPersonalContributions(userProfile):
 
     contribution_list.append(contribution_dict.copy())
 
+    logger.debug("Returning contributions list - %s", contribution_list)
+
     return contribution_list
 
 
 def getBestContributions():
+
+    logger.debug("Retrieving best user contributions")
 
     user_contribution_singleton = UserContributionsSingleton.load()
 
@@ -192,5 +202,7 @@ def getBestContributions():
     contribution_dict['value'] = user_contribution_singleton.lastCalculated
 
     contribution_list.append(contribution_dict.copy())
+
+    logger.debug("Returning best contributions list - %s", contribution_list)
 
     return contribution_list
