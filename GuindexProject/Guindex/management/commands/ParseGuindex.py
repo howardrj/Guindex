@@ -139,7 +139,7 @@ class Command(BaseCommand):
                 except:
                     print("Failed to make decimal from price %s" % row[PRICE][3:])
 
-                    if row[PRICE]= "N.A."
+                    if row[PRICE] == "N.A.":
                         serving_guinness = False
                     else:
                         return

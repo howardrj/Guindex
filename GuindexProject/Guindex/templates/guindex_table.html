@@ -40,15 +40,46 @@
                 <!-- PUB NAME CELL -->
                 <td>
                     <span class="pub_name">
-                        <a href="{{ pub.map_link }}" target="_blank" class="pub_link">
+                      {% if pub.closed %}
+                        <a href="{{ pub.map_link }}" target="_blank" style="text-decoration:line-through" class="pub_link needs_description" data-description_text="Pub is closed">
+
                             <span class="payload">{{ pub.name }}</span>
                         </a>
+                        {% elif not pub.serving_guinness %}
+                        <a href="{{ pub.map_link }}" target="_blank" style="text-decoration:line-through" class="pub_link needs_description" data-description_text="Pub does not serve Guinness">
+                            <span class="payload" >{{ pub.name }}</span>
+                        </a>
+                        {% else %}
+                        <a href="{{ pub.map_link }}" target="_blank" class="pub_link">
+                                <span class="payload">{{ pub.name }}</span>
+                        </a>
+                        {% endif %}
+
                     </span>
                     <div class="edit_button_container">
                     
                         <div class="guindex_button_container">
                             <i class="fa fa-pencil-square-o rename_pub_button needs_description"
                                data-description_text="Rename pub"
+                               data-pub_id="{{ pub.id }}"
+                               data-pub_name="{{ pub.name}}"
+                               aria-hidden="true">
+                            </i>
+                        </div>
+
+                        <div class="guindex_button_container">
+                            <i class="fa fa-close close_pub_button needs_description"
+                               data-description_text="Mark pub as closed"
+                               data-pub_id="{{ pub.id }}"
+                               data-pub_name="{{ pub.name}}"
+                               aria-hidden="true">
+                            </i>
+                        </div>
+
+                        <div class="guindex_button_container">
+                            <i class="fa fa-thumbs-o-down not_serving_guinness_button needs_description"
+                               style="text-decoration: line-through"
+                               data-description_text="Mark pub as not serving guinness"
                                data-pub_id="{{ pub.id }}"
                                data-pub_name="{{ pub.name}}"
                                aria-hidden="true">

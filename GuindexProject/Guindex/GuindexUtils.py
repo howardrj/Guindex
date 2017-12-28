@@ -58,16 +58,17 @@ def getPubs():
 
     for pub in pubs:
 
-        if not pub.closed and pub.servingGuinness:
-            pub_dict = {}
+        pub_dict = {}
 
-            pub_dict['id']             = str(pub.id)
-            pub_dict['name']           = pub.name
-            pub_dict['first_guinness'] = pub.getFirstVerifiedGuinness()
-            pub_dict['last_guinness']  = pub.getLastVerifiedGuinness()
-            pub_dict['map_link']       = pub.mapLink
+        pub_dict['id']               = str(pub.id)
+        pub_dict['name']             = pub.name
+        pub_dict['first_guinness']   = pub.getFirstVerifiedGuinness()
+        pub_dict['last_guinness']    = pub.getLastVerifiedGuinness()
+        pub_dict['map_link']         = pub.mapLink
+        pub_dict['closed']           = pub.closed
+        pub_dict['serving_guinness'] = pub.servingGuinness
 
-            pub_list.append(pub_dict.copy())
+        pub_list.append(pub_dict.copy())
 
     return sorted(pub_list, key = lambda k: k['name'], reverse = False)
 
