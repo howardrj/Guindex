@@ -238,6 +238,12 @@ class NewGuinnessForm(ModelForm):
 
         pub_id = self.cleaned_data.get('pub')
 
+        if not self.userProfile.user.is_staff:
+            logger.error("Only staff members can add a new price")
+            msg = "Only staff members can add a new price"
+            self.add_error('price', msg)
+            return self.cleaned_data
+
         try:
             pub_id = int(pub_id)
         except:

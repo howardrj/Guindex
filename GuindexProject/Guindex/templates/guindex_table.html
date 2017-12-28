@@ -56,6 +56,7 @@
                         {% endif %}
 
                     </span>
+                    {% if not pub.closed and pub.serving_guinness %}
                     <div class="edit_button_container">
                     
                         <div class="guindex_button_container">
@@ -96,6 +97,7 @@
                         </div>
 
                     </div>
+                    {% endif %}
                 </td>
 
                 <!-- CURRENT PRICE CELL -->

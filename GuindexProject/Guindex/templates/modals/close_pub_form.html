@@ -1,0 +1,31 @@
+{% if modal_to_display == "close_pub_form" %}
+<div id="close_pub_modal" class="modal" style="display:block;">
+{% else %}
+<div id="close_pub_modal" class="modal" style="display:none;">
+{% endif %}
+    <div class="modal-content">
+        <form method="post" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="modal-header">
+                <span class="close modal_close_button">×</span>
+                <h2>Close Pub</h2>
+            </div>
+
+            <div class="modal-body">
+                
+                <p> You are about to mark the pub <span id="pub_name" style="font-weight: 900"></span> as closed.
+                <p> Click to confirm. </p>
+
+                <input type="hidden" name="pub_id" id="pub_id" value=""/ style="display: none">
+              
+            </div>
+            <div class="modal-footer">
+
+                <div class="loader" id="close_pub_confirm_button_loader"> </div>
+                <input type="submit" value="Confirm" name="close_pub" id="close_pub_confirm_button" class="button_with_loader">
+            </div>
+        </form>
+    </div>
+</div>

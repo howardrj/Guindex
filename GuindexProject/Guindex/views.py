@@ -85,6 +85,20 @@ def guindex(request):
             if not modal_to_display:
                 return HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
 
+        elif 'close_pub' in request.POST:
+        
+            modal_to_display, warning_text = handleClosePubRequest(user_profile, request.POST)
+
+            if not modal_to_display:
+                return HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
+            
+        elif 'not_serving_guinness' in request.POST: 
+
+            modal_to_display, warning_text = handleNotServingGuinnessRequest(user_profile, request.POST)
+
+            if not modal_to_display:
+                return HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
+
         else:
             logger.error("Received POST request to unknown resource")
 
@@ -320,6 +334,15 @@ def handleVerifyGuinnessRequest(userProfile, postData):
         warning_text = "Invalid pub ID."
 
         return modal_to_display, warning_text
+        
+    if userProfile.user.is_staff:
+        logger.debug("UserProfile is a staff member so price verification is allowed")
+    else:
+        logger.debug("UserProfile is not a staff member. Not deleting object")
+
+        modal_to_display = "warning"
+        warning_text = "This operation is only permitted for staff members."
+        return modal_to_display, warning_text
 
     last_verified_guinness = pub.getLastVerifiedGuinness()
 
@@ -349,6 +372,107 @@ def handleVerifyGuinnessRequest(userProfile, postData):
         warning_text = "Failed to verify."
         modal_to_display = "warning"
         return modal_to_display, warning_text
+
+    return modal_to_display, warning_text
+
+
+def handleClosePubRequest(userProfile, postData):
+
+    logger.info("Received close Pub request - %s", postData)
+
+    modal_to_display = ""
+    warning_text     = ""
+
+    try:
+        pub_id = postData.get("pub_id")
+    except:
+        logger.error("Could not get pub id")
+
+        modal_to_display = "warning"
+        warning_text = "Could not get pub ID in request."
+
+        return modal_to_display, warning_text
+
+    if not pub_id.isnumeric():
+        logger.error("Pub id is not a number %s", pub_id)
+
+        modal_to_display = "warning"
+        warning_text = "Invalid pub ID."
+
+        return modal_to_display, warning_text
+
+    try:
+        pub = Pub.objects.get(id = int(pub_id))
+        logger.debug("Found pub %s", pub)
+    except ObjectDoesNotExist:
+        logger.error("No pub exists with id %s", pub_id)
+
+        modal_to_display = "warning"
+        warning_text = "Invalid pub ID."
+
+        return modal_to_display, warning_text
+
+    if userProfile.user.is_staff:
+        logger.debug("UserProfile is a staff member so closing pub is allowed")
+    else:
+        logger.debug("UserProfile is not a staff member. Not closing pub")
+
+        modal_to_display = "warning"
+        warning_text = "This operation is only permitted for staff members."
+        return modal_to_display, warning_text
+
+    pub.closed = True
+    pub.save()
+
+    return modal_to_display, warning_text
+
+def handleNotServingGuinnessRequest(userProfile, postData):
+
+    logger.info("Received not serving Guinness request - %s", postData)
+
+    modal_to_display = ""
+    warning_text     = ""
+
+    try:
+        pub_id = postData.get("pub_id")
+    except:
+        logger.error("Could not get pub id")
+
+        modal_to_display = "warning"
+        warning_text = "Could not get pub ID in request."
+
+        return modal_to_display, warning_text
+
+    if not pub_id.isnumeric():
+        logger.error("Pub id is not a number %s", pub_id)
+
+        modal_to_display = "warning"
+        warning_text = "Invalid pub ID."
+
+        return modal_to_display, warning_text
+
+    try:
+        pub = Pub.objects.get(id = int(pub_id))
+        logger.debug("Found pub %s", pub)
+    except ObjectDoesNotExist:
+        logger.error("No pub exists with id %s", pub_id)
+
+        modal_to_display = "warning"
+        warning_text = "Invalid pub ID."
+
+        return modal_to_display, warning_text
+        
+    if userProfile.user.is_staff:
+        logger.debug("UserProfile is a staff member so marking pub as not serving Guinness is allowed")
+    else:
+        logger.debug("UserProfile is not a staff member. Not marking pub as not serving Guinness")
+
+        modal_to_display = "warning"
+        warning_text = "This operation is only permitted for staff members."
+        return modal_to_display, warning_text
+
+    pub.servingGuinness = False
+    pub.save()
 
     return modal_to_display, warning_text
 
