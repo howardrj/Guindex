@@ -94,6 +94,8 @@ def guindex(request):
 
     context_dict = {'pubs'                   : GuindexUtils.getPubs(),
                     'stats'                  : GuindexUtils.getStats(),
+                    'personal_contributions' : GuindexUtils.getPersonalContributions(user_profile),
+                    'best_contributions'     : GuindexUtils.getBestContributions(),
                     'modal_to_display'       : modal_to_display,
                     'warning_text'           : warning_text,
                     'new_pub_form'           : new_pub_form,

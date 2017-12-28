@@ -68,6 +68,7 @@ TEMPLATES = [
                  os.path.join(BASE_DIR, "TelegramUser/templates/emails"),
                  os.path.join(BASE_DIR, "Guindex/templates"),
                  os.path.join(BASE_DIR, "Guindex/templates/modals"),
+                 os.path.join(BASE_DIR, "Guindex/templates/emails"),
                  os.path.join(BASE_DIR, "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -199,6 +200,22 @@ LOGGING = {
             'backupCount': 10,
             'formatter': 'verbose'
         },
+        'GuindexUserContributionsLogFile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, "/var/log/GuindexUserContributions.log"),
+            'maxBytes': 1024 * 1024 * 10,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
+        'GuindexBotLogFile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, "/var/log/GuindexBot.log"),
+            'maxBytes': 1024 * 1024 * 10,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'UserProfile': {
@@ -223,6 +240,16 @@ LOGGING = {
         },
         'GuindexAlerts': {
             'handlers': ['GuindexAlertsLogFile'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
+        'GuindexUserContributions': {
+            'handlers': ['GuindexUserContributionsLogFile'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
+        'GuindexBot': {
+            'handlers': ['GuindexBotLogFile'],
             'propogate': True,
             'level': 'DEBUG',
         },

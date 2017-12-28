@@ -1,3 +1,42 @@
 <div id="user_contributions_content" class="tabcontent">
 
+    <table align="center" id="user_contributions_table" class="guindex_table"> 
+        <colgroup>
+            <col style="width:50%">
+            <col style="width:50%">
+        </colgroup>
+
+        <tr>
+            <td colspan="2" align="center" class="contributions_table_header"> Personal Contributions </td>
+        </tr>
+
+        {% for contribution in personal_contributions %}
+        <tr>
+            <td> {{ contribution.title }} </td>
+            <td> {{ contribution.value }} </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    <table align="center" id="best_contributions_table" class="guindex_table"> 
+        <colgroup>
+            <col style="width:50%">
+            <col style="width:50%">
+        </colgroup>
+
+        <tr>
+            <td colspan="2" align="center" class="contributions_table_header"> Best Contributors </td>
+        </tr>
+
+        {% for contribution in best_contributions %}
+
+        <tr>
+            <td> {{ contribution.title }} </td>
+            <td> {{ contribution.value }} </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
 </div>

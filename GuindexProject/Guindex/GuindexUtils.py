@@ -3,7 +3,7 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from Guindex.models import Pub, StatisticsSingleton
+from Guindex.models import Pub, StatisticsSingleton, UserContributionsSingleton
 
 from UserProfile.models import UserProfile
 
@@ -128,3 +128,54 @@ def getStats():
 
     return stats_list
 
+def getPersonalContributions(userProfile):
+
+    contribution_list = [] 
+
+    contribution_dict = {}
+
+    contribution_dict['title'] = 'Pubs Visited'
+    contribution_dict['value'] = userProfile.guindexuser.pubsVisited
+
+    contribution_list.append(contribution_dict.copy())
+    
+    contribution_dict['title'] = 'Original Prices'
+    contribution_dict['value'] = userProfile.guindexuser.originalPrices
+
+    contribution_list.append(contribution_dict.copy())
+
+    contribution_dict['title'] = 'Current Verifications'
+    contribution_dict['value'] = userProfile.guindexuser.currentVerifications
+
+    contribution_list.append(contribution_dict.copy())
+
+    return contribution_list
+
+
+def getBestContributions():
+
+    user_contribution_singleton = UserContributionsSingleton.load()
+
+    contribution_list = [] 
+
+    contribution_dict = {}
+
+    contribution_dict['title'] = 'Most Pubs Visited'
+    contribution_dict['value'] = "%s (%d)" % (user_contribution_singleton.mostVisited.user.username,
+                                              user_contribution_singleton.mostVisited.guindexuser.pubsVisited)
+
+    contribution_list.append(contribution_dict.copy())
+    
+    contribution_dict['title'] = 'Most Original Prices'
+    contribution_dict['value'] = "%s (%d)" % (user_contribution_singleton.mostFirstVerified.user.username,
+                                              user_contribution_singleton.mostFirstVerified.guindexuser.originalPrices)
+
+    contribution_list.append(contribution_dict.copy())
+
+    contribution_dict['title'] = 'Most Current Verifications'
+    contribution_dict['value'] = "%s (%d)" % (user_contribution_singleton.mostLastVerified.user.username,
+                                              user_contribution_singleton.mostLastVerified.guindexuser.currentVerifications)
+
+    contribution_list.append(contribution_dict.copy())
+
+    return contribution_list

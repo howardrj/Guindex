@@ -189,6 +189,35 @@ td {
     text-align: center;
 }    
 
+/****************************/
+/* User Contribution Tables */
+/****************************/
+#user_contributions_table, #best_contributions_table {
+    position: relative;
+    width: 40%;
+    left: 5px;
+    margin: 20px auto;
+    border: 2px solid black;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    border-collapse: collapse;
+    display: table;
+    table-layout: fixed;
+} 
+
+#user_contributions_table td, #best_contributions_table td {
+    font-family: "Oswald";
+    font-size: 16px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 5px;
+    text-align: center;
+}    
+
+.contributions_table_header {
+    font-size: 20px !important;
+    font-weight: bold !important;
+}
+
 /*****************************/
 /* Add Guinness price button */
 /*****************************/

@@ -127,8 +127,27 @@ class AlertsSingleton(models.Model):
         return obj
 
 
-class UserContribution(models.Model):
+class UserContributionsSingleton(models.Model):
+    """
+        Singleton class to keep track of best contributors
+    """
 
-    title      = models.CharField(max_length = 50)
-    descripton = models.TextField()
-    url        = models.TextField()
+    mostVisited       = models.ForeignKey(UserProfile, related_name = 'most_visited', null = True)
+    mostLastVerified  = models.ForeignKey(UserProfile, related_name = 'most_last_verifications', null = True)
+    mostFirstVerified = models.ForeignKey(UserProfile, related_name = 'most_first_verifications', null = True)
+    
+    def __unicode__(self):
+
+        return "'%s - %s - %s'" % (self.mostVisited, self.mostLastVerified, self.mostFirstVerified)
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(UserContributionsSingleton, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk = 1)
+        return obj
