@@ -6,7 +6,11 @@ from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 
+from rest_framework import generics
+from rest_framework import permissions
+
 from Guindex.forms import NewPubForm, NewGuinnessForm, RenamePubForm
+from Guindex.serializers import PubSerializer, GuinnessSerializer
 from Guindex.models import Pub, Guinness
 from GuindexParameters import GuindexParameters
 import GuindexUtils
@@ -537,3 +541,67 @@ def guindexAlertSettings(request):
         logger.error("Received invalid request type")
 
         return render(request, 'error_404.html', {'user_profile_parameters': UserProfileParameters.getParameters()})
+
+
+class PubList(generics.ListAPIView):
+
+    serializer_class   = PubSerializer
+    permission_classes = (permissions.AllowAny, )
+
+    def __init__(self, *args, **kwargs):
+
+        logger.error("Received PubList request")
+
+        # Access base class constructor
+        super(PubList, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        return Pub.objects.all()
+
+
+class PubDetail(generics.RetrieveAPIView):
+
+    serializer_class   = PubSerializer
+    permission_classes = (permissions.AllowAny, )
+
+    def __init__(self, *args, **kwargs):
+
+        logger.error("Received PubDetail request")
+
+        # Access base class constructor
+        super(PubDetail, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        return Pub.objects.all()
+
+
+class GuinnessList(generics.ListAPIView):
+
+    serializer_class   = GuinnessSerializer
+    permission_classes = (permissions.AllowAny, )
+
+    def __init__(self, *args, **kwargs):
+
+        logger.error("Received GuinnessList request")
+
+        # Access base class constructor
+        super(GuinnessList, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        return Guinness.objects.all()
+
+
+class GuinnessDetail(generics.RetrieveAPIView):
+
+    serializer_class   = GuinnessSerializer
+    permission_classes = (permissions.AllowAny, )
+
+    def __init__(self, *args, **kwargs):
+
+        logger.error("Received GuinnesDetail request")
+
+        # Access base class constructor
+        super(GuinnessDetail, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        return Guinness.objects.all()

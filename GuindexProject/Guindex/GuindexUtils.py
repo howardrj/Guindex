@@ -179,4 +179,9 @@ def getBestContributions():
 
     contribution_list.append(contribution_dict.copy())
 
+    contribution_dict['title'] = 'Last Calculated' 
+    contribution_dict['value'] = user_contribution_singleton.lastCalculated
+
+    contribution_list.append(contribution_dict.copy())
+
     return contribution_list

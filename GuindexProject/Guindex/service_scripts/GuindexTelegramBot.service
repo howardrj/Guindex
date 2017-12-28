@@ -1,0 +1,11 @@
+[Unit]
+Description=Guindex Telegram Bot
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/var/www/Guindex/GuindexProject
+ExecStart=/usr/bin/python /var/www/Guindex/GuindexProject/manage.py TelegramMonitor
+
+[Install]
+WantedBy=multi-user.target

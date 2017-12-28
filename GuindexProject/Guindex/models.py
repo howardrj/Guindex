@@ -135,6 +135,7 @@ class UserContributionsSingleton(models.Model):
     mostVisited       = models.ForeignKey(UserProfile, related_name = 'most_visited', null = True)
     mostLastVerified  = models.ForeignKey(UserProfile, related_name = 'most_last_verifications', null = True)
     mostFirstVerified = models.ForeignKey(UserProfile, related_name = 'most_first_verifications', null = True)
+    lastCalculated    = models.DateTimeField(auto_now = True)
     
     def __unicode__(self):
 

@@ -1,0 +1,11 @@
+[Unit]
+Description=Monitor Guindex Alerts
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/var/www/Guindex/GuindexProject
+ExecStart=/usr/bin/python /var/www/Guindex/GuindexProject/manage.py GuindexAlerts
+
+[Install]
+WantedBy=multi-user.target

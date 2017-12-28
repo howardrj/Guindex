@@ -77,7 +77,9 @@
         }
         else
         {
-            table_rows_content.sort();
+            table_rows_content.sort(function (a, b) {
+                return a.localeCompare(b, 'en', {'sensitivity': 'base'});
+            });
         }
 
         if (evt.target.innerHTML.indexOf(DOWN_ARROW) != -1) // Column is in descending order
