@@ -162,20 +162,29 @@ def getBestContributions():
     contribution_dict = {}
 
     contribution_dict['title'] = 'Most Pubs Visited'
-    contribution_dict['value'] = "%s (%d)" % (user_contribution_singleton.mostVisited.user.username,
-                                              user_contribution_singleton.mostVisited.guindexuser.pubsVisited)
+    if user_contribution_singleton.mostVisited:
+        contribution_dict['value'] = "%s (%d)" % (user_contribution_singleton.mostVisited.user.username,
+                                                 user_contribution_singleton.mostVisited.guindexuser.pubsVisited)
+    else:
+        contribution_dict['value'] = 'NA'
 
     contribution_list.append(contribution_dict.copy())
     
     contribution_dict['title'] = 'Most Original Prices'
-    contribution_dict['value'] = "%s (%d)" % (user_contribution_singleton.mostFirstVerified.user.username,
-                                              user_contribution_singleton.mostFirstVerified.guindexuser.originalPrices)
+    if user_contribution_singleton.mostFirstVerified:
+        contribution_dict['value'] = "%s (%d)" % (user_contribution_singleton.mostFirstVerified.user.username,
+                                                  user_contribution_singleton.mostFirstVerified.guindexuser.originalPrices)
+    else:
+        contribution_dict['value'] = 'NA'
 
     contribution_list.append(contribution_dict.copy())
 
     contribution_dict['title'] = 'Most Current Verifications'
-    contribution_dict['value'] = "%s (%d)" % (user_contribution_singleton.mostLastVerified.user.username,
-                                              user_contribution_singleton.mostLastVerified.guindexuser.currentVerifications)
+    if user_contribution_singleton.mostLastVerified:
+        contribution_dict['value'] = "%s (%d)" % (user_contribution_singleton.mostLastVerified.user.username,
+                                                  user_contribution_singleton.mostLastVerified.guindexuser.currentVerifications)
+    else:
+        contribution_dict['value'] = 'NA'
 
     contribution_list.append(contribution_dict.copy())
 
