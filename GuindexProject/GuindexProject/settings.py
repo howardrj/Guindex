@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'GuindexProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': '/usr/share/Guindex.db',
     }
 }
 
@@ -209,6 +209,14 @@ LOGGING = {
             'backupCount': 10,
             'formatter': 'verbose'
         },
+        'GuindexDbBackupLogFile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, "/var/log/GuindexDbBackup.log"),
+            'maxBytes': 1024 * 1024 * 10,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
         'GuindexBotLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -246,6 +254,11 @@ LOGGING = {
         },
         'GuindexUserContributions': {
             'handlers': ['GuindexUserContributionsLogFile'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
+        'GuindexDbBackup': {
+            'handlers': ['GuindexDbBackupLogFile'],
             'propogate': True,
             'level': 'DEBUG',
         },

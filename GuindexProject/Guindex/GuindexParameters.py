@@ -11,9 +11,10 @@ class GuindexParameters:
     MAX_GUINNESS_PRICE = 100.00
     MIN_GUINNESS_PRICE = 0.00
 
-    STATISTICS_CALCULATION_PERIOD         = 86400 # In seconds
-    ALERTS_CHECK_PERIOD                   = 86400 # In seconds
-    USER_CONTRIBUTIONS_CALCULATION_PERIOD = 86400 # In seconds
+    STATISTICS_CALCULATION_PERIOD         = 600 # In seconds
+    ALERTS_CHECK_PERIOD                   = 600 # In seconds
+    USER_CONTRIBUTIONS_CALCULATION_PERIOD = 600 # In seconds
+    DB_BACKUP_PERIOD                      = 84600 # In seconds
 
     @staticmethod
     def getParameters():

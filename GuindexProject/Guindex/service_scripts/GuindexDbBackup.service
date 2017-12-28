@@ -1,0 +1,11 @@
+[Unit]
+Description=Script to periodically backup Guindex database
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/var/www/Guindex/GuindexProject
+ExecStart=/usr/bin/python /var/www/Guindex/GuindexProject/manage.py GuindexDbBackup
+
+[Install]
+WantedBy=multi-user.target

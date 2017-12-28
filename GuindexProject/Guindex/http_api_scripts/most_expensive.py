@@ -3,7 +3,7 @@ import pycurl
 import json
 from StringIO import StringIO
 
-GUINDEX_URL = 'http://172.28.4.151:8000'
+GUINDEX_URL = 'http://guindex.ie'
 
 def main():
 
