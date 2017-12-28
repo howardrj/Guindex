@@ -27,6 +27,29 @@
 
     <body>
 
+        {% if modal_to_display == "" %}
+
+            <!-- If no modal to display, display loading screen -->
+            <div id="loading_background">
+
+                <div id="main_loader_container">
+                    <div class="loader" id="main_guindex_loader"> </div>
+                    <div class="loading_text"> Loading Guindex ... </div>
+                </div>
+
+            </div>
+
+            <!-- Hide loading background when page loads -->
+            <script>
+
+                window.addEventListener("load", function(){
+                    $("#loading_background").fadeOut("slow", "linear", function() {});
+                });
+
+            </script>
+
+        {% endif %}
+
         <h1 id="guindex_header"> {{ user_profile_parameters.PROJECT_TITLE }} </h1>
 
         {% include "guindex_controls.html" %}
