@@ -112,25 +112,27 @@
 
                     <div class="guinness_price_container">
 
-                        <div class="guindex_button_container">
-                            <i class="fa fa-plus new_guinness_button needs_description"
-                               data-description_text="Add new Guinness price for this pub"
-                               data-pub_id="{{ pub.id }}"
-                               data-pub_name="{{ pub.name}}"
-                               aria-hidden="true">
-                            </i>
-                        </div>
+                        {% if not pub.closed and pub.serving_guinness %}
+                            <div class="guindex_button_container">
+                                <i class="fa fa-plus new_guinness_button needs_description"
+                                   data-description_text="Add new Guinness price for this pub"
+                                   data-pub_id="{{ pub.id }}"
+                                   data-pub_name="{{ pub.name}}"
+                                   aria-hidden="true">
+                                </i>
+                            </div>
 
-                        {% if pub.last_guinness %}
-                        <div class="guindex_button_container">
-                            <i class="fa fa-check verify_guinness_button needs_description"
-                               data-description_text="Verify current price"
-                               data-pub_id="{{ pub.id }}"
-                               data-pub_name="{{ pub.name}}"
-                               data-pub_price="{{ pub.last_guinness.price }}"
-                               aria-hidden="true">
-                            </i>
-                        </div>
+                            {% if pub.last_guinness %}
+                            <div class="guindex_button_container">
+                                <i class="fa fa-check verify_guinness_button needs_description"
+                                   data-description_text="Verify current price"
+                                   data-pub_id="{{ pub.id }}"
+                                   data-pub_name="{{ pub.name}}"
+                                   data-pub_price="{{ pub.last_guinness.price }}"
+                                   aria-hidden="true">
+                                </i>
+                            </div>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </td>

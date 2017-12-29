@@ -52,7 +52,7 @@ class Pub(models.Model):
             Return most recently verified Guinness object.
         """
 
-        guini = self.getGuini(True)
+        guini = self.getGuini(False)
 
         return guini[0] if len(guini) else None
 
@@ -61,7 +61,7 @@ class Pub(models.Model):
             Return most recently verified Guinness object.
         """
 
-        guini = self.getGuini(False)
+        guini = self.getGuini(True)
 
         return guini[0] if len(guini) else None
 
@@ -85,8 +85,8 @@ class StatisticsSingleton(models.Model):
     """
 
     pubsInDb           = models.IntegerField(default = 0)
-    cheapestPub        = models.ForeignKey(Pub, null = True, related_name = 'cheapest_pub')
-    dearestPub         = models.ForeignKey(Pub, null = True, related_name = 'dearest_pub')
+    cheapestPub        = models.TextField(default = "") # Make Textfield instead of Pub key to avoid crashes on delete
+    dearestPub         = models.TextField(default = "") # Make Textfield instead of Pub key to avoid crahes on delete
     averagePrice       = models.DecimalField(decimal_places = 2, max_digits = 6,  default = Decimal('0.0'))
     standardDevation   = models.DecimalField(decimal_places = 3, max_digits = 12, default = Decimal('0.0'))
     percentageVisited  = models.DecimalField(decimal_places = 2, max_digits = 5,  default = Decimal('0.0'))

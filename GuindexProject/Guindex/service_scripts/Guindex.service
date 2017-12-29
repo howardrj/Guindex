@@ -1,0 +1,11 @@
+[Unit]
+Description=Guindex Gunicorn HTTP Server
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/var/www/Guindex/GuindexProject
+ExecStart=/usr/local/bin/gunicorn --workers 3 --bind unix:/var/www/Guindex/GuindexProject/Guindex.sock GuindexProject.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

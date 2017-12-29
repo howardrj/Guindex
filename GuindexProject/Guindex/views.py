@@ -11,7 +11,7 @@ from rest_framework import permissions
 
 from Guindex.forms import NewPubForm, NewGuinnessForm, RenamePubForm
 from Guindex.serializers import PubSerializer, GuinnessSerializer
-from Guindex.models import Pub, Guinness
+from Guindex.models import Pub, Guinness, StatisticsSingleton
 from GuindexParameters import GuindexParameters
 import GuindexUtils
 
@@ -193,6 +193,7 @@ def handleDeletePubRequest(userProfile, postData):
 
     if userProfile.user.is_staff:
         logger.debug("UserProfile is a staff member so delete is allowed")
+
         pub.delete()
     else:
         logger.debug("UserProfile is not a staff member. Not deleting object")

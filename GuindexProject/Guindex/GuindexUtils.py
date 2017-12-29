@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
+from decimal import Decimal
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from Guindex.models import Pub, StatisticsSingleton, UserContributionsSingleton
+from Guindex.models import Pub, Guinness, StatisticsSingleton, UserContributionsSingleton
 
 from UserProfile.models import UserProfile
 
@@ -102,7 +103,7 @@ def getStats():
     if not stats_singleton.cheapestPub:
         stats_dict['value'] = 'TBD'
     else:
-        stats_dict['value'] = u'€%.2f (%s)' % (stats_singleton.cheapestPub.getLastVerifiedGuinness()['price'], stats_singleton.cheapestPub.name)
+        stats_dict['value'] = u'€%s' % (stats_singleton.cheapestPub)
 
     stats_list.append(stats_dict.copy())
     
@@ -110,7 +111,7 @@ def getStats():
     if not stats_singleton.dearestPub:
         stats_dict['value'] = 'TBD'
     else:
-        stats_dict['value'] = u'€%.2f (%s)' % (stats_singleton.dearestPub.getLastVerifiedGuinness()['price'], stats_singleton.dearestPub.name)
+        stats_dict['value'] = u'€%s' % (stats_singleton.dearestPub)
 
     stats_list.append(stats_dict.copy())
     
@@ -174,7 +175,7 @@ def getBestContributions():
     contribution_dict['title'] = 'Most Pubs Visited'
     if user_contribution_singleton.mostVisited:
         contribution_dict['value'] = "%s (%d)" % (user_contribution_singleton.mostVisited.user.username,
-                                                 user_contribution_singleton.mostVisited.guindexuser.pubsVisited)
+                                                  user_contribution_singleton.mostVisited.guindexuser.pubsVisited)
     else:
         contribution_dict['value'] = 'NA'
 
@@ -206,3 +207,171 @@ def getBestContributions():
     logger.debug("Returning best contributions list - %s", contribution_list)
 
     return contribution_list
+
+
+def calculateNumberOfPubs(statsSingleton): 
+
+    statsSingleton.pubsInDb = len(Pub.objects.all())
+
+
+def calculateCheapestPub(statsSingleton):
+         
+    cheapest_pub = None
+
+    for pub_index, pub in enumerate(Pub.objects.all()): 
+
+        if pub_index == 0:
+            cheapest_pub = pub
+
+        if not pub.getLastVerifiedGuinness():
+            continue
+        elif pub.getLastVerifiedGuinness()['price'] < cheapest_pub.getLastVerifiedGuinness()['price']:
+            cheapest_pub = pub
+
+    statsSingleton.cheapestPub = '%.2f (%s)' % (cheapest_pub.getLastVerifiedGuinness()['price'], cheapest_pub.name)
+
+
+def calculateDearestPub(statsSingleton):
+
+    dearest_pub = None
+
+    for pub_index, pub in enumerate(Pub.objects.all()): 
+
+        if pub_index == 0:
+            dearest_pub = pub
+
+        if not pub.getLastVerifiedGuinness():
+            continue
+        elif pub.getLastVerifiedGuinness()['price'] > dearest_pub.getLastVerifiedGuinness()['price']:
+            dearest_pub = pub
+
+    statsSingleton.dearestPub = '%.2f (%s)' % (dearest_pub.getLastVerifiedGuinness()['price'], dearest_pub.name)
+    
+
+def calculateAveragePrice(statsSingleton):
+
+    visited_pubs = 0
+    sum_total    = 0
+
+    for pub in Pub.objects.all(): 
+
+        if pub.getLastVerifiedGuinness():
+            visited_pubs = visited_pubs + 1
+            sum_total    = sum_total + pub.getLastVerifiedGuinness()['price']
+
+    if visited_pubs == 0:
+        statsSingleton.averagePrice = 0
+        return
+
+    statsSingleton.averagePrice = Decimal(sum_total / visited_pubs)
+
+
+def calculateStandardDeviation(statsSingleton):
+
+    variance_tmp = 0
+
+    if statsSingleton.averagePrice == 0:
+        statsSingleton.standardDevation = 0
+        return
+
+    for pub in Pub.objects.all(): 
+
+        if pub.getLastVerifiedGuinness():
+            variance_tmp = variance_tmp + math.pow((pub.getLastVerifiedGuinness()['price'] - statsSingleton.averagePrice), 2)
+
+    variance = Decimal(variance_tmp) / statsSingleton.averagePrice    
+
+    statsSingleton.standardDevation = variance.sqrt()
+
+
+def calculatePercentageVisited(statsSingleton):
+
+    visited_pubs = 0
+
+    if statsSingleton.pubsInDb == 0:
+        statsSingleton.percentageVisited = 0
+        return
+
+    for pub in Pub.objects.all(): 
+
+        if pub.getLastVerifiedGuinness() or not pub.servingGuinness:
+            visited_pubs = visited_pubs + 1
+
+    statsSingleton.percentageVisited = (Decimal(visited_pubs) / statsSingleton.pubsInDb) * 100
+
+
+def calculateClosedPubs(statsSingleton):
+
+    statsSingleton.closedPubs = len(Pub.objects.filter(closed = True))
+
+
+def calculateNotServingGuinness(statsSingleton):
+
+    statsSingleton.notServingGuinness = len(Pub.objects.filter(servingGuinness = False))
+
+
+def calculateUserContributions(logger):
+
+    logger.info("Calculating User Contributions")
+
+    most_pubs_visited          = None
+    most_first_verifications   = None
+    most_current_verifications = None
+
+    for loop_index, user_profile in enumerate(UserProfile.objects.all()):
+
+        logger.debug("Calculating contrbutions for UserProfile %s", user_profile)
+
+        if not user_profile.guindexuser:
+            logger.debug("Need to create GuindexUser for UserProfile %s", user_profile) 
+
+            GuindexUserUtils.createNewGuindexUser(user_profile)
+            
+        logger.debug("Calculating number of current and first verifications")
+
+        number_of_current_verifications = 0
+        number_of_first_verifications   = 0 
+        number_of_pubs_visited          = 0
+
+        for pub in Pub.objects.all():
+           
+            if pub.getLastVerifiedGuinness(): 
+                if pub.getLastVerifiedGuinness()['creator'] == user_profile.user.username:
+                    number_of_current_verifications = number_of_current_verifications + 1
+
+            if pub.getFirstVerifiedGuinness(): 
+                if pub.getFirstVerifiedGuinness()['creator'] == user_profile.user.username:
+                    number_of_first_verifications = number_of_first_verifications + 1
+
+            # TODO Test this
+            if len(Guinness.objects.filter(pub = pub, creator = user_profile)):
+                number_of_pubs_visited = number_of_pubs_visited + 1
+
+        user_profile.guindexuser.originalPrices       = number_of_first_verifications
+        user_profile.guindexuser.currentVerifications = number_of_current_verifications
+        user_profile.guindexuser.pubsVisited          = number_of_pubs_visited
+
+        user_profile.guindexuser.save()
+        user_profile.save() # Pedantic
+
+        if loop_index == 0:
+            most_first_verifications   = user_profile
+            most_current_verifications = user_profile
+            most_pubs_visited          = user_profile
+
+        elif user_profile.guindexuser.originalPrices > most_first_verifications.guindexuser.originalPrices:
+            most_first_verifications = user_profile
+        elif user_profile.guindexuser.currentVerifications > most_current_verifications.guindexuser.currentVerifications:
+            most_current_verifications = user_profile
+        elif user_profile.guindexuser.pubsVisited > most_first_verifications.guindexuser.pubsVisited:
+            most_pubs_visited = user_profile
+
+    user_contributions_singleton = UserContributionsSingleton.load()
+
+    user_contributions_singleton.mostVisited       = most_pubs_visited
+    user_contributions_singleton.mostLastVerified  = most_current_verifications
+    user_contributions_singleton.mostFirstVerified = most_first_verifications
+
+    logger.info("Saving User Contributions %s", user_contributions_singleton)
+
+    user_contributions_singleton.save()
