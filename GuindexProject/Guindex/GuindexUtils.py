@@ -100,6 +100,11 @@ def getStats():
 
     stats_list.append(stats_dict.copy())
 
+    stats_dict['title'] = 'Standard Deviation'
+    stats_dict['value'] = '%.3f' % stats_singleton.standardDevation
+
+    stats_list.append(stats_dict.copy())
+
     stats_dict['title'] = 'Cheapest Pint'
     if not stats_singleton.cheapestPub:
         stats_dict['value'] = 'TBD'
@@ -270,6 +275,7 @@ def calculateAveragePrice(statsSingleton):
 def calculateStandardDeviation(statsSingleton):
 
     variance_tmp = 0
+    visited_pubs = 0
 
     if statsSingleton.averagePrice == 0:
         statsSingleton.standardDevation = 0
@@ -278,9 +284,10 @@ def calculateStandardDeviation(statsSingleton):
     for pub in Pub.objects.all(): 
 
         if pub.getLastVerifiedGuinness():
+            visited_pubs = visited_pubs + 1
             variance_tmp = variance_tmp + math.pow((pub.getLastVerifiedGuinness()['price'] - statsSingleton.averagePrice), 2)
 
-    variance = Decimal(variance_tmp) / statsSingleton.averagePrice    
+    variance = Decimal(variance_tmp) / visited_pubs
 
     statsSingleton.standardDevation = variance.sqrt()
 
