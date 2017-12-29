@@ -81,8 +81,6 @@ class NewPubForm(ModelForm):
         except ObjectDoesNotExist:
             logger.info("No pub with the name %s exists yet. Creating a new pub object", pub_name)
 
-        print("Latitude = %s" % latitude)
-
         if latitude < Decimal(-90) or latitude > Decimal(90):
             logger.error("Latitude %f not in range", latitude)
 
@@ -106,7 +104,7 @@ class NewPubForm(ModelForm):
         pub.name      = self.cleaned_data.get('name')
         pub.latitude  = self.cleaned_data.get('latitude')
         pub.longitude = self.cleaned_data.get('longitude')
-        pub.mapLink   = "https://www.google.ie/maps/@%f,%f" % (pub.latitude, pub.longitude)
+        pub.mapLink   = "https://www.google.ie/maps/@%f,%f,17z" % (pub.latitude, pub.longitude)
 
         try:
             pub.full_clean()
