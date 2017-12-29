@@ -164,7 +164,7 @@ LOGGING = {
         'UserProfileLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/UserProfile.log"),
+            'filename': os.path.join(BASE_DIR, "/var/log/UserProfileGuindex.log"),
             'maxBytes': 1024 * 1024 * 10,
             'backupCount': 10,
             'formatter': 'verbose'
