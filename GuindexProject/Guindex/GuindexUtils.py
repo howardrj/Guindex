@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import math
 from decimal import Decimal
 
 from django.core.exceptions import ObjectDoesNotExist

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from UserProfile.models import UserProfile
 
@@ -33,7 +34,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        with open('Guindex/management/commands/guindex.csv') as csvfile:
+        with open('Guindex/management/commands/guindex_new.csv') as csvfile:
 
             parsed_csv = csv.reader(csvfile, delimiter=',')
 
@@ -120,7 +121,7 @@ class Command(BaseCommand):
 
                 pub.save()
 
-        with open('Guindex/management/commands/guindex.csv') as csvfile:
+        with open('Guindex/management/commands/guindex_new.csv') as csvfile:
 
             print("Creating Guini ...")
 
@@ -134,14 +135,19 @@ class Command(BaseCommand):
 
                 serving_guinness = True
 
+                print (row[PRICE])
                 try:
                     price = Decimal(row[PRICE][3:])
                 except:
-                    print("Failed to make decimal from price %s" % row[PRICE][3:])
 
+                    print(len(row[PRICE]))
                     if row[PRICE] == "N.A.":
                         serving_guinness = False
+                    elif row[PRICE] == "":
+                        print("Pub has not been visited continue")
+                        continue
                     else:
+                        print("Failed to make decimal from price %s. Exiting" % row[PRICE][3:])
                         return
 
                 pub_name = row[PUB_NAME]
@@ -162,15 +168,28 @@ class Command(BaseCommand):
                 if not serving_guinness:
                     pub.servingGuinness = False
                     pub.save()
+                    continue
 
                 # Add last verified price
                 last_verified_by = row[LAST_VERIFIED_BY]
+                print(last_verified_by)
 
-                try:
+                if last_verified_by == "": # Mark it as other
+                    user = User.objects.get(username = "Other")
+
+                    user_profile = UserProfile.objects.get(user = user)
+
+                    guinness = Guinness()
+
+                    guinness.creator = user_profile
+                    guinness.creationDate = timezone.now()
+                    guinness.price = price
+                    guinness.pub = pub
+
+                    guinness.save()
+                    continue
+                else:
                     user = User.objects.get(username = last_verified_by)
-                except:
-                    print("No user with username %s" % last_verified_by)
-                    return
 
                 try:
                     user_profile = UserProfile.objects.get(user = user)
