@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^pubs/(?P<pk>[0-9]+)/$', views.PubDetail.as_view()), # API view
     url(r'^guinness/$', views.GuinnessList.as_view()), # API view
     url(r'^guinness/(?P<pk>[0-9]+)/$', views.GuinnessDetail.as_view()), # API view
+    url(r'^stats/$', views.StatisticsList.as_view()), # API view
 ]

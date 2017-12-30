@@ -10,7 +10,7 @@ from rest_framework import generics
 from rest_framework import permissions
 
 from Guindex.forms import NewPubForm, NewGuinnessForm, RenamePubForm
-from Guindex.serializers import PubSerializer, GuinnessSerializer
+from Guindex.serializers import PubSerializer, GuinnessSerializer, StatisticsSerializer
 from Guindex.models import Pub, Guinness, StatisticsSingleton
 from GuindexParameters import GuindexParameters
 import GuindexUtils
@@ -606,3 +606,19 @@ class GuinnessDetail(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return Guinness.objects.all()
+
+
+class StatisticsList(generics.ListAPIView):
+
+    serializer_class   = StatisticsSerializer
+    permission_classes = (permissions.AllowAny, )
+
+    def __init__(self, *args, **kwargs):
+
+        logger.error("Received StatisticsList request")
+
+        # Access base class constructor
+        super(StatisticsList, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        return StatisticsSingleton.objects.filter(id = 1)

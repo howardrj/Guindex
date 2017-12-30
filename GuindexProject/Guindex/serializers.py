@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from Guindex.models import Pub, Guinness
+from Guindex.models import Pub, Guinness, StatisticsSingleton
 
 
 class PubSerializer(serializers.ModelSerializer):
@@ -17,3 +17,11 @@ class GuinnessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guinness
         fields = ['id', 'price', 'pub', 'creationDate', 'contributor']
+
+
+class StatisticsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = StatisticsSingleton
+        fields = ['pubsInDb', 'cheapestPub', 'dearestPub', 'averagePrice', 'standardDevation',
+                  'percentageVisited', 'closedPubs', 'notServingGuinness', 'lastCalculated']
