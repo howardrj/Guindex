@@ -104,7 +104,7 @@ class NewPubForm(ModelForm):
         pub.name      = self.cleaned_data.get('name')
         pub.latitude  = self.cleaned_data.get('latitude')
         pub.longitude = self.cleaned_data.get('longitude')
-        pub.mapLink   = "https://www.google.ie/maps/@%f,%f,17z" % (pub.latitude, pub.longitude)
+        pub.mapLink   = "https://www.google.ie/maps/place/%f,%f" % (pub.latitude, pub.longitude)
 
         try:
             pub.full_clean()
