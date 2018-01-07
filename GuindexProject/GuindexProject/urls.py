@@ -14,26 +14,28 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from django.contrib import admin
 
 from UserProfile import urls as UserProfileUrls
 from UserProfile.views import error404
 
 from Guindex import urls as GuindexUrls
 
+from GuindexUser import urls as GuindexUserUrls
+
 from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 
 
-urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-]
+urlpatterns = []
 
 # Append UserProfile views
 urlpatterns.extend(UserProfileUrls.urlpatterns)
 
 # Append Guindex views
 urlpatterns.extend(GuindexUrls.urlpatterns)
+
+# Append Guindex User views
+urlpatterns.extend(GuindexUserUrls.urlpatterns)
 
 # Append HTTP API schema url
 schema_view = get_schema_view(title='Guindex HTTP API')

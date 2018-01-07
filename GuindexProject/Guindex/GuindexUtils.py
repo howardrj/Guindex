@@ -163,6 +163,11 @@ def getPersonalContributions(userProfile):
 
     contribution_list.append(contribution_dict.copy())
 
+    contribution_dict['title'] = 'Last Calculated'
+    contribution_dict['value'] = userProfile.guindexuser.lastCalculated
+
+    contribution_list.append(contribution_dict.copy())
+
     logger.debug("Returning contributions list - %s", contribution_list)
 
     return contribution_list
@@ -335,8 +340,6 @@ def calculateUserContributions(logger):
 
             GuindexUserUtils.createNewGuindexUser(user_profile)
             
-        logger.debug("Calculating number of current and first verifications")
-
         number_of_current_verifications = 0
         number_of_first_verifications   = 0 
         number_of_pubs_visited          = 0
@@ -380,6 +383,6 @@ def calculateUserContributions(logger):
     user_contributions_singleton.mostLastVerified  = most_current_verifications
     user_contributions_singleton.mostFirstVerified = most_first_verifications
 
-    logger.info("Saving User Contributions %s", user_contributions_singleton)
+    logger.info("Saving User Contributions Singleton %s", user_contributions_singleton)
 
     user_contributions_singleton.save()

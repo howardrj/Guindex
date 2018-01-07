@@ -376,3 +376,11 @@ input:checked + .slider:before {
     top: 50%;
     transform: translateY(-50%);
 }
+
+/***************/
+/* Guindex Map */
+/***************/
+#guindex_map {
+    height: 400px;
+    width: 100%;
+}

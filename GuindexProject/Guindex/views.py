@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 from rest_framework import generics
 from rest_framework import permissions
@@ -124,6 +125,7 @@ def guindex(request):
                     'guindex_parameters'     : GuindexParameters.getParameters(),
                     'using_email_alerts'     : user_profile.usingEmailAlerts,
                     'using_telegram_alerts'  : user_profile.telegramuser.usingTelegramAlerts,
+                    'google_maps_api_token'  : settings.GOOGLE_MAPS_API_KEY,
                     }
 
     return render(request, 'guindex_main.html', context_dict)

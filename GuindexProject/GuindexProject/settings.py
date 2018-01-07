@@ -28,7 +28,7 @@ DEBUG = True
 # Enable timezone support
 USE_TZ = True
 
-ALLOWED_HOSTS = ['45.79.148.4', 'guindex.ie', 'www.guindex.ie', '127.0.0.1', '172.28.5.22', '172.28.4.151']
+ALLOWED_HOSTS = ['45.79.148.4', 'guindex.ie', 'www.guindex.ie', '127.0.0.1', '172.28.5.22', '172.28.4.152']
 
 # Application definition
 
@@ -272,3 +272,6 @@ LOGGING = {
 
 # Telegram API
 BOT_HTTP_API_TOKEN = secrets.BOT_HTTP_API_TOKEN
+
+# Google Maps API
+GOOGLE_MAPS_API_KEY = secrets.GOOGLE_MAPS_API_KEY

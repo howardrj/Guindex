@@ -12,7 +12,6 @@
         <link rel="icon" href="{% static "images/favicon.png" %}"/>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script type="text/javascript" src="{% static "javascript/modals_utils.js" %}" defer></script>
-        <script type="text/javascript" src="{% static "javascript/cookie.js" %}" defer> </script>
         <script type="text/javascript" src="{% static "javascript/loader.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/tabs.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/dropdown.js" %}" defer></script>
@@ -25,6 +24,8 @@
         <script type="text/javascript" src="{% static "javascript/search.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/sorting.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/alert_switches.js" %}" defer></script>
+        <script type="text/javascript" src="{% static "javascript/cookie.js" %}"> </script>
+        <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"> </script>
     </head>
 
     <body>
@@ -79,6 +80,7 @@
 
             <div id="tab_content_container">
                 {% include "guindex_table.html" %}
+                {% include "guindex_map.html" %}
                 {% include "guindex_stats.html" %}
                 {% include "user_contributions.html" %}
                 {% include "user_settings.html" %}
