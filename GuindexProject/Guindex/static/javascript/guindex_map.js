@@ -2,15 +2,11 @@ MAP_ICON_BASE = location.protocol + '//' + location.hostname + ':' + location.po
 
 var initMap = function () {
     
-    console.log("Initializing Map");
-
     navigator.geolocation.getCurrentPosition(onSuccess, onError);
 }
 
 var onSuccess = function (position)
 {
-    console.log("Successfully retrieved current position: " + position.coords);
-
     // Set map center to user's location
     var map_center = {lat: position.coords.latitude, lng: position.coords.longitude};
 
@@ -19,8 +15,6 @@ var onSuccess = function (position)
 
 var onError = function (error)
 {
-    console.log("Failed to get current position");
-
     // Set map center to center of Dublin
     var map_center = {lat: 53.345280, lng: -6.272161};
 
@@ -35,7 +29,16 @@ var setMarkers = function (mapCenter, foundUserLocation)
         mapTypeId: google.maps.MapTypeId.ROADMAP,
     }
 
-    var guindex_map = new google.maps.Map(document.getElementById('guindex_map'), map_options);
+    var guindex_map_container = document.getElementById('guindex_map');
+    var guindex_map_tab       = document.getElementById('guindex_map_link');
+
+    var guindex_map = new google.maps.Map(guindex_map_container, map_options);
+
+    guindex_map_tab.addEventListener('click', function (event) {
+
+        google.maps.event.trigger(guindex_map, 'resize');
+
+    });
 
     if (foundUserLocation)
     {
@@ -49,8 +52,6 @@ var setMarkers = function (mapCenter, foundUserLocation)
         });
     }
     
-    google.maps.event.trigger(guindex_map, "resize");
-
     var request = new XMLHttpRequest();
     request.open('GET', 'https:/guindex.ie/pubs/', true); 
 
@@ -99,13 +100,9 @@ var getPints = function (pubs, guindexMap) {
 
 var markPubs = function (pubs, pints, guindexMap)
 {
-    console.log(guindexMap);
-
     // Loop over all pub JSON objects
     for (var i = 0; i < pubs.length; i++)
     {
-        console.log("Marking pub: " + pubs[i]['name']);
-
         if (pubs[i].closed)
         {
             var icon_to_use   = MAP_ICON_BASE + 'closed_icon.png';
@@ -146,9 +143,6 @@ var markPubs = function (pubs, pints, guindexMap)
                 title: pubs[i]['name'],
                 zIndex: pubs[i]['id'],
             });
-
-
-        console.log("Set marker");
 
         var content = '<h3>'+ "Pub: " + pubs[i]['name'] + '</h3>' + '<p>' + price_of_pint + '</p>';
 
