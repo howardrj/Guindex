@@ -53,7 +53,7 @@ var setMarkers = function (mapCenter, foundUserLocation)
     }
     
     var request = new XMLHttpRequest();
-    request.open('GET', 'https:/guindex.ie/pubs/', true); 
+    request.open('GET', 'https://guindex.ie/pubs/', true); 
 
     request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
     request.setRequestHeader('Content-Type', 'application/json');
@@ -77,7 +77,7 @@ var setMarkers = function (mapCenter, foundUserLocation)
 var getPints = function (pubs, guindexMap) {
 
     var request = new XMLHttpRequest();
-    request.open('GET', 'https:/guindex.ie/guinness/', true); 
+    request.open('GET', 'https://guindex.ie/guinness/', true); 
 
     request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
     request.setRequestHeader('Content-Type', 'application/json');
