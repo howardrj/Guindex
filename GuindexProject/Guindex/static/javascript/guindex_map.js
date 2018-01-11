@@ -46,7 +46,7 @@ var setMarkers = function (mapCenter, foundUserLocation)
         var mymarker = new google.maps.Marker({
                 position: mapCenter,
                 map: guindex_map,
-                icon: MAP_ICON_BASE + 'my_location2.png',
+                icon: MAP_ICON_BASE + 'my_location.png',
                 title: 'My Location',
                 zIndex: google.maps.Marker.MAX_ZINDEX + 1
         });
@@ -142,6 +142,7 @@ var markPubs = function (pubs, pints, guindexMap)
                 icon: icon_to_use,
                 title: pubs[i]['name'],
                 zIndex: pubs[i]['id'],
+                disableAutoPan: true,
             });
 
         var content = '<h3>'+ "Pub: " + pubs[i]['name'] + '</h3>' + '<p>' + price_of_pint + '</p>';

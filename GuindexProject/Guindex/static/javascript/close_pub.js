@@ -4,7 +4,7 @@
 
     for (var i = 0 ; i < close_pub_buttons.length; i++)
     {
-        close_pub_buttons[i].addEventListener('click', function () { openClosePubForm(event) });
+        close_pub_buttons[i].addEventListener('click', function (evt) { openClosePubForm(evt) });
     }
 
     var openClosePubForm = function (evt)

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import logging
 import math
+import socket
 from decimal import Decimal
 
 from django.core.exceptions import ObjectDoesNotExist
 
 from Guindex.models import Pub, Guinness, StatisticsSingleton, UserContributionsSingleton
+from Guindex import GuindexAlertsIf_pb2 as GuindexAlertsIf
 
 from UserProfile.models import UserProfile
 
@@ -73,6 +75,27 @@ def getPubs():
         pub_list.append(pub_dict.copy())
 
     return sorted(pub_list, key = lambda k: k['name'], reverse = False)
+
+
+def getPendingContributions():
+
+    pending_contributions = Guinness.objects.filter(approved = False)
+
+    pending_contributions_list = []
+    
+    for guin in pending_contributions:
+
+        pending_contribution_dict = {}
+
+        pending_contribution_dict['id']           = str(guin.id)
+        pending_contribution_dict['pub']          = guin.pub.name
+        pending_contribution_dict['contributor']  = guin.creator.user.username
+        pending_contribution_dict['creationDate'] = guin.creationDate
+        pending_contribution_dict['price']        = guin.price
+
+        pending_contributions_list.append(pending_contribution_dict)
+
+    return sorted(pending_contributions_list, key = lambda k: k['creationDate'], reverse = False)
 
 
 def getStats():
@@ -386,3 +409,132 @@ def calculateUserContributions(logger):
     logger.info("Saving User Contributions Singleton %s", user_contributions_singleton)
 
     user_contributions_singleton.save()
+
+
+def createAlertsServerConnection():
+    """ 
+        Return TCP socket that's connected to Alerts Server
+    """
+
+    alerts_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+    try:
+        logger.info("Creating TCP connection to Alerts Server")
+        alerts_socket.connect((GuindexParameters.ALERTS_LISTEN_IP, GuindexParameters.ALERTS_LISTEN_PORT))
+        logger.info("Successfully connected to Alerts Server")
+    except socket.error:
+        logger.error("Failed to connect to Alerts Server")
+        alerts_socket.close()
+        raise
+
+    return alerts_socket
+
+
+def sendAlertRequest(guinness):
+    """
+        Send alert request to Guindex Alerts server
+    """
+
+    logger.info("Sending Alert Request for Guinness %s", guinness)
+
+    try:
+        alerts_socket = createAlertsServerConnection()
+    except:
+        logger.error("Failed to create Alerts Sewrver connection")
+        raise
+
+    # Create Alert Request message
+    guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
+
+    guindex_alerts_msg.alertRequest.pub       = guinness.pub.name
+    guindex_alerts_msg.alertRequest.price     = '€%.2f' % guinness.price
+    guindex_alerts_msg.alertRequest.username  = guinness.creator.user.username
+    guindex_alerts_msg.alertRequest.approved  = guinness.approved
+    guindex_alerts_msg.alertRequest.timestamp = '%s' % guinness.creationDate
+
+    try:
+        message_string = guindex_alerts_msg.SerializeToString()
+    except:
+        logger.error("Failed to serialize Alert Request message")
+        alerts_socket.close()
+        raise
+        
+    message_length = len(message_string)
+
+    message_string = prependTwoByteHeader(message_string)
+
+    # Prepend two byte length header to message_string
+    try:
+        message_length_first_byte = (message_length >> 8) & 0xFF
+        message_length_second_byte = message_length & 0xFF
+        message_string = chr(message_length_first_byte) + chr(message_length_second_byte) + message_string
+
+        logger.info("Sending Alert Request message to Alerts Server - %s" % (":".join("{:02x}".format(ord(c)) for c in message_string)))
+
+        alerts_socket.send(message_string)
+
+        logger.info("Successfully sent Alert Request")
+
+        alerts_socket.close()
+
+    except:
+        logger.error("Failed to send Alert Request message to Alert Server")
+        alerts_socket.close()
+        raise
+
+
+def sendApprovalConfirmationRequest(guinness):
+    """
+        Send approval confirmation request to Guindex Alerts server
+    """
+
+    logger.info("Sending Approval Confirmation Request for Guinness %s", guinness)
+
+    alerts_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    try:
+        logger.info("Creating TCP connection to Alerts Server")
+        alerts_socket.connect((GuindexParameters.ALERTS_LISTEN_IP, GuindexParameters.ALERTS_LISTEN_PORT))
+        logger.info("Successfully connected to Alerts Server")
+    except socket.error:
+        logger.error("Failed to connect to Alerts Server")
+        alerts_socket.close()
+        raise
+
+    # Create Approval Confimration Request message
+    guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
+
+    guindex_alerts_msg.approvalConfirmationRequest.creatorId = str(guinness.creator.id)
+    guindex_alerts_msg.approvalConfirmationRequest.pub       = guinness.pub.name
+    guindex_alerts_msg.approvalConfirmationRequest.price     = '€%.2f' % guinness.price
+    guindex_alerts_msg.approvalConfirmationRequest.approved  = guinness.approved
+    guindex_alerts_msg.alertRequest.timestamp = '%s' % guinness.creationDate
+
+    try:
+        message_string = guindex_alerts_msg.SerializeToString()
+    except:
+        logger.error("Failed to serialize Approval Confirmation Request message")
+        alerts_socket.close()
+        raise
+        
+    message_length = len(message_string)
+
+    # Prepend two byte length header to message_string
+    try:
+        message_length_first_byte = (message_length >> 8) & 0xFF
+        message_length_second_byte = message_length & 0xFF
+        message_string = chr(message_length_first_byte) + chr(message_length_second_byte) + message_string
+
+        logger.info("Sending Approval Confirmation Request message to Alerts Server - %s" % (":".join("{:02x}".format(ord(c)) for c in message_string)))
+
+        alerts_socket.send(message_string)
+
+        logger.info("Successfully sent Approval Confirmation Request")
+
+        alerts_socket.close()
+
+    except:
+        logger.error("Failed to send Approval Confimration Request message to Alert Server")
+        alerts_socket.close()
+        raise
+

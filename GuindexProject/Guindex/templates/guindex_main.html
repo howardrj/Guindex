@@ -4,9 +4,10 @@
 
 <html>
     <head>
-        <title> {{ user_profile_parameters.PROJECT_TITLE }} | {{ username }} </title>
+        <title> {{ user_profile_parameters.PROJECT_TITLE }} | {{ user_profile.user.username }} </title>
         <link rel="stylesheet" type="text/css" href="{% static "css/global.css" %}" /> 
         <link rel="stylesheet" type="text/css" href="{% static "css/guindex.css" %}" /> 
+        <link rel="stylesheet" type="text/css" href="{% static "css/index_page_animation.css" %}" /> 
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Oswald" />
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
         <link rel="icon" href="{% static "images/favicon.png" %}"/>
@@ -53,7 +54,7 @@
 
         {% endif %}
 
-        <h1 id="guindex_header"> {{ user_profile_parameters.PROJECT_TITLE }} </h1>
+        {% include "index_page_animation.html" %}
 
         {% include "guindex_controls.html" %}
 
@@ -61,8 +62,20 @@
             <a href="/logout/" id="logout_link">
                 <i class="fa fa-sign-out needs_description" aria-hidden="true" data-description_text="Logout"></i>
             </a>
-            <h4 id="username"> {{ username }} </h4>
+            <h4 id="username"> {{ user_profile.user.username }} </h4>
         </div>
+
+        {% if pending_contributions|length and user_profile.user.is_staff %}
+
+        <div id="notification_info">
+            <a href="/pending_contributions/" id="pending_contributions_link">
+                <i id="pending_contributions_i" class="fa fa-bell blink needs_description" aria-hidden="true" data-description_text="Check pending contributions"></i>
+            </a>
+            <h4 id="username"> Pending Contributions </h4>
+
+        </div>
+
+        {% endif %}
 
         {% include "new_pub_form.html" %}
         {% include "new_guinness_form.html" %}

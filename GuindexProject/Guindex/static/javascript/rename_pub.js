@@ -4,7 +4,7 @@
 
     for (var i = 0 ; i < rename_pub_buttons.length; i++)
     {
-        rename_pub_buttons[i].addEventListener('click', function () { openRenamePubForm(event) });
+        rename_pub_buttons[i].addEventListener('click', function (evt) { openRenamePubForm(evt) });
     }
 
     var openRenamePubForm = function (evt)

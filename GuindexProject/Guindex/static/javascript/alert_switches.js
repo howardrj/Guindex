@@ -8,7 +8,7 @@
 
     for (var i = 0; i < alerts_switches.length; i++)
     {
-        alerts_switches[i].addEventListener('change', function() { updateAlertsSettings(event) });
+        alerts_switches[i].addEventListener('change', function(evt) { updateAlertsSettings(evt) });
     }
 
     var updateAlertsSettings = function(evt)

@@ -5,7 +5,7 @@
 
     for (var i = 0; i < new_guinness_buttons.length; i++)
     {
-        new_guinness_buttons[i].addEventListener('click', function () { openNewGuinnessForm(event) });
+        new_guinness_buttons[i].addEventListener('click', function (evt) { openNewGuinnessForm(evt) });
     }
 
     var openNewGuinnessForm = function (evt)

@@ -4,7 +4,7 @@
 
     for (var i = 0 ; i < delete_pub_buttons.length; i++)
     {
-        delete_pub_buttons[i].addEventListener('click', function () { openDeletePubForm(event) });
+        delete_pub_buttons[i].addEventListener('click', function (evt) { openDeletePubForm(evt) });
     }
 
     var openDeletePubForm = function (evt)

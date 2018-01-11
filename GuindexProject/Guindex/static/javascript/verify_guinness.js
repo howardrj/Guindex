@@ -4,7 +4,7 @@
 
     for (var i = 0 ; i < verify_guinness_buttons.length; i++)
     {
-        verify_guinness_buttons[i].addEventListener('click', function () { openVerifyGuinnessForm(event) });
+        verify_guinness_buttons[i].addEventListener('click', function (evt) { openVerifyGuinnessForm(evt) });
     }
 
     var openVerifyGuinnessForm = function (evt)

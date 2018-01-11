@@ -11,7 +11,7 @@
        
     for (var i = 0; i < sortable_column_headers.length; i++)
     {
-        sortable_column_headers[i].addEventListener('click', function () { sortRows(event); });
+        sortable_column_headers[i].addEventListener('click', function (evt) { sortRows(evt); });
     }
 
     function sortRows(evt)

@@ -1,5 +1,5 @@
 import logging
-from decimal import *
+from decimal import Decimal
 
 from django import forms
 from django.forms import ModelForm
@@ -63,7 +63,7 @@ class NewPubForm(ModelForm):
 
             if not longitude:
                 logger.debug("No longitude was provided in form")
-                
+
                 msg = "Valid longitude required"
                 self.add_error('longitude', msg)
 
@@ -236,12 +236,6 @@ class NewGuinnessForm(ModelForm):
 
         pub_id = self.cleaned_data.get('pub')
 
-        if not self.userProfile.user.is_staff:
-            logger.error("Only staff members can add a new price")
-            msg = "Only staff members can add a new price"
-            self.add_error('price', msg)
-            return self.cleaned_data
-
         try:
             pub_id = int(pub_id)
         except:
@@ -261,15 +255,16 @@ class NewGuinnessForm(ModelForm):
 
         return self.cleaned_data
 
-    def save(self):
+    def save(self, isStaffMember):
 
         logger.info("Creating new Guinness using data - %s", self.cleaned_data)
 
         guinness = Guinness()
 
-        guinness.creator = self.userProfile
-        guinness.price = self.cleaned_data.get('price')
-        guinness.pub = self.pub
+        guinness.creator  = self.userProfile
+        guinness.price    = self.cleaned_data.get('price')
+        guinness.pub      = self.pub
+        guinness.approved = isStaffMember
 
         try:
             guinness.full_clean()
@@ -282,3 +277,5 @@ class NewGuinnessForm(ModelForm):
         except:
             logger.error("Guinness object could not be saved")
             raise
+
+        return guinness

@@ -2,7 +2,6 @@ import logging
 import time
 from subprocess import call
 
-from django.utils import timezone
 from django.core.management.base import BaseCommand
 
 from Guindex.GuindexParameters import GuindexParameters
@@ -17,9 +16,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        logger.info("Backing up Guindex database")
+        while True:
 
-        call("/usr/bin/backup_guindex_db.sh")
-    
-        logger.info("Sleeping for %d seconds", GuindexParameters.DB_BACKUP_PERIOD)
-        time.sleep(GuindexParameters.DB_BACKUP_PERIOD)
+            logger.info("Backing up Guindex database")
+
+            call("/usr/bin/backup_guindex_db.sh")
+
+            logger.info("Sleeping for %d seconds", GuindexParameters.DB_BACKUP_PERIOD)
+            time.sleep(GuindexParameters.DB_BACKUP_PERIOD)

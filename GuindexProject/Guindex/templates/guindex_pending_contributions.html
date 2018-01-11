@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+    <head>
+        <title> {{ user_profile_parameters.PROJECT_TITLE }} | Pending Contributions </title>
+        <link rel="stylesheet" type="text/css" href="{% static "css/global.css" %}" /> 
+        <link rel="stylesheet" type="text/css" href="{% static "css/guindex.css" %}" /> 
+        <link rel="stylesheet" type="text/css" href="{% static "css/index_page_animation.css" %}" /> 
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Oswald" />
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
+        <link rel="icon" href="{% static "images/favicon.png" %}"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script type="text/javascript" src="{% static "javascript/modals_utils.js" %}" defer></script>
+        <script type="text/javascript" src="{% static "javascript/loader.js" %}" defer></script>
+        <script type="text/javascript" src="{% static "javascript/sorting.js" %}" defer></script>
+        <script type="text/javascript" src="{% static "javascript/cookie.js" %}"> </script>
+        <script type="text/javascript" src="{% static "javascript/approve_contribution.js" %}" defer> </script>
+    </head>
+
+    <body>
+
+        {% if modal_to_display == "" %}
+
+            <!-- If no modal to display, display loading screen -->
+            <div id="loading_background">
+
+                <div id="main_loader_container">
+                    <div class="loader" id="main_guindex_loader"> </div>
+                    <div class="loading_text"> Loading Guindex ... </div>
+                </div>
+
+            </div>
+
+            <!-- Hide loading background when page loads -->
+            <script>
+
+                window.addEventListener("load", function(){
+                    $("#loading_background").fadeOut("slow", "linear", function() {});
+                });
+
+            </script>
+
+        {% endif %}
+
+        {% include "index_page_animation.html" %}
+
+        <h1 style="font-size: 30px"> Pending Contributions </h1>
+
+        <div id="corner_info">
+            <a href="/guindex/" id="main_page_link">
+                <i class="fa fa-arrow-left needs_description" aria-hidden="true" data-description_text="Back to main Guindex page"></i>
+            </a>
+            <h4 id="username"> {{ user_profile.user.username }} </h4>
+        </div>
+
+        <div id="centered_content_div">
+
+            <div id="pending_contributions_table_container">
+
+                <table align="left" id="pending_contributions_table" class="guindex_table"> 
+                    <colgroup>
+                        <col style="width:20%">
+                        <col style="width:20%">
+                        <col style="width:20%">
+                        <col style="width:20%">
+                        <col style="width:20%">
+                    </colgroup>
+
+                    <tr class="first_row">
+                        <td> <span class="sortable_column_header"> PUB NAME &#9660; </span></td>
+                        <td> <span class="sortable_column_header"> PRICE </span></td>
+                        <td> <span class="sortable_column_header"> CONTRIBUTOR </span></td>
+                        <td> <span class="sortable_column_header timestamp_column"> TIMESTAMP </span></td>
+                        <td> <span class=""> APPROVE </span></td>
+                    </tr>
+
+                    {% for contribution in pending_contributions %} 
+                    <tr>
+
+                        <!-- PUB NAME CELL -->
+                        <td>
+                            <span class="payload">{{ contribution.pub }}</span>
+                        </td>
+
+                        <!-- PRICE CELL -->
+                        <td>
+                            &euro;<span class="payload">{{ contribution.price }}</span> 
+                        </td>
+
+                        <!-- CONTRIBUTOR CELL -->
+                        <td>
+                            <span class="payload">{{ contribution.contributor }}</span> 
+                        </td>
+
+                        <!-- TIMESTAMP CELL -->
+                        <td>
+                            <span class="payload">{{ contribution.creationDate|date:"D d M Y" }}</span> 
+                        </td>
+
+                        <td>
+                            <i class="fa fa-check approve_contribution_button needs_description" 
+                               data-description_text="Click to approve"
+                               aria-hidden="true"
+                               id="approve_contribution_button_{{ contribution.id }}"
+                               data-contribution_id="{{ contribution.id }}">
+                            </i>
+                            <div class="small_loader" style="width: 10px; height: 10px" id="approve_contribution_button_{{ contribution.id }}_loader"> </div>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                    {% if pending_contributions|length > 0 %}
+                    <tr id="pending_contributions_table_last_row" style="display:none" class="last_row">
+                    {% else %}
+                    <tr id="pending_contributions_table_last_row" class="last_row">
+                    {% endif %}
+                        <td colspan="5" align="center"> No Pending Contributions </td>
+                    </tr>
+                </table>
+
+            </div>
+
+
+        </div>
+        
+    </body>
+
+</html>

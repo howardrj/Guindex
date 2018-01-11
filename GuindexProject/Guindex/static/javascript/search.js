@@ -2,7 +2,7 @@
 
     var search_bar = document.getElementById('pubs_search_bar');
 
-    search_bar.addEventListener('input', function() { filterTable(event); });
+    search_bar.addEventListener('input', function (evt) { filterTable(evt); });
 
     var filterTable = function(evt)
     {

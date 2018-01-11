@@ -4,7 +4,7 @@
 
     for (var i = 0 ; i < not_serving_buttons.length; i++)
     {
-        not_serving_buttons[i].addEventListener('click', function () { openNotServingGuinnessForm(event) });
+        not_serving_buttons[i].addEventListener('click', function (evt) { openNotServingGuinnessForm(evt) });
     }
 
     var openNotServingGuinnessForm = function (evt)
