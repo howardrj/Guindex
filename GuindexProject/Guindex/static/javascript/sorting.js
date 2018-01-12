@@ -25,9 +25,12 @@
         var table = node;
         
         var time_stamp = false;
+        var decimal    = false
 
         if (evt.target.classList.contains('timestamp_column'))
-            time_stamp = true        
+            time_stamp = true; 
+        else if (evt.target.classList.contains('decimal_column'))
+            decimal = true; 
 
         // Get position of target cell in first row 
         var first_row = table.rows[0]; 
@@ -74,6 +77,16 @@
                     return Date.parse(a) - Date.parse(b);
                 }
             );
+        }
+        else if (decimal)
+        {
+            table_rows_content.sort(
+                function(a, b)
+                {
+                    return parseFloat(a) - parseFloat(b);
+                }
+            );
+
         }
         else
         {

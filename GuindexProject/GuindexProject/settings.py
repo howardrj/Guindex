@@ -189,6 +189,14 @@ LOGGING = {
             'backupCount': 10,
             'formatter': 'verbose'
         },
+        'GuindexUserLogFile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, "/var/log/GuindexUser.log"),
+            'maxBytes': 1024 * 1024 * 10,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
         'GuindexStatsLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -243,6 +251,11 @@ LOGGING = {
         },
         'Guindex': {
             'handlers': ['GuindexLogFile'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
+        'GuindexUser': {
+            'handlers': ['GuindexUserLogFile'],
             'propogate': True,
             'level': 'DEBUG',
         },

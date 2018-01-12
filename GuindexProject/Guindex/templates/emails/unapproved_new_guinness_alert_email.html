@@ -14,19 +14,20 @@
         <h1> {{ user_profile_parameters.PROJECT_TITLE }} </h1>
 
         <div class="content_div">
-            <p> Hello {{ username }}, </p>
+            <p> Hello {{ user_profile.user.username }}, </p>
 
-            <p> The following event(s) have occured in the Guindex: </p>
+            <p> The following event was submitted to the Guindex by a non-staff member: </p>
 
-            {% for pub in pub_list %} 
+            <br>
 
-                <p> Pub: {{ pub.name }}</p>
-                <p> Price: {{ pub.price }}</p>
-                <p> Contributor: {{ pub.creator }}</p>
-                <p> Time: {{ pub.creationDate }}</p>
+            <p> Pub: {{ new_guinness.name }}</p>
+            <p> Price: {{ new_guinness.price }}</p>
+            <p> Contributor: {{ new_guinness.creator }}</p>
+            <p> Time: {{ new_guinness.creationDate }}</p>
 
-                <br>
-            {% endfor %}
+            <br>
+
+            <p> Please visit {{ new_guinness.pendingContributionsUrl }} to approve the submission. </p>
 
             <p> Regards, </p>
             <p> {{ user_profile_parameters.PROJECT_TITLE }} Team </p>

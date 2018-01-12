@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 import logging
 import math
-import socket
 from decimal import Decimal
 
 from django.core.exceptions import ObjectDoesNotExist
 
 from Guindex.models import Pub, Guinness, StatisticsSingleton, UserContributionsSingleton
-from Guindex import GuindexAlertsIf_pb2 as GuindexAlertsIf
 
 from UserProfile.models import UserProfile
 
@@ -40,7 +38,7 @@ def getUserProfileFromUser(user):
         logger.debug("UserProfile %s has a TelegramUser %s. No need to create one", user_profile, user_profile.telegramuser)
 
     if not user_profile.guindexuser:
-            
+
         logger.info("UserProfile %s does not have a GuindexUser. Creating one", user_profile)
         GuindexUserUtils.createNewGuindexUser(user_profile)
 
@@ -74,7 +72,7 @@ def getPubs():
 
         pub_list.append(pub_dict.copy())
 
-    return sorted(pub_list, key = lambda k: k['name'], reverse = False)
+    return sorted(pub_list, key = lambda k: k['name'].lower(), reverse = False)
 
 
 def getPendingContributions():
@@ -82,7 +80,7 @@ def getPendingContributions():
     pending_contributions = Guinness.objects.filter(approved = False)
 
     pending_contributions_list = []
-    
+
     for guin in pending_contributions:
 
         pending_contribution_dict = {}
@@ -109,7 +107,7 @@ def getStats():
     stats_dict = {}
 
     stats_dict['title'] = 'Number of Pubs in Database'
-    stats_dict['value'] = stats_singleton.pubsInDb 
+    stats_dict['value'] = stats_singleton.pubsInDb
 
     stats_list.append(stats_dict.copy())
 
@@ -135,7 +133,7 @@ def getStats():
         stats_dict['value'] = u'€%s' % (stats_singleton.cheapestPub)
 
     stats_list.append(stats_dict.copy())
-    
+
     stats_dict['title'] = 'Dearest Pint'
     if not stats_singleton.dearestPub:
         stats_dict['value'] = 'TBD'
@@ -143,7 +141,7 @@ def getStats():
         stats_dict['value'] = u'€%s' % (stats_singleton.dearestPub)
 
     stats_list.append(stats_dict.copy())
-    
+
     stats_dict['title'] = 'Closed Pubs'
     stats_dict['value'] = stats_singleton.closedPubs
 
@@ -163,11 +161,12 @@ def getStats():
 
     return stats_list
 
+
 def getPersonalContributions(userProfile):
 
     logger.debug("Retrieving personal contributions")
 
-    contribution_list = [] 
+    contribution_list = []
 
     contribution_dict = {}
 
@@ -175,7 +174,7 @@ def getPersonalContributions(userProfile):
     contribution_dict['value'] = userProfile.guindexuser.pubsVisited
 
     contribution_list.append(contribution_dict.copy())
-    
+
     contribution_dict['title'] = 'Original Prices'
     contribution_dict['value'] = userProfile.guindexuser.originalPrices
 
@@ -202,7 +201,7 @@ def getBestContributions():
 
     user_contribution_singleton = UserContributionsSingleton.load()
 
-    contribution_list = [] 
+    contribution_list = []
 
     contribution_dict = {}
 
@@ -214,7 +213,7 @@ def getBestContributions():
         contribution_dict['value'] = 'NA'
 
     contribution_list.append(contribution_dict.copy())
-    
+
     contribution_dict['title'] = 'Most Original Prices'
     if user_contribution_singleton.mostFirstVerified:
         contribution_dict['value'] = "%s (%d)" % (user_contribution_singleton.mostFirstVerified.user.username,
@@ -233,7 +232,7 @@ def getBestContributions():
 
     contribution_list.append(contribution_dict.copy())
 
-    contribution_dict['title'] = 'Last Calculated' 
+    contribution_dict['title'] = 'Last Calculated'
     contribution_dict['value'] = user_contribution_singleton.lastCalculated
 
     contribution_list.append(contribution_dict.copy())
@@ -243,16 +242,16 @@ def getBestContributions():
     return contribution_list
 
 
-def calculateNumberOfPubs(statsSingleton): 
+def calculateNumberOfPubs(statsSingleton):
 
     statsSingleton.pubsInDb = len(Pub.objects.all())
 
 
 def calculateCheapestPub(statsSingleton):
-         
+
     cheapest_pub = None
 
-    for pub_index, pub in enumerate(Pub.objects.all()): 
+    for pub_index, pub in enumerate(Pub.objects.all()):
 
         if pub_index == 0:
             cheapest_pub = pub
@@ -269,7 +268,7 @@ def calculateDearestPub(statsSingleton):
 
     dearest_pub = None
 
-    for pub_index, pub in enumerate(Pub.objects.all()): 
+    for pub_index, pub in enumerate(Pub.objects.all()):
 
         if pub_index == 0:
             dearest_pub = pub
@@ -280,14 +279,14 @@ def calculateDearestPub(statsSingleton):
             dearest_pub = pub
 
     statsSingleton.dearestPub = '%.2f (%s)' % (dearest_pub.getLastVerifiedGuinness()['price'], dearest_pub.name)
-    
+
 
 def calculateAveragePrice(statsSingleton):
 
     visited_pubs = 0
     sum_total    = 0
 
-    for pub in Pub.objects.all(): 
+    for pub in Pub.objects.all():
 
         if pub.getLastVerifiedGuinness():
             visited_pubs = visited_pubs + 1
@@ -309,7 +308,7 @@ def calculateStandardDeviation(statsSingleton):
         statsSingleton.standardDevation = 0
         return
 
-    for pub in Pub.objects.all(): 
+    for pub in Pub.objects.all():
 
         if pub.getLastVerifiedGuinness():
             visited_pubs = visited_pubs + 1
@@ -328,7 +327,7 @@ def calculatePercentageVisited(statsSingleton):
         statsSingleton.percentageVisited = 0
         return
 
-    for pub in Pub.objects.all(): 
+    for pub in Pub.objects.all():
 
         if pub.getLastVerifiedGuinness() or not pub.servingGuinness:
             visited_pubs = visited_pubs + 1
@@ -356,24 +355,24 @@ def calculateUserContributions(logger):
 
     for loop_index, user_profile in enumerate(UserProfile.objects.all()):
 
-        logger.debug("Calculating contrbutions for UserProfile %s", user_profile)
+        logger.debug("Calculating contributions for UserProfile %s", user_profile)
 
         if not user_profile.guindexuser:
-            logger.debug("Need to create GuindexUser for UserProfile %s", user_profile) 
+            logger.debug("Need to create GuindexUser for UserProfile %s", user_profile)
 
             GuindexUserUtils.createNewGuindexUser(user_profile)
-            
+
         number_of_current_verifications = 0
-        number_of_first_verifications   = 0 
+        number_of_first_verifications   = 0
         number_of_pubs_visited          = 0
 
         for pub in Pub.objects.all():
-           
-            if pub.getLastVerifiedGuinness(): 
+
+            if pub.getLastVerifiedGuinness():
                 if pub.getLastVerifiedGuinness()['creator'] == user_profile.user.username:
                     number_of_current_verifications = number_of_current_verifications + 1
 
-            if pub.getFirstVerifiedGuinness(): 
+            if pub.getFirstVerifiedGuinness():
                 if pub.getFirstVerifiedGuinness()['creator'] == user_profile.user.username:
                     number_of_first_verifications = number_of_first_verifications + 1
 
@@ -409,132 +408,3 @@ def calculateUserContributions(logger):
     logger.info("Saving User Contributions Singleton %s", user_contributions_singleton)
 
     user_contributions_singleton.save()
-
-
-def createAlertsServerConnection():
-    """ 
-        Return TCP socket that's connected to Alerts Server
-    """
-
-    alerts_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
-    try:
-        logger.info("Creating TCP connection to Alerts Server")
-        alerts_socket.connect((GuindexParameters.ALERTS_LISTEN_IP, GuindexParameters.ALERTS_LISTEN_PORT))
-        logger.info("Successfully connected to Alerts Server")
-    except socket.error:
-        logger.error("Failed to connect to Alerts Server")
-        alerts_socket.close()
-        raise
-
-    return alerts_socket
-
-
-def sendAlertRequest(guinness):
-    """
-        Send alert request to Guindex Alerts server
-    """
-
-    logger.info("Sending Alert Request for Guinness %s", guinness)
-
-    try:
-        alerts_socket = createAlertsServerConnection()
-    except:
-        logger.error("Failed to create Alerts Sewrver connection")
-        raise
-
-    # Create Alert Request message
-    guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
-
-    guindex_alerts_msg.alertRequest.pub       = guinness.pub.name
-    guindex_alerts_msg.alertRequest.price     = '€%.2f' % guinness.price
-    guindex_alerts_msg.alertRequest.username  = guinness.creator.user.username
-    guindex_alerts_msg.alertRequest.approved  = guinness.approved
-    guindex_alerts_msg.alertRequest.timestamp = '%s' % guinness.creationDate
-
-    try:
-        message_string = guindex_alerts_msg.SerializeToString()
-    except:
-        logger.error("Failed to serialize Alert Request message")
-        alerts_socket.close()
-        raise
-        
-    message_length = len(message_string)
-
-    message_string = prependTwoByteHeader(message_string)
-
-    # Prepend two byte length header to message_string
-    try:
-        message_length_first_byte = (message_length >> 8) & 0xFF
-        message_length_second_byte = message_length & 0xFF
-        message_string = chr(message_length_first_byte) + chr(message_length_second_byte) + message_string
-
-        logger.info("Sending Alert Request message to Alerts Server - %s" % (":".join("{:02x}".format(ord(c)) for c in message_string)))
-
-        alerts_socket.send(message_string)
-
-        logger.info("Successfully sent Alert Request")
-
-        alerts_socket.close()
-
-    except:
-        logger.error("Failed to send Alert Request message to Alert Server")
-        alerts_socket.close()
-        raise
-
-
-def sendApprovalConfirmationRequest(guinness):
-    """
-        Send approval confirmation request to Guindex Alerts server
-    """
-
-    logger.info("Sending Approval Confirmation Request for Guinness %s", guinness)
-
-    alerts_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    try:
-        logger.info("Creating TCP connection to Alerts Server")
-        alerts_socket.connect((GuindexParameters.ALERTS_LISTEN_IP, GuindexParameters.ALERTS_LISTEN_PORT))
-        logger.info("Successfully connected to Alerts Server")
-    except socket.error:
-        logger.error("Failed to connect to Alerts Server")
-        alerts_socket.close()
-        raise
-
-    # Create Approval Confimration Request message
-    guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
-
-    guindex_alerts_msg.approvalConfirmationRequest.creatorId = str(guinness.creator.id)
-    guindex_alerts_msg.approvalConfirmationRequest.pub       = guinness.pub.name
-    guindex_alerts_msg.approvalConfirmationRequest.price     = '€%.2f' % guinness.price
-    guindex_alerts_msg.approvalConfirmationRequest.approved  = guinness.approved
-    guindex_alerts_msg.alertRequest.timestamp = '%s' % guinness.creationDate
-
-    try:
-        message_string = guindex_alerts_msg.SerializeToString()
-    except:
-        logger.error("Failed to serialize Approval Confirmation Request message")
-        alerts_socket.close()
-        raise
-        
-    message_length = len(message_string)
-
-    # Prepend two byte length header to message_string
-    try:
-        message_length_first_byte = (message_length >> 8) & 0xFF
-        message_length_second_byte = message_length & 0xFF
-        message_string = chr(message_length_first_byte) + chr(message_length_second_byte) + message_string
-
-        logger.info("Sending Approval Confirmation Request message to Alerts Server - %s" % (":".join("{:02x}".format(ord(c)) for c in message_string)))
-
-        alerts_socket.send(message_string)
-
-        logger.info("Successfully sent Approval Confirmation Request")
-
-        alerts_socket.close()
-
-    except:
-        logger.error("Failed to send Approval Confimration Request message to Alert Server")
-        alerts_socket.close()
-        raise
-

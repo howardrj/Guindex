@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="{% static "css/index.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "css/global.css" %}" />
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Oswald">
+    </head>
+
+    <body>
+
+        <h1> {{ user_profile_parameters.PROJECT_TITLE }} </h1>
+
+        <div class="content_div">
+            <p> Hello {{ user_profile.user.username }}, </p>
+
+            <p> Your below Guindex submission has been {{ new_guinness.approved }}: </p>
+
+            <br>
+
+            <p> Pub: {{ new_guinness.name }}</p>
+            <p> Price: {{ new_guinness.price }}</p>
+            <p> Time: {{ new_guinness.creationDate }}</p>
+
+            {% if new_guinness.resaon %}
+                <p> Reason: {{ new_guinness.reason }} </p>
+            {% endif %}
+
+            <br>
+
+            <p> Regards, </p>
+            <p> {{ user_profile_parameters.PROJECT_TITLE }} Team </p>
+
+        </div>
+
+    </body>
+
+</html>

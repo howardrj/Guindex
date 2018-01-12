@@ -2,21 +2,22 @@ package GuindexAlertsIf;
 
 // Message to send to AlertsServer when new price is added
 message NewGuinnessAlertRequest {
-    required string pub       = 1;
-    required string price     = 2;
-    required string username  = 3;
-    required bool   approved  = 4;
-    required string timestamp = 5;
+    required string pub          = 1;
+    required string price        = 2;
+    required string username     = 3;
+    required bool   approved     = 4;
+    required string creationDate = 5;
+    optional string uri          = 6; // URI of project (may not be guindex.ie) 
 }
 
 // Message to send to AlertsServer when contribution is approved/rejected
 message ApprovalDecisionAlertRequest {
-    required string creatorId = 1;
-    required string pub       = 2;
-    required string price     = 3;
-    required bool   approved  = 4;
-    required string timestamp = 5;
-    optional string reason    = 6;
+    required string creatorId    = 1;
+    required string pub          = 2;
+    required string price        = 3;
+    required bool   approved     = 4;
+    required string creationDate = 5;
+    optional string reason       = 6;
 }
 
 message GuindexAlertsIfMessage {

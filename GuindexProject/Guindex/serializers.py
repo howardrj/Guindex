@@ -16,7 +16,7 @@ class GuinnessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Guinness
-        fields = ['id', 'price', 'pub', 'creationDate', 'contributor']
+        fields = ['id', 'price', 'pub', 'creationDate', 'contributor', 'approved']
 
 
 class StatisticsSerializer(serializers.ModelSerializer):
