@@ -447,6 +447,7 @@ input:checked + .slider:before {
 #guindex_map {
     height: 400px;
     width: 100%;
+    margin-bottom: 50px;
 }
 
 /* floating panel on top of map */
