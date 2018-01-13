@@ -13,12 +13,19 @@ logger = logging.getLogger(__name__)
 
 class Pub(models.Model):
 
-    name            = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN, default = "")
-    longitude       = models.DecimalField(decimal_places = 7, max_digits = 12, default = 0.0)
-    latitude        = models.DecimalField(decimal_places = 7, max_digits = 12, default = 0.0)
-    mapLink         = models.TextField(default = "")
-    closed          = models.BooleanField(default = False)
-    servingGuinness = models.BooleanField(default = True)
+    name                                 = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN, default = "")
+    longitude                            = models.DecimalField(decimal_places = 7, max_digits = 12, default = 0.0)
+    latitude                             = models.DecimalField(decimal_places = 7, max_digits = 12, default = 0.0)
+    mapLink                              = models.TextField(default = "")
+    closed                               = models.BooleanField(default = False)
+    servingGuinness                      = models.BooleanField(default = True)
+    approved                             = models.BooleanField(default = True) # In case non-staff member wants to add a pub
+    pendingClosed                        = models.BooleanField(default = False) # In case non-staff member closes pub
+    pendingClosedContributor             = models.ForeignKey(UserProfile, null = True, related_name = 'pendingCloser')
+    pendingClosedTime                    = models.DateTimeField(default = timezone.now)
+    pendingNotServingGuinness            = models.BooleanField(default = False) # In case non-staff member marks pub as not serving Guinness
+    pendingNotServingGuinnessContributor = models.ForeignKey(UserProfile, null = True, related_name = 'pendingNotServingGuinnessMarker')
+    pendingNotServigGuinnessTime         = models.DateTimeField(default = timezone.now)
 
     def __unicode__(self):
 
