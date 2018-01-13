@@ -269,7 +269,7 @@ def handleNewGuinnessRequest(userProfile, postData):
         return (modal_to_display, new_guinness_form, warning_text)
 
     try:
-        alerts_client.sendNewGuinnessAlertRequest(new_guinness, request)
+        alerts_client.sendNewGuinnessAlertRequest(new_guinness)
     except:
         logger.error("Failed to send New Guinness Alert Request")
         return (modal_to_display, new_guinness_form, warning_text)
@@ -312,7 +312,6 @@ def handleVerifyGuinnessRequest(userProfile, postData):
 
         modal_to_display = "warning"
         warning_text = "This operation is only permitted for staff members."
-        return modal_to_display, warning_text
 
     last_verified_guinness = pub.getLastVerifiedGuinness()
 
@@ -321,16 +320,17 @@ def handleVerifyGuinnessRequest(userProfile, postData):
     # Create new Guinness object
     guinness = Guinness()
 
-    guinness.creator = userProfile
-    guinness.price   = last_verified_guinness['price']
-    guinness.pub     = pub
+    guinness.creator  = userProfile
+    guinness.price    = last_verified_guinness['price']
+    guinness.pub      = pub
+    guinness.approved = userProfile.user.is_staff
 
     try:
         guinness.full_clean()
     except:
         logger.error("Guinness object data could not be validated")
 
-        warning_text = "Failed to verify."
+        warning_text = "Failed to validate new Guinness object."
         modal_to_display = "warning"
         return modal_to_display, warning_text
 
@@ -339,8 +339,33 @@ def handleVerifyGuinnessRequest(userProfile, postData):
     except:
         logger.error("Guinness object could not be saved")
 
-        warning_text = "Failed to verify."
+        warning_text = "Failed to save new Guinness object."
         modal_to_display = "warning"
+        return modal_to_display, warning_text
+
+    # Guinness object has been saved at this point
+
+    if not userProfile.user.is_staff:
+
+        logger.info("Contribution was made by non-staff member")
+
+        # Set relevant return variables
+        modal_to_display  = "warning"
+        warning_text      = "Thank you for your contribution. A staff member will verify your submission shortly."
+
+    else:
+        logger.info("Contribution was made by staff member")
+
+    try:
+        alerts_client = GuindexAlertsClient(logger)
+    except:
+        logger.error("Failed to create Alerts Client")
+        return (modal_to_display, warning_text)
+
+    try:
+        alerts_client.sendNewGuinnessAlertRequest(guinness)
+    except:
+        logger.error("Failed to send New Guinness Alert Request")
         return modal_to_display, warning_text
 
     return modal_to_display, warning_text

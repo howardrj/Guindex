@@ -36,7 +36,7 @@
 
         var cleanUpTable = function (contributionId) {
 
-            var table          = document.getElementById('pending_contributions_table');
+            var table          = document.getElementById('pending_prices_table');
             var clicked_button = table.querySelector('#approve_contribution_button_' + contributionId)
 
             clicked_button.parentNode.innerHTML = "APPROVED";

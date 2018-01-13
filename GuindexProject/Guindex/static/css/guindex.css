@@ -168,7 +168,7 @@
 /*****************/
 /* Guindex Table */
 /*****************/
-#guindex_table, #pending_contributions_table {
+#guindex_table, .pending_contributions_table {
     position: relative;
     width: 99.2%;
     left: 5px;
@@ -180,11 +180,11 @@
     table-layout: fixed;
 } 
 
-#guindex_table tr, #pending_contributions_table tr {
+#guindex_table tr, .pending_contributions_table tr {
     border-bottom: 1px solid black;
 }
 
-#guindex_table td, #pending_contributions_table td {
+#guindex_table td, .pending_contributions_table td {
     font-family: "Oswald";
     font-size: 16px;
     padding-top: 15px;
@@ -192,7 +192,7 @@
     padding-left: 5px;
 }    
 
-#guindex_table i, #pending_contributions_table i {
+#guindex_table i, .pending_contributions_table i {
     font-size: 20px;
 }
 
@@ -203,6 +203,16 @@
 
 td {
     overflow: visible;
+}
+
+.pending_contributions_table caption {
+
+    font-family: "Oswald";
+    border: 2px solid black;
+    border-bottom: 0px;
+    text-align:center;
+    font-size: 20px;
+    padding: 15px 0;
 }
 
 /***********************/
