@@ -21,10 +21,10 @@ class Pub(models.Model):
     servingGuinness                      = models.BooleanField(default = True)
     approved                             = models.BooleanField(default = True) # In case non-staff member wants to add a pub
     pendingClosed                        = models.BooleanField(default = False) # In case non-staff member closes pub
-    pendingClosedContributor             = models.ForeignKey(UserProfile, null = True, related_name = 'pendingCloser')
+    pendingClosedContributor             = models.ForeignKey(UserProfile, null = True, blank = True, related_name = 'pendingCloser', default = None)
     pendingClosedTime                    = models.DateTimeField(default = timezone.now)
     pendingNotServingGuinness            = models.BooleanField(default = False) # In case non-staff member marks pub as not serving Guinness
-    pendingNotServingGuinnessContributor = models.ForeignKey(UserProfile, null = True, related_name = 'pendingNotServingGuinnessMarker')
+    pendingNotServingGuinnessContributor = models.ForeignKey(UserProfile, null = True, blank = True, related_name = 'pendingNotServingGuinnessMarker', default = None)
     pendingNotServigGuinnessTime         = models.DateTimeField(default = timezone.now)
 
     def __unicode__(self):
