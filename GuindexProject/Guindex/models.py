@@ -19,7 +19,9 @@ class Pub(models.Model):
     mapLink                              = models.TextField(default = "")
     closed                               = models.BooleanField(default = False)
     servingGuinness                      = models.BooleanField(default = True)
-    approved                             = models.BooleanField(default = True) # In case non-staff member wants to add a pub
+    pendingApproval                      = models.BooleanField(default = True) # In case non-staff member wants to add a pub
+    pendingApprovalContributor           = models.ForeignKey(UserProfile, null = True, blank = True, related_name = 'pendingAdder', default = None)
+    pendingApprovalTime                  = models.DateTimeField(default = timezone.now)
     pendingClosed                        = models.BooleanField(default = False) # In case non-staff member closes pub
     pendingClosedContributor             = models.ForeignKey(UserProfile, null = True, blank = True, related_name = 'pendingCloser', default = None)
     pendingClosedTime                    = models.DateTimeField(default = timezone.now)
