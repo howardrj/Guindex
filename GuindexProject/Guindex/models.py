@@ -27,7 +27,7 @@ class Pub(models.Model):
     pendingClosedTime                    = models.DateTimeField(default = timezone.now)
     pendingNotServingGuinness            = models.BooleanField(default = False) # In case non-staff member marks pub as not serving Guinness
     pendingNotServingGuinnessContributor = models.ForeignKey(UserProfile, null = True, blank = True, related_name = 'pendingNotServingGuinnessMarker', default = None)
-    pendingNotServigGuinnessTime         = models.DateTimeField(default = timezone.now)
+    pendingNotServingGuinnessTime        = models.DateTimeField(default = timezone.now)
 
     def __unicode__(self):
 
