@@ -1,11 +1,9 @@
 import logging
 import time
-import math
-from decimal import Decimal
 
 from django.core.management.base import BaseCommand
 
-from Guindex.models import Pub, StatisticsSingleton
+from Guindex.models import StatisticsSingleton
 from Guindex.GuindexParameters import GuindexParameters
 from Guindex import GuindexUtils
 
@@ -29,19 +27,19 @@ class Command(BaseCommand):
                 GuindexUtils.calculateNumberOfPubs(statistics_singleton)
             except:
                 logger.error("Failed to calculate number of pubs")
-                
+
             try:
                 logger.info("Calculating cheapest pub")
                 GuindexUtils.calculateCheapestPub(statistics_singleton)
             except:
                 logger.error("Failed to calculate cheapest pub")
-                
+
             try:
                 logger.info("Calculating dearest pub")
                 GuindexUtils.calculateDearestPub(statistics_singleton)
             except:
                 logger.error("Failed to calculate dearest pub")
-                
+
             try:
                 logger.info("Calculating average price")
                 GuindexUtils.calculateAveragePrice(statistics_singleton)
@@ -53,13 +51,13 @@ class Command(BaseCommand):
                 GuindexUtils.calculateStandardDeviation(statistics_singleton)
             except:
                 logger.error("Failed to calculate standard deviation")
-                
+
             try:
                 logger.info("Calculating percentage visited")
                 GuindexUtils.calculatePercentageVisited(statistics_singleton)
             except:
                 logger.error("Failed to calculate percentage visited")
-                
+
             try:
                 logger.info("Calculating closed pubs")
                 GuindexUtils.calculateClosedPubs(statistics_singleton)

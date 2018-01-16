@@ -35,11 +35,11 @@
     <!-- Click switches if required -->
     <script>
         
-        {% if using_email_alerts %}
+        {% if user_profile.usingEmailAlerts %}
             document.getElementById('email_checkbox').click();
         {% endif %}
 
-        {% if using_telegram_alerts %}
+        {% if user_profile.telegramuser.usingTelegramAlerts %}
             document.getElementById('telegram_checkbox').click();
         {% endif %}
     </script>

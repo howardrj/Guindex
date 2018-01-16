@@ -61,17 +61,38 @@ class GuindexAlertsServer(Int16StringReceiver):
 
             self._handleNewGuinnessAlertRequest(msg)
 
-        elif msg.HasField('approvalDecisionAlertRequest'):
+        elif msg.HasField('newPubAlertRequest'):
 
-            self._handleApprovalDecisionAlertRequest(msg)
+            self._handleNewPubAlertRequest(msg)
+
+        elif msg.HasField('pubClosedAlertRequest'):
+
+            self._handlePubClosedAlertRequest(msg)
+
+        elif msg.HasField('pubNotServingGuinnessAlertRequest'):
+
+            self._handlePubNotServingGuinnessAlertRequest(msg)
+
+        elif msg.HasField('newGuinnessDecisionAlertRequest'):
+
+            self._handleNewGuinnessDecisionAlertRequest(msg)
+
+        elif msg.HasField('newPubDecisionAlertRequest'):
+
+            self._handleNewPubDecisionAlertRequest(msg)
+
+        elif msg.HasField('pubClosedDecisionAlertRequest'):
+
+            self._handlePubClosediDecisionAlertRequest(msg)
+
+        elif msg.HasField('pubNotServingGuinnessDecisionAlertRequest'):
+
+            self._handlePubNotServingGuinnessDecisionAlertRequest(msg)
 
         else:
             self.logger.error("Received unknown message type")
 
     def _handleNewGuinnessAlertRequest(self, message):
-        """
-           Send alerts each time a price has been submitted
-        """
 
         self.logger.info("Received New Guinness Alert Request")
 
@@ -81,6 +102,39 @@ class GuindexAlertsServer(Int16StringReceiver):
         else:
             self.logger.info("Guinness is not approved")
             self._handleUnapprovedNewGuinnessAlertRequest(message)
+
+    def _handleNewPubAlertRequest(self, message):
+
+        self.logger.info("Received New Pub Alert Request")
+
+        if message.newPubAlertRequest.approved:
+            self.logger.info("Pub is approved")
+            self._handleApprovedNewPubAlertRequest(message)
+        else:
+            self.logger.info("Pub is not approved")
+            self._handleUnapprovedNewPubAlertRequest(message)
+
+    def _handlePubClosedAlertRequest(self, message):
+
+        self.logger.info("Received Pub Closed Alert Request")
+
+        if message.pubClosedAlertRequest.approved:
+            self.logger.info("Pub closure is approved")
+            self._handleApprovedPubCloseAlertRequest(message)
+        else:
+            self.logger.info("Pub closure is not approved")
+            self._handleUnapprovedPubCloseAlertRequest(message)
+
+    def _handlePubNotServingGuinnessAlertRequest(self, message):
+
+        self.logger.info("Received Pub Not Serving Guinness Alert Request")
+
+        if message.pubNotServingGuinnessAlertRequest.approved:
+            self.logger.info("Pub not serving Guinness is approved")
+            self._handleApprovedPubNotServingGuinnessAlertRequest(message)
+        else:
+            self.logger.info("Pub not serving Guinness is not approved")
+            self._handleUnapprovedPubNotServingGuinnessAlertRequest(message)
 
     def _handleApprovedNewGuinnessAlertRequest(self, message, userProfileToIgnore = None):
 
@@ -99,7 +153,6 @@ class GuindexAlertsServer(Int16StringReceiver):
 
                 self.logger.debug("Sending Approved New Guinness Alerts email to UserProfile %s", user_profile)
 
-                # TODO Do we need to do this on every loop iteration?
                 new_guinness_dict = {}
 
                 new_guinness_dict['name']         = message.newGuinnessAlertRequest.pub
@@ -160,7 +213,6 @@ class GuindexAlertsServer(Int16StringReceiver):
 
                 self.logger.debug("Sending Unapproved New Guinness Alert email to UserProfile %s", user_profile)
 
-                # TODO Do we need to do this on every loop iteration?
                 new_guinness_dict = {}
 
                 new_guinness_dict['name']         = message.newGuinnessAlertRequest.pub
@@ -217,82 +269,3 @@ class GuindexAlertsServer(Int16StringReceiver):
                     GuindexBot.sendMessage(telegram_message, user_profile.telegramuser.chatId)
                 except:
                     self.logger.error("Failed to send Telegram to %s", user_profile)
-
-    def _handleApprovalDecisionAlertRequest(self, message):
-        """
-           Send alerts each time a pending price has been dealt with
-        """
-
-        self.logger.info("Received Approval Decision Alert Request")
-
-        try:
-            user_profile = UserProfile.objects.get(id = int(message.approvalDecisionAlertRequest.creatorId))
-        except:
-            self.logger.error("Failed to find UserProfile with id %s", message.approvalDecisionAlertRequest.creatorId)
-            return
-
-        if user_profile.usingEmailAlerts:
-
-            self.logger.debug("Sending Approval Decision Alert email to UserProfile %s", user_profile)
-
-            # TODO Do we need to do this on every loop iteration?
-            new_guinness_dict = {}
-
-            new_guinness_dict['name']         = message.approvalDecisionAlertRequest.pub
-            new_guinness_dict['price']        = message.approvalDecisionAlertRequest.price
-            new_guinness_dict['creationDate'] = message.approvalDecisionAlertRequest.creationDate
-            new_guinness_dict['approved']     = "approved" if message.approvalDecisionAlertRequest.approved else "rejected"
-
-            if message.approvalDecisionAlertRequest.HasField('reason'):
-                new_guinness_dict['reason'] = message.approvalDecisionAlertRequest.reason
-
-            data = {}
-
-            data['user_profile']               = user_profile
-            data['user_profile_parameters']    = UserProfileParameters.getParameters()
-            data['new_guinness']               = new_guinness_dict
-
-            try:
-                html_content = render_to_string('approval_decision_alert_email.html', data)
-                user_profile.user.email_user('Guindex Submission Decision Alert', html_content, None, html_message = html_content)
-            except:
-                self.logger.error("Failed to send email to %s", user_profile)
-
-        if user_profile.telegramuser:
-
-            if user_profile.telegramuser.activated and user_profile.telegramuser.usingTelegramAlerts:
-
-                self.logger.debug("Sending Approval Decision Alert Telegram to UserProfile %s", user_profile)
-
-                decision = "approved" if message.approvalDecisionAlertRequest.approved else "rejected"
-
-                telegram_message = "Your below Guindex submission has been %s:\n\n" % decision
-
-                telegram_message += "Pub: %s\n"   % message.approvalDecisionAlertRequest.pub
-                telegram_message += "Price: %s\n" % message.approvalDecisionAlertRequest.price[1:]
-                telegram_message += "Time: %s\n"  % message.approvalDecisionAlertRequest.creationDate
-
-                if message.approvalDecisionAlertRequest.HasField('reason'):
-                    telegram_message += "Reason: %s\n" % message.approvalDecisionAlertRequest.creationDate
-
-                try:
-                    GuindexBot.sendMessage(telegram_message, user_profile.telegramuser.chatId)
-                except:
-                    self.logger.error("Failed to send Telegram to %s", user_profile)
-
-        else:
-            self.logger.info("UserProfile %s has not created telegramuser yet", user_profile)
-
-        # Send new approved Guinness request?
-        guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
-
-        guindex_alerts_msg.newGuinnessAlertRequest.pub          = message.approvalDecisionAlertRequest.pub
-        guindex_alerts_msg.newGuinnessAlertRequest.price        = message.approvalDecisionAlertRequest.price
-        guindex_alerts_msg.newGuinnessAlertRequest.username     = user_profile.user.username
-        guindex_alerts_msg.newGuinnessAlertRequest.approved     = True
-        guindex_alerts_msg.newGuinnessAlertRequest.creationDate = '%s' % message.approvalDecisionAlertRequest.creationDate
-
-        try:
-            self._handleApprovedNewGuinnessAlertRequest(guindex_alerts_msg, user_profile)
-        except:
-            self.logger.error("Failed to inform other Users of approval decision")

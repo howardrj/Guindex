@@ -2,6 +2,7 @@ import logging
 from decimal import Decimal
 
 from django import forms
+from django.utils import timezone
 from django.forms import ModelForm
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -27,13 +28,6 @@ class NewPubForm(ModelForm):
         super(NewPubForm, self).__init__(*args, **kwargs)
 
     def clean(self):
-        """
-            Note that if a required field is blank in form,
-            it will be not be found in cleaned_data.
-            If it is not required an empty string will be placed
-            in cleaned_data.
-            Some browsers won't let us get this far!
-        """
 
         logger.debug("Cleaning data - %s", self.cleaned_data)
 
@@ -41,12 +35,7 @@ class NewPubForm(ModelForm):
         latitude  = self.cleaned_data.get('latitude')
         longitude = self.cleaned_data.get('longitude')
 
-        if not self.userProfile.user.is_staff:
-            logger.error("Only staff members can create a new pub")
-            msg = "Only staff members can create a new pub"
-            self.add_error('name', msg)
-            return self.cleaned_data
-
+        # TODO Could check lat/lon are within Dublin
         if not pub_name or not latitude or not longitude:
 
             if not pub_name:
@@ -101,10 +90,13 @@ class NewPubForm(ModelForm):
 
         pub = Pub()
 
-        pub.name      = self.cleaned_data.get('name')
-        pub.latitude  = self.cleaned_data.get('latitude')
-        pub.longitude = self.cleaned_data.get('longitude')
-        pub.mapLink   = "https://www.google.ie/maps/place/%f,%f" % (pub.latitude, pub.longitude)
+        pub.name                       = self.cleaned_data.get('name')
+        pub.latitude                   = self.cleaned_data.get('latitude')
+        pub.longitude                  = self.cleaned_data.get('longitude')
+        pub.mapLink                    = "https://www.google.ie/maps/place/%f,%f" % (pub.latitude, pub.longitude)
+        pub.pendingApproval            = not self.userProfile.user.is_staff
+        pub.pendingApprovalContributor = self.userProfile # Means we know who added pub
+        pub.pendingApprovalTime        = timezone.now()
 
         try:
             pub.full_clean()
@@ -118,90 +110,7 @@ class NewPubForm(ModelForm):
             logger.error("Pub object could not be saved")
             raise
 
-
-class RenamePubForm(ModelForm):
-
-    pub = forms.CharField(label = "", widget = forms.HiddenInput())
-
-    class Meta:
-        model = Pub
-        fields = ['name']
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("RenamePubForm constructor called")
-
-        # RenamePubForm has user as member variable
-        self.userProfile = kwargs.pop('userProfile', None)
-        self.pub         = kwargs.pop('pub', None)
-
-        # Access base class constructor
-        super(RenamePubForm, self).__init__(*args, **kwargs)
-
-    def clean(self):
-        """
-            Note that if a required field is blank in form,
-            it will be not be found in cleaned_data.
-            If it is not required an empty string will be placed
-            in cleaned_data.
-            Some browsers won't let us get this far!
-        """
-
-        logger.debug("Cleaning data - %s", self.cleaned_data)
-
-        pub_id   = self.cleaned_data.get('pub')
-        new_name = self.cleaned_data.get('name')
-
-        if not self.userProfile.user.is_staff:
-            logger.error("Only staff members can rename a pub")
-            msg = "Only staff members can rename a pub"
-            self.add_error('name', msg)
-            return self.cleaned_data
-
-        try:
-            pub_id = int(pub_id)
-        except:
-            logger.error("Pub id %s is not an integer", pub_id)
-            msg = "Pub id %s is invalid" % pub_id
-            self.add_error('pub', msg)
-            return self.cleaned_data
-
-        try:
-            pub = Pub.objects.get(id = pub_id)
-            self.pub = pub
-        except ObjectDoesNotExist:
-            logger.error("No pub with id %d exists", pub_id)
-            msg = "No pub with id %d exists" % pub_id
-            self.add_error('pub', msg)
-            return self.cleaned_data
-
-        try:
-            Pub.objects.get(name = new_name)
-            logger.error("Pub with name %s already exists. Can't use this name", new_name)
-            msg = "A pub already exists with this name."
-            self.add_error('name', msg)
-        except ObjectDoesNotExist:
-            logger.debug("Pub name %s has not been taken yet", new_name)
-
-        return self.cleaned_data
-
-    def save(self):
-
-        logger.info("Renaming pub using data - %s", self.cleaned_data)
-
-        self.pub.name = self.cleaned_data.get('name')
-
-        try:
-            self.pub.full_clean()
-        except:
-            logger.error("Pub object data could not be validated")
-            raise
-
-        try:
-            self.pub.save()
-        except:
-            logger.error("Pub object could not be saved")
-            raise
+        return pub
 
 
 class NewGuinnessForm(ModelForm):
@@ -224,13 +133,6 @@ class NewGuinnessForm(ModelForm):
         super(NewGuinnessForm, self).__init__(*args, **kwargs)
 
     def clean(self):
-        """
-            Note that if a required field is blank in form,
-            it will be not be found in cleaned_data.
-            If it is not required an empty string will be placed
-            in cleaned_data.
-            Some browsers won't let us get this far!
-        """
 
         logger.debug("Cleaning data - %s", self.cleaned_data)
 
@@ -255,7 +157,7 @@ class NewGuinnessForm(ModelForm):
 
         return self.cleaned_data
 
-    def save(self, isStaffMember):
+    def save(self):
 
         logger.info("Creating new Guinness using data - %s", self.cleaned_data)
 
@@ -264,7 +166,7 @@ class NewGuinnessForm(ModelForm):
         guinness.creator  = self.userProfile
         guinness.price    = self.cleaned_data.get('price')
         guinness.pub      = self.pub
-        guinness.approved = isStaffMember
+        guinness.approved = self.userProfile.user.is_staff
 
         try:
             guinness.full_clean()

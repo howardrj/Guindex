@@ -20,7 +20,7 @@ class Command(BaseCommand):
             As of now, it only checks the most last verified Guinness
             and not all.
         """
-        
+
         logger.info("Creating Guindex alerts server")
 
         reactor.listenTCP(GuindexParameters.ALERTS_LISTEN_PORT,
@@ -28,7 +28,7 @@ class Command(BaseCommand):
                           GuindexParameters.ALERTS_BACKLOG,
                           GuindexParameters.ALERTS_LISTEN_IP)
 
-        logger.info("Created TCP server listening on %s:%d. Waiting for alerts ...", 
+        logger.info("Created TCP server listening on %s:%d. Waiting for alerts ...",
                     GuindexParameters.ALERTS_LISTEN_IP, GuindexParameters.ALERTS_LISTEN_PORT)
 
         reactor.run()

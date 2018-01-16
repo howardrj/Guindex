@@ -65,7 +65,7 @@
             <h4 id="username"> {{ user_profile.user.username }} </h4>
         </div>
 
-        {% if pending_contributions|length and user_profile.user.is_staff %}
+        {% if pending_contributions and user_profile.user.is_staff %}
 
         <div id="notification_info">
             <a href="/pending_contributions/" id="pending_contributions_link">
@@ -79,8 +79,6 @@
 
         {% include "new_pub_form.html" %}
         {% include "new_guinness_form.html" %}
-        {% include "rename_pub_form.html" %}
-        {% include "delete_pub_form.html" %}
         {% include "verify_guinness_form.html" %}
         {% include "close_pub_form.html" %}
         {% include "not_serving_form.html" %}

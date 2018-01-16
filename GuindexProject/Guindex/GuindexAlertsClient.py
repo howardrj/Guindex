@@ -4,8 +4,6 @@ import socket
 from Guindex.GuindexParameters import GuindexParameters
 from Guindex import GuindexAlertsIf_pb2 as GuindexAlertsIf
 
-from UserProfile import UserProfileUtils
-
 
 class GuindexAlertsClient():
 
@@ -90,25 +88,158 @@ class GuindexAlertsClient():
 
         self.sendMessage(message_string)
 
-    def sendApprovalDecisionAlertRequest(self, guinness):
+    def sendNewPubAlertRequest(self, pub):
 
-        self.logger.info("Sending Approval Decision Alert Request")
+        self.logger.info("Sending New Pub Alert Request")
 
-        # Create Approval Decision Alert Request message
+        # Create New Pub Alert Request message
         guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
 
-        price = '€%.2f' % guinness.price
+        guindex_alerts_msg.newPubAlertRequest.pub          = pub.name
+        guindex_alerts_msg.newPubAlertRequest.latitude     = str(pub.latitude)
+        guindex_alerts_msg.newPubAlertRequest.longitude    = str(pub.longitude)
+        guindex_alerts_msg.newPubAlertRequest.username     = pub.pendingApprovalContributor.user.username
+        guindex_alerts_msg.newPubAlertRequest.approved     = not pub.pendingApproval
+        guindex_alerts_msg.newPubAlertRequest.creationDate = '%s' % pub.pendingApprovalTime
 
-        guindex_alerts_msg.approvalDecisionAlertRequest.creatorId    = str(guinness.creator.id)
-        guindex_alerts_msg.approvalDecisionAlertRequest.pub          = guinness.pub.name
-        guindex_alerts_msg.approvalDecisionAlertRequest.price        = price.decode('utf-8')
-        guindex_alerts_msg.approvalDecisionAlertRequest.approved     = guinness.approved
-        guindex_alerts_msg.approvalDecisionAlertRequest.creationDate = '%s' % guinness.creationDate
+        if pub.pendingApproval: # Give url of pending contributions
+            guindex_alerts_msg.newPubAlertRequest.uri = "https://guindex.ie"
 
         try:
             message_string = guindex_alerts_msg.SerializeToString()
         except:
-            self.logger.error("Failed to serialize Approval Decision Alert Request message")
+            self.logger.error("Failed to serialize New Pub Alert Request message")
+            raise
+
+        self.sendMessage(message_string)
+
+    def sendPubClosedAlertRequest(self, pub):
+
+        self.logger.info("Sending Pub Closed Alert Request")
+
+        # Create Pub Closed Alert Request message
+        guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
+
+        guindex_alerts_msg.pubClosedAlertRequest.pub          = pub.name
+        guindex_alerts_msg.pubClosedAlertRequest.username     = pub.pendingClosedContributor.user.username
+        guindex_alerts_msg.pubClosedAlertRequest.approved     = not pub.pendingClosed
+        guindex_alerts_msg.pubClosedAlertRequest.creationDate = '%s' % pub.pendingClosedTime
+
+        if pub.pendingClosed: # Give url of pending contributions
+            guindex_alerts_msg.pubClosedAlertRequest.uri = "https://guindex.ie"
+
+        try:
+            message_string = guindex_alerts_msg.SerializeToString()
+        except:
+            self.logger.error("Failed to serialize Pub Closed Alert Request message")
+            raise
+
+        self.sendMessage(message_string)
+
+    def sendPubNotServingGuinnessAlertRequest(self, pub):
+
+        self.logger.info("Sending Pub Not Serving Guinness Alert Request")
+
+        # Create Pub Not Serving Guinness Alert Request message
+        guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
+
+        guindex_alerts_msg.pubNotServingGinnessAlertRequest.pub          = pub.name
+        guindex_alerts_msg.pubNotServingGinnessAlertRequest.username     = pub.pendingNotServingGuinnessContributor.user.username
+        guindex_alerts_msg.pubNotServingGinnessAlertRequest.approved     = not pub.pendingNotServingGuinness
+        guindex_alerts_msg.pubNotServingGinnessAlertRequest.creationDate = '%s' % pub.pendingNotServingGuinnessTime
+
+        if pub.pendingNotServingGuinness: # Give url of pending contributions
+            guindex_alerts_msg.pubNotServingGuinnessAlertRequest.uri = "https://guindex.ie"
+
+        try:
+            message_string = guindex_alerts_msg.SerializeToString()
+        except:
+            self.logger.error("Failed to serialize Pub Not Serving Guinness Alert Request message")
+            raise
+
+        self.sendMessage(message_string)
+
+    def sendNewGuinnessDecisionAlertRequest(self, guinness):
+
+        self.logger.info("Sending New Guinness Decision Alert Request")
+
+        # Create New Guinness Decision Alert Request message
+        guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
+
+        price = '€%.2f' % guinness.price
+
+        guindex_alerts_msg.newGuinnessDecisionAlertRequest.creatorId    = str(guinness.creator.id)
+        guindex_alerts_msg.newGuinnessDecisionAlertRequest.pub          = guinness.pub.name
+        guindex_alerts_msg.newGuinnessDecisionAlertRequest.price        = price.decode('utf-8')
+        guindex_alerts_msg.newGuinnessDecisionAlertRequest.approved     = guinness.approved
+        guindex_alerts_msg.newGuinnessDecisionAlertRequest.creationDate = '%s' % guinness.creationDate
+
+        try:
+            message_string = guindex_alerts_msg.SerializeToString()
+        except:
+            self.logger.error("Failed to serialize New Guinness Decision Alert Request message")
+            raise
+
+        self.sendMessage(message_string)
+
+    def sendNewPubDecisionAlertRequest(self, pub):
+
+        self.logger.info("Sending New Pub Decision Alert Request")
+
+        # Create New Pub Decision Alert Request message
+        guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
+
+        guindex_alerts_msg.newPubDecisionAlertRequest.creatorId    = str(pub.pendingApprovalContributor.id)
+        guindex_alerts_msg.newPubDecisionAlertRequest.pub          = pub.name
+        guindex_alerts_msg.newPubDecisionAlertRequest.latitude     = str(pub.latitude)
+        guindex_alerts_msg.newPubDecisionAlertRequest.longitude    = str(pub.longitude)
+        guindex_alerts_msg.newPubDecisionAlertRequest.approved     = not pub.pendingApproval
+        guindex_alerts_msg.newPubDecisionAlertRequest.creationDate = '%s' % pub.pendingApprovalTime
+
+        try:
+            message_string = guindex_alerts_msg.SerializeToString()
+        except:
+            self.logger.error("Failed to serialize New Pub Decision Alert Request message")
+            raise
+
+        self.sendMessage(message_string)
+
+    def sendPubClosedDecisionAlertRequest(self, pub):
+
+        self.logger.info("Sending Pub Closed Decision Alert Request")
+
+        # Create Pub Closed Decision Alert Request message
+        guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
+
+        guindex_alerts_msg.pubClosedDecisionAlertRequest.creatorId    = str(pub.pendingClosedContributor.id)
+        guindex_alerts_msg.pubClosedDecisionAlertRequest.pub          = pub.name
+        guindex_alerts_msg.pubClosedDecisionAlertRequest.approved     = not pub.pendingClosed
+        guindex_alerts_msg.pubClosedDecisionAlertRequest.creationDate = '%s' % pub.pendingClosedTime
+
+        try:
+            message_string = guindex_alerts_msg.SerializeToString()
+        except:
+            self.logger.error("Failed to serialize Pub Closed Decision Alert Request message")
+            raise
+
+        self.sendMessage(message_string)
+
+    def sendPubNotServingGuinnessDecisionAlertRequest(self, pub):
+
+        self.logger.info("Sending Pub Not Serving Guinness Decision Alert Request")
+
+        # Create Pub Not Serving Guinness Decision Alert Request message
+        guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
+
+        guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.creatorId    = str(pub.pendingNotServingGuinnessContributor.id)
+        guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.pub          = pub.name
+        guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.approved     = not pub.pendingNotServingGuinness
+        guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.creationDate = '%s' % pub.pendingNotServingGuinnessTime
+
+        try:
+            message_string = guindex_alerts_msg.SerializeToString()
+        except:
+            self.logger.error("Failed to serialize Pub Not Serving Guinness Decision Alert Request message")
             raise
 
         self.sendMessage(message_string)

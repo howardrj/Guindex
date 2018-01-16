@@ -57,7 +57,9 @@
 
             <div id="pending_contributions_table_container">
 
-                <table align="left" id="pending_prices_table" class="pending_contributions_table guindex_table"> 
+                <!-- PENDING PRICES TABLE -->
+
+                <table align="left" id="pending_price_table" class="pending_contributions_table guindex_table"> 
                     <caption> Pending Price Submissions </caption>
                     <colgroup>
                         <col style="width:20%">
@@ -75,50 +77,230 @@
                         <td> <span class=""> APPROVE </span></td>
                     </tr>
 
-                    {% for contribution in pending_contributions %} 
+                    {% for guinness in pending_contributions.pending_prices %} 
                     <tr>
 
                         <!-- PUB NAME CELL -->
                         <td>
-                            <span class="payload">{{ contribution.pub }}</span>
+                            <span class="payload">{{ guinness.pub }}</span>
                         </td>
 
                         <!-- PRICE CELL -->
                         <td>
-                            &euro;<span class="payload">{{ contribution.price }}</span> 
+                            &euro;<span class="payload">{{ guinness.price }}</span> 
                         </td>
 
                         <!-- CONTRIBUTOR CELL -->
                         <td>
-                            <span class="payload">{{ contribution.contributor }}</span> 
+                            <span class="payload">{{ guinness.contributor }}</span> 
                         </td>
 
                         <!-- TIMESTAMP CELL -->
                         <td>
-                            <span class="payload">{{ contribution.creationDate|date:"D d M Y" }}</span> 
+                            <span class="payload">{{ guinness.creationDate|date:"D d M Y" }}</span> 
                         </td>
 
                         <td>
                             <i class="fa fa-check approve_contribution_button needs_description" 
                                data-description_text="Click to approve"
                                aria-hidden="true"
-                               id="approve_contribution_button_{{ contribution.id }}"
-                               data-contribution_id="{{ contribution.id }}">
+                               id="pending_price_{{ guinness.id }}"
+                               data-contribution_id="{{ guinness.id }}"
+                               data-contribution_type="pending_price">
                             </i>
-                            <div class="small_loader" style="width: 10px; height: 10px" id="approve_contribution_button_{{ contribution.id }}_loader"> </div>
+                            <div class="small_loader" style="width: 10px; height: 10px" id="pending_price_{{ guinness.id }}_loader"> </div>
                         </td>
 
                     </tr>
                     {% endfor %}
 
-                    {% if pending_contributions|length > 0 %}
-                    <tr id="pending_contributions_table_last_row" style="display:none" class="last_row">
+                    {% if pending_contributions.pending_prices|length > 0 %}
+                    <tr id="pending_prices_table_last_row" style="display:none" class="last_row">
                     {% else %}
-                    <tr id="pending_contributions_table_last_row" class="last_row">
+                    <tr id="pending_prices_table_last_row" class="last_row">
                     {% endif %}
-                        <td colspan="5" align="center"> No Pending Contributions </td>
+                        <td colspan="5" align="center"> No Pending New Price Submissions </td>
                     </tr>
                 </table>
+
+                <!-- PENDING PUBS TABLE -->
+
+                <table align="left" id="pending_pub_table" class="pending_contributions_table guindex_table"> 
+                    <caption> Pending New Pub Submissions </caption>
+                    <colgroup>
+                        <col style="width:25%">
+                        <col style="width:25%">
+                        <col style="width:25%">
+                        <col style="width:25%">
+                    </colgroup>
+
+                    <tr class="first_row">
+                        <td> <span class="sortable_column_header"> PUB NAME &#9660; </span></td>
+                        <td> <span class="sortable_column_header"> CONTRIBUTOR </span></td>
+                        <td> <span class="sortable_column_header timestamp_column"> TIMESTAMP </span></td>
+                        <td> <span class=""> APPROVE </span></td>
+                    </tr>
+
+                    {% for pub in pending_contributions.pending_pubs %} 
+                    <tr>
+
+                        <!-- PUB NAME CELL -->
+                        <td>
+                            <span class="payload">{{ pub.pub }}</span>
+                        </td>
+
+                        <!-- CONTRIBUTOR CELL -->
+                        <td>
+                            <span class="payload">{{ pub.contributor }}</span> 
+                        </td>
+
+                        <!-- TIMESTAMP CELL -->
+                        <td>
+                            <span class="payload">{{ pub.creationDate|date:"D d M Y" }}</span> 
+                        </td>
+
+                        <td>
+                            <i class="fa fa-check approve_contribution_button needs_description" 
+                               data-description_text="Click to approve"
+                               aria-hidden="true"
+                               id="pending_pub_{{ pub.id }}"
+                               data-contribution_id="{{ pub.id }}"
+                               data-contribution_type="pending_pub">
+                            </i>
+                            <div class="small_loader" style="width: 10px; height: 10px" id="pending_pub_{{ pub.id }}_loader"> </div>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                    {% if pending_contributions.pending_prices|length > 0 %}
+                    <tr id="pending_pubs_table_last_row" style="display:none" class="last_row">
+                    {% else %}
+                    <tr id="pending_pubs_table_last_row" class="last_row">
+                    {% endif %}
+                        <td colspan="4" align="center"> No Pending New Pub Submissions </td>
+                    </tr>
+                </table>
+
+                <!-- PENDING CLOSURES TABLE -->
+
+                <table align="left" id="pending_closure_table" class="pending_contributions_table guindex_table"> 
+                    <caption> Pending Pub Closure Submissions </caption>
+                    <colgroup>
+                        <col style="width:25%">
+                        <col style="width:25%">
+                        <col style="width:25%">
+                        <col style="width:25%">
+                    </colgroup>
+
+                    <tr class="first_row">
+                        <td> <span class="sortable_column_header"> PUB NAME &#9660; </span></td>
+                        <td> <span class="sortable_column_header"> CONTRIBUTOR </span></td>
+                        <td> <span class="sortable_column_header timestamp_column"> TIMESTAMP </span></td>
+                        <td> <span class=""> APPROVE </span></td>
+                    </tr>
+
+                    {% for pub in pending_contributions.pending_closures %} 
+                    <tr>
+
+                        <!-- PUB NAME CELL -->
+                        <td>
+                            <span class="payload">{{ pub.pub }}</span>
+                        </td>
+
+                        <!-- CONTRIBUTOR CELL -->
+                        <td>
+                            <span class="payload">{{ pub.contributor }}</span> 
+                        </td>
+
+                        <!-- TIMESTAMP CELL -->
+                        <td>
+                            <span class="payload">{{ pub.creationDate|date:"D d M Y" }}</span> 
+                        </td>
+
+                        <td>
+                            <i class="fa fa-check approve_contribution_button needs_description" 
+                               data-description_text="Click to approve"
+                               aria-hidden="true"
+                               id="pending_closure_{{ pub.id }}"
+                               data-contribution_id="{{ pub.id }}"
+                               data-contribution_type="pending_closure">
+                            </i>
+                            <div class="small_loader" style="width: 10px; height: 10px" id="pending_closure_{{ pub.id }}_loader"> </div>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                    {% if pending_contributions.pending_closures|length > 0 %}
+                    <tr id="pending_closures_table_last_row" style="display:none" class="last_row">
+                    {% else %}
+                    <tr id="pending_closures_table_last_row" class="last_row">
+                    {% endif %}
+                        <td colspan="4" align="center"> No Pending Closure Submissions </td>
+                    </tr>
+                </table>
+
+                <!-- PENDING NOT SERVING GUINNESS TABLE -->
+
+                <table align="left" id="pending_not_serving_guinness_table" class="pending_contributions_table guindex_table"> 
+                    <caption> Pending Not Serving Guinness Submissions </caption>
+                    <colgroup>
+                        <col style="width:25%">
+                        <col style="width:25%">
+                        <col style="width:25%">
+                        <col style="width:25%">
+                    </colgroup>
+
+                    <tr class="first_row">
+                        <td> <span class="sortable_column_header"> PUB NAME &#9660; </span></td>
+                        <td> <span class="sortable_column_header"> CONTRIBUTOR </span></td>
+                        <td> <span class="sortable_column_header timestamp_column"> TIMESTAMP </span></td>
+                        <td> <span class=""> APPROVE </span></td>
+                    </tr>
+
+                    {% for pub in pending_contributions.pending_not_serving_guinness %} 
+                    <tr>
+
+                        <!-- PUB NAME CELL -->
+                        <td>
+                            <span class="payload">{{ pub.pub }}</span>
+                        </td>
+
+                        <!-- CONTRIBUTOR CELL -->
+                        <td>
+                            <span class="payload">{{ pub.contributor }}</span> 
+                        </td>
+
+                        <!-- TIMESTAMP CELL -->
+                        <td>
+                            <span class="payload">{{ pub.creationDate|date:"D d M Y" }}</span> 
+                        </td>
+
+                        <td>
+                            <i class="fa fa-check approve_contribution_button needs_description" 
+                               data-description_text="Click to approve"
+                               aria-hidden="true"
+                               id="pending_not_serving_guinness_{{ pub.id }}"
+                               data-contribution_id="{{ pub.id }}"
+                               data-contribution_type="pending_not_serving_guinness">
+                            </i>
+                            <div class="small_loader" style="width: 10px; height: 10px" id="pending_not_serving_guinness_{{ pub.id }}_loader"> </div>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                    {% if pending_contributions.pending_not_serving_guinness|length > 0 %}
+                    <tr id="pending_not_serving_table_last_row" style="display:none" class="last_row">
+                    {% else %}
+                    <tr id="pending_not_serving_table_last_row" class="last_row">
+                    {% endif %}
+                        <td colspan="4" align="center"> No Pending Not Serving Guinness Submissions </td>
+                    </tr>
+                </table>
+
+
 
             </div>
 

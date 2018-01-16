@@ -7,11 +7,12 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
+from django.utils import timezone
 
 from rest_framework import generics
 from rest_framework import permissions
 
-from Guindex.forms import NewPubForm, NewGuinnessForm, RenamePubForm
+from Guindex.forms import NewPubForm, NewGuinnessForm
 from Guindex.serializers import PubSerializer, GuinnessSerializer, StatisticsSerializer
 from Guindex.models import Pub, Guinness, StatisticsSingleton
 from GuindexParameters import GuindexParameters
@@ -27,14 +28,10 @@ logger = logging.getLogger(__name__)
 @require_http_methods(['GET', 'POST'])
 def guindex(request):
 
-    modal_to_display = ""
-    warning_text     = ""
+    logger.info("Received %s request to %s", request.method, request.get_full_path())
 
     new_pub_form      = NewPubForm()
-    rename_pub_form   = RenamePubForm()
     new_guinness_form = NewGuinnessForm()
-
-    logger.info("Received %s request to %s", request.method, request.get_full_path())
 
     try:
         user_profile = GuindexUtils.getUserProfileFromUser(request.user)
@@ -55,52 +52,21 @@ def guindex(request):
 
             modal_to_display, new_pub_form, warning_text = handleNewPubRequest(user_profile, request.POST)
 
-            if not modal_to_display:
-                return HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
-
-        elif 'delete_pub' in request.POST:
-
-            modal_to_display, warning_text = handleDeletePubRequest(user_profile, request.POST)
-
-            if not modal_to_display:
-                return HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
-
-        elif 'rename_pub' in request.POST:
-
-            modal_to_display, rename_pub_form, warning_text = handleRenamePubRequest(user_profile, request.POST)
-
-            if not modal_to_display:
-                return HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
-
         elif 'new_guinness' in request.POST:
 
             modal_to_display, new_guinness_form, warning_text = handleNewGuinnessRequest(user_profile, request.POST)
-
-            # TODO Fix redirect here in case of non-staff member submission
-
-            if not modal_to_display:
-                return HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
 
         elif 'verify_guinness' in request.POST:
 
             modal_to_display, warning_text = handleVerifyGuinnessRequest(user_profile, request.POST)
 
-            if not modal_to_display:
-                return HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
-
         elif 'close_pub' in request.POST:
 
             modal_to_display, warning_text = handleClosePubRequest(user_profile, request.POST)
 
-            if not modal_to_display:
-                return HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
-
         elif 'not_serving_guinness' in request.POST:
 
             modal_to_display, warning_text = handleNotServingGuinnessRequest(user_profile, request.POST)
-
-            if not modal_to_display:
-                return HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
 
         else:
             logger.error("Received POST request to unknown resource")
@@ -109,25 +75,52 @@ def guindex(request):
 
             return render(request, 'error_404.html', context_dict, status = 404)
 
+        if not modal_to_display:
+
+            logger.info("Successful POST")
+
+            return HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
+
+        elif modal_to_display == 'warning':
+
+            logger.info("POST comes with warning")
+
+            response = HttpResponseRedirect(UserProfileParameters.LOGIN_SUCCESS_REDIRECT_URL)
+
+            response.set_cookie('modal_to_display', 'warning')
+            response.set_cookie('warning_text', warning_text)
+
+            return response
+
+        else:
+            logger.info("Returning form with errors to correct")
+
+    # Retrieve cookies that may or may not be set
+    modal_to_display = request.COOKIES.get('modal_to_display')
+    warning_text     = request.COOKIES.get('warning_text')
+
     context_dict = {'pubs'                   : GuindexUtils.getPubs(),
                     'stats'                  : GuindexUtils.getStats(),
                     'personal_contributions' : GuindexUtils.getPersonalContributions(user_profile),
-                    'pending_contributions'  : GuindexUtils.getPendingContributions(),
+                    'pending_contributions'  : GuindexUtils.arePendingContributions(),
                     'best_contributions'     : GuindexUtils.getBestContributions(),
                     'modal_to_display'       : modal_to_display,
                     'warning_text'           : warning_text,
                     'new_pub_form'           : new_pub_form,
-                    'rename_pub_form'        : rename_pub_form,
                     'new_guinness_form'      : new_guinness_form,
                     'user_profile'           : user_profile,
                     'user_profile_parameters': UserProfileParameters.getParameters(),
                     'guindex_parameters'     : GuindexParameters.getParameters(),
-                    'using_email_alerts'     : user_profile.usingEmailAlerts,
-                    'using_telegram_alerts'  : user_profile.telegramuser.usingTelegramAlerts,
                     'google_maps_api_token'  : settings.GOOGLE_MAPS_API_KEY,
                     }
 
-    return render(request, 'guindex_main.html', context_dict)
+    response = render(request, 'guindex_main.html', context_dict)
+
+    # Delete cookies if they exist
+    response.delete_cookie('modal_to_display')
+    response.delete_cookie('warning_text')
+
+    return response
 
 
 def handleNewPubRequest(userProfile, postData):
@@ -143,84 +136,44 @@ def handleNewPubRequest(userProfile, postData):
         logger.info("UserProfile %s: New pub form data was valid. Creating new pub", userProfile)
 
         try:
-            new_pub_form.save()
+            new_pub = new_pub_form.save()
             modal_to_display = ""
         except:
             logger.error("Failed to save form")
             modal_to_display = "warning"
             warning_text = "Failed to save new Pub object."
+            return modal_to_display, new_pub_form, warning_text
 
     else:
         logger.error("UserProfile %s: New pub form data was invalid", userProfile)
+        return modal_to_display, new_pub_form, warning_text
 
-    return (modal_to_display, new_pub_form, warning_text)
+    # Pub object has been saved at this point
 
+    if not userProfile.user.is_staff:
 
-def handleDeletePubRequest(userProfile, postData):
+        logger.info("Contribution was made by non-staff member")
 
-    logger.info("Received delete pub request - %s", postData)
+        # Set relevant return variables
+        modal_to_display  = "warning"
+        warning_text      = "Thank you for your contribution. A staff member will verify your submission shortly."
 
-    modal_to_display = ""
-    warning_text     = ""
+    else:
+        logger.info("Contribution was made by staff member")
 
     try:
-        pub_id = postData.get("pub_id")
+        alerts_client = GuindexAlertsClient(logger)
     except:
-        logger.error("Could not get pub id")
-
-        modal_to_display = "warning"
-        warning_text = "Could not get pub ID in request."
-
-        return modal_to_display, warning_text
+        logger.error("Failed to create Alerts Client")
+        return modal_to_display, new_pub_form, warning_text
 
     try:
-        pub = Pub.objects.get(id = int(pub_id))
-        logger.debug("Found pub %s", pub)
-    except ObjectDoesNotExist:
-        logger.error("No pub exists with id %s", pub_id)
+        alerts_client.sendNewPubAlertRequest(new_pub)
+    except:
+        logger.error("Failed to send New Pub Alert Request")
+        return modal_to_display, new_pub_form, warning_text
 
-        modal_to_display = "warning"
-        warning_text = "Invalid pub ID."
-
-        return modal_to_display, warning_text
-
-    if userProfile.user.is_staff:
-        logger.debug("UserProfile is a staff member so delete is allowed")
-
-        pub.delete()
-    else:
-        logger.debug("UserProfile is not a staff member. Not deleting object")
-
-        modal_to_display = "warning"
-        warning_text = "This operation is only permitted for staff members."
-
-    return modal_to_display, warning_text
-
-
-def handleRenamePubRequest(userProfile, postData):
-
-    logger.info("Received rename pub request - %s", postData)
-
-    modal_to_display = "rename_pub_form"
-    rename_pub_form  = RenamePubForm(userProfile = userProfile, data = postData)
-    warning_text     = ""
-
-    if rename_pub_form.is_valid():
-
-        logger.info("UserProfile %s: Rename pub form data was valid. Renaming pub", userProfile)
-
-        try:
-            rename_pub_form.save()
-            modal_to_display = ""
-        except:
-            logger.error("Failed to save form")
-            modal_to_display = "warning"
-            warning_text = "Failed to save Pub object"
-
-    else:
-        logger.error("UserProfile %s: Rename pub form data was invalid", userProfile)
-
-    return (modal_to_display, rename_pub_form, warning_text)
+    return modal_to_display, new_pub_form, warning_text
 
 
 def handleNewGuinnessRequest(userProfile, postData):
@@ -236,17 +189,17 @@ def handleNewGuinnessRequest(userProfile, postData):
         logger.info("UserProfile %s: New Guinness form data was valid. Creating new Guinness", userProfile)
 
         try:
-            new_guinness = new_guinness_form.save(userProfile.user.is_staff)
+            new_guinness = new_guinness_form.save()
             modal_to_display = ""
         except:
             logger.error("Failed to save form")
             modal_to_display = "warning"
             warning_text = "Failed to save new Guinness object"
-            return (modal_to_display, new_guinness_form, warning_text)
+            return modal_to_display, new_guinness_form, warning_text
 
     else:
         logger.error("UserProfile %s: New Guinness form data was invalid", userProfile)
-        return (modal_to_display, new_guinness_form, warning_text)
+        return modal_to_display, new_guinness_form, warning_text
 
     # Guinness object has been saved at this point
 
@@ -257,7 +210,6 @@ def handleNewGuinnessRequest(userProfile, postData):
         # Set relevant return variables
         modal_to_display  = "warning"
         warning_text      = "Thank you for your contribution. A staff member will verify your submission shortly."
-        new_guinness_form = NewGuinnessForm()
 
     else:
         logger.info("Contribution was made by staff member")
@@ -266,15 +218,15 @@ def handleNewGuinnessRequest(userProfile, postData):
         alerts_client = GuindexAlertsClient(logger)
     except:
         logger.error("Failed to create Alerts Client")
-        return (modal_to_display, new_guinness_form, warning_text)
+        return modal_to_display, new_guinness_form, warning_text
 
     try:
         alerts_client.sendNewGuinnessAlertRequest(new_guinness)
     except:
         logger.error("Failed to send New Guinness Alert Request")
-        return (modal_to_display, new_guinness_form, warning_text)
+        return modal_to_display, new_guinness_form, warning_text
 
-    return (modal_to_display, new_guinness_form, warning_text)
+    return modal_to_display, new_guinness_form, warning_text
 
 
 def handleVerifyGuinnessRequest(userProfile, postData):
@@ -305,17 +257,9 @@ def handleVerifyGuinnessRequest(userProfile, postData):
 
         return modal_to_display, warning_text
 
-    if userProfile.user.is_staff:
-        logger.debug("UserProfile is a staff member so price verification is allowed")
-    else:
-        logger.debug("UserProfile is not a staff member. Not deleting object")
-
-        modal_to_display = "warning"
-        warning_text = "This operation is only permitted for staff members."
-
     last_verified_guinness = pub.getLastVerifiedGuinness()
 
-    logger.debug("Creating new guinness object")
+    logger.debug("Creating new Guinness object")
 
     # Create new Guinness object
     guinness = Guinness()
@@ -400,16 +344,53 @@ def handleClosePubRequest(userProfile, postData):
         return modal_to_display, warning_text
 
     if userProfile.user.is_staff:
-        logger.debug("UserProfile is a staff member so closing pub is allowed")
-    else:
-        logger.debug("UserProfile is not a staff member. Not closing pub")
 
+        logger.debug("UserProfile is a staff member so closing pub is allowed")
+        pub.closed = True
+
+    else:
+        logger.debug("UserProfile is not a staff member. Submission will need to be approved")
+
+        if not pub.pendingClosed:
+            # Set relevant return variables
+            modal_to_display  = "warning"
+            warning_text      = "Thank you for your contribution. A staff member will verify your submission shortly."
+
+            pub.pendingClosed = True
+        else:
+            modal_to_display  = "warning"
+            warning_text      = "Another user has already has already marked this pub as closed."
+
+            return modal_to_display, warning_text
+
+    pub.pendingClosedContributor = userProfile
+    pub.pendingClosedTime        = timezone.now()
+
+    try:
+        pub.full_clean()
+    except:
+        warning_text = "Failed to validate new Pub object."
         modal_to_display = "warning"
-        warning_text = "This operation is only permitted for staff members."
         return modal_to_display, warning_text
 
-    pub.closed = True
-    pub.save()
+    try:
+        pub.save()
+    except:
+        warning_text = "Failed to save new Pub object."
+        modal_to_display = "warning"
+        return modal_to_display, warning_text
+
+    try:
+        alerts_client = GuindexAlertsClient(logger)
+    except:
+        logger.error("Failed to create Alerts Client")
+        return modal_to_display, warning_text
+
+    try:
+        alerts_client.sendPubClosedAlertRequest(pub)
+    except:
+        logger.error("Failed to send Pub Closure Alert Request")
+        return modal_to_display, warning_text
 
     return modal_to_display, warning_text
 
@@ -443,16 +424,53 @@ def handleNotServingGuinnessRequest(userProfile, postData):
         return modal_to_display, warning_text
 
     if userProfile.user.is_staff:
-        logger.debug("UserProfile is a staff member so marking pub as not serving Guinness is allowed")
-    else:
-        logger.debug("UserProfile is not a staff member. Not marking pub as not serving Guinness")
 
+        logger.debug("UserProfile is a staff member so marking pub as not serving Guinness is allowed")
+        pub.servingGuinness = False
+
+    else:
+        logger.debug("UserProfile is not a staff member. Submission will need to be approved")
+
+        if not pub.pendingNotServingGuinness:
+            # Set relevant return variables
+            modal_to_display  = "warning"
+            warning_text      = "Thank you for your contribution. A staff member will verify your submission shortly."
+
+            pub.pendingNotServingGuinness = True
+        else:
+            modal_to_display  = "warning"
+            warning_text      = "Another user has already has already marked this pub as not serving Guinness."
+
+            return modal_to_display, warning_text
+
+    pub.pendingNotServingGuinnessContributor = userProfile
+    pub.pendingNotServingGuinnessTime        = timezone.now()
+
+    try:
+        pub.full_clean()
+    except:
+        warning_text = "Failed to validate new Pub object."
         modal_to_display = "warning"
-        warning_text = "This operation is only permitted for staff members."
         return modal_to_display, warning_text
 
-    pub.servingGuinness = False
-    pub.save()
+    try:
+        pub.save()
+    except:
+        warning_text = "Failed to save new Pub object."
+        modal_to_display = "warning"
+        return modal_to_display, warning_text
+
+    try:
+        alerts_client = GuindexAlertsClient(logger)
+    except:
+        logger.error("Failed to create Alerts Client")
+        return modal_to_display, warning_text
+
+    try:
+        alerts_client.sendPubNotServingGuinnessAlertRequest(pub)
+    except:
+        logger.error("Failed to send Pub Not Serving Guinness Alert Request")
+        return modal_to_display, warning_text
 
     return modal_to_display, warning_text
 
@@ -526,61 +544,231 @@ def approveContribution(request):
 
         return render(request, 'error_404.html', context_dict, status = 404)
 
-    if request.method == "POST" and request.is_ajax():
+    if request.method != "POST" or not request.is_ajax():
 
-        try:
-            contribution_id = json.loads(request.body)['contributionId']
-        except:
-            logger.error("Failed to load contribution ID")
-            raise Http404("Failed to load contribution ID")
-
-        try:
-            guinness = Guinness.objects.get(id = int(contribution_id))
-        except:
-            logger.error("Failed to Guinness with ID %s", contribution_id)
-            raise Http404("Invalid contribution ID")
-
-        if guinness.approved:
-
-            logger.error("Guinness %s has already been approved", guinness)
-            return HttpResponse(json.dumps({}), content_type="application/json") # Send 200 OK anyway
-
-        guinness.approved = True
-
-        try:
-            guinness.full_clean()
-        except:
-            logger.error("Guinness object data could not be validated")
-            raise Http404("Failed to validate Guinness object")
-
-        try:
-            guinness.save()
-        except:
-            logger.error("Guinness object could not be saved")
-            raise Http404("Failed to save Guinness object")
-
-        logger.info("Guinness %s was approved", guinness)
-
-        try:
-            alerts_client = GuindexAlertsClient(logger)
-        except:
-            logger.error("Failed to create Alerts Client")
-            return HttpResponse(json.dumps({}), content_type="application/json")
-
-        try:
-            alerts_client.sendApprovalDecisionAlertRequest(guinness)
-        except:
-            logger.error("Failed to send Approval Decision Alert Request")
-            return HttpResponse(json.dumps({}), content_type="application/json")
-
-        return HttpResponse(json.dumps({}), content_type="application/json")
-
-    else:
         logger.error("Received invalid request type")
 
         context_dict = {'user_profile_parameters': UserProfileParameters.getParameters()}
 
         return render(request, 'error_404.html', context_dict, status = 404)
+
+    try:
+        contribution_type = json.loads(request.body)['contributionType']
+    except:
+        logger.error("Failed to load contribution type")
+        raise Http404("Failed to load contribution type")
+
+    try:
+        contribution_id = json.loads(request.body)['contributionId']
+    except:
+        logger.error("Failed to load contribution ID")
+        raise Http404("Failed to load contribution ID")
+
+    if contribution_type == 'pending_price':
+
+        logger.info("Received pending price decision")
+
+        return handleNewPriceDecision(contribution_id)
+
+    if contribution_type == 'pending_pub':
+
+        logger.info("Received pending new pub decision")
+
+        return handleNewPubDecision(contribution_id)
+
+    if contribution_type == 'pending_closure':
+
+        logger.info("Received pending pub closure decision")
+
+        return handlePubClosureDecision(contribution_id)
+
+    if contribution_type == 'pending_not_serving_guinness':
+
+        logger.info("Received pending pub not serving Guinness decision")
+
+        return handlePubNotServingGuinnessDecision(contribution_id)
+
+    logger.error("Received invalid contribution type")
+
+    raise Http404("Received invalid contribution type")
+
+
+def handleNewPriceDecision(contributionId):
+
+    try:
+        guinness = Guinness.objects.get(id = int(contributionId))
+    except:
+        logger.error("Failed to Guinness with ID %s", contributionId)
+        raise Http404("Invalid contribution ID")
+
+    if guinness.approved:
+
+        logger.error("Guinness %s has already been approved", guinness)
+        return HttpResponse(json.dumps({}), content_type="application/json") # Send 200 OK anyway
+
+    guinness.approved = True
+
+    try:
+        guinness.full_clean()
+    except:
+        logger.error("Guinness object data could not be validated")
+        raise Http404("Failed to validate Guinness object")
+
+    try:
+        guinness.save()
+    except:
+        logger.error("Guinness object could not be saved")
+        raise Http404("Failed to save Guinness object")
+
+    logger.info("Guinness %s was approved", guinness)
+
+    try:
+        alerts_client = GuindexAlertsClient(logger)
+    except:
+        logger.error("Failed to create Alerts Client")
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    try:
+        alerts_client.sendNewGuinnessDecisionAlertRequest(guinness)
+    except:
+        logger.error("Failed to send New Guinness Decision Alert Request")
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    return HttpResponse(json.dumps({}), content_type="application/json")
+
+
+def handleNewPubDecision(contributionId):
+
+    try:
+        pub = Pub.objects.get(id = int(contributionId))
+    except:
+        logger.error("Failed to Pub with ID %s", contributionId)
+        raise Http404("Invalid contribution ID")
+
+    if not pub.pendingApproval:
+
+        logger.error("Pub %s is not pending approval", pub)
+        return HttpResponse(json.dumps({}), content_type="application/json") # Send 200 OK anyway
+
+    pub.pendingApproval = False
+
+    try:
+        pub.full_clean()
+    except:
+        logger.error("Pub object data could not be validated")
+        raise Http404("Failed to validate Guinness object")
+
+    try:
+        pub.save()
+    except:
+        logger.error("Pub object could not be saved")
+        raise Http404("Failed to save Guinness object")
+
+    logger.info("Pub %s was approved", pub)
+
+    try:
+        alerts_client = GuindexAlertsClient(logger)
+    except:
+        logger.error("Failed to create Alerts Client")
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    try:
+        alerts_client.sendNewPubDecisionAlertRequest(pub)
+    except:
+        logger.error("Failed to send New Pub Decision Alert Request")
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    return HttpResponse(json.dumps({}), content_type="application/json")
+
+
+def handlePubClosureDecision(contributionId):
+
+    try:
+        pub = Pub.objects.get(id = int(contributionId))
+    except:
+        logger.error("Failed to Pub with ID %s", contributionId)
+        raise Http404("Invalid contribution ID")
+
+    if not pub.pendingClosed:
+
+        logger.error("Pub %s is not pending closure", pub)
+        return HttpResponse(json.dumps({}), content_type="application/json") # Send 200 OK anyway
+
+    pub.pendingClosed = False
+    pub.closed = True
+
+    try:
+        pub.full_clean()
+    except:
+        logger.error("Pub object data could not be validated")
+        raise Http404("Failed to validate Guinness object")
+
+    try:
+        pub.save()
+    except:
+        logger.error("Pub object could not be saved")
+        raise Http404("Failed to save Guinness object")
+
+    logger.info("Pub %s has been closed", pub)
+
+    try:
+        alerts_client = GuindexAlertsClient(logger)
+    except:
+        logger.error("Failed to create Alerts Client")
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    try:
+        alerts_client.sendPubClosedDecisionAlertRequest(pub)
+    except:
+        logger.error("Failed to send Pub Closed Decision Alert Request")
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    return HttpResponse(json.dumps({}), content_type="application/json")
+
+
+def handlePubNotServingGuinnessDecision(contributionId):
+
+    try:
+        pub = Pub.objects.get(id = int(contributionId))
+    except:
+        logger.error("Failed to Pub with ID %s", contributionId)
+        raise Http404("Invalid contribution ID")
+
+    if not pub.pendingNotServingGuinness:
+
+        logger.error("Pub %s is not pending not serving Guinness", pub)
+        return HttpResponse(json.dumps({}), content_type="application/json") # Send 200 OK anyway
+
+    pub.pendingNotServingGuinness = False
+    pub.notServingGuinness = True
+
+    try:
+        pub.full_clean()
+    except:
+        logger.error("Pub object data could not be validated")
+        raise Http404("Failed to validate Guinness object")
+
+    try:
+        pub.save()
+    except:
+        logger.error("Pub object could not be saved")
+        raise Http404("Failed to save Guinness object")
+
+    logger.info("Pub %s has been marked as not serving Guinness", pub)
+
+    try:
+        alerts_client = GuindexAlertsClient(logger)
+    except:
+        logger.error("Failed to create Alerts Client")
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    try:
+        alerts_client.sendPubNotServingGuinnessDecisionAlertRequest(pub)
+    except:
+        logger.error("Failed to send Pub Not Serving Guinness Decision Alert Request")
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    return HttpResponse(json.dumps({}), content_type="application/json")
 
 
 @login_required
@@ -661,7 +849,7 @@ class PubList(generics.ListAPIView):
         super(PubList, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
-        return Pub.objects.all()
+        return Pub.objects.all(pendingApproval = False)
 
 
 class PubDetail(generics.RetrieveAPIView):

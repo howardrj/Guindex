@@ -92,7 +92,6 @@ class Guinness(models.Model):
 class StatisticsSingleton(models.Model):
     """
         This is a singleton class to store statistics.
-        Statistics are calculated in the background and wriiten to this singleton
     """
 
     pubsInDb           = models.IntegerField(default = 0)
