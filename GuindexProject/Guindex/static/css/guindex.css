@@ -504,7 +504,7 @@ input:checked + .slider:before {
 }
 
 /* Add a grey background to the active (and on mouse over) button */
-.btn:hover ,  .active {
+.btn:hover , .active_button {
 	background-color: #ccc;
 	width: 100%;
 }
