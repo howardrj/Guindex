@@ -20,6 +20,10 @@ import GuindexUtils
 
 from UserProfile.UserProfileParameters import UserProfileParameters
 
+def guindexMapFull(request):
+        return render(request, 'guindex_map_full.html')
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -726,3 +730,4 @@ class StatisticsList(generics.ListAPIView):
 
     def get_queryset(self):
         return StatisticsSingleton.objects.filter(id = 1)
+
