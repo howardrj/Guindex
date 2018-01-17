@@ -118,7 +118,7 @@ def getPendingContributions():
     pending_contributions_dict['pending_pubs'] = sorted(pending_pubs_list, key = lambda k: k['creationDate'], reverse = False)
 
     # Check pending closures
-    pending_closures = Pub.objects.filter(pendingClosed = True, pendingClosedRejected = False)
+    pending_closures = Pub.objects.filter(pendingClosed = True)
 
     pending_closures_list = []
 
@@ -137,7 +137,7 @@ def getPendingContributions():
     pending_contributions_dict['pending_closures'] = sorted(pending_closures_list, key = lambda k: k['creationDate'], reverse = False)
 
     # Check pending not serving Guinness
-    pending_not_serving = Pub.objects.filter(pendingNotServingGuinness = True, pendingNotServingGuinnessRejected = False)
+    pending_not_serving = Pub.objects.filter(pendingNotServingGuinness = True)
 
     pending_not_serving_list = []
 

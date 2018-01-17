@@ -795,11 +795,9 @@ def handlePubClosureDecision(contributionId, contributionApproved):
 
     if contributionApproved:
         pub.pendingClosed = False
-        pub.pendingClosedRejected = False
         pub.closed = True
     else:
         pub.pendingClosed = False
-        pub.pendingClosedRejected = True
         pub.closed = False
 
     try:
@@ -844,11 +842,9 @@ def handlePubNotServingGuinnessDecision(contributionId, contributionApproved):
 
     if contributionApproved:
         pub.pendingNotServingGuinness = False
-        pub.pendingNotServingGuinnessRejected = False
         pub.servingGuinness = False
     else:
         pub.pendingNotServingGuinness = False
-        pub.pendingNotServingGuinnessRejected = True
         pub.servingGuinness = True
 
     try:
