@@ -918,7 +918,7 @@ class PubList(generics.ListAPIView):
         super(PubList, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
-        return Pub.objects.all(pendingApproval = False)
+        return Pub.objects.filter(pendingApproval = False)
 
 
 class PubDetail(generics.RetrieveAPIView):
