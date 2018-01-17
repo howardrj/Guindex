@@ -171,7 +171,7 @@ class GuindexAlertsClient():
         guindex_alerts_msg.newGuinnessDecisionAlertRequest.creatorId    = str(guinness.creator.id)
         guindex_alerts_msg.newGuinnessDecisionAlertRequest.pub          = guinness.pub.name
         guindex_alerts_msg.newGuinnessDecisionAlertRequest.price        = price.decode('utf-8')
-        guindex_alerts_msg.newGuinnessDecisionAlertRequest.approved     = guinness.approved
+        guindex_alerts_msg.newGuinnessDecisionAlertRequest.approved     = guinness.approved # Approved if approved field is true
         guindex_alerts_msg.newGuinnessDecisionAlertRequest.creationDate = '%s' % guinness.creationDate
 
         try:
@@ -193,7 +193,7 @@ class GuindexAlertsClient():
         guindex_alerts_msg.newPubDecisionAlertRequest.pub          = pub.name
         guindex_alerts_msg.newPubDecisionAlertRequest.latitude     = str(pub.latitude)
         guindex_alerts_msg.newPubDecisionAlertRequest.longitude    = str(pub.longitude)
-        guindex_alerts_msg.newPubDecisionAlertRequest.approved     = not pub.pendingApproval
+        guindex_alerts_msg.newPubDecisionAlertRequest.approved     = not pub.pendingApproval and not pub.pendingApprovalRejected
         guindex_alerts_msg.newPubDecisionAlertRequest.creationDate = '%s' % pub.pendingApprovalTime
 
         try:
@@ -213,7 +213,7 @@ class GuindexAlertsClient():
 
         guindex_alerts_msg.pubClosedDecisionAlertRequest.creatorId    = str(pub.pendingClosedContributor.id)
         guindex_alerts_msg.pubClosedDecisionAlertRequest.pub          = pub.name
-        guindex_alerts_msg.pubClosedDecisionAlertRequest.approved     = not pub.pendingClosed
+        guindex_alerts_msg.pubClosedDecisionAlertRequest.approved     = pub.closed # Approved if pub now marked as closed
         guindex_alerts_msg.pubClosedDecisionAlertRequest.creationDate = '%s' % pub.pendingClosedTime
 
         try:
@@ -233,7 +233,7 @@ class GuindexAlertsClient():
 
         guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.creatorId    = str(pub.pendingNotServingGuinnessContributor.id)
         guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.pub          = pub.name
-        guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.approved     = not pub.pendingNotServingGuinness
+        guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.approved     = not pub.servingGuinness # Approved if pub now marked as not serving Guinness
         guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.creationDate = '%s' % pub.pendingNotServingGuinnessTime
 
         try:

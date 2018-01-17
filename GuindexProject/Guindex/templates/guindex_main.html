@@ -107,13 +107,11 @@
                             if (JSON.parse(request.responseText)['arePendingContributions'])
                             {
                                 // If there are pending contributions, display notification
-                                console.log("There are pending contributions");
                                 document.getElementById('notification_info').style.display = 'block';
                             }    
                             else
                             {
                                 // If there are no pending contributions, hide notification
-                                console.log("There are no pending contributions");
                                 document.getElementById('notification_info').style.display = 'none';
                             }
                         }
