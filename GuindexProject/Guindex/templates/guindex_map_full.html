@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+  <head>
+  	<meta charset=utf-8 />
+		<title>Guindex Map</title>
+	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+	<link rel="stylesheet" type="text/css" href="{% static "css/guindex.css" %}" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script type="text/javascript" src="{% static "javascript/cookie.js" %}"> </script>
+	<script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"> </script>
+	<style>
+       #guindex_map {
+        height: 100%;
+        width: 100%;
+       }
+	   html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+	 </style>
+  </head>
+  <body>
+  
+                    <div id="guindex_map">
+
+					</div>
+           
+
+       
+    	<div id="floating-panel">
+			<button onclick="goBack()"><</button>
+			<div id="filter-MainArea">
+				<div id="myShowHideButtons">
+					<button id="ShowButton" class="btn" onclick="showHide()">Show Filters</button>
+					<button id="HideButton" class="btn active" onclick="showHide()" style="display:none">Hide Filters</button>
+				</div>
+				<div id="filterArea" style="display:none">
+					<input type="text" id="myInput" onkeyup="initMap()" placeholder="Search for Pubs.." title="Type in a name">
+				</div>
+			</div>
+		</div>
+	
+
+
+
+
+		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3ljMm1aO1IAI-IVIAF1vLtKmW1qEWjCM&callback=initMap">
+		</script>
+  </body>
+</html>
