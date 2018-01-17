@@ -8,9 +8,11 @@ class GuindexParameters:
 
     MAX_PUB_NAME_LEN = 40
 
-    MAX_GUINNESS_PRICE = 100.00
-    MIN_GUINNESS_PRICE = 0.00
+    # Guinness price parameters
+    MAX_GUINNESS_PRICE_DIGITS = 4
+    MIN_GUINNESS_PRICE        = '0.01'
 
+    # Background script parameters
     STATISTICS_CALCULATION_PERIOD         = 600 # In seconds
     USER_CONTRIBUTIONS_CALCULATION_PERIOD = 600 # In seconds
     DB_BACKUP_PERIOD                      = 84600 # In seconds
@@ -19,6 +21,14 @@ class GuindexParameters:
     ALERTS_LISTEN_IP   = '127.0.0.1'
     ALERTS_LISTEN_PORT = 8080
     ALERTS_BACKLOG     = 50
+
+    # GPS Parameters
+    GPS_COORD_DECIMAL_PLACES     = 7
+    GPS_COORD_MIN_DECIMAL_PLACES = 6
+    GPS_DUBLIN_MIN_LATITUDE      = '53.185403' 
+    GPS_DUBLIN_MAX_LATITUDE      = '53.635552' 
+    GPS_DUBLIN_MIN_LONGITUDE     = '-6.547498'
+    GPS_DUBLIN_MAX_LONGITUDE     = '-6.042723'
 
     @staticmethod
     def getParameters():

@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.db import models
 from django.utils import timezone
+from django.core.validators import MinValueValidator
 
 from GuindexParameters import GuindexParameters
 
@@ -14,8 +15,8 @@ logger = logging.getLogger(__name__)
 class Pub(models.Model):
 
     name                                 = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN, default = "")
-    longitude                            = models.DecimalField(decimal_places = 7, max_digits = 12, default = 0.0)
-    latitude                             = models.DecimalField(decimal_places = 7, max_digits = 12, default = 0.0)
+    longitude                            = models.DecimalField(decimal_places = GuindexParameters.GPS_COORD_DECIMAL_PLACES, max_digits = 12, default = 0.0)
+    latitude                             = models.DecimalField(decimal_places = GuindexParameters.GPS_COORD_DECIMAL_PLACES, max_digits = 12, default = 0.0)
     mapLink                              = models.TextField(default = "")
     closed                               = models.BooleanField(default = False)
     servingGuinness                      = models.BooleanField(default = True)
@@ -83,7 +84,9 @@ class Guinness(models.Model):
 
     creator      = models.ForeignKey(UserProfile)
     creationDate = models.DateTimeField(default = timezone.now)
-    price        = models.DecimalField(decimal_places = 2, max_digits = 6)
+    price        = models.DecimalField(decimal_places = 2,
+                                       max_digits     = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
+                                       validators     = [MinValueValidator(Decimal(GuindexParameters.MIN_GUINNESS_PRICE))])
     pub          = models.ForeignKey(Pub)
     approved     = models.BooleanField(default = True)
     rejected     = models.BooleanField(default = False)
