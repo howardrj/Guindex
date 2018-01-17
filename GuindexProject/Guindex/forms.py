@@ -8,6 +8,8 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from Guindex.models import Pub, Guinness
 
+from GuindexParameters import GuindexParameters
+
 logger = logging.getLogger(__name__)
 
 
@@ -35,8 +37,7 @@ class NewPubForm(ModelForm):
         latitude  = self.cleaned_data.get('latitude')
         longitude = self.cleaned_data.get('longitude')
 
-        # TODO Could check lat/lon are within Dublin
-        if not pub_name or not latitude or not longitude:
+        if not pub_name or latitude is None or longitude is None:
 
             if not pub_name:
                 logger.debug("No pub name was provided in form")
@@ -70,16 +71,41 @@ class NewPubForm(ModelForm):
         except ObjectDoesNotExist:
             logger.info("No pub with the name %s exists yet. Creating a new pub object", pub_name)
 
-        if latitude < Decimal(-90) or latitude > Decimal(90):
-            logger.error("Latitude %f not in range", latitude)
+        if -1 * latitude.as_tuple().exponent < GuindexParameters.GPS_COORD_MIN_DECIMAL_PLACES:
 
-            msg = "Latitude must be in range %d:%d" % (-90, 90)
+            logger.error("Latitude is not specific enough - %s", latitude)
+
+            msg = "Latitude is not specific enough. Please use 7 decimal places"
             self.add_error('latitude', msg)
 
-        if longitude < Decimal(-180) or longitude > Decimal(180):
+            return self.cleaned_data
+
+        if -1 * longitude.as_tuple().exponent < GuindexParameters.GPS_COORD_MIN_DECIMAL_PLACES:
+
+            logger.error("Longitude is not specific enough - %s", longitude)
+
+            msg = "Longitude is not specific enough. Please use 7 decimal places"
+            self.add_error('longitude', msg)
+
+            return self.cleaned_data
+
+        if latitude < Decimal(GuindexParameters.GPS_DUBLIN_MIN_LATITUDE) or \
+           latitude > Decimal(GuindexParameters.GPS_DUBLIN_MAX_LATITUDE):
+
+            logger.error("Latitude %f not in range", latitude)
+
+            msg = "Latitude must be in range %s:%s" % (GuindexParameters.GPS_DUBLIN_MIN_LATITUDE,   
+                                                       GuindexParameters.GPS_DUBLIN_MAX_LATITUDE)
+            self.add_error('latitude', msg)
+
+        if longitude < Decimal(GuindexParameters.GPS_DUBLIN_MIN_LONGITUDE) or \
+           longitude > Decimal(GuindexParameters.GPS_DUBLIN_MAX_LONGITUDE):
+
             logger.error("Longitude %f not in range", longitude)
 
-            msg = "Latitude must be in range %d:%d" % (-180, 180)
+            msg = "Longitude must be in range %s:%s" % (GuindexParameters.GPS_DUBLIN_MIN_LONGITUDE,
+                                                        GuindexParameters.GPS_DUBLIN_MAX_LONGITUDE)
+
             self.add_error('longitude', msg)
 
         return self.cleaned_data

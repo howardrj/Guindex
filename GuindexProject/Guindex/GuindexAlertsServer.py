@@ -457,7 +457,7 @@ class GuindexAlertsServer(Int16StringReceiver):
 
                 self.logger.debug("Sending Approved Pub Close Alert telegram to UserProfile %s", user_profile)
 
-                telegram_message = "The following Pub has been marked as closed:\n\n"
+                telegram_message = "The following pub has been marked as closed:\n\n"
 
                 telegram_message += "Pub Name: %s\n"    % message.pubClosedAlertRequest.pub
                 telegram_message += "Contributor: %s\n" % message.pubClosedAlertRequest.username
@@ -520,7 +520,7 @@ class GuindexAlertsServer(Int16StringReceiver):
 
                 self.logger.debug("Sending Unapproved Pub Close Alert Telegram to UserProfile %s", user_profile)
 
-                telegram_message = "The following Pub has been marked as closed by a non-staff member:\n\n"
+                telegram_message = "The following pub has been marked as closed by a non-staff member:\n\n"
 
                 telegram_message += "Pub Name: %s\n"    % message.pubClosedAlertRequest.pub
                 telegram_message += "Contributor: %s\n" % message.pubClosedAlertRequest.username
@@ -587,7 +587,7 @@ class GuindexAlertsServer(Int16StringReceiver):
 
                 self.logger.debug("Sending Pub Not Serving Guinness Alert telegram to UserProfile %s", user_profile)
 
-                telegram_message = "The following Pub has been marked as not serving Guinness:\n\n"
+                telegram_message = "The following pub has been marked as not serving Guinness:\n\n"
 
                 telegram_message += "Pub Name: %s\n"    % message.pubNotServingGuinnessAlertRequest.pub
                 telegram_message += "Contributor: %s\n" % message.pubNotServingGuinnessAlertRequest.username
@@ -650,7 +650,7 @@ class GuindexAlertsServer(Int16StringReceiver):
 
                 self.logger.debug("Sending Unapproved Pub Not Serving Guinness Alert Telegram to UserProfile %s", user_profile)
 
-                telegram_message = "The following Pub has been marked as not serving Guinness by a non-staff member:\n\n"
+                telegram_message = "The following pub has been marked as not serving Guinness by a non-staff member:\n\n"
 
                 telegram_message += "Pub Name: %s\n"    % message.pubNotServingGuinnessAlertRequest.pub
                 telegram_message += "Contributor: %s\n" % message.pubNotServingGuinnessAlertRequest.username

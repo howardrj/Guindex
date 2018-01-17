@@ -74,7 +74,7 @@
                         <td> <span class="sortable_column_header decimal_column"> PRICE </span></td>
                         <td> <span class="sortable_column_header"> CONTRIBUTOR </span></td>
                         <td> <span class="sortable_column_header timestamp_column"> TIMESTAMP </span></td>
-                        <td> <span class=""> APPROVE </span></td>
+                        <td> <span class=""> APPROVE/REJECT </span></td>
                     </tr>
 
                     {% for guinness in pending_contributions.pending_prices %} 
@@ -104,8 +104,17 @@
                             <i class="fa fa-check approve_contribution_button needs_description" 
                                data-description_text="Click to approve"
                                aria-hidden="true"
-                               id="pending_price_{{ guinness.id }}"
+                               id="approve_pending_price_{{ guinness.id }}"
                                data-contribution_id="{{ guinness.id }}"
+                               data-method="approve"
+                               data-contribution_type="pending_price">
+                            </i>
+                            <i class="fa fa-close approve_contribution_button needs_description" 
+                               data-description_text="Click to reject"
+                               aria-hidden="true"
+                               id="reject_pending_price_{{ guinness.id }}"
+                               data-contribution_id="{{ guinness.id }}"
+                               data-method="reject"
                                data-contribution_type="pending_price">
                             </i>
                             <div class="small_loader" style="width: 10px; height: 10px" id="pending_price_{{ guinness.id }}_loader"> </div>
@@ -138,7 +147,7 @@
                         <td> <span class="sortable_column_header"> PUB NAME &#9660; </span></td>
                         <td> <span class="sortable_column_header"> CONTRIBUTOR </span></td>
                         <td> <span class="sortable_column_header timestamp_column"> TIMESTAMP </span></td>
-                        <td> <span class=""> APPROVE </span></td>
+                        <td> <span class=""> APPROVE/REJECT </span></td>
                     </tr>
 
                     {% for pub in pending_contributions.pending_pubs %} 
@@ -163,8 +172,17 @@
                             <i class="fa fa-check approve_contribution_button needs_description" 
                                data-description_text="Click to approve"
                                aria-hidden="true"
-                               id="pending_pub_{{ pub.id }}"
+                               id="approve_pending_pub_{{ pub.id }}"
                                data-contribution_id="{{ pub.id }}"
+                               data-method="approve"
+                               data-contribution_type="pending_pub">
+                            </i>
+                            <i class="fa fa-close approve_contribution_button needs_description" 
+                               data-description_text="Click to reject"
+                               aria-hidden="true"
+                               id="reject_pending_pub_{{ pub.id }}"
+                               data-contribution_id="{{ pub.id }}"
+                               data-method="reject"
                                data-contribution_type="pending_pub">
                             </i>
                             <div class="small_loader" style="width: 10px; height: 10px" id="pending_pub_{{ pub.id }}_loader"> </div>
@@ -173,7 +191,7 @@
                     </tr>
                     {% endfor %}
 
-                    {% if pending_contributions.pending_prices|length > 0 %}
+                    {% if pending_contributions.pending_pubs|length > 0 %}
                     <tr id="pending_pubs_table_last_row" style="display:none" class="last_row">
                     {% else %}
                     <tr id="pending_pubs_table_last_row" class="last_row">
@@ -197,7 +215,7 @@
                         <td> <span class="sortable_column_header"> PUB NAME &#9660; </span></td>
                         <td> <span class="sortable_column_header"> CONTRIBUTOR </span></td>
                         <td> <span class="sortable_column_header timestamp_column"> TIMESTAMP </span></td>
-                        <td> <span class=""> APPROVE </span></td>
+                        <td> <span class=""> APPROVE/REJECT </span></td>
                     </tr>
 
                     {% for pub in pending_contributions.pending_closures %} 
@@ -222,8 +240,17 @@
                             <i class="fa fa-check approve_contribution_button needs_description" 
                                data-description_text="Click to approve"
                                aria-hidden="true"
-                               id="pending_closure_{{ pub.id }}"
+                               id="approve_pending_closure_{{ pub.id }}"
                                data-contribution_id="{{ pub.id }}"
+                               data-method="approve"
+                               data-contribution_type="pending_closure">
+                            </i>
+                            <i class="fa fa-close approve_contribution_button needs_description" 
+                               data-description_text="Click to reject"
+                               aria-hidden="true"
+                               id="reject_pending_closure_{{ pub.id }}"
+                               data-contribution_id="{{ pub.id }}"
+                               data-method="reject"
                                data-contribution_type="pending_closure">
                             </i>
                             <div class="small_loader" style="width: 10px; height: 10px" id="pending_closure_{{ pub.id }}_loader"> </div>
@@ -256,7 +283,7 @@
                         <td> <span class="sortable_column_header"> PUB NAME &#9660; </span></td>
                         <td> <span class="sortable_column_header"> CONTRIBUTOR </span></td>
                         <td> <span class="sortable_column_header timestamp_column"> TIMESTAMP </span></td>
-                        <td> <span class=""> APPROVE </span></td>
+                        <td> <span class=""> APPROVE/REJECT </span></td>
                     </tr>
 
                     {% for pub in pending_contributions.pending_not_serving_guinness %} 
@@ -281,8 +308,17 @@
                             <i class="fa fa-check approve_contribution_button needs_description" 
                                data-description_text="Click to approve"
                                aria-hidden="true"
-                               id="pending_not_serving_guinness_{{ pub.id }}"
+                               id="approve_pending_not_serving_guinness_{{ pub.id }}"
                                data-contribution_id="{{ pub.id }}"
+                               data-method="approve"
+                               data-contribution_type="pending_not_serving_guinness">
+                            </i>
+                            <i class="fa fa-close approve_contribution_button needs_description" 
+                               data-description_text="Click to reject"
+                               aria-hidden="true"
+                               id="reject_pending_not_serving_guinness_{{ pub.id }}"
+                               data-contribution_id="{{ pub.id }}"
+                               data-method="reject"
                                data-contribution_type="pending_not_serving_guinness">
                             </i>
                             <div class="small_loader" style="width: 10px; height: 10px" id="pending_not_serving_guinness_{{ pub.id }}_loader"> </div>
@@ -300,10 +336,7 @@
                     </tr>
                 </table>
 
-
-
             </div>
-
 
         </div>
         

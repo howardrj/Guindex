@@ -9,12 +9,14 @@
 
     var approveContribution = function (evt) {
 
-        var contribution_id   = evt.target.getAttribute('data-contribution_id');
-        var contribution_type = evt.target.getAttribute('data-contribution_type');
+        var contribution_id     = evt.target.getAttribute('data-contribution_id');
+        var contribution_type   = evt.target.getAttribute('data-contribution_type');
+        var contribution_method = evt.target.getAttribute('data-method');
 
-        // Display loader
-        evt.target.style.display = 'none';
-        document.getElementById(evt.target.id + '_loader').style.display = 'block';
+        // Hide approve and reject buttons and display loader
+        document.getElementById('approve_' + contribution_type + '_' + contribution_id).style.display = 'none';
+        document.getElementById('reject_'  + contribution_type + '_' + contribution_id).style.display = 'none';
+        document.getElementById(contribution_type + '_' + contribution_id + '_loader').style.display  = 'block';
 
         var request = new XMLHttpRequest();
         request.open('POST', '/approve_contribution/', true); 
@@ -23,8 +25,9 @@
         request.setRequestHeader('Content-Type', 'application/json');
         request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-        request.send(JSON.stringify({'contributionId'  : contribution_id,
-                                     'contributionType': contribution_type}));
+        request.send(JSON.stringify({'contributionId'    : contribution_id,
+                                     'contributionType'  : contribution_type,
+                                     'contributionMethod': contribution_method}));
 
         request.onreadystatechange = processRequest;
 
@@ -32,16 +35,29 @@
         {
             if (request.readyState == 4 && request.status == 200)
             {
-                cleanUpTable(contribution_id, contribution_type);
+                cleanUpTable(contribution_id, contribution_type, contribution_method);
             }
         };
 
-        var cleanUpTable = function (contributionId, contributionType) {
+        var cleanUpTable = function (contributionId, contributionType, contributionMethod) {
 
-            var table          = document.getElementById(contributionType + '_table');
-            var clicked_button = table.querySelector('#' + contributionType + '_' + contributionId)
+            var table   = document.getElementById(contributionType + '_table');
 
-            clicked_button.parentNode.innerHTML = "APPROVED";
+            var clicked_button_id = contributionMethod + '_' + contributionType + '_' + contributionId;
+            var clicked_button    = table.querySelector('#' + clicked_button_id)
+
+            if (contributionMethod == "approve")
+            {
+                clicked_button.parentNode.innerHTML = "APPROVED";
+            }
+            else if (contributionMethod == "reject")
+            {
+                clicked_button.parentNode.innerHTML = "REJECTED";
+            }
+            else
+            {
+                console.log("Received invalid contribution method");
+            }
         };
     };
 })();

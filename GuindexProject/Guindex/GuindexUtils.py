@@ -56,7 +56,7 @@ def getPubs():
 
     pub_list = []
 
-    pubs = Pub.objects.filter(pendingApproval = False)
+    pubs = Pub.objects.filter(pendingApproval = False, pendingApprovalRejected = False)
 
     for pub in pubs:
 
@@ -80,7 +80,7 @@ def getPendingContributions():
     pending_contributions_dict = {}
 
     # Check pending prices
-    pending_prices = Guinness.objects.filter(approved = False)
+    pending_prices = Guinness.objects.filter(approved = False, rejected = False)
 
     pending_prices_list = []
 
@@ -99,7 +99,7 @@ def getPendingContributions():
     pending_contributions_dict['pending_prices'] = sorted(pending_prices_list, key = lambda k: k['creationDate'], reverse = False)
 
     # Checking pending new pubs
-    pending_pubs = Pub.objects.filter(pendingApproval = True)
+    pending_pubs = Pub.objects.filter(pendingApproval = True, pendingApprovalRejected = False)
 
     pending_pubs_list = []
 
@@ -164,7 +164,7 @@ def arePendingContributions():
         Means we don't have to return full list to main Guindex view
     """
 
-    if len(Guinness.objects.filter(approved = False)):
+    if len(Guinness.objects.filter(approved = False, rejected = False)):
 
         return True
 

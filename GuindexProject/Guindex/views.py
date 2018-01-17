@@ -25,7 +25,10 @@ logger = logging.getLogger(__name__)
 
 
 def guindexMapFull(request):
-        return render(request, 'guindex_map_full.html')
+
+    logger.info("Received %s request to %s", request.method, request.get_full_path())
+
+    return render(request, 'guindex_map_full.html')
 
 
 @login_required
@@ -36,6 +39,9 @@ def guindex(request):
 
     new_pub_form      = NewPubForm()
     new_guinness_form = NewGuinnessForm()
+
+    modal_to_display = ""
+    warning_text     = ""
 
     try:
         user_profile = GuindexUtils.getUserProfileFromUser(request.user)
@@ -97,11 +103,12 @@ def guindex(request):
             return response
 
         else:
-            logger.info("Returning form with errors to correct")
+            logger.info("Returning form %s with errors to correct", modal_to_display)
 
     # Retrieve cookies that may or may not be set
-    modal_to_display = request.COOKIES.get('modal_to_display')
-    warning_text     = request.COOKIES.get('warning_text')
+    if not modal_to_display:
+        modal_to_display = request.COOKIES.get('modal_to_display', "")
+        warning_text     = request.COOKIES.get('warning_text', "")
 
     context_dict = {'pubs'                   : GuindexUtils.getPubs(),
                     'stats'                  : GuindexUtils.getStats(),
@@ -529,6 +536,7 @@ def pendingContributions(request):
                     'user_profile'           : user_profile,
                     'user_profile_parameters': UserProfileParameters.getParameters(),
                     'guindex_parameters'     : GuindexParameters.getParameters(),
+                    'modal_to_display'       : "",
                     }
 
     return render(request, 'guindex_pending_contributions.html', context_dict)
@@ -584,29 +592,45 @@ def approveContribution(request):
         logger.error("Failed to load contribution ID")
         raise Http404("Failed to load contribution ID")
 
+    try:
+        contribution_method = json.loads(request.body)['contributionMethod']
+    except:
+        logger.error("Failed to load contribution method")
+        raise Http404("Failed to load contribution method")
+
+    if contribution_method == 'approve':
+        logger.debug("Contribution was approved")
+        contribution_approved = True
+    elif contribution_method == 'reject':
+        logger.debug("Contribution was rejected")
+        contribution_approved = False
+    else:
+        logger.error("Received invalid contributionMethod: %s", contribution_method)
+        raise Http404("Received invalid contributionMethod: %s" % contribution_method)
+        
     if contribution_type == 'pending_price':
 
         logger.info("Received pending price decision")
 
-        return handleNewPriceDecision(contribution_id)
+        return handleNewPriceDecision(contribution_id, contribution_approved)
 
     if contribution_type == 'pending_pub':
 
         logger.info("Received pending new pub decision")
 
-        return handleNewPubDecision(contribution_id)
+        return handleNewPubDecision(contribution_id, contribution_approved)
 
     if contribution_type == 'pending_closure':
 
         logger.info("Received pending pub closure decision")
 
-        return handlePubClosureDecision(contribution_id)
+        return handlePubClosureDecision(contribution_id, contribution_approved)
 
     if contribution_type == 'pending_not_serving_guinness':
 
         logger.info("Received pending pub not serving Guinness decision")
 
-        return handlePubNotServingGuinnessDecision(contribution_id)
+        return handlePubNotServingGuinnessDecision(contribution_id, contribution_approved)
 
     logger.error("Received invalid contribution type")
 
@@ -662,7 +686,7 @@ def arePendingContributions(request):
     return HttpResponse(json.dumps(response), content_type="application/json") # Send 200 OK anyway
 
 
-def handleNewPriceDecision(contributionId):
+def handleNewPriceDecision(contributionId, contributionApproved):
 
     try:
         guinness = Guinness.objects.get(id = int(contributionId))
@@ -675,7 +699,12 @@ def handleNewPriceDecision(contributionId):
         logger.error("Guinness %s has already been approved", guinness)
         return HttpResponse(json.dumps({}), content_type="application/json") # Send 200 OK anyway
 
-    guinness.approved = True
+    if contributionApproved:
+        guinness.approved = True
+        guinness.rejected = False
+    else:
+        guinness.approved = False
+        guinness.rejected = True 
 
     try:
         guinness.full_clean()
@@ -688,8 +717,6 @@ def handleNewPriceDecision(contributionId):
     except:
         logger.error("Guinness object could not be saved")
         raise Http404("Failed to save Guinness object")
-
-    logger.info("Guinness %s was approved", guinness)
 
     try:
         alerts_client = GuindexAlertsClient(logger)
@@ -706,7 +733,7 @@ def handleNewPriceDecision(contributionId):
     return HttpResponse(json.dumps({}), content_type="application/json")
 
 
-def handleNewPubDecision(contributionId):
+def handleNewPubDecision(contributionId, contributionApproved):
 
     try:
         pub = Pub.objects.get(id = int(contributionId))
@@ -719,7 +746,12 @@ def handleNewPubDecision(contributionId):
         logger.error("Pub %s is not pending approval", pub)
         return HttpResponse(json.dumps({}), content_type="application/json") # Send 200 OK anyway
 
-    pub.pendingApproval = False
+    if contributionApproved:
+        pub.pendingApproval = False
+        pub.pendingApprovalRejected = False
+    else:
+        pub.pendingApproval = False
+        pub.pendingApprovalRejected = True
 
     try:
         pub.full_clean()
@@ -732,8 +764,6 @@ def handleNewPubDecision(contributionId):
     except:
         logger.error("Pub object could not be saved")
         raise Http404("Failed to save Guinness object")
-
-    logger.info("Pub %s was approved", pub)
 
     try:
         alerts_client = GuindexAlertsClient(logger)
@@ -750,7 +780,7 @@ def handleNewPubDecision(contributionId):
     return HttpResponse(json.dumps({}), content_type="application/json")
 
 
-def handlePubClosureDecision(contributionId):
+def handlePubClosureDecision(contributionId, contributionApproved):
 
     try:
         pub = Pub.objects.get(id = int(contributionId))
@@ -763,8 +793,12 @@ def handlePubClosureDecision(contributionId):
         logger.error("Pub %s is not pending closure", pub)
         return HttpResponse(json.dumps({}), content_type="application/json") # Send 200 OK anyway
 
-    pub.pendingClosed = False
-    pub.closed = True
+    if contributionApproved:
+        pub.pendingClosed = False
+        pub.closed = True
+    else:
+        pub.pendingClosed = False
+        pub.closed = False
 
     try:
         pub.full_clean()
@@ -777,8 +811,6 @@ def handlePubClosureDecision(contributionId):
     except:
         logger.error("Pub object could not be saved")
         raise Http404("Failed to save Guinness object")
-
-    logger.info("Pub %s has been closed", pub)
 
     try:
         alerts_client = GuindexAlertsClient(logger)
@@ -795,7 +827,7 @@ def handlePubClosureDecision(contributionId):
     return HttpResponse(json.dumps({}), content_type="application/json")
 
 
-def handlePubNotServingGuinnessDecision(contributionId):
+def handlePubNotServingGuinnessDecision(contributionId, contributionApproved):
 
     try:
         pub = Pub.objects.get(id = int(contributionId))
@@ -808,8 +840,12 @@ def handlePubNotServingGuinnessDecision(contributionId):
         logger.error("Pub %s is not pending not serving Guinness", pub)
         return HttpResponse(json.dumps({}), content_type="application/json") # Send 200 OK anyway
 
-    pub.pendingNotServingGuinness = False
-    pub.notServingGuinness = True
+    if contributionApproved:
+        pub.pendingNotServingGuinness = False
+        pub.servingGuinness = False
+    else:
+        pub.pendingNotServingGuinness = False
+        pub.servingGuinness = True
 
     try:
         pub.full_clean()
@@ -822,8 +858,6 @@ def handlePubNotServingGuinnessDecision(contributionId):
     except:
         logger.error("Pub object could not be saved")
         raise Http404("Failed to save Guinness object")
-
-    logger.info("Pub %s has been marked as not serving Guinness", pub)
 
     try:
         alerts_client = GuindexAlertsClient(logger)
@@ -918,7 +952,7 @@ class PubList(generics.ListAPIView):
         super(PubList, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
-        return Pub.objects.filter(pendingApproval = False)
+        return Pub.objects.filter(pendingApproval = False, pendingApprovalRejected = False)
 
 
 class PubDetail(generics.RetrieveAPIView):
