@@ -20,12 +20,15 @@ class Pub(models.Model):
     closed                               = models.BooleanField(default = False)
     servingGuinness                      = models.BooleanField(default = True)
     pendingApproval                      = models.BooleanField(default = False) # In case non-staff member wants to add a pub
+    pendingApprovalRejected              = models.BooleanField(default = False)
     pendingApprovalContributor           = models.ForeignKey(UserProfile, null = True, blank = True, related_name = 'pendingAdder', default = None)
     pendingApprovalTime                  = models.DateTimeField(default = timezone.now)
     pendingClosed                        = models.BooleanField(default = False) # In case non-staff member closes pub
+    pendingClosedRejected                = models.BooleanField(default = False)
     pendingClosedContributor             = models.ForeignKey(UserProfile, null = True, blank = True, related_name = 'pendingCloser', default = None)
     pendingClosedTime                    = models.DateTimeField(default = timezone.now)
     pendingNotServingGuinness            = models.BooleanField(default = False) # In case non-staff member marks pub as not serving Guinness
+    pendingNotServingGuinnessRejected    = models.BooleanField(default = False)
     pendingNotServingGuinnessContributor = models.ForeignKey(UserProfile, null = True, blank = True, related_name = 'pendingNotServingGuinnessMarker', default = None)
     pendingNotServingGuinnessTime        = models.DateTimeField(default = timezone.now)
 
@@ -83,6 +86,7 @@ class Guinness(models.Model):
     price        = models.DecimalField(decimal_places = 2, max_digits = 6)
     pub          = models.ForeignKey(Pub)
     approved     = models.BooleanField(default = True)
+    rejected     = models.BooleanField(default = False)
 
     def __unicode__(self):
 
