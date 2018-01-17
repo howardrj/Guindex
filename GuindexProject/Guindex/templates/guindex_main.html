@@ -74,6 +74,56 @@
             <h4 id="username"> Pending Contributions </h4>
 
         </div>
+        {% elif user_profile.user.is_staff %}
+
+            <div id="notification_info" style="display:none">
+                <a href="/pending_contributions/" id="pending_contributions_link">
+                    <i id="pending_contributions_i" class="fa fa-bell blink needs_description" aria-hidden="true" data-description_text="Check pending contributions"></i>
+                </a>
+                <h4 id="username"> Pending Contributions </h4>
+
+            </div>
+
+            <script>
+                
+                var checkPendingContributions = function ()
+                {
+                    // Check if there are pending contributions to check
+                    var request = new XMLHttpRequest();
+                    request.open('GET', '/are_pending_contributions/', true); 
+
+                    request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+                    request.setRequestHeader('Content-Type', 'application/json');
+                    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                    request.send(null);
+
+                    request.onreadystatechange = processRequest;
+
+                    function processRequest()
+                    {
+                        if (request.readyState == 4 && request.status == 200)
+                        {
+                            if (JSON.parse(request.responseText)['arePendingContributions'])
+                            {
+                                // If there are pending contributions, display notification
+                                console.log("There are pending contributions");
+                                document.getElementById('notification_info').style.display = 'block';
+                            }    
+                            else
+                            {
+                                // If there are no pending contributions, hide notification
+                                console.log("There are no pending contributions");
+                                document.getElementById('notification_info').style.display = 'none';
+                            }
+                        }
+                    }
+                }
+
+                // Check pending contributions every 10 seconds
+                setInterval(checkPendingContributions, 10000);
+
+            </script>
 
         {% endif %}
 

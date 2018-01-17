@@ -16,16 +16,19 @@
         <div class="content_div">
             <p> Hello {{ user_profile.user.username }}, </p>
 
-            <p> The following Guinness price has been added to the Guindex: </p>
+            <p> The following pub has been submitted to the Guindex by a non-staff member: </p>
 
             <br>
 
-            <p> Pub Name: {{ new_guinness.name }}</p>
-            <p> Price: {{ new_guinness.price }}</p>
-            <p> Contributor: {{ new_guinness.creator }}</p>
-            <p> Time: {{ new_guinness.creationDate }}</p>
+            <p> Pub Name: {{ new_pub.name }}</p>
+            <p> Latitude: {{ new_pub.latitude }}</p>
+            <p> Longitude: {{ new_pub.longitude }}</p>
+            <p> Contributor: {{ new_pub.creator }}</p>
+            <p> Time: {{ new_pub.creationDate }}</p>
 
             <br>
+
+            <p> Please visit {{ new_pub.pendingContributionsUrl }} to approve the submission. </p>
 
             <p> Regards, </p>
             <p> {{ user_profile_parameters.PROJECT_TITLE }} Team </p>

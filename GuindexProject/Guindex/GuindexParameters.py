@@ -37,6 +37,4 @@ class GuindexParameters:
 
                 parameter_dict[key] = attribute
 
-        logger.debug("Returning Guindex parameters - %s", parameter_dict)
-
         return parameter_dict

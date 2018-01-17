@@ -21,11 +21,11 @@ import GuindexUtils
 
 from UserProfile.UserProfileParameters import UserProfileParameters
 
+logger = logging.getLogger(__name__)
+
+
 def guindexMapFull(request):
         return render(request, 'guindex_map_full.html')
-
-
-logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -347,6 +347,14 @@ def handleClosePubRequest(userProfile, postData):
 
         return modal_to_display, warning_text
 
+    if pub.closed:
+        logger.error("Pub is already closed")
+
+        modal_to_display = "warning"
+        warning_text = "Pub is already closed."
+
+        return modal_to_display, warning_text
+
     if userProfile.user.is_staff:
 
         logger.debug("UserProfile is a staff member so closing pub is allowed")
@@ -363,7 +371,7 @@ def handleClosePubRequest(userProfile, postData):
             pub.pendingClosed = True
         else:
             modal_to_display  = "warning"
-            warning_text      = "Another user has already has already marked this pub as closed."
+            warning_text      = "Another user has already marked this pub as closed."
 
             return modal_to_display, warning_text
 
@@ -427,6 +435,14 @@ def handleNotServingGuinnessRequest(userProfile, postData):
 
         return modal_to_display, warning_text
 
+    if not pub.servingGuinness:
+        logger.error("Pub is marked as not serving Guinness")
+
+        modal_to_display = "warning"
+        warning_text = "Pub is already marked as not serving Guinness."
+
+        return modal_to_display, warning_text
+
     if userProfile.user.is_staff:
 
         logger.debug("UserProfile is a staff member so marking pub as not serving Guinness is allowed")
@@ -443,7 +459,7 @@ def handleNotServingGuinnessRequest(userProfile, postData):
             pub.pendingNotServingGuinness = True
         else:
             modal_to_display  = "warning"
-            warning_text      = "Another user has already has already marked this pub as not serving Guinness."
+            warning_text      = "Another user has already marked this pub as not serving Guinness."
 
             return modal_to_display, warning_text
 
@@ -595,6 +611,55 @@ def approveContribution(request):
     logger.error("Received invalid contribution type")
 
     raise Http404("Received invalid contribution type")
+
+@login_required
+@require_http_methods(['GET'])
+def arePendingContributions(request):
+
+    logger.info("Received %s request to %s", request.method, request.get_full_path())
+
+    try:
+        user_profile = GuindexUtils.getUserProfileFromUser(request.user)
+        logger.debug("Found UserProfile %s with user '%s'", user_profile, request.user)
+    except:
+        logger.error("Could not retrieve UserProfile with user '%s'. Raising 404 exception", request.user)
+
+        error_message = "No UserProfile exists with user '%s'" % request.user
+
+        context_dict = {'user_profile_parameters': UserProfileParameters.getParameters(),
+                        'message'                : error_message}
+
+        return render(request, 'error_404.html', context_dict, status = 404)
+
+    if not user_profile.user.is_staff:
+
+        logger.error("This resource is only available to staff members")
+
+        error_message = "This resource is only available to staff members."
+
+        context_dict = {'user_profile_parameters': UserProfileParameters.getParameters(),
+                        'message'                : error_message}
+
+        return render(request, 'error_404.html', context_dict, status = 404)
+
+    if request.method != "GET":
+
+        logger.error("Received invalid request type")
+
+        context_dict = {'user_profile_parameters': UserProfileParameters.getParameters()}
+
+        return render(request, 'error_404.html', context_dict, status = 404)
+
+    are_pending_contributions = GuindexUtils.arePendingContributions()
+
+    if are_pending_contributions:
+        logger.debug("There are pending contributions")
+    else:
+        logger.error("There are no pending contributons")
+    
+    response = {'arePendingContributions': are_pending_contributions}
+
+    return HttpResponse(json.dumps(response), content_type="application/json") # Send 200 OK anyway
 
 
 def handleNewPriceDecision(contributionId):
@@ -918,4 +983,3 @@ class StatisticsList(generics.ListAPIView):
 
     def get_queryset(self):
         return StatisticsSingleton.objects.filter(id = 1)
-

@@ -16,16 +16,17 @@
         <div class="content_div">
             <p> Hello {{ user_profile.user.username }}, </p>
 
-            <p> Your below Guindex submission has been {{ new_guinness.approved }}: </p>
+            <p> Your below new pub submission has been {{ new_pub.approved }}: </p>
 
             <br>
 
-            <p> Pub: {{ new_guinness.name }}</p>
-            <p> Price: {{ new_guinness.price }}</p>
-            <p> Time: {{ new_guinness.creationDate }}</p>
+            <p> Pub Name: {{ new_pub.name }}</p>
+            <p> Latitude: {{ new_pub.latitude }}</p>
+            <p> Longitude: {{ new_pub.longitude }}</p>
+            <p> Time: {{ new_pub.creationDate }}</p>
 
-            {% if new_guinness.resaon %}
-                <p> Reason: {{ new_guinness.reason }} </p>
+            {% if new_pub.reason %}
+                <p> Reason: {{ new_pub.reason }} </p>
             {% endif %}
 
             <br>

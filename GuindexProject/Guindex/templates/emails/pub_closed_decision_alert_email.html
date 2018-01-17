@@ -16,14 +16,16 @@
         <div class="content_div">
             <p> Hello {{ user_profile.user.username }}, </p>
 
-            <p> The following Guinness price has been added to the Guindex: </p>
+            <p> Your below closed pub submission has been {{ closed_pub.approved }}: </p>
 
             <br>
 
-            <p> Pub Name: {{ new_guinness.name }}</p>
-            <p> Price: {{ new_guinness.price }}</p>
-            <p> Contributor: {{ new_guinness.creator }}</p>
-            <p> Time: {{ new_guinness.creationDate }}</p>
+            <p> Pub Name: {{ closed_pub.name }}</p>
+            <p> Time: {{ closed_pub.creationDate }}</p>
+
+            {% if closed_pub.reason %}
+                <p> Reason: {{ closed_pub.reason }} </p>
+            {% endif %}
 
             <br>
 

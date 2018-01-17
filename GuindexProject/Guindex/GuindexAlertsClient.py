@@ -37,7 +37,7 @@ class GuindexAlertsClient():
     def sendMessage(self, message, prependTwoByteHeader = True):
         """
             Sends string 'message' to Alerts Server
-            (appending two byte length header by default)
+            (prepending two byte length header by default)
         """
 
         self.logger.debug("Sending message to Guindex Alerts Server - %s", ":".join("{:02x}".format(ord(c)) for c in message))
@@ -143,10 +143,10 @@ class GuindexAlertsClient():
         # Create Pub Not Serving Guinness Alert Request message
         guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
 
-        guindex_alerts_msg.pubNotServingGinnessAlertRequest.pub          = pub.name
-        guindex_alerts_msg.pubNotServingGinnessAlertRequest.username     = pub.pendingNotServingGuinnessContributor.user.username
-        guindex_alerts_msg.pubNotServingGinnessAlertRequest.approved     = not pub.pendingNotServingGuinness
-        guindex_alerts_msg.pubNotServingGinnessAlertRequest.creationDate = '%s' % pub.pendingNotServingGuinnessTime
+        guindex_alerts_msg.pubNotServingGuinnessAlertRequest.pub          = pub.name
+        guindex_alerts_msg.pubNotServingGuinnessAlertRequest.username     = pub.pendingNotServingGuinnessContributor.user.username
+        guindex_alerts_msg.pubNotServingGuinnessAlertRequest.approved     = not pub.pendingNotServingGuinness
+        guindex_alerts_msg.pubNotServingGuinnessAlertRequest.creationDate = '%s' % pub.pendingNotServingGuinnessTime
 
         if pub.pendingNotServingGuinness: # Give url of pending contributions
             guindex_alerts_msg.pubNotServingGuinnessAlertRequest.uri = "https://guindex.ie"
