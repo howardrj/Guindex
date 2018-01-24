@@ -39,7 +39,7 @@
 #corner_info {
     position: absolute;
     left: 20px; 
-    top: 12vw;
+    top: 1vw;
     text-align: center;
 }
 
@@ -58,7 +58,7 @@
 /******************************/
 #notification_info {
     position: absolute;
-    top: 12vw; 
+    top: 1vw; 
     right: 20px;
     text-align: center;
 }
@@ -118,6 +118,19 @@
 }
 
 /******************************************/
+/* Big Div Shifted Downward to Avoid header */
+/******************************************/
+
+#bigshiftedcontainer {
+    width: 100%;
+    top: 10vw;
+    max-width: 1200px;
+    min-width: 800px; 
+    overflow: visible;
+}
+
+
+/******************************************/
 /* Div containing main table and controls */
 /******************************************/
 
@@ -137,7 +150,7 @@
 #add_new_pub_div {
     position: relative;
     font-size: 17px;
-    margin-top: 14vw;
+    margin-top: 1.5vw;
     margin-left:  auto;
     margin-right: auto;
     text-align: center;

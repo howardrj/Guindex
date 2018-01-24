@@ -43,7 +43,7 @@
     </header>
 
     <body>
-
+    
         {% if modal_to_display == "" %}
 
             <!-- If no modal to display, display loading screen -->
@@ -55,6 +55,7 @@
                 </div>
 
             </div>
+            
 
             <!-- Hide loading background when page loads -->
             <script>
@@ -67,7 +68,7 @@
 
         {% endif %}
 
-
+	<div id="bigshiftedcontainer">
         {% include "guindex_controls.html" %}
 
         <div id="corner_info">
@@ -158,7 +159,7 @@
             </div>
 
         </div>
-        
+       </div> 
     </body>
 
 </html>
