@@ -29,8 +29,12 @@
     font-size: 2.2vw;
     margin-top:2.15vw;
     padding: 0;
+    white-space: nowrap;
 }
 
+#guindex_table_navbar {
+    font-size: 2vw;
+}
 
 /***************/
 /* Logout link */
@@ -39,8 +43,8 @@
 #corner_info {
     position: absolute;
     left: 20px; 
-    top: 1vw;
     text-align: center;
+    top: 20px;
 }
 
 #logout_link {
@@ -58,9 +62,9 @@
 /******************************/
 #notification_info {
     position: absolute;
-    top: 1vw; 
     right: 20px;
     text-align: center;
+    top: 20px;
 }
 
 #pending_contributions_link {
@@ -123,10 +127,11 @@
 
 #bigshiftedcontainer {
     width: 100%;
-    top: 10vw;
-    max-width: 1200px;
+    margin-top: 15vw;
     min-width: 800px; 
     overflow: visible;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 
@@ -150,7 +155,6 @@
 #add_new_pub_div {
     position: relative;
     font-size: 17px;
-    margin-top: 1.5vw;
     margin-left:  auto;
     margin-right: auto;
     text-align: center;
