@@ -31,12 +31,69 @@
 
     <header id="main_menu" class="header navbar-fixed-top">
 	    <div class="main_menu_bg">
-                <ul class="navbar">
+                <ul class="navbar" id="guindex_table_navbar">
                    <a href="../" class="class1">Overview</a>
                     <a href="../statistics/" class="class1">Statistics</a>
                     <a href="../analysis/" class="class1">Analysis</a>
                     <a href="../info/" class="class1">About</a>
-                    <a href="." class="class1">Log a Price</a>
+                    <a href="/logout/" class="class1">Logout</a>
+
+                    {% if pending_contributions and user_profile.user.is_staff %}
+
+                        <a href="/pending_contributions/" 
+                           class="blink class1" 
+                           id="pending_contributions_notification_link"> 
+                            Pending Contributions
+                        </a>
+
+                    {% elif user_profile.user.is_staff %}
+                        <a href="/pending_contributions/" 
+                           style="visibility:hidden"
+                           class="blink class1" 
+                           id="pending_contributions_notification_link"> 
+                            Pending Contributions
+                        </a>
+
+                        <script>
+                            
+                            var checkPendingContributions = function ()
+                            {
+                                // Check if there are pending contributions to check
+                                var request = new XMLHttpRequest();
+                                request.open('GET', '/are_pending_contributions/', true); 
+
+                                request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+                                request.setRequestHeader('Content-Type', 'application/json');
+                                request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                                request.send(null);
+
+                                request.onreadystatechange = processRequest;
+
+                                function processRequest()
+                                {
+                                    if (request.readyState == 4 && request.status == 200)
+                                    {
+                                        if (JSON.parse(request.responseText)['arePendingContributions'])
+                                        {
+                                            // If there are pending contributions, display notification
+                                            document.getElementById('pending_contributions_notification_link').style.visibility = 'visible';
+                                        }    
+                                        else
+                                        {
+                                            // If there are no pending contributions, hide notification
+                                            document.getElementById('pending_contributions_notification_link').style.visibility = 'hidden';
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Check pending contributions every 10 seconds
+                            setInterval(checkPendingContributions, 10000);
+
+                        </script>
+
+                    {% endif %}
                 </ul>
                 </div>
             </div>
@@ -69,74 +126,8 @@
         {% endif %}
 
 	<div id="bigshiftedcontainer">
+
         {% include "guindex_controls.html" %}
-
-        <div id="corner_info">
-            <a href="/logout/" id="logout_link">
-                <i class="fa fa-sign-out needs_description" aria-hidden="true" data-description_text="Logout"></i>
-            </a>
-            <h4 id="username"> {{ user_profile.user.username }} </h4>
-        </div>
-
-        {% if pending_contributions and user_profile.user.is_staff %}
-
-        <div id="notification_info">
-            <a href="/pending_contributions/" id="pending_contributions_link">
-                <i id="pending_contributions_i" class="fa fa-bell blink needs_description" aria-hidden="true" data-description_text="Check pending contributions"></i>
-            </a>
-            <h4 id="username"> Pending Contributions </h4>
-
-        </div>
-        {% elif user_profile.user.is_staff %}
-
-            <div id="notification_info" style="display:none">
-                <a href="/pending_contributions/" id="pending_contributions_link">
-                    <i id="pending_contributions_i" class="fa fa-bell blink needs_description" aria-hidden="true" data-description_text="Check pending contributions"></i>
-                </a>
-                <h4 id="username"> Pending Contributions </h4>
-
-            </div>
-
-            <script>
-                
-                var checkPendingContributions = function ()
-                {
-                    // Check if there are pending contributions to check
-                    var request = new XMLHttpRequest();
-                    request.open('GET', '/are_pending_contributions/', true); 
-
-                    request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
-                    request.setRequestHeader('Content-Type', 'application/json');
-                    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-                    request.send(null);
-
-                    request.onreadystatechange = processRequest;
-
-                    function processRequest()
-                    {
-                        if (request.readyState == 4 && request.status == 200)
-                        {
-                            if (JSON.parse(request.responseText)['arePendingContributions'])
-                            {
-                                // If there are pending contributions, display notification
-                                document.getElementById('notification_info').style.display = 'block';
-                            }    
-                            else
-                            {
-                                // If there are no pending contributions, hide notification
-                                document.getElementById('notification_info').style.display = 'none';
-                            }
-                        }
-                    }
-                }
-
-                // Check pending contributions every 10 seconds
-                setInterval(checkPendingContributions, 10000);
-
-            </script>
-
-        {% endif %}
 
         {% include "new_pub_form.html" %}
         {% include "new_guinness_form.html" %}
