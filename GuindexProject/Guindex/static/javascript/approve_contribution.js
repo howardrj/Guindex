@@ -12,10 +12,20 @@
         var contribution_id     = evt.target.getAttribute('data-contribution_id');
         var contribution_type   = evt.target.getAttribute('data-contribution_type');
         var contribution_method = evt.target.getAttribute('data-method');
+        var contribution_reason = ""
+
+        if (contribution_method == 'reject')
+        {
+            // Try get contribution reason
+            contribution_reason = evt.target.parentNode.children[0].value;
+
+            // Hide dropdown
+            evt.target.parentNode.classList.remove("show");
+        }
 
         // Hide approve and reject buttons and display loader
         document.getElementById('approve_' + contribution_type + '_' + contribution_id).style.display = 'none';
-        document.getElementById('reject_'  + contribution_type + '_' + contribution_id).style.display = 'none';
+        document.getElementById('reject_'  + contribution_type + '_' + contribution_id + '_button').style.display = 'none';
         document.getElementById(contribution_type + '_' + contribution_id + '_loader').style.display  = 'block';
 
         var request = new XMLHttpRequest();
@@ -27,6 +37,7 @@
 
         request.send(JSON.stringify({'contributionId'    : contribution_id,
                                      'contributionType'  : contribution_type,
+                                     'contributionReason': contribution_reason,
                                      'contributionMethod': contribution_method}));
 
         request.onreadystatechange = processRequest;

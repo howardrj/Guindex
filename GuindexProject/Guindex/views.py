@@ -601,9 +601,19 @@ def approveContribution(request):
     if contribution_method == 'approve':
         logger.debug("Contribution was approved")
         contribution_approved = True
+        reason = None
     elif contribution_method == 'reject':
         logger.debug("Contribution was rejected")
         contribution_approved = False
+
+        # Try get reason for rejection
+        try:
+            reason = json.loads(request.body)['contributionReason']
+            logger.debug("Rejection reason - %s", reason)
+        except:
+            logger.debug("Reason for rejecton was not provided in request")
+            reason = None
+
     else:
         logger.error("Received invalid contributionMethod: %s", contribution_method)
         raise Http404("Received invalid contributionMethod: %s" % contribution_method)
@@ -612,25 +622,25 @@ def approveContribution(request):
 
         logger.info("Received pending price decision")
 
-        return handleNewPriceDecision(contribution_id, contribution_approved)
+        return handleNewPriceDecision(contribution_id, contribution_approved, reason)
 
     if contribution_type == 'pending_pub':
 
         logger.info("Received pending new pub decision")
 
-        return handleNewPubDecision(contribution_id, contribution_approved)
+        return handleNewPubDecision(contribution_id, contribution_approved, reason)
 
     if contribution_type == 'pending_closure':
 
         logger.info("Received pending pub closure decision")
 
-        return handlePubClosureDecision(contribution_id, contribution_approved)
+        return handlePubClosureDecision(contribution_id, contribution_approved, reason)
 
     if contribution_type == 'pending_not_serving_guinness':
 
         logger.info("Received pending pub not serving Guinness decision")
 
-        return handlePubNotServingGuinnessDecision(contribution_id, contribution_approved)
+        return handlePubNotServingGuinnessDecision(contribution_id, contribution_approved, reason)
 
     logger.error("Received invalid contribution type")
 
@@ -686,7 +696,7 @@ def arePendingContributions(request):
     return HttpResponse(json.dumps(response), content_type="application/json") # Send 200 OK anyway
 
 
-def handleNewPriceDecision(contributionId, contributionApproved):
+def handleNewPriceDecision(contributionId, contributionApproved, reason = None):
 
     try:
         guinness = Guinness.objects.get(id = int(contributionId))
@@ -725,7 +735,7 @@ def handleNewPriceDecision(contributionId, contributionApproved):
         return HttpResponse(json.dumps({}), content_type="application/json")
 
     try:
-        alerts_client.sendNewGuinnessDecisionAlertRequest(guinness)
+        alerts_client.sendNewGuinnessDecisionAlertRequest(guinness, reason)
     except:
         logger.error("Failed to send New Guinness Decision Alert Request")
         return HttpResponse(json.dumps({}), content_type="application/json")
@@ -733,7 +743,7 @@ def handleNewPriceDecision(contributionId, contributionApproved):
     return HttpResponse(json.dumps({}), content_type="application/json")
 
 
-def handleNewPubDecision(contributionId, contributionApproved):
+def handleNewPubDecision(contributionId, contributionApproved, reason = None):
 
     try:
         pub = Pub.objects.get(id = int(contributionId))
@@ -772,7 +782,7 @@ def handleNewPubDecision(contributionId, contributionApproved):
         return HttpResponse(json.dumps({}), content_type="application/json")
 
     try:
-        alerts_client.sendNewPubDecisionAlertRequest(pub)
+        alerts_client.sendNewPubDecisionAlertRequest(pub, reason)
     except:
         logger.error("Failed to send New Pub Decision Alert Request")
         return HttpResponse(json.dumps({}), content_type="application/json")
@@ -780,7 +790,7 @@ def handleNewPubDecision(contributionId, contributionApproved):
     return HttpResponse(json.dumps({}), content_type="application/json")
 
 
-def handlePubClosureDecision(contributionId, contributionApproved):
+def handlePubClosureDecision(contributionId, contributionApproved, reason = None):
 
     try:
         pub = Pub.objects.get(id = int(contributionId))
@@ -819,7 +829,7 @@ def handlePubClosureDecision(contributionId, contributionApproved):
         return HttpResponse(json.dumps({}), content_type="application/json")
 
     try:
-        alerts_client.sendPubClosedDecisionAlertRequest(pub)
+        alerts_client.sendPubClosedDecisionAlertRequest(pub, reason)
     except:
         logger.error("Failed to send Pub Closed Decision Alert Request")
         return HttpResponse(json.dumps({}), content_type="application/json")
@@ -827,7 +837,7 @@ def handlePubClosureDecision(contributionId, contributionApproved):
     return HttpResponse(json.dumps({}), content_type="application/json")
 
 
-def handlePubNotServingGuinnessDecision(contributionId, contributionApproved):
+def handlePubNotServingGuinnessDecision(contributionId, contributionApproved, reason = None):
 
     try:
         pub = Pub.objects.get(id = int(contributionId))
@@ -866,7 +876,7 @@ def handlePubNotServingGuinnessDecision(contributionId, contributionApproved):
         return HttpResponse(json.dumps({}), content_type="application/json")
 
     try:
-        alerts_client.sendPubNotServingGuinnessDecisionAlertRequest(pub)
+        alerts_client.sendPubNotServingGuinnessDecisionAlertRequest(pub, reason)
     except:
         logger.error("Failed to send Pub Not Serving Guinness Decision Alert Request")
         return HttpResponse(json.dumps({}), content_type="application/json")
