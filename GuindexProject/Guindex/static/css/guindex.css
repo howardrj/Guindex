@@ -520,3 +520,11 @@ input:checked + .slider:before {
     margin: 0 auto;
     display: none;
 }
+
+/**********************************/
+/* Pending Contributions Dropdown */
+/**********************************/
+.dropdown_button:hover {
+    cursor:hand;
+    cursor:pointer;
+}

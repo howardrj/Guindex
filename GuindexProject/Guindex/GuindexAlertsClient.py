@@ -159,7 +159,7 @@ class GuindexAlertsClient():
 
         self.sendMessage(message_string)
 
-    def sendNewGuinnessDecisionAlertRequest(self, guinness):
+    def sendNewGuinnessDecisionAlertRequest(self, guinness, reason = None):
 
         self.logger.info("Sending New Guinness Decision Alert Request")
 
@@ -174,6 +174,9 @@ class GuindexAlertsClient():
         guindex_alerts_msg.newGuinnessDecisionAlertRequest.approved     = guinness.approved # Approved if approved field is true
         guindex_alerts_msg.newGuinnessDecisionAlertRequest.creationDate = '%s' % guinness.creationDate
 
+        if reason:
+            guindex_alerts_msg.newGuinnessDecisionAlertRequest.reason = reason
+        
         try:
             message_string = guindex_alerts_msg.SerializeToString()
         except:
@@ -182,7 +185,7 @@ class GuindexAlertsClient():
 
         self.sendMessage(message_string)
 
-    def sendNewPubDecisionAlertRequest(self, pub):
+    def sendNewPubDecisionAlertRequest(self, pub, reason = None):
 
         self.logger.info("Sending New Pub Decision Alert Request")
 
@@ -196,6 +199,9 @@ class GuindexAlertsClient():
         guindex_alerts_msg.newPubDecisionAlertRequest.approved     = not pub.pendingApproval and not pub.pendingApprovalRejected
         guindex_alerts_msg.newPubDecisionAlertRequest.creationDate = '%s' % pub.pendingApprovalTime
 
+        if reason:
+            guindex_alerts_msg.newPubDecisionAlertRequest.reason = reason
+
         try:
             message_string = guindex_alerts_msg.SerializeToString()
         except:
@@ -204,7 +210,7 @@ class GuindexAlertsClient():
 
         self.sendMessage(message_string)
 
-    def sendPubClosedDecisionAlertRequest(self, pub):
+    def sendPubClosedDecisionAlertRequest(self, pub, reason = None):
 
         self.logger.info("Sending Pub Closed Decision Alert Request")
 
@@ -216,6 +222,9 @@ class GuindexAlertsClient():
         guindex_alerts_msg.pubClosedDecisionAlertRequest.approved     = pub.closed # Approved if pub now marked as closed
         guindex_alerts_msg.pubClosedDecisionAlertRequest.creationDate = '%s' % pub.pendingClosedTime
 
+        if reason:
+            guindex_alerts_msg.pubClosedDecisionAlertRequest.reason = reason
+
         try:
             message_string = guindex_alerts_msg.SerializeToString()
         except:
@@ -224,7 +233,7 @@ class GuindexAlertsClient():
 
         self.sendMessage(message_string)
 
-    def sendPubNotServingGuinnessDecisionAlertRequest(self, pub):
+    def sendPubNotServingGuinnessDecisionAlertRequest(self, pub, reason = None):
 
         self.logger.info("Sending Pub Not Serving Guinness Decision Alert Request")
 
@@ -235,6 +244,9 @@ class GuindexAlertsClient():
         guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.pub          = pub.name
         guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.approved     = not pub.servingGuinness # Approved if pub now marked as not serving Guinness
         guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.creationDate = '%s' % pub.pendingNotServingGuinnessTime
+
+        if reason:
+            guindex_alerts_msg.pubNotServingGuinnessDecisionAlertRequest.reason = reason
 
         try:
             message_string = guindex_alerts_msg.SerializeToString()

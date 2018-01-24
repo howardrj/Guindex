@@ -22,6 +22,8 @@ from Guindex import urls as GuindexUrls
 
 from GuindexUser import urls as GuindexUserUrls
 
+from TopLevel import urls as TopLevelUrls
+
 from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 
@@ -36,6 +38,9 @@ urlpatterns.extend(GuindexUrls.urlpatterns)
 
 # Append Guindex User views
 urlpatterns.extend(GuindexUserUrls.urlpatterns)
+
+# Append TopLevel views
+urlpatterns.extend(TopLevelUrls.urlpatterns)
 
 # Append HTTP API schema url
 schema_view = get_schema_view(title='Guindex HTTP API')

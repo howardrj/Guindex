@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'Guindex',
     'TelegramUser',
     'GuindexUser',
+    'TopLevel',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -74,6 +75,7 @@ TEMPLATES = [
                  os.path.join(BASE_DIR, "Guindex/templates"),
                  os.path.join(BASE_DIR, "Guindex/templates/modals"),
                  os.path.join(BASE_DIR, "Guindex/templates/emails"),
+	         os.path.join(BASE_DIR, "TopLevel/templates"),
                  os.path.join(BASE_DIR, "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -139,6 +141,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "CDN/")
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'

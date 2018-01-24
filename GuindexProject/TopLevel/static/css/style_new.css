@@ -1,0 +1,229 @@
+
+
+/*
+Author: XpeedStudio
+Author URI: http://themeforest.net/user/XpeedStudio/portfolio
+*/
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+html,
+body {
+    background-color: #000000;
+    color: #ffffff;
+    -webkit-text-stroke:1px black;
+    width: 100vw;
+    height:40vw;
+    background-image:   url('../images/bg6_1.png');
+    background-repeat: repeat;
+    background-size: cover;
+    padding: 0;
+    margin:0;
+    margin-left: 0;
+    margin-right: 0;
+    font-family: 'roboto', sans-serif;
+    font-weight: 300;
+}
+/*==========================================
+PRE LOADER 
+==========================================*/
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #fefefe;
+    z-index: 99999;
+    height: 100%;
+    width: 100%;
+    overflow: hidden !important;
+}
+
+.loaded {
+    width: 20vw;
+    height: 30vw;
+    position: absolute;
+    left: 40%;
+    top: 20%;
+    background-image: url(../images/GuinPour.gif);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: -2vw 0 0 -2vw;
+}
+
+.main_menu_bg{
+    background-image:url(../images/rsz_1guin1_2_recol2.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: top left;
+    background-color: #F5F0EB;
+    margin-bottom:-0px;
+    height: 8vw;
+    margin-top:-1vw;
+    top:0;
+    position:fixed;
+    z-index:99;
+    width:100%;
+    padding: 0;
+    margin:0;
+}
+.navbar{
+    width: 55%;
+    height: 100%;
+    min-width: 3vw;
+    min-height: 3vw;
+    float:right;
+    font-size: 2.3vw;
+    margin-top:2.15vw;
+    padding: 0;
+}
+.navbar li{
+    width: 55%;
+    height: 100%;
+    min-width: 3vw;
+    min-height: 3vw;
+    margin:0;
+    float:right;
+    font-size: 2.15vw;
+    padding: 0;
+    margin:0;
+
+}
+a.class1 {color:black;}
+a.class1:link {
+    text-decoration:  none;
+    color:black;
+}
+
+a.class1:hover {
+    text-decoration:  none;
+    color:gray;
+}
+a.class2 {color:red;}
+
+a.class2:link {
+    text-decoration:  none;
+    color:red;
+}
+
+a.class2:hover {
+    text-decoration:  none;
+    color:purple;
+}
+
+ /* Container holding the image and the text */
+.container {
+    position:relative;
+    width:90%;
+    display:inline-block;
+    min-width: 100px;
+    min-height: 100px;
+}
+.illustration img{
+    max-width:100%;
+    height:auto;
+    display: block;
+}
+.title {
+    width: 100%;
+    height: 100%;
+    margin-right:5vw;
+    margin-left:5vw;
+    margin-top:6.5vw;
+    margin-bottom:0px;
+    padding:0;
+    font-size:3vw;
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    right: 0%;
+    transform: translate(0%, 0%);
+} 
+
+/* Centered text */
+
+/*Conditional Font sizing for Desktops, Tablets and mobiles*/
+
+/*Desktops*/
+@media only screen and (min-width:961px){
+
+.centered {
+    width: 100%;
+    height: 100%;
+    margin-right:5vw;
+    margin-left:5vw;
+    margin-top:8vw;
+    margin-bottom:0px;
+    padding:0;
+    position:absolute;
+    font-size: 2.2vw;
+    top: 0%;
+    left: 0%;
+    right: 0%;
+    transform: translate(0%, 0%);
+} 
+}
+
+/*Tablets*/
+@media only screen and (min-width:401px) and (max-width:960px){
+
+.centered {
+    width: 100%;
+    height: 100%;
+    margin-right:5vw;
+    margin-left:5vw;
+    margin-top:8vw;
+    margin-bottom:0px;
+    padding:0;
+    position:absolute;
+    font-size: 3.2vw;
+    top: 0%;
+    left: 0%;
+    right: 0%;
+    transform: translate(0%, 0%);
+} 
+}
+
+/*Mobiles*/
+@media only screen and (max-width:400px){
+
+.centered {
+    width: 100%;
+    height: 100%;
+    margin-right:5vw;
+    margin-left:5vw;
+    margin-top:6.5vw;
+    margin-bottom:0px;
+    padding:0;
+    position:absolute;
+    font-size: 4.2vw;
+    top: 0%;
+    left: 0%;
+    right: 0%;
+    transform: translate(0%, 0%);
+} 
+}
+/*footer*/
+.footer{
+    overflow: hidden;
+    padding: 0px;
+    background: black;
+}
+.footer .main_footer p{
+    color:#fff;
+}
+.footer .main_footer p a{
+    color:#ffe13e;
+    padding: 0px;
+}
+.footer .main_footer p i{
+    color:#ff0000;
+    padding: 0px;
+}
+
+
+#guindex_banner {
+    height: 100%;
+    width: 40%;
+}
