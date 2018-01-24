@@ -4,6 +4,33 @@
 #guindex_header {
     margin-bottom: 0px;
 }
+.main_menu_bg{
+    background-image:url(../images/rsz_1guin1_2_recol2.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: top left;
+    background-color: #FfFfff;
+    margin-bottom:-0px;
+    height: 8vw;
+    margin-top:-1vw;
+    top:0;
+    position:fixed;
+    z-index:99;
+    width:100%;
+    padding: 0;
+    margin:0;
+}
+.navbar{
+    width: 55%;
+    height: 100%;
+    min-width: 3vw;
+    min-height: 3vw;
+    float:right;
+    font-size: 2.2vw;
+    margin-top:2.15vw;
+    padding: 0;
+}
+
 
 /***************/
 /* Logout link */
