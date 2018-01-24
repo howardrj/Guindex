@@ -39,7 +39,7 @@
 #corner_info {
     position: absolute;
     left: 20px; 
-    top: 20px;
+    top: 12vw;
     text-align: center;
 }
 
@@ -58,7 +58,7 @@
 /******************************/
 #notification_info {
     position: absolute;
-    top: 20px; 
+    top: 12vw; 
     right: 20px;
     text-align: center;
 }
@@ -137,6 +137,7 @@
 #add_new_pub_div {
     position: relative;
     font-size: 17px;
+    margin-top: 14vw;
     margin-left:  auto;
     margin-right: auto;
     text-align: center;
