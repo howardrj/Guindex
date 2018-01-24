@@ -29,6 +29,19 @@
         <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"> </script>
     </head>
 
+    <header id="main_menu" class="header navbar-fixed-top">
+	    <div class="main_menu_bg">
+                <ul class="navbar">
+                   <a href="../" class="class1">Overview</a>
+                    <a href="../statistics/" class="class1">Statistics</a>
+                    <a href="../analysis/" class="class1">Analysis</a>
+                    <a href="../info/" class="class1">About</a>
+                    <a href="." class="class1">Log a Price</a>
+                </ul>
+                </div>
+            </div>
+    </header>
+
     <body>
 
         {% if modal_to_display == "" %}
@@ -54,7 +67,6 @@
 
         {% endif %}
 
-        {% include "index_page_animation.html" %}
 
         {% include "guindex_controls.html" %}
 

@@ -47,8 +47,8 @@ Below are the instructions to run the Guindex web app locally.
    
 8. Run django development server:
 
-   python manage,py runserver
+   python manage.py runserver
    
 9. Open 127.0.0.1:8000 in a web browser to see the index page.
    Note you can change the IP address and port combination the server runs on by using:
-   python manage,py runserver IP:port
+   python manage.py runserver IP:port
