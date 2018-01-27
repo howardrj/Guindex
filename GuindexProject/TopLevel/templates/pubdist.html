@@ -4,14 +4,24 @@
 
     <title>Guindex</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113016256-1"></script>
+    <script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'UA-113016256-1');
+    </script>
+
 
 
     <!--Theme custom css -->
     <link rel="stylesheet" href="../../static/css/style_new.css">
-img{
-      max-width:100%;
-      height:auto;
-      }
+    {% load static %} 
+    <link rel="icon" href="{% static "images/favicon.png" %}"/>
+
 </head>
     <body data-spy="scroll" data-target="#navmenu">
 		<div class='preloader'><div class='loaded'>&nbsp;</div></div>
@@ -22,6 +32,7 @@ img{
             <div class="main_menu_bg">
                 <ul class="navbar">
                     <a href="../../" class="class1">Overview</a>
+					<a href="../../map/" class="class1">Map</a></li>
                     <a href="../../statistics/" class="class1">Statistics</a>
                     <a href="../" class="class1">Analysis</a>
                     <a href="../../info/" class="class1">About</a>
@@ -51,7 +62,7 @@ img{
 	    <P ALIGN=LEFT><b> To generate the coordinates interior to this polygon we formed the square bounding the polygons extreme latitude and longitude values and defined an x-y mesh over this square with a chosen granularity. The granularity (mesh step-size) was chosen to be approximately 30m. </b></P>
 	    <P ALIGN=LEFT><b> We then check whether each point in the mesh is inside the county Dublin polygon and retain the points that are. </b></P>
             <P ALIGN=LEFT><b> This generated a set of 885,126 latitude longitude points constituting county Dublin. One then can, in principle, calculate the distance to the nearest pub at each of these points using the Haversine formula to obtain a distance scalar field. </b></P>
-	    <P ALIGN=LEFT><b> Attemptting this procedure would however take too much computer time. Instead I took 27,222 points from the 885,126 and calculated the distance to nearest pub at each of them. This represents an error inflation of approximately 5.7x so instead of having a maximum error of plus or minus 30Sqrt(2) it'll be ~ 170Sqrt(2). This isn't the biggest deal.   </b></P>        
+	    <P ALIGN=LEFT><b> Attempting this procedure would however take too much computer time. Instead I took 27,222 points from the 885,126 and calculated the distance to nearest pub at each of them. This represents an error inflation of approximately 5.7x so instead of having a maximum error of plus or minus 30Sqrt(2) it'll be ~ 170Sqrt(2). This isn't the biggest deal.   </b></P>        
 	    <P ALIGN=LEFT><b>The picture above uses quadratic interpolation to smooth out the scalar field in between the actual calculated points. This is a procedure to allow the variation to be estimated (and visualised) at a finer scale than was considered initially. To see the effect of the interpolation consider the raw image below. We see that the interpolation smoothes out the effects of the irregularly shaped boundary. To make the scalar field drop off at the boundary I've put in an absorbing wall by appending the defined boundaries of the region with a distance value of 0 to the calculated points.</b></P>
 	    <div class="illustration">
 	    <P ALIGN=CENTER> <img src="../../static/images/GuinDist8000pointsOpoint65NoInt.png" style="width:50%";>

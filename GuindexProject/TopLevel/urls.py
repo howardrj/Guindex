@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^analysis/pubdist/$', views.pubdist),
     url(r'^analysis/travdrnk/$', views.travdrnk),
     url(r'^info/$', views.info),
+    url(r'^links/$', views.links),
 ]

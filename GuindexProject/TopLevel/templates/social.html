@@ -4,14 +4,24 @@
 
     <title>Guindex</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113016256-1"></script>
+    <script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'UA-113016256-1');
+    </script>
+
 
 
     <!--Theme custom css -->
     <link rel="stylesheet" href="../../static/css/style_new.css">
-img{
-      max-width:100%;
-      height:auto;
-      }
+    {% load static %} 
+    <link rel="icon" href="{% static "images/favicon.png" %}"/>
+
 </head>
     <body data-spy="scroll" data-target="#navmenu">
 		<div class='preloader'><div class='loaded'>&nbsp;</div></div>
@@ -22,6 +32,7 @@ img{
             <div class="main_menu_bg">
                 <ul class="navbar">
                   <a href="../../" class="class1">Overview</a>
+				  <a href="../../map/" class="class1">Map</a></li>
                   <a href="../../statistics/" class="class1">Statistics</a>
                   <a href="../" class="class1">Analysis</a>
                   <a href="../../info/" class="class1">About</a>

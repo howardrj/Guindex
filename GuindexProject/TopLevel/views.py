@@ -34,3 +34,6 @@ def travdrnk(request):
 
 def info(request):    
     return render(request, 'info.html')
+
+def links(request):    
+    return render(request, 'links.html')

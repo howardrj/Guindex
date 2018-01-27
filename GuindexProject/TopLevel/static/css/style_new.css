@@ -11,13 +11,13 @@ html,
 body {
     background-color: #000000;
     color: #ffffff;
-    -webkit-text-stroke:1px black;
+    -webkit-text-stroke:0.025vw black;
     width: 100vw;
     height:40vw;
     background-image:   url('../images/bg6_1.png');
     background-repeat: repeat;
     background-size: cover;
-    padding: 0;
+    padding:0;
     margin:0;
     margin-left: 0;
     margin-right: 0;
@@ -41,14 +41,15 @@ PRE LOADER
 }
 
 .loaded {
-    width: 20vw;
-    height: 30vw;
+    width: 40vw;
+    height: 50vw;
     position: absolute;
-    left: 40%;
-    top: 20%;
+    left: 32%;
+    top: 7%;
     background-image: url(../images/GuinPour.gif);
     background-repeat: no-repeat;
     background-position: center;
+	background-size: 45%;
     margin: -2vw 0 0 -2vw;
 }
 
@@ -74,7 +75,7 @@ PRE LOADER
     min-width: 3vw;
     min-height: 3vw;
     float:right;
-    font-size: 2.3vw;
+    font-size: 2.12vw;
     margin-top:2.15vw;
     padding: 0;
 }
@@ -119,6 +120,7 @@ a.class2:hover {
     display:inline-block;
     min-width: 100px;
     min-height: 100px;
+	
 }
 .illustration img{
     max-width:100%;
@@ -155,7 +157,7 @@ a.class2:hover {
     margin-left:5vw;
     margin-top:8vw;
     margin-bottom:0px;
-    padding:0;
+	padding-bottom:900px;
     position:absolute;
     font-size: 2.2vw;
     top: 0%;
@@ -194,7 +196,7 @@ a.class2:hover {
     margin-right:5vw;
     margin-left:5vw;
     margin-top:6.5vw;
-    margin-bottom:0px;
+    margin-bottom:100px;
     padding:0;
     position:absolute;
     font-size: 4.2vw;

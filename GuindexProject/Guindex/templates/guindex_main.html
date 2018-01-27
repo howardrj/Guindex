@@ -27,12 +27,25 @@
         <script type="text/javascript" src="{% static "javascript/alert_switches.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/cookie.js" %}"> </script>
         <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"> </script>
+        
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113016256-1"></script>
+    <script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'UA-113016256-1');
+    </script>
+
+        
     </head>
 
     <header id="main_menu" class="header navbar-fixed-top">
 	    <div class="main_menu_bg">
                 <ul class="navbar" id="guindex_table_navbar">
                    <a href="../" class="class1">Overview</a>
+                   <a href="../map/" class="class1">Map</a>
                     <a href="../statistics/" class="class1">Statistics</a>
                     <a href="../analysis/" class="class1">Analysis</a>
                     <a href="../info/" class="class1">About</a>
@@ -143,7 +156,6 @@
 
             <div id="tab_content_container">
                 {% include "guindex_table.html" %}
-                {% include "guindex_map.html" %}
                 {% include "guindex_stats.html" %}
                 {% include "user_contributions.html" %}
                 {% include "user_settings.html" %}

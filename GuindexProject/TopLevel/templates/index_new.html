@@ -4,14 +4,24 @@
 
     <title>Guindex</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113016256-1"></script>
+    <script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
 
+	gtag('config', 'UA-113016256-1');
+    </script>
+
+    
 
     <!--Theme custom css -->
     <link rel="stylesheet" href="../static/css/style_new.css">
-img{
-      max-width:100%;
-      height:auto;
-      }
+    {% load static %} 
+    <link rel="icon" href="{% static "images/favicon.png" %}"/>
+
 </head>
     <body data-spy="scroll" data-target="#navmenu">
 		<div class='preloader'><div class='loaded'>&nbsp;</div></div>
@@ -22,6 +32,7 @@ img{
             <div class="main_menu_bg">
                 <ul class="navbar">
                    <a href="." class="class1">Overview</a>
+		   <a href="./map/" class="class1">Map</a></li>
                    <a href="./statistics/" class="class1">Statistics</a>
                    <a href="./analysis/" class="class1">Analysis</a>
                    <a href="./info/" class="class1">About</a>
@@ -38,10 +49,10 @@ img{
             <P ALIGN=LEFT><b>We are particularly interested in how the price variation is affected by geographic and social factors. </b></P>
             <P ALIGN=LEFT><b>We are also interested in how the pubs themselves are distributed around the county Dublin area and mathematical problems related to the placement of these pubs. </b></P>
             <P ALIGN=LEFT><b>To examine some of these themes we have been conducting "in the field" data collection. We have collected the price of a pint in over 200 bars, pubs and nightclubs so far! </b></P>
-            <P ALIGN=LEFT><b>The statistics tab directly tracks this data collection, including the top 5 cheapest and most expensive pints thus far. This tab also keeps track of which pubs have been visited and which have yet to have an original price added. </b></P>
+            <P ALIGN=LEFT><b>The Guindex map tab displays a user-centred map of Dublin pubs and the prices of the pints at those pubs.  </b></P>
+	    <P ALIGN=LEFT><b>The statistics tab directly tracks this data collection, including the top 5 cheapest and most expensive pints thus far. This tab also keeps track of which pubs have been visited and which have yet to have an original price added. </b></P>
             <P ALIGN=LEFT><b>In the analysis tab we have transformed the collected data in order to examine the aformentioned themes. In particular we examine geographic variation in the pricing of Guinness at the level of 1) Dublin Post routing administrative areas and 2) Electoral divisions within county Dublin.  </b></P>
             <P ALIGN=LEFT><b>We also examine interesting problems related to the distributions of the pubs themselves including:  1) What is the furthest you can be from a pub in county Dublin? 2) What is the order to visit the pubs in between the two circular roads to minimise travel time?  </b></P>
-            <P ALIGN=LEFT><b> The Guindex Map tab displays a user-centred map of Dublin pubs and the prices of the pints at those pubs.  </b></P>
             <P ALIGN=LEFT><b>The Log a Price tab allows users to sign up for the site (for free) and start submitting their own data to help the project. </b></P>
             </div>
         </div> 
