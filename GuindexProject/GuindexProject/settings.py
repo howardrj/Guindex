@@ -289,6 +289,12 @@ LOGGING = {
     }
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}
+
 # Telegram API
 BOT_HTTP_API_TOKEN = secrets.BOT_HTTP_API_TOKEN
 

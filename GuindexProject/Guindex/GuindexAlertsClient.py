@@ -1,68 +1,13 @@
 # -*- coding: utf-8 -*-
-import socket
+from UserProfile import UserProfileUtils
 
-from Guindex.GuindexParameters import GuindexParameters
+from Guindex.GuindexClient import GuindexClient
 from Guindex import GuindexAlertsIf_pb2 as GuindexAlertsIf
 
 
-class GuindexAlertsClient():
+class GuindexAlertsClient(GuindexClient):
 
-    def __init__(self, logger):
-
-        self.logger     = logger
-        self._connection = self._createConnection()
-
-        self.logger.debug("Created GuindexAlertsClient %s", self)
-
-    def __del__(self):
-
-        self.logger.debug("Destroying GuindexAlertsClient %s", self)
-        self._connection.close()
-
-    def _createConnection(self):
-
-        alerts_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        try:
-            self.logger.info("Creating TCP connection to Alerts Server")
-            alerts_socket.connect((GuindexParameters.ALERTS_LISTEN_IP, GuindexParameters.ALERTS_LISTEN_PORT))
-            self.logger.info("Successfully connected to Alerts Server")
-        except socket.error:
-            self.logger.error("Failed to connect to Alerts Server")
-            alerts_socket.close()
-            raise
-
-        return alerts_socket
-
-    def sendMessage(self, message, prependTwoByteHeader = True):
-        """
-            Sends string 'message' to Alerts Server
-            (prepending two byte length header by default)
-        """
-
-        self.logger.debug("Sending message to Guindex Alerts Server - %s", ":".join("{:02x}".format(ord(c)) for c in message))
-
-        if prependTwoByteHeader:
-
-            self.logger.debug("Prepending two byte length header to message")
-
-            message_length = len(message)
-
-            self.logger.debug("Message length = %d", message_length)
-
-            message_length_first_byte = (message_length >> 8) & 0xFF
-            message_length_second_byte = message_length & 0xFF
-            message = chr(message_length_first_byte) + chr(message_length_second_byte) + message
-
-            self.logger.debug("Updated message - %s", ":".join("{:02x}".format(ord(c)) for c in message))
-
-        try:
-            self._connection.send(message)
-        except:
-            self.logger.error("Failed to send message to Alerts Server")
-            raise
-
-    def sendNewGuinnessAlertRequest(self, guinness):
+    def sendNewGuinnessAlertRequest(self, guinness, httpRequest):
 
         self.logger.info("Sending New Guinnness Alert Request")
 
@@ -78,17 +23,17 @@ class GuindexAlertsClient():
         guindex_alerts_msg.newGuinnessAlertRequest.creationDate = '%s' % guinness.creationDate
 
         if not guinness.approved: # Give url of pending contributions
-            guindex_alerts_msg.newGuinnessAlertRequest.uri = "https://guindex.ie"
+            guindex_alerts_msg.newGuinnessAlertRequest.uri = UserProfileUtils.getProjectUri(httpRequest)
 
         try:
             message_string = guindex_alerts_msg.SerializeToString()
         except:
             self.logger.error("Failed to serialize New Guinness Alert Request message")
-            raise
+            raise Exception("Failed to serialize New Guinness Alert Request message")
 
         self.sendMessage(message_string)
 
-    def sendNewPubAlertRequest(self, pub):
+    def sendNewPubAlertRequest(self, pub, httpRequest):
 
         self.logger.info("Sending New Pub Alert Request")
 
@@ -103,17 +48,17 @@ class GuindexAlertsClient():
         guindex_alerts_msg.newPubAlertRequest.creationDate = '%s' % pub.pendingApprovalTime
 
         if pub.pendingApproval: # Give url of pending contributions
-            guindex_alerts_msg.newPubAlertRequest.uri = "https://guindex.ie"
+            guindex_alerts_msg.newPubAlertRequest.uri = UserProfileUtils.getProjectUri(httpRequest)
 
         try:
             message_string = guindex_alerts_msg.SerializeToString()
         except:
             self.logger.error("Failed to serialize New Pub Alert Request message")
-            raise
+            raise Exception("Failed to serialize New Pub Alert Request message")
 
         self.sendMessage(message_string)
 
-    def sendPubClosedAlertRequest(self, pub):
+    def sendPubClosedAlertRequest(self, pub, httpRequest):
 
         self.logger.info("Sending Pub Closed Alert Request")
 
@@ -126,17 +71,17 @@ class GuindexAlertsClient():
         guindex_alerts_msg.pubClosedAlertRequest.creationDate = '%s' % pub.pendingClosedTime
 
         if pub.pendingClosed: # Give url of pending contributions
-            guindex_alerts_msg.pubClosedAlertRequest.uri = "https://guindex.ie"
+            guindex_alerts_msg.pubClosedAlertRequest.uri = UserProfileUtils.getProjectUri(httpRequest)
 
         try:
             message_string = guindex_alerts_msg.SerializeToString()
         except:
             self.logger.error("Failed to serialize Pub Closed Alert Request message")
-            raise
+            raise Exception("Failed to serialize Pub Closed Alert Request message")
 
         self.sendMessage(message_string)
 
-    def sendPubNotServingGuinnessAlertRequest(self, pub):
+    def sendPubNotServingGuinnessAlertRequest(self, pub, httpRequest):
 
         self.logger.info("Sending Pub Not Serving Guinness Alert Request")
 
@@ -149,13 +94,13 @@ class GuindexAlertsClient():
         guindex_alerts_msg.pubNotServingGuinnessAlertRequest.creationDate = '%s' % pub.pendingNotServingGuinnessTime
 
         if pub.pendingNotServingGuinness: # Give url of pending contributions
-            guindex_alerts_msg.pubNotServingGuinnessAlertRequest.uri = "https://guindex.ie"
+            guindex_alerts_msg.pubNotServingGuinnessAlertRequest.uri = UserProfileUtils.getProjectUri(httpRequest)
 
         try:
             message_string = guindex_alerts_msg.SerializeToString()
         except:
             self.logger.error("Failed to serialize Pub Not Serving Guinness Alert Request message")
-            raise
+            raise Exception("Failed to serialize Pub Not Serving Guinness Alert Request message")
 
         self.sendMessage(message_string)
 
@@ -176,12 +121,12 @@ class GuindexAlertsClient():
 
         if reason:
             guindex_alerts_msg.newGuinnessDecisionAlertRequest.reason = reason
-        
+
         try:
             message_string = guindex_alerts_msg.SerializeToString()
         except:
             self.logger.error("Failed to serialize New Guinness Decision Alert Request message")
-            raise
+            raise Exception("Failed to serialize New Guinness Decision Alert Request message")
 
         self.sendMessage(message_string)
 
@@ -206,7 +151,7 @@ class GuindexAlertsClient():
             message_string = guindex_alerts_msg.SerializeToString()
         except:
             self.logger.error("Failed to serialize New Pub Decision Alert Request message")
-            raise
+            raise Exception("Failed to serialize New Pub Decision Alert Request message")
 
         self.sendMessage(message_string)
 
@@ -229,7 +174,7 @@ class GuindexAlertsClient():
             message_string = guindex_alerts_msg.SerializeToString()
         except:
             self.logger.error("Failed to serialize Pub Closed Decision Alert Request message")
-            raise
+            raise Exception("Failed to serialize Pub Closed Decision Alert Request message")
 
         self.sendMessage(message_string)
 
@@ -252,6 +197,6 @@ class GuindexAlertsClient():
             message_string = guindex_alerts_msg.SerializeToString()
         except:
             self.logger.error("Failed to serialize Pub Not Serving Guinness Decision Alert Request message")
-            raise
+            raise Exception("Failed to serialize Pub Not Serving Guinness Decision Alert Request message")
 
         self.sendMessage(message_string)

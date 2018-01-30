@@ -8,7 +8,6 @@ cp /var/www/Guindex/GuindexProject/Guindex/service_scripts/Guindex.service /etc/
 cp /var/www/Guindex/GuindexProject/Guindex/service_scripts/GuindexStats.service /etc/systemd/system/
 cp /var/www/Guindex/GuindexProject/Guindex/service_scripts/GuindexAlerts.service /etc/systemd/system/
 cp /var/www/Guindex/GuindexProject/Guindex/service_scripts/GuindexDbBackup.service /etc/systemd/system/
-cp /var/www/Guindex/GuindexProject/Guindex/service_scripts/GuindexUserContributions.service /etc/systemd/system/
 cp /var/www/Guindex/GuindexProject/Guindex/service_scripts/GuindexTelegramBot.service /etc/systemd/system/
 
 systemctl daemon-reload
@@ -24,9 +23,6 @@ systemctl restart GuindexAlerts.service
 
 systemctl enable GuindexDbBackup.service
 systemctl restart GuindexDbBackup.service
-
-systemctl enable GuindexUserContributions.service
-systemctl restart GuindexUserContributions.service
 
 systemctl enable GuindexTelegramBot.service
 systemctl restart GuindexTelegramBot.service

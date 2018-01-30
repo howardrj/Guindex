@@ -30,52 +30,37 @@ class Pub(models.Model):
     pendingNotServingGuinness            = models.BooleanField(default = False) # In case non-staff member marks pub as not serving Guinness
     pendingNotServingGuinnessContributor = models.ForeignKey(UserProfile, null = True, blank = True, related_name = 'pendingNotServingGuinnessMarker', default = None)
     pendingNotServingGuinnessTime        = models.DateTimeField(default = timezone.now)
+    prices                               = models.ManyToManyField('Guinness', related_name = 'prices') # Ordered list by datetime
 
     def __unicode__(self):
 
         return "'%s(%d)'" % (self.name, self.id)
-
-    def getGuini(self, newestFirst):
-        """
-            Returns list of Guinness objects belonging to this pub
-            sorted by creation date
-        """
-        guini_list = []
-
-        guini = Guinness.objects.filter(pub = self)
-
-        for guin in guini:
-
-            if guin.approved:
-
-                guin_dict = {}
-
-                guin_dict['id']           = str(guin.id)
-                guin_dict['creator']      = guin.creator.user.username
-                guin_dict['creationDate'] = guin.creationDate
-                guin_dict['price']        = guin.price
-
-                guini_list.append(guin_dict.copy())
-
-        return sorted(guini_list, key = lambda k: k['creationDate'], reverse = newestFirst)
 
     def getFirstVerifiedGuinness(self):
         """
             Return most recently verified Guinness object.
         """
 
-        guini = self.getGuini(False)
+        # Assume prices are sorted by datetime in increasing order
+        for price in self.prices.all():
 
-        return guini[0] if len(guini) else None
+            if price.approved:
+                return price
+
+        return None
 
     def getLastVerifiedGuinness(self):
         """
             Return most recently verified Guinness object.
         """
 
-        guini = self.getGuini(True)
+        # Assume prices are sorted by datetime in increasing order
+        for price in self.prices.all()[::-1]:
 
-        return guini[0] if len(guini) else None
+            if price.approved:
+                return price
+
+        return None
 
 
 class Guinness(models.Model):
@@ -91,7 +76,7 @@ class Guinness(models.Model):
 
     def __unicode__(self):
 
-        return "'%s(%d) - Price: %f'" % (self.pub, self.id, self.price)
+        return "'%s(%d) - Price: %.2f'" % (self.pub, self.id, self.price)
 
 
 class StatisticsSingleton(models.Model):
@@ -100,8 +85,9 @@ class StatisticsSingleton(models.Model):
     """
 
     pubsInDb           = models.IntegerField(default = 0)
-    cheapestPub        = models.TextField(default = "") # Make Textfield instead of Pub key to avoid crashes on delete
-    dearestPub         = models.TextField(default = "") # Make Textfield instead of Pub key to avoid crahes on delete
+    cheapestPubs       = models.ManyToManyField(Pub, related_name = 'cheapest_pubs') # Ordered List
+    dearestPubs        = models.ManyToManyField(Pub, related_name = 'dearest_pubs')  # Ordered List
+    pubsWithPrices     = models.IntegerField(default = 0)
     averagePrice       = models.DecimalField(decimal_places = 2, max_digits = 6,  default = Decimal('0.0'))
     standardDevation   = models.DecimalField(decimal_places = 3, max_digits = 12, default = Decimal('0.0'))
     percentageVisited  = models.DecimalField(decimal_places = 2, max_digits = 5,  default = Decimal('0.0'))
@@ -127,9 +113,9 @@ class UserContributionsSingleton(models.Model):
         Singleton class to keep track of best contributors
     """
 
-    mostVisited       = models.ForeignKey(UserProfile, related_name = 'most_visited', null = True)
-    mostLastVerified  = models.ForeignKey(UserProfile, related_name = 'most_last_verifications', null = True)
-    mostFirstVerified = models.ForeignKey(UserProfile, related_name = 'most_first_verifications', null = True)
+    mostVisited       = models.ManyToManyField(UserProfile, related_name = 'most_visited') # Ordered List
+    mostLastVerified  = models.ManyToManyField(UserProfile, related_name = 'most_last_verifications') # Ordered List
+    mostFirstVerified = models.ManyToManyField(UserProfile, related_name = 'most_first_verifications') # Ordered List
     lastCalculated    = models.DateTimeField(auto_now = True)
 
     def __unicode__(self):

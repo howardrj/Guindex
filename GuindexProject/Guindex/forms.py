@@ -21,8 +21,6 @@ class NewPubForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
 
-        logger.debug("NewPubForm constructor called")
-
         # NewPubForm has user as member variable
         self.userProfile = kwargs.pop('userProfile', None)
 
@@ -94,7 +92,7 @@ class NewPubForm(ModelForm):
 
             logger.error("Latitude %f not in range", latitude)
 
-            msg = "Latitude must be in range %s:%s" % (GuindexParameters.GPS_DUBLIN_MIN_LATITUDE,   
+            msg = "Latitude must be in range %s:%s" % (GuindexParameters.GPS_DUBLIN_MIN_LATITUDE,
                                                        GuindexParameters.GPS_DUBLIN_MAX_LATITUDE)
             self.add_error('latitude', msg)
 
@@ -128,13 +126,13 @@ class NewPubForm(ModelForm):
             pub.full_clean()
         except:
             logger.error("Pub object data could not be validated")
-            raise
+            raise Exception("Pub object data could not be validated")
 
         try:
             pub.save()
         except:
             logger.error("Pub object could not be saved")
-            raise
+            raise Exception("Pub object could not be saved")
 
         return pub
 
@@ -148,8 +146,6 @@ class NewGuinnessForm(ModelForm):
         fields = ['price']
 
     def __init__(self, *args, **kwargs):
-
-        logger.debug("NewGuinnessForm constructor called")
 
         # NewGuinnessForm has user as member variable
         self.userProfile = kwargs.pop('userProfile', None)
@@ -198,12 +194,12 @@ class NewGuinnessForm(ModelForm):
             guinness.full_clean()
         except:
             logger.error("Guinness object data could not be validated")
-            raise
+            raise Exception("Guinness object data could not be validated")
 
         try:
             guinness.save()
         except:
             logger.error("Guinness object could not be saved")
-            raise
+            raise Exception("Guinness object could not be saved")
 
         return guinness

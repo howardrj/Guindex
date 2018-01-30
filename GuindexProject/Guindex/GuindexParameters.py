@@ -1,7 +1,4 @@
-import logging
 import inspect
-
-logger = logging.getLogger(__name__)
 
 
 class GuindexParameters:
@@ -22,11 +19,16 @@ class GuindexParameters:
     ALERTS_LISTEN_PORT = 8080
     ALERTS_BACKLOG     = 50
 
+    # Stats Server Parameters
+    STATS_LISTEN_IP   = '127.0.0.1'
+    STATS_LISTEN_PORT = 8081
+    STATS_BACKLOG     = 50
+
     # GPS Parameters
     GPS_COORD_DECIMAL_PLACES     = 7
     GPS_COORD_MIN_DECIMAL_PLACES = 6
-    GPS_DUBLIN_MIN_LATITUDE      = '53.185403' 
-    GPS_DUBLIN_MAX_LATITUDE      = '53.635552' 
+    GPS_DUBLIN_MIN_LATITUDE      = '53.185403'
+    GPS_DUBLIN_MAX_LATITUDE      = '53.635552'
     GPS_DUBLIN_MIN_LONGITUDE     = '-6.547498'
     GPS_DUBLIN_MAX_LONGITUDE     = '-6.042723'
 

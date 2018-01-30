@@ -72,7 +72,7 @@ var setMarkers = function (mapCenter, foundUserLocation, zoom)
     }
     
     var request = new XMLHttpRequest();
-    request.open('GET', 'https://guindex.ie/pubs/', true); 
+    request.open('GET', 'https://guindex.ie/api/pubs/', true); 
 
     request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
     request.setRequestHeader('Content-Type', 'application/json');

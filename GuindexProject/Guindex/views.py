@@ -17,18 +17,12 @@ from Guindex.serializers import PubSerializer, GuinnessSerializer, StatisticsSer
 from Guindex.models import Pub, Guinness, StatisticsSingleton
 from GuindexParameters import GuindexParameters
 from GuindexAlertsClient import GuindexAlertsClient
+from GuindexStatsClient import GuindexStatsClient
 import GuindexUtils
 
 from UserProfile.UserProfileParameters import UserProfileParameters
 
 logger = logging.getLogger(__name__)
-
-
-def guindexMapFull(request):
-
-    logger.info("Received %s request to %s", request.method, request.get_full_path())
-
-    return render(request, 'guindex_map_full.html')
 
 
 @login_required
@@ -60,23 +54,23 @@ def guindex(request):
 
         if 'new_pub' in request.POST:
 
-            modal_to_display, new_pub_form, warning_text = handleNewPubRequest(user_profile, request.POST)
+            modal_to_display, new_pub_form, warning_text = handleNewPubRequest(user_profile, request)
 
         elif 'new_guinness' in request.POST:
 
-            modal_to_display, new_guinness_form, warning_text = handleNewGuinnessRequest(user_profile, request.POST)
+            modal_to_display, new_guinness_form, warning_text = handleNewGuinnessRequest(user_profile, request)
 
         elif 'verify_guinness' in request.POST:
 
-            modal_to_display, warning_text = handleVerifyGuinnessRequest(user_profile, request.POST)
+            modal_to_display, warning_text = handleVerifyGuinnessRequest(user_profile, request)
 
         elif 'close_pub' in request.POST:
 
-            modal_to_display, warning_text = handleClosePubRequest(user_profile, request.POST)
+            modal_to_display, warning_text = handleClosePubRequest(user_profile, request)
 
         elif 'not_serving_guinness' in request.POST:
 
-            modal_to_display, warning_text = handleNotServingGuinnessRequest(user_profile, request.POST)
+            modal_to_display, warning_text = handleNotServingGuinnessRequest(user_profile, request)
 
         else:
             logger.error("Received POST request to unknown resource")
@@ -111,10 +105,7 @@ def guindex(request):
         warning_text     = request.COOKIES.get('warning_text', "")
 
     context_dict = {'pubs'                   : GuindexUtils.getPubs(),
-                    'stats'                  : GuindexUtils.getStats(),
-                    'personal_contributions' : GuindexUtils.getPersonalContributions(user_profile),
                     'pending_contributions'  : GuindexUtils.arePendingContributions(),
-                    'best_contributions'     : GuindexUtils.getBestContributions(),
                     'modal_to_display'       : modal_to_display,
                     'warning_text'           : warning_text,
                     'new_pub_form'           : new_pub_form,
@@ -134,12 +125,12 @@ def guindex(request):
     return response
 
 
-def handleNewPubRequest(userProfile, postData):
+def handleNewPubRequest(userProfile, request):
 
-    logger.info("Received new pub request - %s", postData)
+    logger.info("Received new pub request - %s", request.POST)
 
     modal_to_display = "new_pub_form"
-    new_pub_form     = NewPubForm(userProfile = userProfile, data = postData)
+    new_pub_form     = NewPubForm(userProfile = userProfile, data = request.POST)
     warning_text     = ""
 
     if new_pub_form.is_valid():
@@ -173,26 +164,48 @@ def handleNewPubRequest(userProfile, postData):
         logger.info("Contribution was made by staff member")
 
     try:
-        alerts_client = GuindexAlertsClient(logger)
+        alerts_client = GuindexAlertsClient(logger,
+                                            'Alerts',
+                                            GuindexParameters.ALERTS_LISTEN_IP,
+                                            GuindexParameters.ALERTS_LISTEN_PORT)
     except:
         logger.error("Failed to create Alerts Client")
         return modal_to_display, new_pub_form, warning_text
 
     try:
-        alerts_client.sendNewPubAlertRequest(new_pub)
+        alerts_client.sendNewPubAlertRequest(new_pub, request)
     except:
         logger.error("Failed to send New Pub Alert Request")
+        return modal_to_display, new_pub_form, warning_text
+
+    if not userProfile.user.is_staff:
+        logger.info("Not updating stats until contribution is approved")
+        return modal_to_display, new_pub_form, warning_text
+
+    try:
+        stats_client = GuindexStatsClient(logger,
+                                          'Stats',
+                                          GuindexParameters.STATS_LISTEN_IP,
+                                          GuindexParameters.STATS_LISTEN_PORT)
+    except:
+        logger.error("Failed to create Stats Client")
+        return modal_to_display, new_pub_form, warning_text
+
+    try:
+        stats_client.sendNewPubStatsRequest(new_pub)
+    except:
+        logger.error("Failed to send New Pub Stats Request")
         return modal_to_display, new_pub_form, warning_text
 
     return modal_to_display, new_pub_form, warning_text
 
 
-def handleNewGuinnessRequest(userProfile, postData):
+def handleNewGuinnessRequest(userProfile, request):
 
-    logger.info("Received new Guinness request - %s", postData)
+    logger.info("Received new Guinness request - %s", request.POST)
 
     modal_to_display  = "new_guinness_form"
-    new_guinness_form = NewGuinnessForm(userProfile = userProfile, data = postData)
+    new_guinness_form = NewGuinnessForm(userProfile = userProfile, data = request.POST)
     warning_text      = ""
 
     if new_guinness_form.is_valid():
@@ -214,6 +227,13 @@ def handleNewGuinnessRequest(userProfile, postData):
 
     # Guinness object has been saved at this point
 
+    # Append new Guinness object to Pub price list
+    try:
+        new_guinness.pub.prices.add(new_guinness)
+        new_guinness.pub.save()
+    except:
+        logger.error("Failed to append guinness to pub price list")
+
     if not userProfile.user.is_staff:
 
         logger.info("Contribution was made by non-staff member")
@@ -226,29 +246,51 @@ def handleNewGuinnessRequest(userProfile, postData):
         logger.info("Contribution was made by staff member")
 
     try:
-        alerts_client = GuindexAlertsClient(logger)
+        alerts_client = GuindexAlertsClient(logger,
+                                            'Alerts',
+                                            GuindexParameters.ALERTS_LISTEN_IP,
+                                            GuindexParameters.ALERTS_LISTEN_PORT)
     except:
         logger.error("Failed to create Alerts Client")
         return modal_to_display, new_guinness_form, warning_text
 
     try:
-        alerts_client.sendNewGuinnessAlertRequest(new_guinness)
+        alerts_client.sendNewGuinnessAlertRequest(new_guinness, request)
     except:
         logger.error("Failed to send New Guinness Alert Request")
+        return modal_to_display, new_guinness_form, warning_text
+
+    if not userProfile.user.is_staff:
+        logger.info("Not updating stats until contribution is approved")
+        return modal_to_display, new_guinness_form, warning_text
+
+    try:
+        stats_client = GuindexStatsClient(logger,
+                                          'Stats',
+                                          GuindexParameters.STATS_LISTEN_IP,
+                                          GuindexParameters.STATS_LISTEN_PORT)
+    except:
+        logger.error("Failed to create Stats Client")
+        return modal_to_display, new_guinness_form, warning_text
+
+    try:
+        stats_client.sendNewGuinnessStatsRequest(new_guinness)
+    except:
+        logger.error("Failed to send New Guinness Stats Request")
         return modal_to_display, new_guinness_form, warning_text
 
     return modal_to_display, new_guinness_form, warning_text
 
 
-def handleVerifyGuinnessRequest(userProfile, postData):
+def handleVerifyGuinnessRequest(userProfile, request):
 
-    logger.info("Received verify Guinness request - %s", postData)
+    logger.info("Received verify Guinness request - %s", request.POST)
 
     modal_to_display = ""
     warning_text     = ""
 
     try:
-        pub_id = postData.get("pub_id")
+        pub_id = request.POST.get("pub_id")
     except:
         logger.error("Could not get pub id")
 
@@ -300,6 +342,13 @@ def handleVerifyGuinnessRequest(userProfile, postData):
 
     # Guinness object has been saved at this point
 
+    # Append new Guinness object to Pub price list
+    try:
+        guinness.pub.prices.add(guinness)
+        guinness.pub.save()
+    except:
+        logger.error("Failed to append guinness to pub price list")
+
     if not userProfile.user.is_staff:
 
         logger.info("Contribution was made by non-staff member")
@@ -312,29 +361,51 @@ def handleVerifyGuinnessRequest(userProfile, postData):
         logger.info("Contribution was made by staff member")
 
     try:
-        alerts_client = GuindexAlertsClient(logger)
+        alerts_client = GuindexAlertsClient(logger,
+                                            'Alerts',
+                                            GuindexParameters.ALERTS_LISTEN_IP,
+                                            GuindexParameters.ALERTS_LISTEN_PORT)
     except:
         logger.error("Failed to create Alerts Client")
         return (modal_to_display, warning_text)
 
     try:
-        alerts_client.sendNewGuinnessAlertRequest(guinness)
+        alerts_client.sendNewGuinnessAlertRequest(guinness, request)
     except:
         logger.error("Failed to send New Guinness Alert Request")
+        return modal_to_display, warning_text
+
+    if not userProfile.user.is_staff:
+        logger.info("Not updating stats until contribution is approved")
+        return modal_to_display, warning_text
+
+    try:
+        stats_client = GuindexStatsClient(logger,
+                                          'Stats',
+                                          GuindexParameters.STATS_LISTEN_IP,
+                                          GuindexParameters.STATS_LISTEN_PORT)
+    except:
+        logger.error("Failed to create Stats Client")
+        return modal_to_display, warning_text
+
+    try:
+        stats_client.sendNewGuinnessStatsRequest(guinness)
+    except:
+        logger.error("Failed to send New Guinness Stats Request")
         return modal_to_display, warning_text
 
     return modal_to_display, warning_text
 
 
-def handleClosePubRequest(userProfile, postData):
+def handleClosePubRequest(userProfile, request):
 
-    logger.info("Received close Pub request - %s", postData)
+    logger.info("Received close Pub request - %s", request.POST)
 
     modal_to_display = ""
     warning_text     = ""
 
     try:
-        pub_id = postData.get("pub_id")
+        pub_id = request.POST.get("pub_id")
     except:
         logger.error("Could not get pub id")
 
@@ -400,29 +471,51 @@ def handleClosePubRequest(userProfile, postData):
         return modal_to_display, warning_text
 
     try:
-        alerts_client = GuindexAlertsClient(logger)
+        alerts_client = GuindexAlertsClient(logger,
+                                            'Alerts',
+                                            GuindexParameters.ALERTS_LISTEN_IP,
+                                            GuindexParameters.ALERTS_LISTEN_PORT)
     except:
         logger.error("Failed to create Alerts Client")
         return modal_to_display, warning_text
 
     try:
-        alerts_client.sendPubClosedAlertRequest(pub)
+        alerts_client.sendPubClosedAlertRequest(pub, request)
     except:
         logger.error("Failed to send Pub Closure Alert Request")
+        return modal_to_display, warning_text
+
+    if not userProfile.user.is_staff:
+        logger.info("Not updating stats until contribution is approved")
+        return modal_to_display, warning_text
+
+    try:
+        stats_client = GuindexStatsClient(logger,
+                                          'Stats',
+                                          GuindexParameters.STATS_LISTEN_IP,
+                                          GuindexParameters.STATS_LISTEN_PORT)
+    except:
+        logger.error("Failed to create Stats Client")
+        return modal_to_display, warning_text
+
+    try:
+        stats_client.sendPubClosedStatsRequest(pub)
+    except:
+        logger.error("Failed to send Pub Closed Stats Request")
         return modal_to_display, warning_text
 
     return modal_to_display, warning_text
 
 
-def handleNotServingGuinnessRequest(userProfile, postData):
+def handleNotServingGuinnessRequest(userProfile, request):
 
-    logger.info("Received not serving Guinness request - %s", postData)
+    logger.info("Received not serving Guinness request - %s", request.POST)
 
     modal_to_display = ""
     warning_text     = ""
 
     try:
-        pub_id = postData.get("pub_id")
+        pub_id = request.POST.get("pub_id")
     except:
         logger.error("Could not get pub id")
 
@@ -488,15 +581,37 @@ def handleNotServingGuinnessRequest(userProfile, postData):
         return modal_to_display, warning_text
 
     try:
-        alerts_client = GuindexAlertsClient(logger)
+        alerts_client = GuindexAlertsClient(logger,
+                                            'Alerts',
+                                            GuindexParameters.ALERTS_LISTEN_IP,
+                                            GuindexParameters.ALERTS_LISTEN_PORT)
     except:
         logger.error("Failed to create Alerts Client")
         return modal_to_display, warning_text
 
     try:
-        alerts_client.sendPubNotServingGuinnessAlertRequest(pub)
+        alerts_client.sendPubNotServingGuinnessAlertRequest(pub, request)
     except:
         logger.error("Failed to send Pub Not Serving Guinness Alert Request")
+        return modal_to_display, warning_text
+
+    if not userProfile.user.is_staff:
+        logger.info("Not updating stats until contribution is approved")
+        return modal_to_display, warning_text
+
+    try:
+        stats_client = GuindexStatsClient(logger,
+                                          'Stats',
+                                          GuindexParameters.STATS_LISTEN_IP,
+                                          GuindexParameters.STATS_LISTEN_PORT)
+    except:
+        logger.error("Failed to create Stats Client")
+        return modal_to_display, warning_text
+
+    try:
+        stats_client.sendPubNotServingGuinnessStatsRequest(pub)
+    except:
+        logger.error("Failed to send Pub Not Serving Guinness Stats Request")
         return modal_to_display, warning_text
 
     return modal_to_display, warning_text
@@ -617,7 +732,7 @@ def approveContribution(request):
     else:
         logger.error("Received invalid contributionMethod: %s", contribution_method)
         raise Http404("Received invalid contributionMethod: %s" % contribution_method)
-        
+
     if contribution_type == 'pending_price':
 
         logger.info("Received pending price decision")
@@ -645,6 +760,7 @@ def approveContribution(request):
     logger.error("Received invalid contribution type")
 
     raise Http404("Received invalid contribution type")
+
 
 @login_required
 @require_http_methods(['GET'])
@@ -690,7 +806,7 @@ def arePendingContributions(request):
         logger.debug("There are pending contributions")
     else:
         logger.error("There are no pending contributons")
-    
+
     response = {'arePendingContributions': are_pending_contributions}
 
     return HttpResponse(json.dumps(response), content_type="application/json") # Send 200 OK anyway
@@ -714,7 +830,7 @@ def handleNewPriceDecision(contributionId, contributionApproved, reason = None):
         guinness.rejected = False
     else:
         guinness.approved = False
-        guinness.rejected = True 
+        guinness.rejected = True
 
     try:
         guinness.full_clean()
@@ -729,13 +845,16 @@ def handleNewPriceDecision(contributionId, contributionApproved, reason = None):
         raise Http404("Failed to save Guinness object")
 
     try:
-        alerts_client = GuindexAlertsClient(logger)
+        alerts_client = GuindexAlertsClient(logger,
+                                            'Alerts',
+                                            GuindexParameters.ALERTS_LISTEN_IP,
+                                            GuindexParameters.ALERTS_LISTEN_PORT)
     except:
         logger.error("Failed to create Alerts Client")
         return HttpResponse(json.dumps({}), content_type="application/json")
 
     try:
-        alerts_client.sendNewGuinnessDecisionAlertRequest(guinness, reason)
+        alerts_client.sendNewGuinnessDecisionAlertRequest(guinness)
     except:
         logger.error("Failed to send New Guinness Decision Alert Request")
         return HttpResponse(json.dumps({}), content_type="application/json")
@@ -776,13 +895,16 @@ def handleNewPubDecision(contributionId, contributionApproved, reason = None):
         raise Http404("Failed to save Guinness object")
 
     try:
-        alerts_client = GuindexAlertsClient(logger)
+        alerts_client = GuindexAlertsClient(logger,
+                                            'Alerts',
+                                            GuindexParameters.ALERTS_LISTEN_IP,
+                                            GuindexParameters.ALERTS_LISTEN_PORT)
     except:
         logger.error("Failed to create Alerts Client")
         return HttpResponse(json.dumps({}), content_type="application/json")
 
     try:
-        alerts_client.sendNewPubDecisionAlertRequest(pub, reason)
+        alerts_client.sendNewPubDecisionAlertRequest(pub)
     except:
         logger.error("Failed to send New Pub Decision Alert Request")
         return HttpResponse(json.dumps({}), content_type="application/json")
@@ -823,13 +945,16 @@ def handlePubClosureDecision(contributionId, contributionApproved, reason = None
         raise Http404("Failed to save Guinness object")
 
     try:
-        alerts_client = GuindexAlertsClient(logger)
+        alerts_client = GuindexAlertsClient(logger,
+                                            'Alerts',
+                                            GuindexParameters.ALERTS_LISTEN_IP,
+                                            GuindexParameters.ALERTS_LISTEN_PORT)
     except:
         logger.error("Failed to create Alerts Client")
         return HttpResponse(json.dumps({}), content_type="application/json")
 
     try:
-        alerts_client.sendPubClosedDecisionAlertRequest(pub, reason)
+        alerts_client.sendPubClosedDecisionAlertRequest(pub)
     except:
         logger.error("Failed to send Pub Closed Decision Alert Request")
         return HttpResponse(json.dumps({}), content_type="application/json")
@@ -870,13 +995,16 @@ def handlePubNotServingGuinnessDecision(contributionId, contributionApproved, re
         raise Http404("Failed to save Guinness object")
 
     try:
-        alerts_client = GuindexAlertsClient(logger)
+        alerts_client = GuindexAlertsClient(logger,
+                                            'Alerts',
+                                            GuindexParameters.ALERTS_LISTEN_IP,
+                                            GuindexParameters.ALERTS_LISTEN_PORT)
     except:
         logger.error("Failed to create Alerts Client")
         return HttpResponse(json.dumps({}), content_type="application/json")
 
     try:
-        alerts_client.sendPubNotServingGuinnessDecisionAlertRequest(pub, reason)
+        alerts_client.sendPubNotServingGuinnessDecisionAlertRequest(pub)
     except:
         logger.error("Failed to send Pub Not Serving Guinness Decision Alert Request")
         return HttpResponse(json.dumps({}), content_type="application/json")
@@ -947,6 +1075,14 @@ def guindexAlertSettings(request):
         context_dict = {'user_profile_parameters': UserProfileParameters.getParameters()}
 
         return render(request, 'error_404.html', context_dict, status = 404)
+
+
+@require_http_methods(['GET'])
+def guindexMapFull(request):
+
+    logger.info("Received %s request to %s", request.method, request.get_full_path())
+
+    return render(request, 'guindex_map_full.html')
 
 
 class PubList(generics.ListAPIView):

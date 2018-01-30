@@ -59,17 +59,6 @@
                     {% if not pub.closed and pub.serving_guinness %}
                     <div class="edit_button_container">
                     
-                        <!--
-                        <div class="guindex_button_container">
-                            <i class="fa fa-pencil-square-o rename_pub_button needs_description"
-                               data-description_text="Rename pub"
-                               data-pub_id="{{ pub.id }}"
-                               data-pub_name="{{ pub.name}}"
-                               aria-hidden="true">
-                            </i>
-                        </div>
-                        -->
-
                         <div class="guindex_button_container">
                             <i class="fa fa-close close_pub_button needs_description"
                                data-description_text="Mark pub as closed"
@@ -88,17 +77,6 @@
                                aria-hidden="true">
                             </i>
                         </div>
-
-                        <!--
-                        <div class="guindex_button_container">
-                            <i class="fa fa-trash-o delete_pub_button needs_description"
-                               data-description_text="Delete pub"
-                               data-pub_id="{{ pub.id }}"
-                               data-pub_name="{{ pub.name}}"
-                               aria-hidden="true">
-                            </i>
-                        </div>
-                        -->
 
                     </div>
                     {% endif %}
@@ -144,7 +122,7 @@
                 <!-- FIRST ADDED BY CELL -->
                 <td>
                     {% if pub.first_guinness %}
-                        <span class="payload" class="needs_description" data-description_text="First added with a price of &euro {{ pub.first_guinness.creator }}.">{{ pub.first_guinness.creator }}</span>
+                        <span class="payload">{{ pub.first_guinness.creator.user.username }}</span>
                     {% else %}
                         <span class="payload"> TBD </span>
                     {% endif %}
@@ -162,7 +140,7 @@
                 <!-- LAST VERIFIED BY CELL -->
                 <td>
                     {% if pub.last_guinness %}
-                        <span class="payload">{{ pub.last_guinness.creator }}</span>
+                        <span class="payload">{{ pub.last_guinness.creator.user.username }}</span>
                     {% else %}
                         <span class="payload"> TBD </span>
                     {% endif %}
