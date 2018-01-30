@@ -8,6 +8,7 @@
 		<title>Guindex Map</title>
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 	<link rel="stylesheet" type="text/css" href="{% static "css/guindex.css" %}" />
+	<link rel="icon" href="{% static "images/favicon.png" %}"/>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script type="text/javascript" src="{% static "javascript/cookie.js" %}"> </script>
 	<script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"> </script>
@@ -22,7 +23,18 @@
         padding: 0;
       }
 	 </style>
+
+	    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113016256-1"></script>
+    <script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'UA-113016256-1');
+    </script>
   </head>
+
   <body>
   
                     <div id="guindex_map">
