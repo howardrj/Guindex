@@ -9,10 +9,8 @@ class GuindexParameters:
     MAX_GUINNESS_PRICE_DIGITS = 4
     MIN_GUINNESS_PRICE        = '0.01'
 
-    # Background script parameters
-    STATISTICS_CALCULATION_PERIOD         = 600 # In seconds
-    USER_CONTRIBUTIONS_CALCULATION_PERIOD = 600 # In seconds
-    DB_BACKUP_PERIOD                      = 84600 # In seconds
+    # Background script run periods
+    DB_BACKUP_PERIOD = 84600 # In seconds
 
     # Alerts Server Parameters
     ALERTS_LISTEN_IP   = '127.0.0.1'

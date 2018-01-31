@@ -1,12 +1,17 @@
 import logging
+import math
 from decimal import Decimal
 from twisted.internet import reactor
 
 from django.core.management.base import BaseCommand
 
-from Guindex.models import StatisticsSingleton, UserContributionsSingleton
+from Guindex.models import Pub, Guinness, StatisticsSingleton, UserContributionsSingleton
 from Guindex.GuindexParameters import GuindexParameters
 from Guindex.GuindexStatsServer import GuindexStatsServerFactory
+
+from GuindexUser import GuindexUserUtils
+
+from UserProfile.models import UserProfile
 
 logger = logging.getLogger(__name__.split('.')[-1])
 
@@ -30,7 +35,7 @@ class Command(BaseCommand):
                 self.gatherPubPrices()
             except:
                 logger.error("Failed to gather pub prices")
-            
+
             try:
                 logger.info("Calculating number of pubs")
                 self.calculateNumberOfPubs()
@@ -96,11 +101,11 @@ class Command(BaseCommand):
                 self.user_contributions.save()
             except:
                 logger.error("Failed to save user contributions")
-                
+
             logger.info("Creating Guindex stats server")
 
             reactor.listenTCP(GuindexParameters.STATS_LISTEN_PORT,
-                              GuindexAlertsServerFactory(logger),
+                              GuindexStatsServerFactory(logger),
                               GuindexParameters.STATS_BACKLOG,
                               GuindexParameters.STATS_LISTEN_IP)
 
@@ -139,7 +144,7 @@ class Command(BaseCommand):
             if pub.getLastVerifiedGuinness():
                 cheapest_pubs.append(pub)
 
-        cheapest_pubs = sorted(cheapest_pubs, 
+        cheapest_pubs = sorted(cheapest_pubs,
                                key = lambda x: x.getLastVerifiedGuinness().price,
                                reverse = False)
 
@@ -288,7 +293,7 @@ class Command(BaseCommand):
 
         # Add lists to model fields
         self.user_contributions.mostVisited.clear()
-        self.user_contributions.mostVisited.add(*most_visited)
+        self.user_contributions.mostVisited.add(*most_pubs_visited)
 
         self.user_contributions.mostLastVerified.clear()
         self.user_contributions.mostLastVerified.add(*most_current_verifications)

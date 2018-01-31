@@ -1,10 +1,15 @@
 from decimal import Decimal
+import math
 
 from twisted.internet import protocol
 from twisted.protocols.basic import Int16StringReceiver
 
 from Guindex import GuindexStatsIf_pb2 as GuindexStatsIf
 from Guindex.models import Pub, Guinness, StatisticsSingleton, UserContributionsSingleton
+
+from GuindexUser import GuindexUserUtils
+
+from UserProfile.models import UserProfile
 
 
 class GuindexStatsServerFactory(protocol.ServerFactory):
@@ -224,6 +229,8 @@ class GuindexStatsServer(Int16StringReceiver):
 
     def adjustPercentageOfPubsVisited(self, guindexObject):
 
+        self.logger.info("Adjusting percentage of pubs visited")
+
         if type(guindexObject) == Pub:
 
             self.logger.debug("Object is a pub. Decrementing percentage of pubs visited")
@@ -250,6 +257,8 @@ class GuindexStatsServer(Int16StringReceiver):
             return
 
     def adjustAveragePrice(self, guindexObject):
+
+        self.logger.info("Adjusting average price")
 
         if type(guindexObject) == Pub and guindexObject.closed:
 
@@ -317,11 +326,33 @@ class GuindexStatsServer(Int16StringReceiver):
             return
 
     def adjustStandardDeviation(self, guinness):
-        pass
+
+        self.logger.info("Adjusting standard deviation")
+
+        # TODO Optimize this so we don't have to fully calculate it again
+
+        variance_tmp = 0
+
+        if self.stats.averagePrice == 0:
+            self.stats.standardDevation = 0
+            return
+
+        for pub in Pub.objects.filter(closed = False,
+                                      pendingApproval = False,
+                                      pendingApprovalRejected = False):
+
+            if pub.getLastVerifiedGuinness():
+                variance_tmp = variance_tmp + math.pow((pub.getLastVerifiedGuinness().price - self.stats.averagePrice), 2)
+
+        variance = variance_tmp / self.pubsWithPrices
+
+        self.stats.standardDevation = variance.sqrt()
 
     def adjustCheapestPints(self, guinness):
 
         # TODO Optimize this so we don't have to regenerate list
+
+        self.logger.info("Adjusting cheapest pints")
 
         cheapest_pubs = []
 
@@ -341,7 +372,10 @@ class GuindexStatsServer(Int16StringReceiver):
 
     def adjustDearestPints(self, guinness):
 
+        self.logger.info("Adjusting dearest pints")
+
         # TODO Optimize this so we don't have to regenerate list
+
         dearest_pubs = []
 
         for pub in Pub.objects.filter(closed = False,
@@ -357,11 +391,79 @@ class GuindexStatsServer(Int16StringReceiver):
 
         self.dearestPubs.clear()
         self.dearestPubs.add(*dearest_pubs)
-    
+
     def adjustUserContributions(self, guinness):
-        pass
+
+        self.logger.info("Adjusting user contributions statistics")
+
+        # Do we need to adjust number of first verifications?
+        if guinness.pub.getFirstVerifiedGuinness() == guinness.pub.getLastVerifiedGuinness():
+
+            self.logger.debug("Increasing number of original prices for %s", guinness.creator)
+            guinness.creator.guindexuser.originalPrices = guinness.creator.guindexuser.originalPrices + 1
+
+        # Do we need to adjust number of visits?
+        if len(Guinness.objects.filter(approved = True,
+                                       pub = guinness.pub,
+                                       creator = guinness.creator)) == 1:
+
+            self.logger.debug("Increasing number of visits for %s", guinness.creator)
+            guinness.creator.guindexuser.pubsVisited = guinness.creator.guindexuser.pubsVisited + 1
+
+        # Do we need to adjust number of current verifications?
+        # Yes, if creator is not already current verifier
+        # and Take it away from the previous verifier
+
+        previous_verifier = guinness.pub.prices.all()[::-1][1]
+
+        if not previous_verifier == guinness.creator:
+
+            self.logger.debug("Increasing number of current verifications for %s", guinness.creator)
+            guinness.creator.guindexuser.currentVerifications  = guinness.creator.guindexuser.currentVerifications + 1
+            previous_verifier.guindexuser.currentVerifications = previous_verifier.guindexuser.currentVerifications - 1
+
+        # Regenerate list of best contributors
+        # TODO Optimize this so list is not regenerated every time
+
+        most_pubs_visited          = []
+        most_first_verifications   = []
+        most_current_verifications = []
+
+        for user_profile in UserProfile.objects.all():
+
+            if not user_profile.guindexuser:
+                self.logger.debug("Need to create GuindexUser for UserProfile %s", user_profile)
+
+                GuindexUserUtils.createNewGuindexUser(user_profile)
+
+            most_pubs_visited.append(user_profile)
+            most_first_verifications.append(user_profile)
+            most_current_verifications.append(user_profile)
+
+        # Sort lists
+        most_pubs_visited          = sorted(most_pubs_visited,
+                                            key = lambda x: x.guindexuser.pubsVisited,
+                                            reverse = True)
+        most_first_verifications   = sorted(most_first_verifications,
+                                            key = lambda x: x.guindexuser.originalPrices,
+                                            reverse = True)
+        most_current_verifications = sorted(most_current_verifications,
+                                            key = lambda x: x.guindexuser.currentVerifications,
+                                            reverse = True)
+
+        # Add lists to model fields
+        self.user_contributions.mostVisited.clear()
+        self.user_contributions.mostVisited.add(*most_pubs_visited)
+
+        self.user_contributions.mostLastVerified.clear()
+        self.user_contributions.mostLastVerified.add(*most_current_verifications)
+
+        self.user_contributions.mostFirstVerified.clear()
+        self.user_contributions.mostFirstVerified.add(*most_first_verifications)
 
     def adjustNumberOfPubsInDatabase(self, pub):
+
+        self.logger.info("Adjusting number of pubs in database")
 
         if pub.closed:
             self.logger.debug("Pub is closed. Decrementing number of pubs in DB")
@@ -372,11 +474,15 @@ class GuindexStatsServer(Int16StringReceiver):
 
     def adjustNumberOfClosedPubs(self, pub):
 
+        self.logger.info("Adjusting number of closed pubs")
+
         if pub.closed:
             self.logger.debug("Incrementing number of closed pubs")
             self.stats.closedPubs = self.stats.closedPubs + 1
 
     def adjustNumberOfPubsNotServingGuinness(self, pub):
+
+        self.logger.info("Adjusting number of pubs not serving Guinness")
 
         if not pub.servingGuinness:
             self.logger.debug("Incrementing number of pubs not serving Guinness")
