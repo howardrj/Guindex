@@ -6,8 +6,7 @@ from twisted.protocols.basic import Int16StringReceiver
 
 from Guindex import GuindexStatsIf_pb2 as GuindexStatsIf
 from Guindex.models import Pub, Guinness, StatisticsSingleton, UserContributionsSingleton
-
-from GuindexUser import GuindexUserUtils
+from Guindex import GuindexUtils
 
 from UserProfile.models import UserProfile
 
@@ -128,14 +127,9 @@ class GuindexStatsServer(Int16StringReceiver):
             self.logger.error("Failed to adjust standard deviation")
 
         try:
-            self.adjustCheapestPints(guinness)
+            self.adjustPubsWithPrices(guinness)
         except:
-            self.logger.error("Failed to adjust cheapest pints")
-
-        try:
-            self.adjustDearestPints(guinness)
-        except:
-            self.logger.error("Failed to adjust dearest pints")
+            self.logger.error("Failed to adjust pubs with prices")
 
         try:
             self.adjustUserContributions(guinness)
@@ -201,6 +195,11 @@ class GuindexStatsServer(Int16StringReceiver):
             self.adjustAveragePrice(pub)
         except:
             self.logger.error("Failed to adjust average price")
+
+        try:
+            self.adjustPubsWithPrices(pub)
+        except:
+            self.logger.error("Failed to adjust pubs with prices")
 
     def _handlePubNotServingGuinnessStatsRequest(self, message):
 
@@ -334,7 +333,7 @@ class GuindexStatsServer(Int16StringReceiver):
         variance_tmp = 0
 
         if self.stats.averagePrice == 0:
-            self.stats.standardDevation = 0
+            self.stats.standardDeviation = 0
             return
 
         for pub in Pub.objects.filter(closed = False,
@@ -344,53 +343,15 @@ class GuindexStatsServer(Int16StringReceiver):
             if pub.getLastVerifiedGuinness():
                 variance_tmp = variance_tmp + math.pow((pub.getLastVerifiedGuinness().price - self.stats.averagePrice), 2)
 
-        variance = variance_tmp / self.pubsWithPrices
+        variance = Decimal(variance_tmp) / self.pubsWithPrices
 
-        self.stats.standardDevation = variance.sqrt()
+        self.stats.standardDeviation = variance.sqrt()
 
-    def adjustCheapestPints(self, guinness):
+    def adjustPubsWithPrices(self, guindexObject):
 
-        # TODO Optimize this so we don't have to regenerate list
+        self.logger.info("Adjusting pubs with prices")
 
-        self.logger.info("Adjusting cheapest pints")
-
-        cheapest_pubs = []
-
-        for pub in Pub.objects.filter(closed = False,
-                                      pendingApproval = False,
-                                      pendingApprovalRejected = False):
-
-            if pub.getLastVerifiedGuinness():
-                cheapest_pubs.append(pub)
-
-        cheapest_pubs = sorted(cheapest_pubs,
-                               key = lambda x: x.getLastVerifiedGuinness().price,
-                               reverse = False)
-
-        self.cheapestPubs.clear()
-        self.cheapestPubs.add(*cheapest_pubs)
-
-    def adjustDearestPints(self, guinness):
-
-        self.logger.info("Adjusting dearest pints")
-
-        # TODO Optimize this so we don't have to regenerate list
-
-        dearest_pubs = []
-
-        for pub in Pub.objects.filter(closed = False,
-                                      pendingApproval = False,
-                                      pendingApprovalRejected = False):
-
-            if pub.getLastVerifiedGuinness():
-                dearest_pubs.append(pub)
-
-        dearest_pubs = sorted(dearest_pubs,
-                              key = lambda x: x.getLastVerifiedGuinness().price,
-                              reverse = True)
-
-        self.dearestPubs.clear()
-        self.dearestPubs.add(*dearest_pubs)
+        # TODO
 
     def adjustUserContributions(self, guinness):
 
@@ -434,7 +395,7 @@ class GuindexStatsServer(Int16StringReceiver):
             if not user_profile.guindexuser:
                 self.logger.debug("Need to create GuindexUser for UserProfile %s", user_profile)
 
-                GuindexUserUtils.createNewGuindexUser(user_profile)
+                GuindexUtils.createNewGuindexUser(user_profile)
 
             most_pubs_visited.append(user_profile)
             most_first_verifications.append(user_profile)

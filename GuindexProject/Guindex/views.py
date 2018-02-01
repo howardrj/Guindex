@@ -20,6 +20,8 @@ from GuindexAlertsClient import GuindexAlertsClient
 from GuindexStatsClient import GuindexStatsClient
 import GuindexUtils
 
+from GuindexUser.models import GuindexUser
+
 from UserProfile.UserProfileParameters import UserProfileParameters
 
 logger = logging.getLogger(__name__)
@@ -1163,3 +1165,35 @@ class StatisticsList(generics.ListAPIView):
 
     def get_queryset(self):
         return StatisticsSingleton.objects.filter(id = 1)
+
+
+class ContributionsList(generics.ListAPIView):
+
+    serializer_class   = GuindexUserSerializer
+    permission_classes = (permissions.AllowAny, )
+
+    def __init__(self, *args, **kwargs):
+
+        logger.error("Received ContributionsList request")
+
+        # Access base class constructor
+        super(ContributionsList, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        return GuindexUser.objects.all()
+
+
+class ContributionsDetail(generics.RetrieveAPIView):
+
+    serializer_class   = GuindexUserSerializer
+    permission_classes = (permissions.AllowAny, )
+
+    def __init__(self, *args, **kwargs):
+
+        logger.error("Received ContributionsDetail request")
+
+        # Access base class constructor
+        super(ContributionsDetail, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        return GuindexUser.objects.all()

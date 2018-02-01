@@ -7,9 +7,8 @@ from django.core.management.base import BaseCommand
 
 from Guindex.models import Pub, Guinness, StatisticsSingleton, UserContributionsSingleton
 from Guindex.GuindexParameters import GuindexParameters
+from Gindex import GuindexUtils
 from Guindex.GuindexStatsServer import GuindexStatsServerFactory
-
-from GuindexUser import GuindexUserUtils
 
 from UserProfile.models import UserProfile
 
@@ -25,10 +24,13 @@ class Command(BaseCommand):
 
         while True:
 
-            logger.info("Calculating Statistics on startup")
+            logger.info("***** Calculating statistics and user contributions on startup *****")
 
             self.stats              = StatisticsSingleton.load()
             self.user_contributions = UserContributionsSingleton.load()
+
+            # Note: Order of function calls is important
+            # Be careful if you shuffle them around
 
             try:
                 logger.info("Gathering pub price list")
@@ -43,16 +45,10 @@ class Command(BaseCommand):
                 logger.error("Failed to calculate number of pubs")
 
             try:
-                logger.info("Calculating cheapest pubs")
-                self.calculateCheapestPubs()
+                logger.info("Calculating pubs with prices")
+                self.calculatePubsWithPrices()
             except:
-                logger.error("Failed to calculate cheapest pubs")
-
-            try:
-                logger.info("Calculating dearest pubs")
-                self.calculateDearestPubs()
-            except:
-                logger.error("Failed to calculate dearest pubs")
+                logger.error("Failed to calculate pubs with prices")
 
             try:
                 logger.info("Calculating average price")
@@ -73,7 +69,7 @@ class Command(BaseCommand):
                 logger.error("Failed to calculate closed pubs")
 
             try:
-                logger.info("Calculating not serving Guinness")
+                logger.info("Calculating pubs not serving Guinness")
                 self.calculateNotServingGuinness()
             except:
                 logger.error("Failed to calculate not serving Guinness")
@@ -120,7 +116,7 @@ class Command(BaseCommand):
 
             pub.prices.clear()
 
-            for guin in Guinness.objects.filter(pub = pub).order_by('creationDate'):
+            for guin in Guinness.objects.filter(pub = pub):
 
                 pub.prices.add(guin)
 
@@ -133,83 +129,48 @@ class Command(BaseCommand):
                                                      pendingApproval = False,
                                                      pendingApprovalRejected = False))
 
-    def calculateCheapestPubs(self):
+    def calculatePubsWithPrices(self):
 
-        cheapest_pubs = []
-
-        for pub in Pub.objects.filter(closed = False,
-                                      pendingApproval = False,
-                                      pendingApprovalRejected = False):
-
-            if pub.getLastVerifiedGuinness():
-                cheapest_pubs.append(pub)
-
-        cheapest_pubs = sorted(cheapest_pubs,
-                               key = lambda x: x.getLastVerifiedGuinness().price,
-                               reverse = False)
-
-        self.cheapestPubs.clear()
-        self.cheapestPubs.add(*cheapest_pubs)
-
-    def calculateDearestPubs(self):
-
-        dearest_pubs = []
+        self.stats.pubsWithPrices.clear()
 
         for pub in Pub.objects.filter(closed = False,
                                       pendingApproval = False,
                                       pendingApprovalRejected = False):
-
-            if pub.getLastVerifiedGuinness():
-                dearest_pubs.append(pub)
-
-        dearest_pubs = sorted(dearest_pubs,
-                              key = lambda x: x.getLastVerifiedGuinness().price,
-                              reverse = True)
-
-        self.dearestPubs.clear()
-        self.dearestPubs.add(*dearest_pubs)
+        
+            if pub.getLastVerifiedGuinness() and pub.servingGuinness:
+                self.stats.pubsWithPrices.add(pub)
 
     def calculateAveragePrice(self):
 
-        visited_pubs = 0
-        sum_total    = 0
+        sum_total = 0
 
-        for pub in Pub.objects.filter(closed = False,
-                                      pendingApproval = False,
-                                      pendingApprovalRejected = False):
+        pubs_with_prices     = self.stats.pubsWithPrices.all()
+        pubs_with_prices_len = len(pubs_with_prices)
+ 
+        for pub in pubs_with_prices:
 
-            if pub.getLastVerifiedGuinness():
-                visited_pubs = visited_pubs + 1
-                sum_total    = sum_total + pub.getLastVerifiedGuinness().price
+            sum_total = sum_total + pub.getLastVerifiedGuinness().price
 
-        if visited_pubs == 0:
-            self.stats.averagePrice = 0
-            return
-
-        self.stats.pubsWithPrices = visited_pubs
-        self.stats.averagePrice   = sum_total / visited_pubs
+        self.stats.averagePrice = sum_total / pubs_with_prices_len if pubs_with_prices_len else 0
 
     def calculateStandardDeviation(self):
 
-        variance_tmp = 0
-        visited_pubs = 0
-
         if self.stats.averagePrice == 0:
-            self.stats.standardDevation = 0
+            self.stats.standardDeviation = 0
             return
 
-        for pub in Pub.objects.filter(closed = False,
-                                      pendingApproval = False,
-                                      pendingApprovalRejected = False):
+        variance_tmp = 0
 
-            if pub.getLastVerifiedGuinness():
-                visited_pubs = visited_pubs + 1
-                variance_tmp = variance_tmp + math.pow((pub.getLastVerifiedGuinness().price - self.stats.averagePrice), 2)
+        pubs_with_prices     = self.stats.pubsWithPrices.all()
+        pubs_with_prices_len = len(pubs_with_prices)
 
-        variance = variance_tmp / visited_pubs
+        for pub in pubs_with_prices:
 
-        self.stats.pubsWithPrices   = visited_pubs
-        self.stats.standardDevation = variance.sqrt()
+            variance_tmp = variance_tmp + math.pow((pub.getLastVerifiedGuinness().price - self.stats.averagePrice), 2)
+
+        variance = Decimal(variance_tmp) / visited_pubs
+
+        self.stats.standardDeviation = variance.sqrt()
 
     def calculateClosedPubs(self):
 
@@ -221,28 +182,15 @@ class Command(BaseCommand):
 
     def calculatePercentageVisited(self):
 
-        visited_pubs = 0
-
         if self.stats.pubsInDb == 0:
             self.stats.percentageVisited = 0
             return
 
-        for pub in Pub.objects.filter(closed = False,
-                                      pendingApproval = False,
-                                      pendingApprovalRejected = False):
-
-            if pub.getLastVerifiedGuinness() or not pub.servingGuinness:
-                visited_pubs = visited_pubs + 1
-
-        self.stats.percentageVisited = (Decimal(visited_pubs) / self.stats.pubsInDb) * 100
+        return ((len(self.stats.pubsWithPrices) + self.stats.notServingGuinness) / Decimal(self.stats.pubsInDb)) * 100
 
     def calculateUserContributions(self):
 
         logger.info("Calculating User Contributions")
-
-        most_pubs_visited          = []
-        most_first_verifications   = []
-        most_current_verifications = []
 
         for user_profile in UserProfile.objects.all():
 
@@ -251,12 +199,14 @@ class Command(BaseCommand):
             if not user_profile.guindexuser:
                 logger.debug("Need to create GuindexUser for UserProfile %s", user_profile)
 
-                GuindexUserUtils.createNewGuindexUser(user_profile)
+                GuindexUtils.createNewGuindexUser(user_profile)
 
             number_of_current_verifications = 0
             number_of_first_verifications   = 0
             number_of_pubs_visited          = 0
 
+            # Do it this way since we want to keep user stats
+            # for closed and pubs marked as no longer serving Guinness
             for pub in Pub.objects.all():
 
                 if pub.getLastVerifiedGuinness():
@@ -267,7 +217,7 @@ class Command(BaseCommand):
                     if pub.getFirstVerifiedGuinness().creator == user_profile:
                         number_of_first_verifications = number_of_first_verifications + 1
 
-                if len(Guinness.objects.filter(pub = pub, creator = user_profile)):
+                if len(Guinness.objects.filter(pub = pub, creator = user_profile, approved = True)):
                     number_of_pubs_visited = number_of_pubs_visited + 1
 
             user_profile.guindexuser.originalPrices       = number_of_first_verifications
@@ -275,30 +225,3 @@ class Command(BaseCommand):
             user_profile.guindexuser.pubsVisited          = number_of_pubs_visited
 
             user_profile.guindexuser.save()
-
-            most_pubs_visited.append(user_profile)
-            most_first_verifications.append(user_profile)
-            most_current_verifications.append(user_profile)
-
-        # Sort lists
-        most_pubs_visited          = sorted(most_pubs_visited,
-                                            key = lambda x: x.guindexuser.pubsVisited,
-                                            reverse = True)
-        most_first_verifications   = sorted(most_first_verifications,
-                                            key = lambda x: x.guindexuser.originalPrices,
-                                            reverse = True)
-        most_current_verifications = sorted(most_current_verifications,
-                                            key = lambda x: x.guindexuser.currentVerifications,
-                                            reverse = True)
-
-        # Add lists to model fields
-        self.user_contributions.mostVisited.clear()
-        self.user_contributions.mostVisited.add(*most_pubs_visited)
-
-        self.user_contributions.mostLastVerified.clear()
-        self.user_contributions.mostLastVerified.add(*most_current_verifications)
-
-        self.user_contributions.mostFirstVerified.clear()
-        self.user_contributions.mostFirstVerified.add(*most_first_verifications)
-
-        logger.info("Saving User Contributions Singleton %s", self.user_contributions)

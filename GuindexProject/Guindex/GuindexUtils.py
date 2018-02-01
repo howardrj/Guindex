@@ -8,7 +8,8 @@ from Guindex.models import Pub, Guinness
 from UserProfile.models import UserProfile
 
 from TelegramUser import TelegramUserUtils
-from GuindexUser import GuindexUserUtils
+
+from GuindexUser.models import GuindexUser
 
 
 logger = logging.getLogger(__name__)
@@ -38,12 +39,26 @@ def getUserProfileFromUser(user):
     if not user_profile.guindexuser:
 
         logger.info("UserProfile %s does not have a GuindexUser. Creating one", user_profile)
-        GuindexUserUtils.createNewGuindexUser(user_profile)
+        createNewGuindexUser(user_profile)
 
     else:
         logger.debug("UserProfile %s has a GuindexUser %s. No need to create one", user_profile, user_profile.guindexuser)
 
     return user_profile
+
+
+def createNewGuindexUser(userProfile):
+
+    logger.info("Creating new GuindexUser for UserProfile %s", userProfile)
+
+    guindex_user = GuindexUser()
+
+    guindex_user.save()
+
+    userProfile.guindexuser = guindex_user
+    userProfile.save()
+
+    logger.info("Successfully created new GuindexUser %s for UserProfile %s", guindex_user, userProfile)
 
 
 def getPubs():

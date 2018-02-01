@@ -30,7 +30,7 @@ class Pub(models.Model):
     pendingNotServingGuinness            = models.BooleanField(default = False) # In case non-staff member marks pub as not serving Guinness
     pendingNotServingGuinnessContributor = models.ForeignKey(UserProfile, null = True, blank = True, related_name = 'pendingNotServingGuinnessMarker', default = None)
     pendingNotServingGuinnessTime        = models.DateTimeField(default = timezone.now)
-    prices                               = models.ManyToManyField('Guinness', related_name = 'prices') # Ordered list by datetime
+    prices                               = models.ManyToManyField('Guinness', related_name = 'prices')
 
     def __unicode__(self):
 
@@ -41,7 +41,6 @@ class Pub(models.Model):
             Return most recently verified Guinness object.
         """
 
-        # Assume prices are sorted by datetime in increasing order
         for price in self.prices.all():
 
             if price.approved:
@@ -54,7 +53,6 @@ class Pub(models.Model):
             Return most recently verified Guinness object.
         """
 
-        # Assume prices are sorted by datetime in increasing order
         for price in self.prices.all()[::-1]:
 
             if price.approved:
@@ -85,46 +83,21 @@ class StatisticsSingleton(models.Model):
     """
 
     pubsInDb           = models.IntegerField(default = 0)
-    cheapestPubs       = models.ManyToManyField(Pub, related_name = 'cheapest_pubs') # Ordered List
-    dearestPubs        = models.ManyToManyField(Pub, related_name = 'dearest_pubs')  # Ordered List
-    pubsWithPrices     = models.IntegerField(default = 0)
+    pubsWithPrices     = models.ManyToManyField(Pub) # Use this to return cheapest/most expensive pubs
     averagePrice       = models.DecimalField(decimal_places = 2, max_digits = 6,  default = Decimal('0.0'))
-    standardDevation   = models.DecimalField(decimal_places = 3, max_digits = 12, default = Decimal('0.0'))
+    standardDeviation  = models.DecimalField(decimal_places = 3, max_digits = 12, default = Decimal('0.0'))
     percentageVisited  = models.DecimalField(decimal_places = 2, max_digits = 5,  default = Decimal('0.0'))
     closedPubs         = models.IntegerField(default = 0)
     notServingGuinness = models.IntegerField(default = 0)
     lastCalculated     = models.DateTimeField(auto_now = True)
 
+    def __unicode__(self):
+
+        return "'StatisticsSingleton'"
+
     def save(self, *args, **kwargs):
         self.pk = 1
         super(StatisticsSingleton, self).save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        pass
-
-    @classmethod
-    def load(cls):
-        obj, created = cls.objects.get_or_create(pk = 1)
-        return obj
-
-
-class UserContributionsSingleton(models.Model):
-    """
-        Singleton class to keep track of best contributors
-    """
-
-    mostVisited       = models.ManyToManyField(UserProfile, related_name = 'most_visited') # Ordered List
-    mostLastVerified  = models.ManyToManyField(UserProfile, related_name = 'most_last_verifications') # Ordered List
-    mostFirstVerified = models.ManyToManyField(UserProfile, related_name = 'most_first_verifications') # Ordered List
-    lastCalculated    = models.DateTimeField(auto_now = True)
-
-    def __unicode__(self):
-
-        return "'%s - %s - %s'" % (self.mostVisited, self.mostLastVerified, self.mostFirstVerified)
-
-    def save(self, *args, **kwargs):
-        self.pk = 1
-        super(UserContributionsSingleton, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         pass

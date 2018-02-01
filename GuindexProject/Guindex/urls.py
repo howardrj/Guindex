@@ -14,5 +14,7 @@ urlpatterns = [
     url(r'^api/guinness/$', views.GuinnessList.as_view()), # API view
     url(r'^api/guinness/(?P<pk>[0-9]+)/$', views.GuinnessDetail.as_view()), # API view
     url(r'^api/statistics/$', views.StatisticsList.as_view()), # API view
+    url(r'^api/contributions/$', views.ContributionsList.as_view()),
+    url(r'^api/contributions/(?P<pk>[0-9]+)$', views.ContributionsDetail.as_view()),
     url(r'^map/$', views.guindexMapFull),
 ]
