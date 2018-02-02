@@ -13,15 +13,14 @@ from rest_framework import generics
 from rest_framework import permissions
 
 from Guindex.forms import NewPubForm, NewGuinnessForm
-from Guindex.serializers import PubSerializer, GuinnessSerializer, StatisticsSerializer
+from Guindex.serializers import PubSerializer, GuinnessSerializer, StatisticsSerializer, ContributorSerializer
 from Guindex.models import Pub, Guinness, StatisticsSingleton
 from GuindexParameters import GuindexParameters
 from GuindexAlertsClient import GuindexAlertsClient
 from GuindexStatsClient import GuindexStatsClient
 import GuindexUtils
 
-from GuindexUser.models import GuindexUser
-
+from UserProfile.models import UserProfile
 from UserProfile.UserProfileParameters import UserProfileParameters
 
 logger = logging.getLogger(__name__)
@@ -115,7 +114,6 @@ def guindex(request):
                     'user_profile'           : user_profile,
                     'user_profile_parameters': UserProfileParameters.getParameters(),
                     'guindex_parameters'     : GuindexParameters.getParameters(),
-                    'google_maps_api_token'  : settings.GOOGLE_MAPS_API_KEY,
                     }
 
     response = render(request, 'guindex_main.html', context_dict)
@@ -193,8 +191,9 @@ def handleNewPubRequest(userProfile, request):
         logger.error("Failed to create Stats Client")
         return modal_to_display, new_pub_form, warning_text
 
+    stats_client.sendNewPubStatsRequest(new_pub)
     try:
-        stats_client.sendNewPubStatsRequest(new_pub)
+        pass
     except:
         logger.error("Failed to send New Pub Stats Request")
         return modal_to_display, new_pub_form, warning_text
@@ -320,7 +319,7 @@ def handleVerifyGuinnessRequest(userProfile, request):
     guinness = Guinness()
 
     guinness.creator  = userProfile
-    guinness.price    = last_verified_guinness['price']
+    guinness.price    = last_verified_guinness.price
     guinness.pub      = pub
     guinness.approved = userProfile.user.is_staff
 
@@ -1116,7 +1115,7 @@ class PubDetail(generics.RetrieveAPIView):
         super(PubDetail, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
-        return Pub.objects.all()
+        return Pub.objects.filter(pendingApproval = False, pendingApprovalRejected = False)
 
 
 class GuinnessList(generics.ListAPIView):
@@ -1148,7 +1147,7 @@ class GuinnessDetail(generics.RetrieveAPIView):
         super(GuinnessDetail, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
-        return Guinness.objects.all()
+        return Guinness.objects.filter(approved = True)
 
 
 class StatisticsList(generics.ListAPIView):
@@ -1167,33 +1166,33 @@ class StatisticsList(generics.ListAPIView):
         return StatisticsSingleton.objects.filter(id = 1)
 
 
-class ContributionsList(generics.ListAPIView):
+class ContributorList(generics.ListAPIView):
 
-    serializer_class   = GuindexUserSerializer
-    permission_classes = (permissions.AllowAny, )
-
-    def __init__(self, *args, **kwargs):
-
-        logger.error("Received ContributionsList request")
-
-        # Access base class constructor
-        super(ContributionsList, self).__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        return GuindexUser.objects.all()
-
-
-class ContributionsDetail(generics.RetrieveAPIView):
-
-    serializer_class   = GuindexUserSerializer
-    permission_classes = (permissions.AllowAny, )
+    serializer_class   = ContributorSerializer
+    permission_classes = (permissions.IsAuthenticated, )
 
     def __init__(self, *args, **kwargs):
 
-        logger.error("Received ContributionsDetail request")
+        logger.error("Received ContributorList request")
 
         # Access base class constructor
-        super(ContributionsDetail, self).__init__(*args, **kwargs)
+        super(ContributorList, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
-        return GuindexUser.objects.all()
+        return UserProfile.objects.all()
+
+
+class ContributorDetail(generics.RetrieveAPIView):
+
+    serializer_class   = ContributorSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def __init__(self, *args, **kwargs):
+
+        logger.error("Received ContributorDetail request")
+
+        # Access base class constructor
+        super(ContributorDetail, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        return UserProfile.objects.all()

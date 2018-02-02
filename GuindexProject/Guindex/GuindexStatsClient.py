@@ -28,7 +28,7 @@ class GuindexStatsClient(GuindexClient):
         # Create New Pub Stats Request message
         guindex_stats_msg = GuindexStatsIf.GuindexStatsIfMessage()
 
-        guindex_stats_msg.newGuinnessStatsRequest.pubId = pub.id
+        guindex_stats_msg.newPubStatsRequest.pubId = pub.id
 
         try:
             message_string = guindex_stats_msg.SerializeToString()

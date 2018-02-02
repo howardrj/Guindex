@@ -73,7 +73,7 @@ class NewPubForm(ModelForm):
 
             logger.error("Latitude is not specific enough - %s", latitude)
 
-            msg = "Latitude is not specific enough. Please use 7 decimal places"
+            msg = "Latitude is not specific enough. Please use %d decimal places" % GuindexParameters.GPS_COORD_MIN_DECIMAL_PLACES
             self.add_error('latitude', msg)
 
             return self.cleaned_data
@@ -82,7 +82,7 @@ class NewPubForm(ModelForm):
 
             logger.error("Longitude is not specific enough - %s", longitude)
 
-            msg = "Longitude is not specific enough. Please use 7 decimal places"
+            msg = "Longitude is not specific enough. Please use %d decimal places" % GuindexParameters.GPS_COORD_MIN_DECIMAL_PLACES
             self.add_error('longitude', msg)
 
             return self.cleaned_data

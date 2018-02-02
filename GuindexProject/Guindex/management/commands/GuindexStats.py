@@ -5,9 +5,9 @@ from twisted.internet import reactor
 
 from django.core.management.base import BaseCommand
 
-from Guindex.models import Pub, Guinness, StatisticsSingleton, UserContributionsSingleton
+from Guindex.models import Pub, Guinness, StatisticsSingleton
 from Guindex.GuindexParameters import GuindexParameters
-from Gindex import GuindexUtils
+from Guindex import GuindexUtils
 from Guindex.GuindexStatsServer import GuindexStatsServerFactory
 
 from UserProfile.models import UserProfile
@@ -26,8 +26,7 @@ class Command(BaseCommand):
 
             logger.info("***** Calculating statistics and user contributions on startup *****")
 
-            self.stats              = StatisticsSingleton.load()
-            self.user_contributions = UserContributionsSingleton.load()
+            self.stats = StatisticsSingleton.load()
 
             # Note: Order of function calls is important
             # Be careful if you shuffle them around
@@ -92,12 +91,6 @@ class Command(BaseCommand):
             except:
                 logger.error("Failed to calculate user contributions")
 
-            try:
-                logger.info("Saving user contributions")
-                self.user_contributions.save()
-            except:
-                logger.error("Failed to save user contributions")
-
             logger.info("Creating Guindex stats server")
 
             reactor.listenTCP(GuindexParameters.STATS_LISTEN_PORT,
@@ -111,6 +104,9 @@ class Command(BaseCommand):
             reactor.run()
 
     def gatherPubPrices(self):
+        """
+            Fill up prices list for each pub
+        """
 
         for pub in Pub.objects.all():
 
@@ -123,30 +119,39 @@ class Command(BaseCommand):
             pub.save()
 
     def calculateNumberOfPubs(self):
+        """
+            Counts approved, open pubs
+        """
 
-        # Only returns approved, open pubs
         self.stats.pubsInDb = len(Pub.objects.filter(closed = False,
                                                      pendingApproval = False,
                                                      pendingApprovalRejected = False))
 
     def calculatePubsWithPrices(self):
+        """
+            Store approved, open pubs that are serving Guinness
+            and have at least one verified price
+        """
 
         self.stats.pubsWithPrices.clear()
 
         for pub in Pub.objects.filter(closed = False,
                                       pendingApproval = False,
                                       pendingApprovalRejected = False):
-        
+
             if pub.getLastVerifiedGuinness() and pub.servingGuinness:
                 self.stats.pubsWithPrices.add(pub)
 
     def calculateAveragePrice(self):
+        """
+            Calculate average price from pubs in pubsWithPrices list
+        """
 
         sum_total = 0
 
         pubs_with_prices     = self.stats.pubsWithPrices.all()
         pubs_with_prices_len = len(pubs_with_prices)
- 
+
         for pub in pubs_with_prices:
 
             sum_total = sum_total + pub.getLastVerifiedGuinness().price
@@ -154,6 +159,9 @@ class Command(BaseCommand):
         self.stats.averagePrice = sum_total / pubs_with_prices_len if pubs_with_prices_len else 0
 
     def calculateStandardDeviation(self):
+        """
+            Calculate standard deviation from pubs in pubsWithPrices list
+        """
 
         if self.stats.averagePrice == 0:
             self.stats.standardDeviation = 0
@@ -168,7 +176,7 @@ class Command(BaseCommand):
 
             variance_tmp = variance_tmp + math.pow((pub.getLastVerifiedGuinness().price - self.stats.averagePrice), 2)
 
-        variance = Decimal(variance_tmp) / visited_pubs
+        variance = Decimal(variance_tmp) / pubs_with_prices_len
 
         self.stats.standardDeviation = variance.sqrt()
 
@@ -186,9 +194,13 @@ class Command(BaseCommand):
             self.stats.percentageVisited = 0
             return
 
-        return ((len(self.stats.pubsWithPrices) + self.stats.notServingGuinness) / Decimal(self.stats.pubsInDb)) * 100
+        self.stats.percentageVisited = 100 * (len(self.stats.pubsWithPrices.all()) + self.stats.notServingGuinness) / \
+                                       Decimal(self.stats.pubsInDb)
 
     def calculateUserContributions(self):
+        """
+            Populate all GuindexUser fields for each UserProfile
+        """
 
         logger.info("Calculating User Contributions")
 

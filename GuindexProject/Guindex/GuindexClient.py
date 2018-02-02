@@ -39,7 +39,7 @@ class GuindexClient():
             (prepending two byte length header by default)
         """
 
-        self.logger.debug("Sending message to %s server - %s", (self.serverName, ":".join("{:02x}".format(ord(c)) for c in message)))
+        self.logger.debug("Sending message to %s server - %s", self.serverName, ":".join("{:02x}".format(ord(c)) for c in message))
 
         if prependTwoByteHeader:
 

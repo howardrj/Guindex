@@ -60,6 +60,12 @@ class Pub(models.Model):
 
         return None
 
+    def getApprovedPrices(self):
+        """
+            Return list of prices that have been approved
+        """
+
+        return self.prices.filter(approved = True)
 
 class Guinness(models.Model):
 
