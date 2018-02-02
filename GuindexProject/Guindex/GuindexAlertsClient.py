@@ -7,6 +7,12 @@ from Guindex import GuindexAlertsIf_pb2 as GuindexAlertsIf
 
 class GuindexAlertsClient(GuindexClient):
 
+    def __init__(self, logger, serverIp, serverPort):
+
+        logger.debug("Creating GuindexAlerts client")
+
+        super(GuindexAlertsClient, self).__init__(logger, 'Alerts', serverIp, serverPort)
+
     def sendNewGuinnessAlertRequest(self, guinness, httpRequest):
 
         self.logger.info("Sending New Guinnness Alert Request")

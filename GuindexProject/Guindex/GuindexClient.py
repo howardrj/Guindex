@@ -1,7 +1,7 @@
 import socket
 
 
-class GuindexClient():
+class GuindexClient(object):
 
     def __init__(self, logger, serverName, serverIp, serverPort):
 

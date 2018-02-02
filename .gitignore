@@ -2,3 +2,4 @@
 *.sqlite3
 *.swp
 *pb2.py
+secrets.py

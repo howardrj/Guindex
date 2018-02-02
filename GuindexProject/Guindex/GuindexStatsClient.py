@@ -4,6 +4,12 @@ from Guindex import GuindexStatsIf_pb2 as GuindexStatsIf
 
 class GuindexStatsClient(GuindexClient):
 
+    def __init__(self, logger, serverIp, serverPort):
+
+        logger.debug("Creating GuindexStats client")
+
+        super(GuindexStatsClient, self).__init__(logger, 'Stats', serverIp, serverPort)
+
     def sendNewGuinnessStatsRequest(self, guinness):
 
         self.logger.info("Sending New Guinnness Stats Request")

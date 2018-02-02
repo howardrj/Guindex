@@ -387,8 +387,6 @@ class GuindexStatsServer(Int16StringReceiver):
 
         variance_tmp = 0
 
-        # Assume pubsWithPrices has been updated at this point
-
         pubs_with_prices     = self.stats.pubsWithPrices.all()
         pubs_with_prices_len = len(pubs_with_prices)
 
