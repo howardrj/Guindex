@@ -1179,7 +1179,7 @@ class ContributorList(generics.ListAPIView):
         super(ContributorList, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
-        return UserProfile.objects.all()
+        return UserProfile.objects.exclude(guindexuser__isnull = True)
 
 
 class ContributorDetail(generics.RetrieveAPIView):
@@ -1195,4 +1195,4 @@ class ContributorDetail(generics.RetrieveAPIView):
         super(ContributorDetail, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
-        return UserProfile.objects.all()
+        return UserProfile.objects.exclude(guindexuser__isnull = True)
