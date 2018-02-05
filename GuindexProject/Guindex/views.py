@@ -788,9 +788,21 @@ def handleNewPriceDecision(contributionId, contributionApproved, reason = None):
                                             GuindexParameters.ALERTS_LISTEN_IP,
                                             GuindexParameters.ALERTS_LISTEN_PORT)
 
-        alerts_client.sendNewGuinnessDecisionAlertRequest(guinness)
+        alerts_client.sendNewGuinnessDecisionAlertRequest(guinness, reason)
     except:
         logger.error("Failed to send New Guinness Decision Alert Request")
+
+    if not contributionApproved:
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    try:
+        stats_client = GuindexStatsClient(logger,
+                                          GuindexParameters.STATS_LISTEN_IP,
+                                          GuindexParameters.STATS_LISTEN_PORT)
+
+        stats_client.sendNewGuinnessStatsRequest(guinness)
+    except:
+        logger.error("Failed to send New Guinness Stats Request")
 
     return HttpResponse(json.dumps({}), content_type="application/json")
 
@@ -832,9 +844,21 @@ def handleNewPubDecision(contributionId, contributionApproved, reason = None):
                                             GuindexParameters.ALERTS_LISTEN_IP,
                                             GuindexParameters.ALERTS_LISTEN_PORT)
 
-        alerts_client.sendNewPubDecisionAlertRequest(pub)
+        alerts_client.sendNewPubDecisionAlertRequest(pub, reason)
     except:
         logger.error("Failed to send New Pub Decision Alert Request")
+
+    if not contributionApproved:
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    try:
+        stats_client = GuindexStatsClient(logger,
+                                          GuindexParameters.STATS_LISTEN_IP,
+                                          GuindexParameters.STATS_LISTEN_PORT)
+
+        stats_client.sendNewPubStatsRequest(pub)
+    except:
+        logger.error("Failed to send New Pub Stats Request")
 
     return HttpResponse(json.dumps({}), content_type="application/json")
 
@@ -876,9 +900,21 @@ def handlePubClosureDecision(contributionId, contributionApproved, reason = None
                                             GuindexParameters.ALERTS_LISTEN_IP,
                                             GuindexParameters.ALERTS_LISTEN_PORT)
 
-        alerts_client.sendPubClosedDecisionAlertRequest(pub)
+        alerts_client.sendPubClosedDecisionAlertRequest(pub, reason)
     except:
         logger.error("Failed to send Pub Closed Decision Alert Request")
+
+    if not contributionApproved:
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    try:
+        stats_client = GuindexStatsClient(logger,
+                                          GuindexParameters.STATS_LISTEN_IP,
+                                          GuindexParameters.STATS_LISTEN_PORT)
+
+        stats_client.sendPubClosedStatsRequest(pub)
+    except:
+        logger.error("Failed to send Pub Closed Stats Request")
 
     return HttpResponse(json.dumps({}), content_type="application/json")
 
@@ -920,9 +956,21 @@ def handlePubNotServingGuinnessDecision(contributionId, contributionApproved, re
                                             GuindexParameters.ALERTS_LISTEN_IP,
                                             GuindexParameters.ALERTS_LISTEN_PORT)
 
-        alerts_client.sendPubNotServingGuinnessDecisionAlertRequest(pub)
+        alerts_client.sendPubNotServingGuinnessDecisionAlertRequest(pub, reason)
     except:
         logger.error("Failed to send Pub Not Serving Guinness Decision Alert Request")
+
+    if not contributionApproved:
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+    try:
+        stats_client = GuindexStatsClient(logger,
+                                          GuindexParameters.STATS_LISTEN_IP,
+                                          GuindexParameters.STATS_LISTEN_PORT)
+
+        stats_client.sendPubNotServingGuinnessStatsRequest(pub)
+    except:
+        logger.error("Failed to send Pub Not Serving Guinness Stats Request")
 
     return HttpResponse(json.dumps({}), content_type="application/json")
 

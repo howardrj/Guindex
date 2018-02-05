@@ -116,7 +116,7 @@ class GuindexStatsServer(Int16StringReceiver):
             self.logger.error("Failed to adjust average price")
 
         try:
-            self.adjustStandardDeviation(guinness)
+            self.adjustStandardDeviation()
         except:
             self.logger.error("Failed to adjust standard deviation")
 
@@ -190,6 +190,11 @@ class GuindexStatsServer(Int16StringReceiver):
         except:
             self.logger.error("Failed to adjust average price")
 
+        try:
+            self.adjustStandardDeviation()
+        except:
+            self.logger.error("Failed to adjust standard deviation")
+
     def _handlePubNotServingGuinnessStatsRequest(self, message):
 
         self.logger.info("Received Pub Not Serving Guinness Stats Request")
@@ -224,6 +229,11 @@ class GuindexStatsServer(Int16StringReceiver):
             self.adjustAveragePrice(pub) # In case where pub previously served Guinness
         except:
             self.logger.error("Failed to adjust average price")
+
+        try:
+            self.adjustStandardDeviation()
+        except:
+            self.logger.error("Failed to adjust standard deviation")
 
     def adjustPubsWithPrices(self, guindexObject):
 
@@ -276,10 +286,15 @@ class GuindexStatsServer(Int16StringReceiver):
 
             # Assume pubsInDb has already been incremented at this point
 
-            if not pub.servingGuinness: # Pub was marked as not serving Guinness
+            if not pub.servingGuinness: # Pub was marked as not serving Guinness and doesn't have price
 
-                self.logger.debug("Pub marked as not serving Guinness, incrementing percentage of pubs visited")
-                self.stats.percentageVisited = self.stats.percentageVisited + (100 / Decimal(self.stats.pubsInDb))
+                if not pub.getLastVerifiedGuinness():
+
+                    self.logger.debug("Pub marked as not serving Guinness, incrementing percentage of pubs visited")
+                    self.stats.percentageVisited = self.stats.percentageVisited + (100 / Decimal(self.stats.pubsInDb))
+
+                else:
+                    self.logger.debug("Pub had already been visited. No adjustments needed")
 
             elif pub.closed:
                 self.logger.debug("Pub closed, decrementing percentage of pubs visited")
@@ -314,9 +329,14 @@ class GuindexStatsServer(Int16StringReceiver):
 
                 self.logger.debug("This is the first price added for this pub")
 
-                inverse_average = 1 / self.stats.averagePrice
-
                 # Assume pubsWithPrices has been updated at this point
+
+                # If the first price has just been added
+                if len(self.stats.pubsWithPrices.all()) == 1:
+                    self.stats.averagePrice = self.stats.pubsWithPrices.all()[0].getLastVerifiedGuinness().price
+                    return
+
+                inverse_average = 1 / self.stats.averagePrice
 
                 old_num_pubs_with_prices = len(self.stats.pubsWithPrices.all()) - 1
                 new_num_pubs_with_prices = old_num_pubs_with_prices + 1
@@ -358,11 +378,17 @@ class GuindexStatsServer(Int16StringReceiver):
                 self.logger.debug("Pub had no verified prices. No need to adjust average price")
                 return
 
+            # If the closed/no serving Guinness pub was the only price
+            if not len(self.stats.pubsWithPrices.all()):
+                self.logger.debug("Only registered price belonged to this pub. Setting average price to 0")
+                self.stats.averagePrice = 0
+                return
+
             # Assume pubsWithPrices has been updated at this point
             inverse_average = 1 / self.stats.averagePrice
 
-            old_num_pubs_with_prices = len(self.stats.pubsWithPrices.all()) - 1
-            new_num_pubs_with_prices = old_num_pubs_with_prices + 1
+            old_num_pubs_with_prices = len(self.stats.pubsWithPrices.all()) + 1
+            new_num_pubs_with_prices = old_num_pubs_with_prices - 1
 
             last_price = pub.getLastVerifiedGuinness().price
 
@@ -374,12 +400,13 @@ class GuindexStatsServer(Int16StringReceiver):
             self.logger.error("Invalid object type")
             raise Exception("Invalid object type")
 
-    def adjustStandardDeviation(self, guinness):
+    def adjustStandardDeviation(self):
 
         self.logger.info("Adjusting standard deviation")
 
         # TODO Optimize this so we don't have to fully calculate it again
         # Assume pubsWithPrices has been populated at this point
+        # aand average price has been updated
 
         if self.stats.averagePrice == 0:
             self.stats.standardDeviation = 0

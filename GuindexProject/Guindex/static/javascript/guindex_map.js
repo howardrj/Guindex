@@ -112,7 +112,7 @@ function searchFunction(marker) {
 var getPints = function (pubs, guindexMap) {
 
     var request = new XMLHttpRequest();
-    request.open('GET', 'https://guindex.ie/guinness/', true); 
+    request.open('GET', 'https://guindex.ie/api/guinness/', true); 
 
     request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
     request.setRequestHeader('Content-Type', 'application/json');

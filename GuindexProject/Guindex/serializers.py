@@ -72,8 +72,8 @@ class ContributorSerializer(serializers.ModelSerializer):
 
     username             = serializers.CharField(source = 'user.username', read_only = True)
     pubsVisited          = serializers.IntegerField(source = 'guindexuser.pubsVisited', read_only = True)
-    originalPrices       = serializers.IntegerField(source = 'guindexuser.currentVerifications', read_only = True)
-    currentVerifications = serializers.IntegerField(source = 'guindexuser.pubsVisited', read_only = True)
+    originalPrices       = serializers.IntegerField(source = 'guindexuser.originalPrices', read_only = True)
+    currentVerifications = serializers.IntegerField(source = 'guindexuser.currentVerifications', read_only = True)
 
     class Meta:
         model = UserProfile

@@ -27,6 +27,7 @@
         <script type="text/javascript" src="{% static "javascript/alert_switches.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/cookie.js" %}"> </script>
         <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"> </script>
+        <script type="text/javascript" src="{% static "javascript/contributors.js" %}" defer> </script>
         
         <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113016256-1"></script>
@@ -113,6 +114,13 @@
     </header>
 
     <body>
+
+        <script>
+            // Set useful global variables
+            g_userProfileId = {{ user_profile.id }}
+            g_username      = "{{ user_profile.user.username }}"
+
+        </script>
     
         {% if modal_to_display == "" %}
 

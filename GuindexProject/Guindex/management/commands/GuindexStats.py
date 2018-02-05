@@ -105,7 +105,7 @@ class Command(BaseCommand):
 
     def gatherPubPrices(self):
         """
-            Fill up prices list for each pub
+            Fill up prices list for each pub in database
         """
 
         for pub in Pub.objects.all():
@@ -221,13 +221,11 @@ class Command(BaseCommand):
             # for closed and pubs marked as no longer serving Guinness
             for pub in Pub.objects.all():
 
-                if pub.getLastVerifiedGuinness():
-                    if pub.getLastVerifiedGuinness().creator == user_profile:
-                        number_of_current_verifications = number_of_current_verifications + 1
+                if pub.getLastVerifiedGuinness() and pub.getLastVerifiedGuinness().creator == user_profile:
+                    number_of_current_verifications = number_of_current_verifications + 1
 
-                if pub.getFirstVerifiedGuinness():
-                    if pub.getFirstVerifiedGuinness().creator == user_profile:
-                        number_of_first_verifications = number_of_first_verifications + 1
+                if pub.getFirstVerifiedGuinness() and pub.getFirstVerifiedGuinness().creator == user_profile:
+                    number_of_first_verifications = number_of_first_verifications + 1
 
                 if len(Guinness.objects.filter(pub = pub, creator = user_profile, approved = True)):
                     number_of_pubs_visited = number_of_pubs_visited + 1
