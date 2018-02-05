@@ -46,14 +46,19 @@
 	    <div class="main_menu_bg">
                 <ul class="navbar" id="guindex_table_navbar">
                    <a href="../" class="class1">Overview</a>
+		   |
                    <a href="../map/" class="class1">Map</a>
+		   |
                     <a href="../statistics/" class="class1">Statistics</a>
+		   |
                     <a href="../analysis/" class="class1">Analysis</a>
+		   |
                     <a href="../info/" class="class1">About</a>
+		   |
                     <a href="/logout/" class="class1">Logout</a>
 
                     {% if pending_contributions and user_profile.user.is_staff %}
-
+		    |
                         <a href="/pending_contributions/" 
                            class="blink class1" 
                            id="pending_contributions_notification_link"> 
