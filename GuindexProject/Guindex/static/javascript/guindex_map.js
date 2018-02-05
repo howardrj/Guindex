@@ -152,7 +152,7 @@ var markPubs = function (pubs, pints, guindexMap)
         {
             for (var j = pints.length - 1; j >= 0; j--)
             {
-                if (pints[j]['pub'] === pubs[i]['id']) 
+                if (pints[j]['pubId'] === pubs[i]['id']) 
                 {
                     var visited       = true
                     var price_of_pint = "Price: " + pints[j].price;
