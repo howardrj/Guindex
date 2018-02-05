@@ -70,17 +70,18 @@ PRE LOADER
     margin:0;
 }
 .navbar{
-    width: 55%;
+    width: 58%;
     height: 100%;
     min-width: 3vw;
     min-height: 3vw;
     float:right;
     font-size: 2.12vw;
-    margin-top:2.15vw;
+    margin-top:3.2vw;
     padding: 0;
+    color:black;
 }
 .navbar li{
-    width: 55%;
+    width: 58%;
     height: 100%;
     min-width: 3vw;
     min-height: 3vw;
