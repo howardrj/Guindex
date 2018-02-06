@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import serializers
 
 from Guindex.models import Pub, Guinness, StatisticsSingleton
@@ -5,62 +7,72 @@ from Guindex.GuindexParameters import GuindexParameters
 
 from UserProfile.models import UserProfile
 
+logger = logging.getLogger(__name__)
+
 
 class GuinnessSerializer(serializers.ModelSerializer):
 
-    pubId               = serializers.PrimaryKeyRelatedField(source = 'pub.id', read_only = True)
-    pubName             = serializers.CharField(source = 'pub.name', read_only = True)
-    contributorId       = serializers.PrimaryKeyRelatedField(source = 'creator.id', read_only = True)
-    contributorUsername = serializers.CharField(source = 'creator.user.username', read_only = True)
+    creator      = serializers.PrimaryKeyRelatedField(read_only = True)
+    creationDate = serializers.DateTimeField(read_only = True)
 
     class Meta:
         model = Guinness
-        fields = ['id', 'price', 'creationDate', 'pubId', 'pubName', 'contributorId', 'contributorUsername']
+        fields = '__all__'
 
+    def onCreateSuccess(self, guinness, request):
 
-class ReducedGuinnessSerializer(serializers.ModelSerializer):
-    """
-        Guinness object serializer that omits pub info
-    """
+        logger.info("Successfully created new Guinness object")
 
-    contributorId   = serializers.PrimaryKeyRelatedField(source = 'creator.id', read_only = True)
-    contributorName = serializers.CharField(source = 'creator.user.username', read_only = True)
+    def onUpdateSuccess(self, guinness):
 
-    class Meta:
-        model = Guinness
-        fields = ['id', 'price', 'creationDate', 'contributorId', 'contributorName']
+        logger.info("Successfully updated Guinness object")
 
 
 class PubSerializer(serializers.ModelSerializer):
 
+    class ReducedGuinnessSerializer(serializers.ModelSerializer):
+        """
+            Guinness object serializer that omits pub info
+        """
+
+        class Meta:
+            model = Guinness
+            fields = ['id', 'price', 'creationDate', 'creator']
+
     # Returns approved Guinness prices associated with this pub
-    priceList = ReducedGuinnessSerializer(source = 'getApprovedPrices', many = True)
+    priceList = ReducedGuinnessSerializer(source = 'getApprovedPrices', many = True, read_only = True)
 
     class Meta:
         model = Pub
-        fields = ['id', 'name', 'longitude', 'latitude', 'closed', 'servingGuinness', 'priceList']
+        fields = '__all__'
 
+    def onCreateSuccess(self, pub, request):
 
-class ReducedPubSerializer(serializers.ModelSerializer):
-    """
-        Pub object serializer that only returns id, name and most recent price.
-        Only applied to pubs in pubsWithPrices list.
-    """
+        logger.info("Successfully created new Pub object")
 
-    # Return last verified price
-    price = serializers.DecimalField(decimal_places = 2,
-                                     max_digits = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
-                                     source = 'getLastVerifiedGuinness.price')
+    def onUpdateSuccess(self, pub):
 
-    class Meta:
-        model = Pub
-        fields = ['id', 'name', 'price']
-
+        logger.info("Successfully updated Pub object")
 
 class StatisticsSerializer(serializers.ModelSerializer):
 
+    class ReducedPubSerializer(serializers.ModelSerializer):
+        """
+            Pub object serializer that only returns id, name and most recent price.
+            Only applied to pubs in pubsWithPrices list.
+        """
+
+        # Return last verified price
+        price = serializers.DecimalField(decimal_places = GuindexParameters.GUINNESS_PRICE_DECIMAL_PLACES,
+                                         max_digits = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
+                                         source = 'getLastVerifiedGuinness.price')
+
+        class Meta:
+            model = Pub
+            fields = ['id', 'name', 'price']
+
     # Return this list and let javascript sort it
-    pubsWithPrices = ReducedPubSerializer(many = True)
+    pubsWithPrices = ReducedPubSerializer(many = True, read_only = True)
 
     class Meta:
         model = StatisticsSingleton

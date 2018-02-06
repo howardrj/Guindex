@@ -6,8 +6,9 @@ class GuindexParameters:
     MAX_PUB_NAME_LEN = 40
 
     # Guinness price parameters
-    MAX_GUINNESS_PRICE_DIGITS = 4
-    MIN_GUINNESS_PRICE        = '0.01'
+    MAX_GUINNESS_PRICE_DIGITS     = 4
+    MIN_GUINNESS_PRICE            = '0.01'
+    GUINNESS_PRICE_DECIMAL_PLACES = 2
 
     # Background script run periods
     DB_BACKUP_PERIOD = 84600 # In seconds
@@ -25,10 +26,12 @@ class GuindexParameters:
     # GPS Parameters
     GPS_COORD_DECIMAL_PLACES     = 7
     GPS_COORD_MIN_DECIMAL_PLACES = 6
+    GPS_COORD_MAX_DIGITS         = 10
     GPS_DUBLIN_MIN_LATITUDE      = '53.185403'
     GPS_DUBLIN_MAX_LATITUDE      = '53.635552'
     GPS_DUBLIN_MIN_LONGITUDE     = '-6.547498'
     GPS_DUBLIN_MAX_LONGITUDE     = '-6.042723'
+    MAP_LINK_STRING              = "https://www.google.ie/maps/place/%f,%f"
 
     @staticmethod
     def getParameters():
