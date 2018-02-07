@@ -13,6 +13,4 @@ urlpatterns = [
     url(r'^api/statistics/$', views.StatisticsList.as_view()), # API view
     url(r'^api/contributors/$', views.ContributorList.as_view()),
     url(r'^api/contributors/(?P<pk>[0-9]+)/$', views.ContributorDetail.as_view()),
-    # url(r'^api/pendingContributions/$', view.PendingContributionList.as_view()), # TODO Implement
-    # url(r'^api/pendingContributions/$(?P<pk>[0-9]+)/', view.PendingContributionDetail.as_view()), # TODO Implement
 ]

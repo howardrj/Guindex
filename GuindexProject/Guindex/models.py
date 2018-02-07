@@ -91,18 +91,8 @@ class Pub(models.Model):
         logger.debug("Saving Pub")
 
         if self.pk is None:
+
             self.firstSave()
-        else:
-            logger.debug("Not first save of Pub object")
-
-            # Check if we need to send events
-            saved_pub = Pub.objects.get(id = self.pk)
-
-            if not saved_pub.closed and self.closed:
-                self.closedSave()
-
-            if saved_pub.servingGuinness and not self.servingGuinness:
-                self.notServingGuinnessSave()
 
         super(Pub, self).save(*args, **kwargs)
 
@@ -113,69 +103,8 @@ class Pub(models.Model):
         # Set map link
         self.mapLink = GuindexParameters.MAP_LINK_STRING % (self.latitude, self.longitude)
 
-        # Set servingGuinness field to true since
-        # it is a BooleanField and rest framework sets it to false by default
-        self.servingGuinness = True
-
-        # Always set pub closed on creation
-        self.closed = False
-
         # Set pendingApproval field to True if user is not a staff member
-        self.pendingApproval = not self.pendingApprovalContributor.user.is_staff 
-
-    def closedSave(self):
-
-        logger.debug("Saving Pub after it has been marked as closed")
-
-        # Send alerts
-        try:
-            alerts_client = GuindexAlertsClient(logger,
-                                                GuindexParameters.ALERTS_LISTEN_IP,
-                                                GuindexParameters.ALERTS_LISTEN_PORT)
-            alerts_client.sendPubClosedAlertRequest(self)
-        except:
-            logger.error("Failed to send New Pub Alert Request")
-
-        # Update stats if necessary
-        if self.pendingApprovalContributor.user.is_staff:
-            self.pendingApproval = False
-            try:
-                stats_client = GuindexStatsClient(logger,
-                                                  GuindexParameters.STATS_LISTEN_IP,
-                                                  GuindexParameters.STATS_LISTEN_PORT)
-                stats_client.sendNewPubStatsRequest(self)
-            except:
-                logger.error("Failed to send New Pub Stats Request")
-        else:
-            logger.info("Not updating stats until contribution is approved")
-            self.pendingApproval = True
-
-    def notServingGuinnessSave(self):
-
-        logger.debug("Saving Pub after it has been marked as not serving Guinness")
-
-        # Send alerts
-        try:
-            alerts_client = GuindexAlertsClient(logger,
-                                                GuindexParameters.ALERTS_LISTEN_IP,
-                                                GuindexParameters.ALERTS_LISTEN_PORT)
-            alerts_client.sendNewPubAlertRequest(self)
-        except:
-            logger.error("Failed to send New Pub Alert Request")
-
-        # Update stats if necessary
-        if self.pendingApprovalContributor.user.is_staff:
-            self.pendingApproval = False
-            try:
-                stats_client = GuindexStatsClient(logger,
-                                                  GuindexParameters.STATS_LISTEN_IP,
-                                                  GuindexParameters.STATS_LISTEN_PORT)
-                stats_client.sendNewPubStatsRequest(self)
-            except:
-                logger.error("Failed to send New Pub Stats Request")
-        else:
-            logger.info("Not updating stats until contribution is approved")
-            self.pendingApproval = True
+        self.pendingApproval = not self.pendingApprovalContributor.user.is_staff
 
 
 class Guinness(models.Model):
@@ -183,7 +112,7 @@ class Guinness(models.Model):
     # API guarantees creator field needs to be set
     # Make it nullable so we get it from request object
     # and not as required payload argument
-    creator      = models.ForeignKey(UserProfile, 
+    creator      = models.ForeignKey(UserProfile,
                                      null    = True,
                                      blank   = True,
                                      default = None)
@@ -194,6 +123,9 @@ class Guinness(models.Model):
     pub          = models.ForeignKey(Pub)
     approved     = models.BooleanField(default = True)
     rejected     = models.BooleanField(default = False)
+    rejectReason = models.TextField(null    = True,
+                                    blank   = True,
+                                    default = "")
 
     def __unicode__(self):
 

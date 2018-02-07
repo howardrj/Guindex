@@ -50,65 +50,6 @@
                     <a href="../analysis/" class="class1">Analysis</a>
                     <a href="../info/" class="class1">About</a>
                     <a href="/logout/" class="class1">Logout</a>
-
-                    
-                    <!-- TODO Fix this to use API -->
-                    {% if pending_contributions and user_profile.user.is_staff %}
-
-                        <a href="/pending_contributions/" 
-                           class="blink class1" 
-                           id="pending_contributions_notification_link"> 
-                            Pending Contributions
-                        </a>
-
-                    {% elif user_profile.user.is_staff %}
-                        <a href="/pending_contributions/" 
-                           style="visibility:hidden"
-                           class="blink class1" 
-                           id="pending_contributions_notification_link"> 
-                            Pending Contributions
-                        </a>
-
-                        <script>
-                            
-                            var checkPendingContributions = function ()
-                            {
-                                // Check if there are pending contributions to check
-                                var request = new XMLHttpRequest();
-                                request.open('GET', '/are_pending_contributions/', true); 
-
-                                request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
-                                request.setRequestHeader('Content-Type', 'application/json');
-                                request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-                                request.send(null);
-
-                                request.onreadystatechange = processRequest;
-
-                                function processRequest()
-                                {
-                                    if (request.readyState == 4 && request.status == 200)
-                                    {
-                                        if (JSON.parse(request.responseText)['arePendingContributions'])
-                                        {
-                                            // If there are pending contributions, display notification
-                                            document.getElementById('pending_contributions_notification_link').style.visibility = 'visible';
-                                        }    
-                                        else
-                                        {
-                                            // If there are no pending contributions, hide notification
-                                            document.getElementById('pending_contributions_notification_link').style.visibility = 'hidden';
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Check pending contributions every 10 seconds
-                            setInterval(checkPendingContributions, 10000);
-
-                        </script>
-
-                    {% endif %}
                 </ul>
                 </div>
             </div>
@@ -130,7 +71,7 @@
                <div class="loading_text"> Loading Guindex ... </div>
            </div>
 
-        <div>
+        </div>
             
 
         <script>

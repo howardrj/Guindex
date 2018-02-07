@@ -23,7 +23,7 @@
 
         // Send asynchronous request to server to update setting
         var request = new XMLHttpRequest();
-        request.open('POST', '/guindex_alerts/', true); 
+        request.open('PATCH', '/api/contributors/' + g_userProfileId + '/, true); 
 
         request.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
         request.setRequestHeader('Content-Type', 'application/json');
@@ -32,7 +32,7 @@
         var using_email    = document.getElementById('email_checkbox').checked;
         var using_telegram = document.getElementById('telegram_checkbox').checked;
 
-        request.send(JSON.stringify({'usingEmail': using_email, 'usingTelegram': using_telegram})); 
+        request.send(JSON.stringify({'usingEmailAlerts': using_email, 'usingTelegramAlerts': using_telegram})); 
 
         request.onreadystatechange = processRequest;
 

@@ -78,66 +78,9 @@
                         <td> <span class=""> APPROVE/REJECT </span></td>
                     </tr>
 
-                    {% for guinness in pending_contributions.pending_prices %} 
-                    <tr>
+                    <!-- TODO Populate this with javascript -->
 
-                        <!-- PUB NAME CELL -->
-                        <td>
-                            <span class="payload">{{ guinness.pub }}</span>
-                        </td>
-
-                        <!-- PRICE CELL -->
-                        <td>
-                            &euro;<span class="payload">{{ guinness.price }}</span> 
-                        </td>
-
-                        <!-- CONTRIBUTOR CELL -->
-                        <td>
-                            <span class="payload">{{ guinness.contributor }}</span> 
-                        </td>
-
-                        <!-- TIMESTAMP CELL -->
-                        <td>
-                            <span class="payload">{{ guinness.creationDate|date:"D d M Y" }}</span> 
-                        </td>
-
-                        <td>
-                            <i class="fa fa-check approve_contribution_button needs_description" 
-                               data-description_text="Click to approve"
-                               aria-hidden="true"
-                               id="approve_pending_price_{{ guinness.id }}"
-                               data-contribution_id="{{ guinness.id }}"
-                               data-method="approve"
-                               data-contribution_type="pending_price">
-                            </i>
-                            <i class="fa fa-close needs_description dropdown_button" 
-                               data-description_text="Click to reject"
-                               aria-hidden="true"
-                               id="reject_pending_price_{{ guinness.id }}_button">
-                            </i>
-                            <div class="small_loader" style="width: 10px; height: 10px" id="pending_price_{{ guinness.id }}_loader"> </div>
-
-                            <div id="reject_pending_price_{{ guinness.id }}" class="dropdown-content">
-                                <textarea style="display:block" rows="5" cols="30" placeholder="Enter reason for rejection here (optional) ..."></textarea>
-                                <button class="approve_contribution_button"
-                                        style="margin: 10px;"
-                                        data-contribution_id="{{ guinness.id }}"
-                                        data-method="reject"
-                                        data-contribution_type="pending_price">
-                                    Submit 
-                                </button>
-                            </div>
-
-                        </td>
-
-                    </tr>
-                    {% endfor %}
-
-                    {% if pending_contributions.pending_prices|length > 0 %}
-                    <tr id="pending_prices_table_last_row" style="display:none" class="last_row">
-                    {% else %}
                     <tr id="pending_prices_table_last_row" class="last_row">
-                    {% endif %}
                         <td colspan="5" align="center"> No Pending New Price Submissions </td>
                     </tr>
                 </table>
@@ -160,61 +103,9 @@
                         <td> <span class=""> APPROVE/REJECT </span></td>
                     </tr>
 
-                    {% for pub in pending_contributions.pending_pubs %} 
-                    <tr>
+                    <!-- TODO Populate this with javascript -->
 
-                        <!-- PUB NAME CELL -->
-                        <td>
-                            <span class="payload">{{ pub.pub }}</span>
-                        </td>
-
-                        <!-- CONTRIBUTOR CELL -->
-                        <td>
-                            <span class="payload">{{ pub.contributor }}</span> 
-                        </td>
-
-                        <!-- TIMESTAMP CELL -->
-                        <td>
-                            <span class="payload">{{ pub.creationDate|date:"D d M Y" }}</span> 
-                        </td>
-
-                        <td>
-                            <i class="fa fa-check approve_contribution_button needs_description" 
-                               data-description_text="Click to approve"
-                               aria-hidden="true"
-                               id="approve_pending_pub_{{ pub.id }}"
-                               data-contribution_id="{{ pub.id }}"
-                               data-method="approve"
-                               data-contribution_type="pending_pub">
-                            </i>
-                            <i class="fa fa-close dropdown_button needs_description" 
-                               data-description_text="Click to reject"
-                               aria-hidden="true"
-                               id="reject_pending_pub_{{ pub.id }}_button">
-                            </i>
-                            <div class="small_loader" style="width: 10px; height: 10px" id="pending_pub_{{ pub.id }}_loader"> </div>
-
-                            <div id="reject_pending_pub_{{ pub.id }}" class="dropdown-content">
-                                <textarea style="display:block" rows="5" cols="30" placeholder="Enter reason for rejection here (optional) ..."></textarea>
-                                <button class="approve_contribution_button"
-                                        style="margin: 10px;"
-                                        data-contribution_id="{{ pub.id }}"
-                                        data-method="reject"
-                                        data-contribution_type="pending_pub">
-                                    Submit 
-                                </button>
-                            </div>
-
-                        </td>
-
-                    </tr>
-                    {% endfor %}
-
-                    {% if pending_contributions.pending_pubs|length > 0 %}
-                    <tr id="pending_pubs_table_last_row" style="display:none" class="last_row">
-                    {% else %}
                     <tr id="pending_pubs_table_last_row" class="last_row">
-                    {% endif %}
                         <td colspan="4" align="center"> No Pending New Pub Submissions </td>
                     </tr>
                 </table>
@@ -237,61 +128,9 @@
                         <td> <span class=""> APPROVE/REJECT </span></td>
                     </tr>
 
-                    {% for pub in pending_contributions.pending_closures %} 
-                    <tr>
+                    <!-- TODO Populate this with javascript -->
 
-                        <!-- PUB NAME CELL -->
-                        <td>
-                            <span class="payload">{{ pub.pub }}</span>
-                        </td>
-
-                        <!-- CONTRIBUTOR CELL -->
-                        <td>
-                            <span class="payload">{{ pub.contributor }}</span> 
-                        </td>
-
-                        <!-- TIMESTAMP CELL -->
-                        <td>
-                            <span class="payload">{{ pub.creationDate|date:"D d M Y" }}</span> 
-                        </td>
-
-                        <td>
-                            <i class="fa fa-check approve_contribution_button needs_description" 
-                               data-description_text="Click to approve"
-                               aria-hidden="true"
-                               id="approve_pending_closure_{{ pub.id }}"
-                               data-contribution_id="{{ pub.id }}"
-                               data-method="approve"
-                               data-contribution_type="pending_closure">
-                            </i>
-                            <i class="fa fa-close dropdown_button needs_description" 
-                               data-description_text="Click to reject"
-                               aria-hidden="true"
-                               id="reject_pending_closure_{{ pub.id }}_button">
-                            </i>
-                            <div class="small_loader" style="width: 10px; height: 10px" id="pending_closure_{{ pub.id }}_loader"> </div>
-
-                            <div id="reject_pending_closure_{{ pub.id }}" class="dropdown-content">
-                                <textarea style="display:block" rows="5" cols="30" placeholder="Enter reason for rejection here (optional) ..."></textarea>
-                                <button class="approve_contribution_button"
-                                        style="margin: 10px;"
-                                        data-contribution_id="{{ pub.id }}"
-                                        data-method="reject"
-                                        data-contribution_type="pending_closure">
-                                    Submit 
-                                </button>
-                            </div>
-
-                        </td>
-
-                    </tr>
-                    {% endfor %}
-
-                    {% if pending_contributions.pending_closures|length > 0 %}
-                    <tr id="pending_closures_table_last_row" style="display:none" class="last_row">
-                    {% else %}
                     <tr id="pending_closures_table_last_row" class="last_row">
-                    {% endif %}
                         <td colspan="4" align="center"> No Pending Closure Submissions </td>
                     </tr>
                 </table>
@@ -314,61 +153,9 @@
                         <td> <span class=""> APPROVE/REJECT </span></td>
                     </tr>
 
-                    {% for pub in pending_contributions.pending_not_serving_guinness %} 
-                    <tr>
+                    <!-- TODO Populate this with javascript -->
 
-                        <!-- PUB NAME CELL -->
-                        <td>
-                            <span class="payload">{{ pub.pub }}</span>
-                        </td>
-
-                        <!-- CONTRIBUTOR CELL -->
-                        <td>
-                            <span class="payload">{{ pub.contributor }}</span> 
-                        </td>
-
-                        <!-- TIMESTAMP CELL -->
-                        <td>
-                            <span class="payload">{{ pub.creationDate|date:"D d M Y" }}</span> 
-                        </td>
-
-                        <td>
-                            <i class="fa fa-check approve_contribution_button needs_description" 
-                               data-description_text="Click to approve"
-                               aria-hidden="true"
-                               id="approve_pending_not_serving_guinness_{{ pub.id }}"
-                               data-contribution_id="{{ pub.id }}"
-                               data-method="approve"
-                               data-contribution_type="pending_not_serving_guinness">
-                            </i>
-                            <i class="fa fa-close dropdown_button needs_description" 
-                               data-description_text="Click to reject"
-                               aria-hidden="true"
-                               id="reject_pending_not_serving_guinness_{{ pub.id }}_button">
-                            </i>
-                            <div class="small_loader" style="width: 10px; height: 10px" id="pending_not_serving_guinness_{{ pub.id }}_loader"> </div>
-
-                            <div id="reject_pending_not_serving_guinness_{{ pub.id }}" class="dropdown-content">
-                                <textarea style="display:block" rows="5" cols="30" placeholder="Enter reason for rejection here (optional) ..."></textarea>
-                                <button class="approve_contribution_button"
-                                        style="margin: 10px;"
-                                        data-contribution_id="{{ pub.id }}"
-                                        data-method="reject"
-                                        data-contribution_type="pending_not_serving_guinness">
-                                    Submit 
-                                </button>
-                            </div>
-
-                        </td>
-
-                    </tr>
-                    {% endfor %}
-
-                    {% if pending_contributions.pending_not_serving_guinness|length > 0 %}
-                    <tr id="pending_not_serving_table_last_row" style="display:none" class="last_row">
-                    {% else %}
                     <tr id="pending_not_serving_table_last_row" class="last_row">
-                    {% endif %}
                         <td colspan="4" align="center"> No Pending Not Serving Guinness Submissions </td>
                     </tr>
                 </table>

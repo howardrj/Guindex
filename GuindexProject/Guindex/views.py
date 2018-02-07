@@ -9,7 +9,10 @@ from rest_framework import generics
 from rest_framework import permissions
 
 from Guindex.forms import NewPubForm, NewGuinnessForm
-from Guindex.serializers import PubSerializer, GuinnessSerializer, StatisticsSerializer, ContributorSerializer
+from Guindex.serializers import PubGetSerializer, PubPostSerializer, PubPatchSerializer
+from Guindex.serializers import GuinnessGetSerializer, GuinnessPostSerializer, GuinnessPatchSerializer
+from Guindex.serializers import ContributorGetSerializer, ContributorPatchSerializer
+from Guindex.serializers import StatisticsSerializer
 from Guindex.models import Pub, Guinness, StatisticsSingleton
 from GuindexParameters import GuindexParameters
 import GuindexUtils
@@ -89,7 +92,6 @@ def pendingContributions(request):
 
 class PubList(generics.ListCreateAPIView):
 
-    serializer_class   = PubSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
 
     def __init__(self, *args, **kwargs):
@@ -115,7 +117,13 @@ class PubList(generics.ListCreateAPIView):
         pub = serializer.save(pendingApprovalContributor = user_profile)
 
         # On create success
-        serializer.onCreateSuccess(pub, self.request)
+        serializer.onCreateSuccess(pub, self.request, user_profile)
+
+    def get_serializer_class(self):
+
+        if self.request.method == 'POST':
+            return PubPostSerializer
+        return PubGetSerializer
 
     def get_queryset(self):
         return Pub.objects.filter(pendingApproval = False, pendingApprovalRejected = False)
@@ -123,7 +131,6 @@ class PubList(generics.ListCreateAPIView):
 
 class PubDetail(generics.RetrieveUpdateAPIView):
 
-    serializer_class   = PubSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     http_method_names  = ['get', 'patch'] # Disallow PUTS
 
@@ -145,11 +152,16 @@ class PubDetail(generics.RetrieveUpdateAPIView):
             logger.error("Could not retrieve UserProfile with user '%s'", self.request.user)
             raise ValidationError('Could not retrieve UserProfile from request')
 
-        # TODO Update this
-        pub = serializer.save(creator = user_profile)
+        pub = serializer.save()
 
-        # On update success
-        serializer.onUpdateSuccess(pub)
+        # On patch success
+        serializer.onPatchSuccess(pub, self.request, user_profile)
+
+    def get_serializer_class(self):
+
+        if self.request.method == 'PATCH':
+            return PubPatchSerializer
+        return PubGetSerializer
 
     def get_queryset(self):
         return Pub.objects.filter(pendingApproval = False, pendingApprovalRejected = False)
@@ -157,7 +169,6 @@ class PubDetail(generics.RetrieveUpdateAPIView):
 
 class GuinnessList(generics.ListCreateAPIView):
 
-    serializer_class   = GuinnessSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
 
     def __init__(self, *args, **kwargs):
@@ -183,16 +194,42 @@ class GuinnessList(generics.ListCreateAPIView):
         guinness = serializer.save(creator = user_profile)
 
         # On create success
-        serializer.onCreateSuccess(guinness, self.request)
+        serializer.onCreateSuccess(guinness, self.request, user_profile)
+
+    def get_serializer_class(self):
+
+        if self.request.method == 'POST':
+            return GuinnessPostSerializer
+        return GuinnessGetSerializer
 
     def get_queryset(self):
-        return Guinness.objects.filter(approved = True)
+        return Guinness.objects.all()
 
 
 class GuinnessDetail(generics.RetrieveUpdateAPIView):
+    """
+        Note: Only staff members can patch a Guinness object
+        i.e. permission class IsAdminUser
+    """
 
-    serializer_class   = GuinnessSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
+    class IsAdminOrReadOnly(permissions.IsAdminUser):
+        """
+            Custom permissions class that only allows admins
+            to perform non-safe methods but any user can read
+        """
+
+        def has_permission(self, request, view):
+
+            try:
+                view.userProfile = GuindexUtils.getUserProfileFromUser(request.user)
+                logger.debug("Found UserProfile %s with user '%s'", view.userProfile, request.user)
+            except:
+                logger.error("Could not retrieve UserProfile with user '%s'", request.user)
+                return False
+
+            return request.method in ['GET'] or view.userProfile.user.is_staff
+
+    permission_classes = (IsAdminOrReadOnly, )
     http_method_names  = ['get', 'patch'] # Disallow PUTS
 
     def __init__(self, *args, **kwargs):
@@ -206,21 +243,20 @@ class GuinnessDetail(generics.RetrieveUpdateAPIView):
 
         logger.info("Updating Guinness object")
 
-        try:
-            user_profile = GuindexUtils.getUserProfileFromUser(self.request.user)
-            logger.debug("Found UserProfile %s with user '%s'", user_profile, self.request.user)
-        except:
-            logger.error("Could not retrieve UserProfile with user '%s'", self.request.user)
-            raise ValidationError('Could not retrieve UserProfile from request')
-
-        # TODO Update this
-        guinness = serializer.save(creator = user_profile)
+        # UserProfile member is set in has_permission function
+        # Note: this won't save object yet, just returns updated object
+        guinness = serializer.save()
 
         # On update success
-        serializer.onUpdateSuccess(guinness)
+        serializer.onPatchSuccess(guinness, self.request, self.userProfile)
+
+    def get_serializer_class(self):
+        if self.request.method == 'PATCH':
+            return GuinnessPatchSerializer
+        return GuinnessGetSerializer
 
     def get_queryset(self):
-        return Guinness.objects.filter(approved = True)
+        return Guinness.objects.all()
 
 
 class StatisticsList(generics.ListAPIView):
@@ -241,7 +277,7 @@ class StatisticsList(generics.ListAPIView):
 
 class ContributorList(generics.ListAPIView):
 
-    serializer_class   = ContributorSerializer
+    serializer_class   = ContributorGetSerializer
     permission_classes = (permissions.IsAuthenticated, )
 
     def __init__(self, *args, **kwargs):
@@ -252,13 +288,39 @@ class ContributorList(generics.ListAPIView):
         super(ContributorList, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
-        return UserProfile.objects.exclude(guindexuser__isnull = True)
+        return UserProfile.objects.exclude(guindexuser__isnull = True).exclude(telegramuser__isnull = True)
 
 
 class ContributorDetail(generics.RetrieveUpdateAPIView):
+    """
+        A contributor can allow patch it's own UserProfile model.
+        The alert settings are the only editable fields
+    """
 
-    serializer_class   = ContributorSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    class IsContributorOrReadOnly(permissions.IsAdminUser):
+        """
+            Custom permissions class that only allows admins
+            to perform non-safe methods but any user can read
+        """
+
+        def has_permission(self, request, view):
+
+            # Get primary key used in request
+            try:
+                pk = int(request.path.split('/')[::-1][1])
+            except:
+                return False
+
+            try:
+                view.userProfile = GuindexUtils.getUserProfileFromUser(request.user)
+                logger.debug("Found UserProfile %s with user '%s'", view.userProfile, request.user)
+            except:
+                logger.error("Could not retrieve UserProfile with user '%s'", request.user)
+                return False
+
+            return request.method in ['GET'] or view.userProfile.id == pk
+
+    permission_classes = (IsContributorOrReadOnly, )
     http_method_names  = ['get', 'patch'] # Disallow PUTS
 
     def __init__(self, *args, **kwargs):
@@ -268,6 +330,10 @@ class ContributorDetail(generics.RetrieveUpdateAPIView):
         # Access base class constructor
         super(ContributorDetail, self).__init__(*args, **kwargs)
 
+    def get_serializer_class(self):
+        if self.request.method == 'PATCH':
+            return ContributorPatchSerializer
+        return ContributorGetSerializer
+
     def get_queryset(self):
-        # TODO Update this for protection against modifying other user settings
-        return UserProfile.objects.exclude(guindexuser__isnull = True)
+        return UserProfile.objects.exclude(guindexuser__isnull = True).exclude(telegramuser__isnull = True)
