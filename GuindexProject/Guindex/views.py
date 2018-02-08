@@ -126,7 +126,7 @@ class PubList(generics.ListCreateAPIView):
         return PubGetSerializer
 
     def get_queryset(self):
-        return Pub.objects.filter(pendingApproval = False, pendingApprovalRejected = False)
+        return Pub.objects.filter()
 
 
 class PubDetail(generics.RetrieveUpdateAPIView):
@@ -160,11 +160,14 @@ class PubDetail(generics.RetrieveUpdateAPIView):
     def get_serializer_class(self):
 
         if self.request.method == 'PATCH':
-            return PubPatchSerializer
+            if self.request.user.is_staff:
+                return PubPatchSerializer.StaffMemberSerializer
+            else:
+                return PubPatchSerializer.NormalUserSerializer
         return PubGetSerializer
 
     def get_queryset(self):
-        return Pub.objects.filter(pendingApproval = False, pendingApprovalRejected = False)
+        return Pub.objects.filter()
 
 
 class GuinnessList(generics.ListCreateAPIView):

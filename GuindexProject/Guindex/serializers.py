@@ -22,8 +22,7 @@ class GuinnessGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Guinness
-        fields = ['id', 'price' , 'pub', 'creator', 'creationDate', 
-                 'approved', 'rejected', 'rejectReason']
+        fields = '__all__'
 
 
 class GuinnessPostSerializer(serializers.ModelSerializer):
@@ -33,6 +32,17 @@ class GuinnessPostSerializer(serializers.ModelSerializer):
         # Note: Creator is extracted from request object,
         # not message payload so don't include it in fields
         fields = ['pub', 'price']
+
+    def validate(self, data):
+        """
+            Raise validation error if unknown keys are present
+        """
+        unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
+
+        if unknown_keys:
+            raise ValidationError("Got unknown fields: {}".format(unknown_keys))
+
+        return data
 
     def onCreateSuccess(self, guinness, request, userProfile):
 
@@ -70,6 +80,17 @@ class GuinnessPatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guinness
         fields = ['approved', 'rejectReason']
+
+    def validate(self, data):
+        """
+            Raise validation error if unknown keys are present
+        """
+        unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
+
+        if unknown_keys:
+            raise ValidationError("Got unknown fields: {}".format(unknown_keys))
+
+        return data
 
     def validate_approved(self, approved):
 
@@ -156,7 +177,7 @@ class PubGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pub
-        fields = ['id', 'name', 'latitude', 'longitude', 'closed', 'servingGuinness', 'prices']
+        fields = '__all__'
 
 
 class PubPostSerializer(serializers.ModelSerializer):
@@ -174,6 +195,17 @@ class PubPostSerializer(serializers.ModelSerializer):
         # Note: Creator is extracted from request object,
         # not message payload so don't include it in fields
         fields = ['name', 'latitude', 'longitude']
+
+    def validate(self, data):
+        """
+            Raise validation error if unknown keys are present
+        """
+        unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
+
+        if unknown_keys:
+            raise ValidationError("Got unknown fields: {}".format(unknown_keys))
+
+        return data
 
     def onCreateSuccess(self, pub, request, userProfile):
 
@@ -206,21 +238,60 @@ class PubPostSerializer(serializers.ModelSerializer):
             logger.error("Failed to send New Pub Stats Request")
 
 
-class PubPatchSerializer(serializers.ModelSerializer):
+class PubPatchSerializer:
 
-    class Meta:
-        model = Pub
-        # Fields we can patch
-        # 'Hidden' fields will e updated accordingly based on contributor permissions
-        fields = ['name', 'latitude', 'longitude', 'closed', 'servingGuinness']
+    class StaffMemberSerializer(serializers.ModelSerializer):
 
-    def onPatchSuccess(self, pub, request, userProfile):
+        class Meta:
+            model = Pub
+            # Below are the 'editable' fields for staff members
+            # 'Hidden' fields will be updated accordingly based on contributor permissions
+            fields = ['name', 'latitude', 'longitude', 'closed', 'servingGuinness', 
+                      'pendingApproval', 'pendingClosed', 'pendingNotServingGuinness', 'pendingApprovalRejectReason']
 
-        logger.info("Successfully patched Pub object")
+        def validate(self, data):
+            """
+                Raise validation error if unknown keys are present
+            """
+            unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
 
-        # TODO
-        # Adjust fields
-        # Send alerts and updated statistics
+            if unknown_keys:
+                raise ValidationError("Got unknown fields: {}".format(unknown_keys))
+
+            return data
+
+        def onPatchSuccess(self, pub, request, userProfile):
+
+            logger.info("Successfully patched Pub object")
+
+            # TODO
+            # Send alerts and updated statistics
+
+    class NormalUserSerializer(serializers.ModelSerializer):
+
+        class Meta:
+            model = Pub
+            # Below are the 'editable' fields for normal users
+            # 'Hidden' fields will be updated accordingly based on contributor permissions
+            fields = ['closed', 'servingGuinness']
+
+        def validate(self, data):
+            """
+                Raise validation error if unknown keys are present
+            """
+            unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
+
+            if unknown_keys:
+                raise ValidationError("Got unknown fields: {}".format(unknown_keys))
+
+            return data
+
+        def onPatchSuccess(self, pub, request, userProfile):
+
+            logger.info("Successfully patched Pub object")
+
+            # TODO
+            # Send alerts and updated statistics
 
 
 ##########################
@@ -275,6 +346,22 @@ class ContributorPatchSerializer(serializers.ModelSerializer):
 
     usingTelegramAlerts = serializers.BooleanField(source = 'telegramuser.usingTelegramAlerts')
 
+    class Meta:
+        model = UserProfile
+        # Can only patch alert settings
+        fields = ['usingEmailAlerts', 'usingTelegramAlerts']
+
+    def validate(self, data):
+        """
+            Raise validation error if unknown keys are present
+        """
+        unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
+
+        if unknown_keys:
+            raise ValidationError("Got unknown fields: {}".format(unknown_keys))
+
+        return data
+
     def save(self, **kwargs):
 
         if 'telegramuser' in self.validated_data:
@@ -290,8 +377,3 @@ class ContributorPatchSerializer(serializers.ModelSerializer):
             del self.validated_data['telegramuser']
 
         super(ContributorPatchSerializer, self).save(**kwargs)
-
-    class Meta:
-        model = UserProfile
-        # Can only patch alert settings
-        fields = ['usingEmailAlerts', 'usingTelegramAlerts']

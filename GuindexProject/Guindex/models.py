@@ -28,6 +28,9 @@ class Pub(models.Model):
     servingGuinness                      = models.BooleanField(default = True)
     pendingApproval                      = models.BooleanField(default = False) # In case non-staff member wants to add a pub
     pendingApprovalRejected              = models.BooleanField(default = False)
+    pendingApprovalRejectReason          = models.TextField(null    = True,
+                                                            blank   = False,
+                                                            default = None) 
     pendingApprovalContributor           = models.ForeignKey(UserProfile,
                                                              null         = True,
                                                              blank        = True,
