@@ -53,6 +53,10 @@ PRE LOADER
     margin: -2vw 0 0 -2vw;
 }
 
+/*Conditional Header settings for Desktops, Tablets and mobiles*/
+
+/*Desktops*/
+@media only screen and (min-width:961px){
 .main_menu_bg{
     background-image:url(../images/rsz_1guin1_2_recol2.png);
     background-repeat: no-repeat;
@@ -92,6 +96,97 @@ PRE LOADER
     margin:0;
 
 }
+}
+/*Tablets*/
+@media only screen and (min-width:401px) and (max-width:960px){
+.main_menu_bg{
+    background-image:url(../images/rsz_1guin1_2_recol2.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: top center;
+    background-color: #F5F0EB;
+    margin-bottom:-0px;
+    height: 31vw;
+    margin-top:-1vw;
+    top:0;
+    position:fixed;
+    z-index:99;
+    width:100%;
+    padding: 0;
+    margin:0;
+}
+.navbar{
+    width: 100%;
+    height: 100%;
+    min-width: 3vw;
+    min-height: 3vw;
+    float:right;
+    text-align:center;
+    font-size: 4vw;
+    margin-top:22vw;
+    padding: 0;
+    color:black;
+}
+.navbar li{
+    width: 58%;
+    height: 100%;
+    min-width: 3vw;
+    min-height: 3vw;
+    margin:0;
+    float:right;
+    font-size: 2.15vw;
+    padding: 0;
+    margin:0;
+
+}
+}
+/*Mobiles*/
+@media only screen and (max-width:400px){
+.main_menu_bg{
+    background-image:url(../images/rsz_1guin1_2_recol2.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: top center;
+    background-color: #F5F0EB;
+    margin-bottom:-0px;
+    height: 35vw;
+    margin-top:-1vw;
+    top:0;
+    position:fixed;
+    z-index:99;
+    width:100%;
+    padding: 0;
+    margin:0;
+}
+.navbar{
+    width: 100%;
+    height: 100%;
+    min-width: 3vw;
+    min-height: 3vw;
+    float:right;
+    text-align:center;
+    font-size: 5.5vw;
+    margin-top:22vw;
+    padding: 0;
+    color:black;
+}
+.navbar li{
+    width: 58%;
+    height: 100%;
+    min-width: 3vw;
+    min-height: 3vw;
+    margin:0;
+    float:right;
+    font-size: 2.15vw;
+    padding: 0;
+    margin:0;
+
+}
+}
+
+
+
+
 a.class1 {color:black;}
 a.class1:link {
     text-decoration:  none;
@@ -176,7 +271,7 @@ a.class2:hover {
     height: 100%;
     margin-right:5vw;
     margin-left:5vw;
-    margin-top:8vw;
+    margin-top:33vw;
     margin-bottom:0px;
     padding:0;
     position:absolute;
@@ -196,7 +291,7 @@ a.class2:hover {
     height: 100%;
     margin-right:5vw;
     margin-left:5vw;
-    margin-top:6.5vw;
+    margin-top:37vw;
     margin-bottom:100px;
     padding:0;
     position:absolute;
