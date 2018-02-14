@@ -1,14 +1,13 @@
 import logging
+import time
 import math
 from decimal import Decimal
-from twisted.internet import reactor
 
 from django.core.management.base import BaseCommand
 
 from Guindex.models import Pub, Guinness, StatisticsSingleton
 from Guindex.GuindexParameters import GuindexParameters
 from Guindex import GuindexUtils
-from Guindex.GuindexStatsServer import GuindexStatsServerFactory
 
 from UserProfile.models import UserProfile
 
@@ -24,7 +23,7 @@ class Command(BaseCommand):
 
         while True:
 
-            logger.info("***** Calculating statistics and user contributions on startup *****")
+            logger.info("***** Calculating statistics and user contributions *****")
 
             self.stats = StatisticsSingleton.load()
 
@@ -91,17 +90,9 @@ class Command(BaseCommand):
             except:
                 logger.error("Failed to calculate user contributions")
 
-            logger.info("Creating Guindex stats server")
+            logger.info("Sleeping for %s seconds", GuindexParameters.STATS_CALCULATION_PERIOD)
 
-            reactor.listenTCP(GuindexParameters.STATS_LISTEN_PORT,
-                              GuindexStatsServerFactory(logger),
-                              GuindexParameters.STATS_BACKLOG,
-                              GuindexParameters.STATS_LISTEN_IP)
-
-            logger.info("Created TCP server listening on %s:%d. Waiting for stats updates ...",
-                        GuindexParameters.STATS_LISTEN_IP, GuindexParameters.STATS_LISTEN_PORT)
-
-            reactor.run()
+            time.sleep(GuindexParameters.STATS_CALCULATION_PERIOD)
 
     def gatherPubPrices(self):
         """

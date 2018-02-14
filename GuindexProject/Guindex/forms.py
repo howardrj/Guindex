@@ -1,6 +1,5 @@
 import logging
 
-from django import forms
 from django.forms import ModelForm
 
 from Guindex.models import Pub, Guinness
@@ -12,6 +11,7 @@ class NewPubForm(ModelForm):
 
     class Meta:
         model = Pub
+        # Same as PubPostSerializer
         fields = ['name', 'latitude', 'longitude']
 
 
@@ -19,4 +19,5 @@ class NewGuinnessForm(ModelForm):
 
     class Meta:
         model = Guinness
+        # Same as GuinnessPostSerializer
         fields = ['pub', 'price']

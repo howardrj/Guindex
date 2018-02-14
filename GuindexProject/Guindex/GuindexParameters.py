@@ -10,8 +10,9 @@ class GuindexParameters:
     MIN_GUINNESS_PRICE            = '0.01'
     GUINNESS_PRICE_DECIMAL_PLACES = 2
 
-    # Background script run periods
-    DB_BACKUP_PERIOD = 84600 # In seconds
+    # Background script run periods (in seconds)
+    DB_BACKUP_PERIOD         = 84600
+    STATS_CALCULATION_PERIOD = 3600
 
     # Alerts Server Parameters
     ALERTS_LISTEN_IP   = '127.0.0.1'
@@ -32,6 +33,8 @@ class GuindexParameters:
     GPS_DUBLIN_MIN_LONGITUDE     = '-6.547498'
     GPS_DUBLIN_MAX_LONGITUDE     = '-6.042723'
     MAP_LINK_STRING              = "https://www.google.ie/maps/place/%f,%f"
+
+    REJECT_REASON_MAX_LEN = 100
 
     @staticmethod
     def getParameters():

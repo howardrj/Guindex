@@ -4,10 +4,10 @@ from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
 
-from Guindex.models import Pub, Guinness, StatisticsSingleton
+from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
+from Guindex.models import Guinness, GuinnessPendingCreate, GuinnessPendingPatch
+from Guindex.models import StatisticsSingleton
 from Guindex.GuindexParameters import GuindexParameters
-from Guindex.GuindexAlertsClient import GuindexAlertsClient
-from Guindex.GuindexStatsClient import GuindexStatsClient
 
 from UserProfile.models import UserProfile
 
@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 ########################
 # Guinness Serializers #
 ########################
+
 
 class GuinnessGetSerializer(serializers.ModelSerializer):
 
@@ -44,41 +45,79 @@ class GuinnessPostSerializer(serializers.ModelSerializer):
 
         return data
 
-    def onCreateSuccess(self, guinness, request, userProfile):
-
-        logger.info("Successfully created new Guinness object")
-
-        # Fields have been correctly set in firstSave at this point
-
-        # Send alerts
-        try:
-            alerts_client = GuindexAlertsClient(logger,
-                                                GuindexParameters.ALERTS_LISTEN_IP,
-                                                GuindexParameters.ALERTS_LISTEN_PORT)
-
-            alerts_client.sendNewGuinnessAlertRequest(guinness, request)
-        except:
-            logger.error("Failed to send New Guinness Alert Request")
-
-        if not userProfile.user.is_staff:
-            logger.info("Not updating stats until contribution is approved")
-            return
-
-        # Update statistics
-        try:
-            stats_client = GuindexStatsClient(logger,
-                                              GuindexParameters.STATS_LISTEN_IP,
-                                              GuindexParameters.STATS_LISTEN_PORT)
-
-            stats_client.sendNewGuinnessStatsRequest(guinness)
-        except:
-            logger.error("Failed to send New Guinness Stats Request")
-
 
 class GuinnessPatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Guinness
+        fields = ['pub', 'price']
+
+    def validate(self, data):
+        """
+            Raise validation error if unknown keys are present
+        """
+        unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
+
+        if unknown_keys:
+            raise ValidationError("Got unknown fields: {}".format(unknown_keys))
+
+        # Check there are no pending contributions for this Guinness
+        if len(GuinnessPendingPatch.objects.filter(clonedFrom = self.instance)):
+            raise ValidationError('There are already pending contributions for this Guinness')
+
+        return data
+
+    def save(self, **kwargs):
+
+        user_profile = kwargs['userProfile']
+
+        if user_profile.user.is_staff:
+            logger.debug("Contributor is a staff member. Saving changes")
+            super(GuinnessPatchSerializer, self).save(**kwargs)
+            return
+
+        logger.debug("Contributor is not a staff member. Creating GuinnessPendingPatch object")
+
+        guinness_pending_patch = GuinnessPendingPatch()
+
+        # Copy over original values of instance
+        for field in self.instance._meta.fields:
+            setattr(guinness_pending_patch, field.name, getattr(self.instance, field.name))
+
+        # Now put validated values on top
+        for value in self.validated_data.items():
+            setattr(guinness_pending_patch, value[0], value[1])
+
+        # Update relevant fields
+        guinness_pending_patch.pk         = None
+        guinness_pending_patch.creator    = user_profile
+        guinness_pending_patch.clonedFrom = self.instance
+        guinness_pending_patch.save()
+
+
+#####################################
+# GuinnessPendingCreate Serializers #
+#####################################
+
+
+class GuinnessPendingCreateGetSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GuinnessPendingCreate
+        fields = '__all__'
+
+
+class GuinnessPendingCreatePatchSerializer(serializers.ModelSerializer):
+
+    approved     = serializers.BooleanField(required   = True,
+                                            write_only = True)
+    rejectReason = serializers.CharField(max_length  = GuindexParameters.REJECT_REASON_MAX_LEN,
+                                         required    = False,
+                                         write_only  = True,
+                                         allow_blank = True)
+
+    class Meta:
+        model = GuinnessPendingCreate
         fields = ['approved', 'rejectReason']
 
     def validate(self, data):
@@ -92,71 +131,105 @@ class GuinnessPatchSerializer(serializers.ModelSerializer):
 
         return data
 
-    def validate_approved(self, approved):
+    def save(self, **kwargs):
 
-        logger.debug("Validating approved %s", approved)
-
-        if self.instance.approved: # Previous approve value
-            raise ValidationError("Cannot update an already approved Guinness")
-
-        if self.instance.rejected:
-            raise ValidationError("Cannot update a rejected Guinness")
-
-        # Sending approved = False updates Guinness to rejected
-        # and vice versa
-        self.instance.rejected = not approved
-
-        # Store approved value so we can use it in validate_rejectReason
-        self.approved = approved
-
-        return approved
-
-    def validate_rejectReason(self, rejectReason):
-
-        logger.debug("Validating rejectReason %s", rejectReason)
-
-        if not hasattr(self, 'approved'):
-            raise ValidationError("Cannot have rejectReason without approved field")
-
-        if self.approved:
-            raise ValidationError("Cannot include reject reason if Guinness submission is approved")
-
-        return rejectReason
-
-    def onPatchSuccess(self, guinness, request, userProfile):
-
-        logger.info("Successfully created new Guinness object")
-
-        # Fields have been correctly set in validate functions at this point
-
-        # Send alerts
         try:
-            alerts_client = GuindexAlertsClient(logger,
-                                                GuindexParameters.ALERTS_LISTEN_IP,
-                                                GuindexParameters.ALERTS_LISTEN_PORT)
-
-            alerts_client.sendNewGuinnessDecisionAlertRequest(guinness, guinness.rejectReason)
+            approved = self._validated_data['approved']
         except:
-            logger.error("Failed to send New Guinness Alert Request")
-
-        if not guinness.approved:
-            logger.info("Guinness was not approved. Not updating stats")
+            logger.error("No approved value included in request")
             return
 
-        # Update statistics
-        try:
-            stats_client = GuindexStatsClient(logger,
-                                              GuindexParameters.STATS_LISTEN_IP,
-                                              GuindexParameters.STATS_LISTEN_PORT)
+        if approved:
 
-            stats_client.sendNewGuinnessStatsRequest(guinness)
+            logger.info("GuinnessPendingCreate object was approved. Creating new Guinness object")
+
+            guinness = Guinness()
+
+            for field in self.instance._meta.fields:
+                setattr(guinness, field.name, getattr(self.instance, field.name))
+
+            # Update relevant fields
+            guinness.pk = None
+            guinness.save(createPendingCreate = False)
+
+        else:
+            logger.info("GuinnessPendingCreate object was not approved")
+
+        logger.info("Deleting pending contribution")
+        self.instance.delete()
+
+
+####################################
+# GuinnessPendingPatch Serializers #
+####################################
+
+
+class GuinnessPendingPatchGetSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GuinnessPendingPatch
+        fields = '__all__'
+
+
+class GuinnessPendingPatchPatchSerializer(serializers.ModelSerializer):
+
+    approved     = serializers.BooleanField(required   = True,
+                                            write_only = True)
+    rejectReason = serializers.CharField(max_length  = GuindexParameters.REJECT_REASON_MAX_LEN,
+                                         required    = False,
+                                         write_only  = True,
+                                         allow_blank = True)
+
+    class Meta:
+        model = GuinnessPendingPatch
+        fields = ['approved', 'rejectReason']
+
+    def validate(self, data):
+        """
+            Raise validation error if unknown keys are present
+        """
+        unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
+
+        if unknown_keys:
+            raise ValidationError("Got unknown fields: {}".format(unknown_keys))
+
+        return data
+
+    def save(self, **kwargs):
+
+        try:
+            approved = self._validated_data['approved']
         except:
-            logger.error("Failed to send New Guinness Stats Request")
+            logger.error("No approved value included in request")
+            return
+
+        if approved:
+
+            logger.info("GuinnessPendingPatch object was approved. Merging changes")
+
+            guinness = self.instance.clonedFrom
+
+            for field in self.instance._meta.fields:
+
+                # Don't merge these fields
+                if field.name in ['id', 'clonedFrom', 'creator', 'creationDate']:
+                    continue
+
+                setattr(guinness, field.name, getattr(self.instance, field.name))
+
+            guinness.save()
+
+        else:
+            logger.info("GuinnessPendingPatch object was not approved")
+
+        logger.info("Deleting pending contribution")
+        self.instance.delete()
 
 
 ###################
 # Pub Serializers #
 ###################
+
 
 class PubGetSerializer(serializers.ModelSerializer):
     """
@@ -207,96 +280,191 @@ class PubPostSerializer(serializers.ModelSerializer):
 
         return data
 
-    def onCreateSuccess(self, pub, request, userProfile):
 
-        logger.info("Successfully created new Pub object")
+class PubPatchSerializer(serializers.ModelSerializer):
 
-        # Fields have been correctly set in firstSave at this point
+    class Meta:
+        model = Pub
+        fields = ['name', 'latitude', 'longitude', 'closed', 'servingGuinness']
 
-        # Send alerts and updated statistics
-        try:
-            alerts_client = GuindexAlertsClient(logger,
-                                                GuindexParameters.ALERTS_LISTEN_IP,
-                                                GuindexParameters.ALERTS_LISTEN_PORT)
+    def validate(self, data):
+        """
+            Raise validation error if unknown keys are present
+        """
+        unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
 
-            alerts_client.sendNewPubAlertRequest(pub, request)
-        except:
-            logger.error("Failed to send New Pub Alert Request")
+        if unknown_keys:
+            raise ValidationError("Got unknown fields: {}".format(unknown_keys))
 
-        if not userProfile.user.is_staff:
-            logger.info("Not updating stats until contribution is approved")
+        # Check there are no pending contributions for this Pub
+        if len(PubPendingPatch.objects.filter(clonedFrom = self.instance)):
+            raise ValidationError('There are already pending contributions for this Pub')
+
+        return data
+
+    def save(self, **kwargs):
+
+        user_profile = kwargs['userProfile']
+
+        if user_profile.user.is_staff:
+            logger.debug("Contributor is a staff member. Saving changes")
+            super(PubPatchSerializer, self).save(**kwargs)
             return
 
-        # Update statistics
+        logger.debug("Contributor is not a staff member. Creating PubPendingPatch object")
+
+        pub_pending_patch = PubPendingPatch()
+
+        # Copy over original values of instance
+        for field in self.instance._meta.fields:
+            setattr(pub_pending_patch, field.name, getattr(self.instance, field.name))
+
+        # Now put validated values on top
+        for value in self.validated_data.items():
+            setattr(pub_pending_patch, value[0], value[1])
+
+        # Update relevant fields
+        pub_pending_patch.pk         = None
+        pub_pending_patch.creator    = user_profile
+        pub_pending_patch.clonedFrom = self.instance
+        pub_pending_patch.save()
+
+
+################################
+# PubPendingCreate Serializers #
+################################
+
+
+class PubPendingCreateGetSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PubPendingCreate
+        fields = '__all__'
+
+
+class PubPendingCreatePatchSerializer(serializers.ModelSerializer):
+
+    approved     = serializers.BooleanField(required   = True,
+                                            write_only = True)
+    rejectReason = serializers.CharField(max_length  = GuindexParameters.REJECT_REASON_MAX_LEN,
+                                         required    = False,
+                                         write_only  = True,
+                                         allow_blank = True)
+
+    class Meta:
+        model = PubPendingCreate
+        fields = ['approved', 'rejectReason']
+
+    def validate(self, data):
+        """
+            Raise validation error if unknown keys are present
+        """
+        unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
+
+        if unknown_keys:
+            raise ValidationError("Got unknown fields: {}".format(unknown_keys))
+
+        return data
+
+    def save(self, **kwargs):
+
         try:
-            stats_client = GuindexStatsClient(logger,
-                                              GuindexParameters.STATS_LISTEN_IP,
-                                              GuindexParameters.STATS_LISTEN_PORT)
-
-            stats_client.sendNewPubStatsRequest(pub)
+            approved = self._validated_data['approved']
         except:
-            logger.error("Failed to send New Pub Stats Request")
+            logger.error("No approved value included in request")
+            return
+
+        if approved:
+
+            logger.info("PubPendingCreate object was approved. Creating new Pub object")
+
+            pub = Pub()
+
+            for field in self.instance._meta.fields:
+                setattr(pub, field.name, getattr(self.instance, field.name))
+
+            # Update relevant fields
+            pub.pk = None
+            pub.save(createPendingCreate = False)
+
+        else:
+            logger.info("PubPendingCreate object was approved")
+
+        logger.info("Deleting pending contribution")
+        self.instance.delete()
 
 
-class PubPatchSerializer:
+###############################
+# PubPendingPatch Serializers #
+###############################
 
-    class StaffMemberSerializer(serializers.ModelSerializer):
 
-        class Meta:
-            model = Pub
-            # Below are the 'editable' fields for staff members
-            # 'Hidden' fields will be updated accordingly based on contributor permissions
-            fields = ['name', 'latitude', 'longitude', 'closed', 'servingGuinness', 
-                      'pendingApproval', 'pendingClosed', 'pendingNotServingGuinness', 'pendingApprovalRejectReason']
+class PubPendingPatchGetSerializer(serializers.ModelSerializer):
 
-        def validate(self, data):
-            """
-                Raise validation error if unknown keys are present
-            """
-            unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
+    class Meta:
+        model = PubPendingPatch
+        fields = '__all__'
 
-            if unknown_keys:
-                raise ValidationError("Got unknown fields: {}".format(unknown_keys))
 
-            return data
+class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
 
-        def onPatchSuccess(self, pub, request, userProfile):
+    approved     = serializers.BooleanField(required   = True,
+                                            write_only = True)
+    rejectReason = serializers.CharField(max_length  = GuindexParameters.REJECT_REASON_MAX_LEN,
+                                         required    = False,
+                                         write_only  = True,
+                                         allow_blank = True)
 
-            logger.info("Successfully patched Pub object")
+    class Meta:
+        model = PubPendingPatch
+        fields = ['approved', 'rejectReason']
 
-            # TODO
-            # Send alerts and updated statistics
+    def validate(self, data):
+        """
+            Raise validation error if unknown keys are present
+        """
+        unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
 
-    class NormalUserSerializer(serializers.ModelSerializer):
+        if unknown_keys:
+            raise ValidationError("Got unknown fields: {}".format(unknown_keys))
 
-        class Meta:
-            model = Pub
-            # Below are the 'editable' fields for normal users
-            # 'Hidden' fields will be updated accordingly based on contributor permissions
-            fields = ['closed', 'servingGuinness']
+        return data
 
-        def validate(self, data):
-            """
-                Raise validation error if unknown keys are present
-            """
-            unknown_keys = set(self.initial_data.keys()) - set(self.fields.keys())
+    def save(self, **kwargs):
 
-            if unknown_keys:
-                raise ValidationError("Got unknown fields: {}".format(unknown_keys))
+        try:
+            approved = self._validated_data['approved']
+        except:
+            logger.error("No approved value included in request")
+            return
 
-            return data
+        if approved:
 
-        def onPatchSuccess(self, pub, request, userProfile):
+            logger.info("PubPendingPatch object was approved. Merging changes")
 
-            logger.info("Successfully patched Pub object")
+            pub = self.instance.clonedFrom
 
-            # TODO
-            # Send alerts and updated statistics
+            for field in self.instance._meta.fields:
+
+                # Don't merge these fields
+                if field.name in ['id', 'clonedFrom', 'creator', 'creationDate']:
+                    continue
+
+                setattr(pub, field.name, getattr(self.instance, field.name))
+
+            pub.save()
+
+        else:
+            logger.info("GuinnessPendingCreate object was not approved")
+
+        logger.info("Deleting pending contribution")
+        self.instance.delete()
 
 
 ##########################
 # Statistics Serializers #
 ##########################
+
 
 class StatisticsSerializer(serializers.ModelSerializer):
 
@@ -327,6 +495,7 @@ class StatisticsSerializer(serializers.ModelSerializer):
 ###########################
 # Contributor Serializers #
 ###########################
+
 
 class ContributorGetSerializer(serializers.ModelSerializer):
 
