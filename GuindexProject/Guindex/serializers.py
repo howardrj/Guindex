@@ -1,6 +1,7 @@
 import logging
 
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from rest_framework import serializers
 
@@ -12,7 +13,6 @@ from Guindex.GuindexStatsClient import GuindexStatsClient
 from UserProfile.models import UserProfile
 
 logger = logging.getLogger(__name__)
-
 
 ########################
 # Guinness Serializers #
@@ -246,8 +246,10 @@ class PubPatchSerializer:
             model = Pub
             # Below are the 'editable' fields for staff members
             # 'Hidden' fields will be updated accordingly based on contributor permissions
-            fields = ['name', 'latitude', 'longitude', 'closed', 'servingGuinness', 
-                      'pendingApproval', 'pendingClosed', 'pendingNotServingGuinness', 'pendingApprovalRejectReason']
+            fields = ['name', 'latitude', 'longitude', 'closed', 'servingGuinness',
+                      'pendingApproval', 'pendingApprovalRejectReason',
+                      'pendingClosed', 'pendingClosedRejectReason',
+                      'pendingNotServingGuinness', 'pendingNotServingGuinnessRejectReason']
 
         def validate(self, data):
             """
@@ -267,7 +269,7 @@ class PubPatchSerializer:
             # TODO
             # Send alerts and updated statistics
 
-    class NormalUserSerializer(serializers.ModelSerializer):
+    class NonStaffMemberSerializer(serializers.ModelSerializer):
 
         class Meta:
             model = Pub
@@ -286,12 +288,99 @@ class PubPatchSerializer:
 
             return data
 
+        def validate_closed(self, closed):
+            """
+                Can only set closed = False if Pub is not already closed
+                or pendingClosed
+            """
+
+            logger.info("Validating closed %s", closed)
+
+            if not closed:
+                raise ValidationError("Can only close a Pub, not reopen")
+
+            if self.instance.closed:
+                raise ValidationError("Pub is already closed")
+
+            if self.instance.pendingClosed:
+                raise ValidationError("Pub is already pending closed")
+
+            self.instance.pendingClosed = True
+
+            # Set serializer member variable so we can check it in
+            # validate_servingGuinness
+            self.closedSet = True
+
+            return closed
+
+        def validate_servingGuinness(self, servingGuinness):
+
+            logger.info("Validating servingGuinness %s")
+
+            if hasattr(self, 'closedSet'):
+                raise ValidationError("Canot set closed and servingGuinness in same request")
+
+            # TODO Remove this requirement
+            if servingGuinness:
+                raise ValidationError("Can only mark a Pub as serving Guinness")
+
+            if not self.instance.servingGuinness:
+                raise ValidationError("Pub is already marked as not serving Guinness")
+
+            if self.instance.pendingNotServingGuniness:
+                raise ValidationError("Pub is already pending not serving Guinness")
+
+            self.instance.pendingNotServingGuinness = True
+
+            self.notServingGuinnessSet = True
+
+            return servingGuinness
+
         def onPatchSuccess(self, pub, request, userProfile):
 
             logger.info("Successfully patched Pub object")
 
-            # TODO
-            # Send alerts and updated statistics
+            if hasattr(self, 'closedSet') and pub.pendingClosed:
+
+                logger.info("Setting pending closed fields for %s", pub)
+
+                pub.pendingClosedContributor = userProfile
+                pub.pendingClosedTime        = timezone.now()
+                pub.closed                   = False # Undo from save
+
+                pub.save()
+
+                # Send alerts
+                # Don't update stats until submission is approved
+                try:
+                    alerts_client = GuindexAlertsClient(logger,
+                                                        GuindexParameters.ALERTS_LISTEN_IP,
+                                                        GuindexParameters.ALERTS_LISTEN_PORT)
+
+                    alerts_client.sendPubClosedAlertRequest(pub, request)
+                except:
+                    logger.error("Failed to send Pub Closure Alert Request")
+
+            elif hasattr(self, 'notServingGuinnessSet') and pub.pendingNotServingGuinness:
+
+                logger.info("Setting pending not serving Guinness fields for %s", pub)
+
+                pub.pendingNotServingGuinnessContributor = userProfile
+                pub.pendingNotServingGuinnessTime        = timezone.now()
+                pub.servingGuinness                      = True # Undo from save
+
+                pub.save()
+
+                # Send alerts
+                # Don't update stats until submission is approved
+                try:
+                    alerts_client = GuindexAlertsClient(logger,
+                                                        GuindexParameters.ALERTS_LISTEN_IP,
+                                                        GuindexParameters.ALERTS_LISTEN_PORT)
+
+                    alerts_client.sendPubNotServingGuinnessAlertRequest(pub, request)
+                except:
+                    logger.error("Failed to send Pub Not Serving Guinness Alert Request")
 
 
 ##########################

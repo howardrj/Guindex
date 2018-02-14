@@ -13,45 +13,45 @@ logger = logging.getLogger(__name__)
 
 class Pub(models.Model):
 
-    name                                 = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN,
-                                                            unique     = True)
-    longitude                            = models.DecimalField(decimal_places = GuindexParameters.GPS_COORD_DECIMAL_PLACES,
-                                                               max_digits     = GuindexParameters.GPS_COORD_MAX_DIGITS,
-                                                               validators     = [MinValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MIN_LONGITUDE)),
-                                                                                 MaxValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MAX_LONGITUDE))])
-    latitude                             = models.DecimalField(decimal_places = GuindexParameters.GPS_COORD_DECIMAL_PLACES,
-                                                               max_digits     = GuindexParameters.GPS_COORD_MAX_DIGITS,
-                                                               validators     = [MinValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MIN_LATITUDE)),
-                                                                                 MaxValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MAX_LATITUDE))])
-    mapLink                              = models.TextField(default = "") # Set this in save method
-    closed                               = models.BooleanField(default = False)
-    servingGuinness                      = models.BooleanField(default = True)
-    pendingApproval                      = models.BooleanField(default = False) # In case non-staff member wants to add a pub
-    pendingApprovalRejected              = models.BooleanField(default = False)
-    pendingApprovalRejectReason          = models.TextField(null    = True,
-                                                            blank   = False,
-                                                            default = None) 
-    pendingApprovalContributor           = models.ForeignKey(UserProfile,
-                                                             null         = True,
-                                                             blank        = True,
-                                                             related_name = 'pendingAdder',
-                                                             default      = None)
-    pendingApprovalTime                  = models.DateTimeField(auto_now_add = True)
-    pendingClosed                        = models.BooleanField(default = False) # In case non-staff member closes pub
-    pendingClosedContributor             = models.ForeignKey(UserProfile,
-                                                             null         = True,
-                                                             blank        = True,
-                                                             related_name = 'pendingCloser',
-                                                             default      = None)
-    pendingClosedTime                    = models.DateTimeField(auto_now_add = True)
-    pendingNotServingGuinness            = models.BooleanField(default = False) # In case non-staff member marks pub as not serving Guinness
-    pendingNotServingGuinnessContributor = models.ForeignKey(UserProfile,
-                                                             null         = True,
-                                                             blank        = True,
-                                                             related_name = 'pendingNotServingGuinnessMarker',
-                                                             default      = None)
-    pendingNotServingGuinnessTime        = models.DateTimeField(auto_now_add = True)
-    prices                               = models.ManyToManyField('Guinness',
+    name                                  = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN,
+                                                             unique     = True)
+    longitude                             = models.DecimalField(decimal_places = GuindexParameters.GPS_COORD_DECIMAL_PLACES,
+                                                                max_digits     = GuindexParameters.GPS_COORD_MAX_DIGITS,
+                                                                validators     = [MinValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MIN_LONGITUDE)),
+                                                                                  MaxValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MAX_LONGITUDE))])
+    latitude                              = models.DecimalField(decimal_places = GuindexParameters.GPS_COORD_DECIMAL_PLACES,
+                                                                max_digits     = GuindexParameters.GPS_COORD_MAX_DIGITS,
+                                                                validators     = [MinValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MIN_LATITUDE)),
+                                                                                  MaxValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MAX_LATITUDE))])
+    mapLink                               = models.TextField(default = "") # Set this in save method
+    closed                                = models.BooleanField(default = False)
+    servingGuinness                       = models.BooleanField(default = True)
+    pendingApproval                       = models.BooleanField(default = False) # In case non-staff member wants to add a pub
+    pendingApprovalRejected               = models.BooleanField(default = False)
+    pendingApprovalRejectReason           = models.TextField(null    = True,
+                                                             blank   = False,
+                                                             default = None) 
+    pendingApprovalContributor            = models.ForeignKey(UserProfile,
+                                                              null         = True,
+                                                              blank        = True,
+                                                              related_name = 'pendingAdder',
+                                                              default      = None)
+    pendingApprovalTime                   = models.DateTimeField(auto_now_add = True)
+    pendingClosed                         = models.BooleanField(default = False) # In case non-staff member closes pub
+    pendingClosedContributor              = models.ForeignKey(UserProfile,
+                                                              null         = True,
+                                                              blank        = True,
+                                                              related_name = 'pendingCloser',
+                                                              default      = None)
+    pendingClosedTime                     = models.DateTimeField(auto_now_add = True)
+    pendingNotServingGuinness             = models.BooleanField(default = False) # In case non-staff member marks pub as not serving Guinness
+    pendingNotServingGuinnessContributor  = models.ForeignKey(UserProfile,
+                                                              null         = True,
+                                                              blank        = True,
+                                                              related_name = 'pendingNotServingGuinnessMarker',
+                                                              default      = None)
+    pendingNotServingGuinnessTime         = models.DateTimeField(auto_now_add = True)
+    prices                                = models.ManyToManyField('Guinness',
                                                                   related_name = 'prices')
 
     def __unicode__(self):
@@ -165,8 +165,12 @@ class StatisticsSingleton(models.Model):
 
     pubsInDb           = models.IntegerField(default = 0)
     pubsWithPrices     = models.ManyToManyField(Pub) # Use this to return cheapest/most expensive pubs
-    averagePrice       = models.DecimalField(decimal_places = 2, max_digits = 6,  default = Decimal('0.0'))
-    standardDeviation  = models.DecimalField(decimal_places = 3, max_digits = 12, default = Decimal('0.0'))
+    averagePrice       = models.DecimalField(decimal_places = GuindexParameters.GUINNESS_PRICE_DECIMAL_PLACES,
+                                             max_digits     = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
+                                             default        = Decimal('0.0'))
+    standardDeviation  = models.DecimalField(decimal_places = GuindexParameters.GUINNESS_PRICE_DECIMAL_PLACES + 1,
+                                             max_digits     = 12,
+                                             default        = Decimal('0.0'))
     percentageVisited  = models.DecimalField(decimal_places = 2, max_digits = 5,  default = Decimal('0.0'))
     closedPubs         = models.IntegerField(default = 0)
     notServingGuinness = models.IntegerField(default = 0)

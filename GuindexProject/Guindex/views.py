@@ -163,7 +163,7 @@ class PubDetail(generics.RetrieveUpdateAPIView):
             if self.request.user.is_staff:
                 return PubPatchSerializer.StaffMemberSerializer
             else:
-                return PubPatchSerializer.NormalUserSerializer
+                return PubPatchSerializer.NonStaffMemberSerializer
         return PubGetSerializer
 
     def get_queryset(self):
