@@ -63,6 +63,9 @@ PRE LOADER
     background-size: contain;
     background-position: top left;
     background-color: #F5F0EB;
+    border-style: solid;
+    border-bottom-color: black;
+    border-bottom-width: 6px;
     margin-bottom:-0px;
     height: 8vw;
     margin-top:-1vw;
@@ -247,10 +250,10 @@ a.class2:hover {
 @media only screen and (min-width:961px){
 
 .centered {
-    width: 100%;
+    width: 70%;
     height: 100%;
     margin-right:5vw;
-    margin-left:5vw;
+    margin-left:18.5vw;
     margin-top:8vw;
     margin-bottom:0px;
 	padding-bottom:900px;
