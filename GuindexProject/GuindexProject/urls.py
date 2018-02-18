@@ -37,5 +37,12 @@ urlpatterns.extend(GuindexUrls.urlpatterns)
 # Append TopLevel views
 urlpatterns.extend(TopLevelUrls.urlpatterns)
 
+# Append HTTP API schema url
+schema_view = get_schema_view(title='Guindex HTTP API')
+urlpatterns.append(url(r'^api/schema/$', schema_view))
+
+# Append HTTP API docs url
+urlpatterns.append(url(r'^api/docs/', include_docs_urls(title='Guindex HTTP API')))
+
 # Append 404 view last
 urlpatterns.append(url(r'.*', error404))

@@ -38,6 +38,9 @@ def info(request):
 def links(request):    
     return render(request, 'links.html')
 
+def guindexMapFull(request):
+    return render(request, 'guindex_map_full.html')
+  
 def test(request):    
     return render(request, 'test.html')
 

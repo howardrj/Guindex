@@ -13,7 +13,7 @@ class GuindexAlertsClient(GuindexClient):
 
         super(GuindexAlertsClient, self).__init__(logger, 'Alerts', serverIp, serverPort)
 
-    def sendNewGuinnessAlertRequest(self, guinness, httpRequest):
+    def sendNewGuinnessAlertRequest(self, guinness, httpRequest = None):
 
         self.logger.info("Sending New Guinnness Alert Request")
 
@@ -28,7 +28,7 @@ class GuindexAlertsClient(GuindexClient):
         guindex_alerts_msg.newGuinnessAlertRequest.approved     = guinness.approved
         guindex_alerts_msg.newGuinnessAlertRequest.creationDate = '%s' % guinness.creationDate
 
-        if not guinness.approved: # Give url of pending contributions
+        if not guinness.approved and httpRequest: # Give url of pending contributions
             guindex_alerts_msg.newGuinnessAlertRequest.uri = UserProfileUtils.getProjectUri(httpRequest)
 
         try:
@@ -39,7 +39,7 @@ class GuindexAlertsClient(GuindexClient):
 
         self.sendMessage(message_string)
 
-    def sendNewPubAlertRequest(self, pub, httpRequest):
+    def sendNewPubAlertRequest(self, pub, httpRequest = None):
 
         self.logger.info("Sending New Pub Alert Request")
 
@@ -53,7 +53,7 @@ class GuindexAlertsClient(GuindexClient):
         guindex_alerts_msg.newPubAlertRequest.approved     = not pub.pendingApproval
         guindex_alerts_msg.newPubAlertRequest.creationDate = '%s' % pub.pendingApprovalTime
 
-        if pub.pendingApproval: # Give url of pending contributions
+        if pub.pendingApproval and httpRequest: # Give url of pending contributions
             guindex_alerts_msg.newPubAlertRequest.uri = UserProfileUtils.getProjectUri(httpRequest)
 
         try:
@@ -64,7 +64,7 @@ class GuindexAlertsClient(GuindexClient):
 
         self.sendMessage(message_string)
 
-    def sendPubClosedAlertRequest(self, pub, httpRequest):
+    def sendPubClosedAlertRequest(self, pub, httpRequest = None):
 
         self.logger.info("Sending Pub Closed Alert Request")
 
@@ -76,7 +76,7 @@ class GuindexAlertsClient(GuindexClient):
         guindex_alerts_msg.pubClosedAlertRequest.approved     = not pub.pendingClosed
         guindex_alerts_msg.pubClosedAlertRequest.creationDate = '%s' % pub.pendingClosedTime
 
-        if pub.pendingClosed: # Give url of pending contributions
+        if pub.pendingClosed and httpRequest: # Give url of pending contributions
             guindex_alerts_msg.pubClosedAlertRequest.uri = UserProfileUtils.getProjectUri(httpRequest)
 
         try:
@@ -87,7 +87,7 @@ class GuindexAlertsClient(GuindexClient):
 
         self.sendMessage(message_string)
 
-    def sendPubNotServingGuinnessAlertRequest(self, pub, httpRequest):
+    def sendPubNotServingGuinnessAlertRequest(self, pub, httpRequest = None):
 
         self.logger.info("Sending Pub Not Serving Guinness Alert Request")
 
@@ -99,7 +99,7 @@ class GuindexAlertsClient(GuindexClient):
         guindex_alerts_msg.pubNotServingGuinnessAlertRequest.approved     = not pub.pendingNotServingGuinness
         guindex_alerts_msg.pubNotServingGuinnessAlertRequest.creationDate = '%s' % pub.pendingNotServingGuinnessTime
 
-        if pub.pendingNotServingGuinness: # Give url of pending contributions
+        if pub.pendingNotServingGuinness and httpRequest: # Give url of pending contributions
             guindex_alerts_msg.pubNotServingGuinnessAlertRequest.uri = UserProfileUtils.getProjectUri(httpRequest)
 
         try:
