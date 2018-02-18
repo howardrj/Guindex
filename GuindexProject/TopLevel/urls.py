@@ -13,4 +13,7 @@ urlpatterns = [
     url(r'^analysis/travdrnk/$', views.travdrnk),
     url(r'^info/$', views.info),
     url(r'^links/$', views.links),
+    url(r'^test/$', views.test),
+    url(r'^tos/$', views.tos),
+    url(r'^privacy/$', views.privacy),
 ]

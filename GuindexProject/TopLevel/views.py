@@ -37,3 +37,12 @@ def info(request):
 
 def links(request):    
     return render(request, 'links.html')
+
+def test(request):    
+    return render(request, 'test.html')
+
+def tos(request):    
+    return render(request, 'tos.html')
+
+def privacy(request):    
+    return render(request, 'privacy.html')
