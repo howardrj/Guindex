@@ -40,3 +40,12 @@ def links(request):
 
 def guindexMapFull(request):
     return render(request, 'guindex_map_full.html')
+  
+def test(request):    
+    return render(request, 'test.html')
+
+def tos(request):    
+    return render(request, 'tos.html')
+
+def privacy(request):    
+    return render(request, 'privacy.html')
