@@ -55,4 +55,4 @@ def createNewGuindexUser(userProfile):
     userProfile.guindexuser.save()
     userProfile.save()
 
-    logger.info("Successfully created new GuindexUser %s for UserProfile %s", guindex_user, userProfile)
+    logger.info("Successfully created new GuindexUser %s for UserProfile %s", userProfile.guindexuser, userProfile)
