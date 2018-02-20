@@ -26,7 +26,6 @@
         <script type="text/javascript" src="{% static "javascript/sorting.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/alert_switches.js" %}" defer></script>
         <script type="text/javascript" src="{% static "javascript/cookie.js" %}"> </script>
-        <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"> </script>
         <script type="text/javascript" src="{% static "javascript/contributors.js" %}" defer> </script>
         
         <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -125,31 +124,25 @@
             g_userProfileId = {{ user_profile.id }}
             g_username      = "{{ user_profile.user.username }}"
 
-        </script>
-    
-        {% if modal_to_display == "" %}
+        </script> 
+            
+        <div id="loading_background">
 
-            <!-- If no modal to display, display loading screen -->
-            <div id="loading_background">
+           <div id="main_loader_container">
+               <div class="loader" id="main_guindex_loader"> </div>
+               <div class="loading_text"> Loading Guindex ... </div>
+           </div>
 
-                <div id="main_loader_container">
-                    <div class="loader" id="main_guindex_loader"> </div>
-                    <div class="loading_text"> Loading Guindex ... </div>
-                </div>
-
-            </div>
+        </div>
             
 
-            <!-- Hide loading background when page loads -->
-            <script>
+        <script>
+            // Hide loading background when page loads
+            window.addEventListener("load", function(){
+                $("#loading_background").fadeOut("slow", "linear", function() {});
+            });
 
-                window.addEventListener("load", function(){
-                    $("#loading_background").fadeOut("slow", "linear", function() {});
-                });
-
-            </script>
-
-        {% endif %}
+        </script>
 
 	<div id="bigshiftedcontainer">
 
@@ -160,10 +153,6 @@
         {% include "verify_guinness_form.html" %}
         {% include "close_pub_form.html" %}
         {% include "not_serving_form.html" %}
-
-        {% if modal_to_display == "warning" %}
-            {% include "warning.html" %}
-        {% endif %}
 
         <div id="centered_content_div">
 
