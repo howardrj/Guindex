@@ -27,6 +27,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='pub',
             name='name',
-            field=models.CharField(max_length=40, unique=True),
+            field=models.CharField(max_length=40, unique=False),
         ),
     ]

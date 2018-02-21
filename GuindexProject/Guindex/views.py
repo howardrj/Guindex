@@ -485,7 +485,10 @@ class ContributorList(generics.ListAPIView):
         super(ContributorList, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
-        return UserProfile.objects.exclude(guindexuser__isnull = True).exclude(telegramuser__isnull = True)
+        # Returns null on guindexuser/telegramuser related fields if either
+        # does not exist for a UserProfile
+        # No need for exclude filter
+        return UserProfile.objects.all()
 
 
 class ContributorDetail(generics.RetrieveUpdateAPIView):
@@ -510,4 +513,7 @@ class ContributorDetail(generics.RetrieveUpdateAPIView):
         return ContributorGetSerializer
 
     def get_queryset(self):
-        return UserProfile.objects.exclude(guindexuser__isnull = True).exclude(telegramuser__isnull = True)
+        # Returns null on guindexuser/telegramuser related fields if either
+        # does not exist for a UserProfile
+        # No need for exclude filter
+        return UserProfile.objects.all()

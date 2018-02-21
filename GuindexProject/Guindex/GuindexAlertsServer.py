@@ -178,7 +178,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     self.logger.error("Failed to send email to %s", user_profile)
                     continue
 
-            if not user_profile.telegramuser:
+            if not hasattr(user_profile, 'telegramuser'):
                 self.logger.debug("UserProfile %s does not have a TelegramUser", user_profile)
                 continue
 
@@ -243,7 +243,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     self.logger.error("Failed to send email to %s", user_profile)
                     continue
 
-            if not user_profile.telegramuser:
+            if not hasattr(user_profile, 'telegramuser'):
                 self.logger.debug("UserProfile %s does not have a TelegramUser", user_profile)
                 continue
 
@@ -313,7 +313,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     self.logger.error("Failed to send email to %s", user_profile)
                     continue
 
-            if not user_profile.telegramuser:
+            if not hasattr(user_profile, 'telegramuser'):
                 self.logger.debug("UserProfile %s does not have a TelegramUser", user_profile)
                 continue
 
@@ -380,7 +380,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     self.logger.error("Failed to send email to %s", user_profile)
                     continue
 
-            if not user_profile.telegramuser:
+            if not hasattr(user_profile, 'telegramuser'):
                 self.logger.debug("UserProfile %s does not have a TelegramUser", user_profile)
                 continue
 
@@ -449,7 +449,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     self.logger.error("Failed to send email to %s", user_profile)
                     continue
 
-            if not user_profile.telegramuser:
+            if not hasattr(user_profile, 'telegramuser'):
                 self.logger.debug("UserProfile %s does not have a TelegramUser", user_profile)
                 continue
 
@@ -512,7 +512,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     self.logger.error("Failed to send email to %s", user_profile)
                     continue
 
-            if not user_profile.telegramuser:
+            if not hasattr(user_profile, 'telegramuser'):
                 self.logger.debug("UserProfile %s does not have a TelegramUser", user_profile)
                 continue
 
@@ -579,7 +579,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     self.logger.error("Failed to send email to %s", user_profile)
                     continue
 
-            if not user_profile.telegramuser:
+            if not hasattr(user_profile, 'telegramuser'):
                 self.logger.debug("UserProfile %s does not have a TelegramUser", user_profile)
                 continue
 
@@ -642,7 +642,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     self.logger.error("Failed to send email to %s", user_profile)
                     continue
 
-            if not user_profile.telegramuser:
+            if not hasattr(user_profile, 'telegramuser'):
                 self.logger.debug("UserProfile %s does not have a TelegramUser", user_profile)
                 continue
 
@@ -704,7 +704,7 @@ class GuindexAlertsServer(Int16StringReceiver):
             except:
                 self.logger.error("Failed to send email to %s", user_profile)
 
-        if user_profile.telegramuser:
+        if hasattr(user_profile, 'telegramuser'):
 
             if user_profile.telegramuser.activated and user_profile.telegramuser.usingTelegramAlerts:
 
@@ -782,7 +782,7 @@ class GuindexAlertsServer(Int16StringReceiver):
             except:
                 self.logger.error("Failed to send email to %s", user_profile)
 
-        if user_profile.telegramuser:
+        if hasattr(user_profile, 'telegramuser'):
 
             if user_profile.telegramuser.activated and user_profile.telegramuser.usingTelegramAlerts:
 
@@ -860,7 +860,7 @@ class GuindexAlertsServer(Int16StringReceiver):
             except:
                 self.logger.error("Failed to send email to %s", user_profile)
 
-        if user_profile.telegramuser:
+        if hasattr(user_profile, 'telegramuser'):
 
             if user_profile.telegramuser.activated and user_profile.telegramuser.usingTelegramAlerts:
 
@@ -934,7 +934,7 @@ class GuindexAlertsServer(Int16StringReceiver):
             except:
                 self.logger.error("Failed to send email to %s", user_profile)
 
-        if user_profile.telegramuser:
+        if hasattr(user_profile, 'telegramuser'):
 
             if user_profile.telegramuser.activated and user_profile.telegramuser.usingTelegramAlerts:
 

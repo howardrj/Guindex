@@ -199,7 +199,7 @@ class Command(BaseCommand):
 
             logger.debug("Calculating contributions for UserProfile %s", user_profile)
 
-            if not user_profile.guindexuser:
+            if not hasattr(user_profile, guindexuser):
                 logger.debug("Need to create GuindexUser for UserProfile %s", user_profile)
 
                 GuindexUtils.createNewGuindexUser(user_profile)

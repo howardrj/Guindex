@@ -22,8 +22,7 @@ class PubBase(models.Model):
                                         blank   = True,
                                         default = None)
     creationDate    = models.DateTimeField(auto_now_add = True)
-    name            = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN,
-                                       unique     = True)
+    name            = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN)
     longitude       = models.DecimalField(decimal_places = GuindexParameters.GPS_COORD_DECIMAL_PLACES,
                                           max_digits     = GuindexParameters.GPS_COORD_MAX_DIGITS,
                                           validators     = [MinValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MIN_LONGITUDE)),
@@ -249,3 +248,22 @@ class StatisticsSingleton(models.Model):
     def load(cls):
         obj, created = cls.objects.get_or_create(pk = 1)
         return obj
+
+######################
+# GuindexUser Models #
+######################
+
+class GuindexUser(models.Model):
+    """
+        Class to keep track of user contributions.
+    """
+
+    userProfile          = models.OneToOneField(UserProfile,
+                                                null         = True,
+                                                blank        = True,
+                                                default      = None,
+                                                related_name = 'guindexuser')
+    pubsVisited          = models.IntegerField(default = 0)
+    originalPrices       = models.IntegerField(default = 0)
+    currentVerifications = models.IntegerField(default = 0)
+    lastCalculated       = models.DateTimeField(auto_now = True)

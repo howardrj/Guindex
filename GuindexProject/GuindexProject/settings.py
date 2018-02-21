@@ -44,7 +44,6 @@ INSTALLED_APPS = (
     'UserProfile',
     'Guindex',
     'TelegramUser',
-    'GuindexUser',
     'TopLevel',
 )
 
