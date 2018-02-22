@@ -43,8 +43,10 @@ INSTALLED_APPS = (
     'corsheaders',
     'UserProfile',
     'Guindex',
+    'GuindexDashboard',
     'TelegramUser',
     'TopLevel',
+    'dashing',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -66,16 +68,7 @@ ROOT_URLCONF = 'GuindexProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "UserProfile/templates"),
-                 os.path.join(BASE_DIR, "UserProfile/templates/modals"),
-                 os.path.join(BASE_DIR, "UserProfile/templates/emails"),
-                 os.path.join(BASE_DIR, "TelegramUser/templates"),
-                 os.path.join(BASE_DIR, "TelegramUser/templates/emails"),
-                 os.path.join(BASE_DIR, "Guindex/templates"),
-                 os.path.join(BASE_DIR, "Guindex/templates/modals"),
-                 os.path.join(BASE_DIR, "Guindex/templates/emails"),
-	         os.path.join(BASE_DIR, "TopLevel/templates"),
-                 os.path.join(BASE_DIR, "templates")],
+        'DIRS': [os.path.join(BASE_DIR, "templates"),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -140,10 +133,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "CDN/")
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'

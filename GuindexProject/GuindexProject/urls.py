@@ -20,6 +20,8 @@ from UserProfile.views import error404
 
 from Guindex import urls as GuindexUrls
 
+from GuindexDashboard import urls as GuindexDashboardUrls
+
 from TopLevel import urls as TopLevelUrls
 
 from rest_framework.documentation import include_docs_urls
@@ -34,6 +36,9 @@ urlpatterns.extend(UserProfileUrls.urlpatterns)
 # Append Guindex views
 urlpatterns.extend(GuindexUrls.urlpatterns)
 
+# Append GuindexDashboard views
+urlpatterns.extend(GuindexDashboardUrls.urlpatterns)
+
 # Append TopLevel views
 urlpatterns.extend(TopLevelUrls.urlpatterns)
 
@@ -42,7 +47,7 @@ schema_view = get_schema_view(title='Guindex HTTP API')
 urlpatterns.append(url(r'^api/schema/$', schema_view))
 
 # Append HTTP API docs url
-urlpatterns.append(url(r'^api/docs/', include_docs_urls(title='Guindex HTTP API')))
+# urlpatterns.append(url(r'^api/docs/', include_docs_urls(title='Guindex HTTP API')))
 
 # Append 404 view last
 urlpatterns.append(url(r'.*', error404))

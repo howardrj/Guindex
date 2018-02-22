@@ -4,8 +4,6 @@ from Guindex import views
 
 
 urlpatterns = [
-    url(r'^guindex/$', views.guindex),
-    url(r'^pending_contributions/$', views.pendingContributions),
     url(r'^api/pubs/$', views.PubList.as_view()),
     url(r'^api/pubs/(?P<pk>[0-9]+)/$', views.PubDetail.as_view()),
     url(r'^api/pubs/pending/create/$', views.PubPendingCreateList.as_view()),
