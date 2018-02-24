@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('UserProfile', '0002_auto_20180112_2059'),
+        ('UserProfile', '0001_initial'),
     ]
 
     operations = [
@@ -68,5 +68,15 @@ class Migration(migrations.Migration):
             model_name='guinness',
             name='pub',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Guindex.Pub'),
+        ),
+        migrations.CreateModel(
+            name='GuindexUser',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('pubsVisited', models.IntegerField(default=0)),
+                ('originalPrices', models.IntegerField(default=0)),
+                ('currentVerifications', models.IntegerField(default=0)),
+                ('lastCalculated', models.DateTimeField(auto_now=True)),
+            ],
         ),
     ]

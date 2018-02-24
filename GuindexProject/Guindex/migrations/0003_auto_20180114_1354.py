@@ -13,6 +13,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.DeleteModel(
+            name='GuindexUser',
+        ),
         migrations.AlterField(
             model_name='pub',
             name='pendingClosedContributor',
