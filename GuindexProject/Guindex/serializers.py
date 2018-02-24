@@ -489,7 +489,7 @@ class StatisticsSerializer(serializers.ModelSerializer):
     class Meta:
         model = StatisticsSingleton
         fields = ['pubsInDb', 'percentageVisited', 'averagePrice', 'standardDeviation',
-                  'closedPubs', 'notServingGuinness', 'pubsWithPrices']
+                  'closedPubs', 'notServingGuinness', 'pubsWithPrices', 'lastCalculated']
 
 
 ###########################
