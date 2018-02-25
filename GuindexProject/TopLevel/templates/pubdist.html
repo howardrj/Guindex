@@ -62,14 +62,14 @@
             <div class="centered"><P ALIGN=CENTER><b>Furthest Distance to a County Dublin Pub</b></P><HR style="height:0.2vw;background-color:white";/>
  	    <P ALIGN=LEFT><b> We wish to find the furthest distance you can be away from a Dublin pub and still be breathing Dublin air. We also want to know where you are in county Dublin when this occurs.  </b></P>
 	    <div class="illustration">
-	    <P ALIGN=CENTER> <img src="../../static/images/Guindist27222pointso0point75Int.png" style="width:50%";>
+	    <P ALIGN=CENTER> <img src="../../static/images/Guindist27222pointso0point75Int.png" style="width:75%";>
 	    </div>
 	    <P ALIGN=LEFT><b> Above is the solution of this problem. It is a logarithmic heat map of the distance to the nearest pub over the county Dublin region. We can see from the map that the most remote point in Dublin is ~9300m away from the nearest pub. This point is on the Wicklow border of Dublin in the south indicated by the green pentagon.   </b></P>
             <P ALIGN=LEFT><b> The extremum occurring on a boundary is a very plausible solution, consistent with looking to maximise/minimise mathematical functions over a region. The methodology used to solve this problem is now explaned:</b></P>	 
             <P ALIGN=LEFT><b>To solve this problem we need two sets of data: 1) the location of all the Dublin pubs (in some coordinate system) and 2) a polygon specifying the boundaries of county Dublin (in the same coordinate system)</b></P>
 	    <P ALIGN=LEFT><b>We also require a method to calculate the physics distance, d, (in m) between any two points in the chosen coordinate system. In this work we have used (longitude,latitude) (&lambda;,  &straightphi;) spherical coordinates, so the Haversine formula (below) is the necessary equation for calculating distances. This formula calculates the distance between two points on a spherical surface of radius r (sorry flat Earthers). </b></P>
 	    <div class="illustration">
-	    <P ALIGN=CENTER> <img src="../../static/images/HaversineFormula.png" style="width:50%";>
+	    <P ALIGN=CENTER> <img src="../../static/images/HaversineFormula.png" style="width:75%";>
 	    </div>
 	    <P ALIGN=LEFT><b>The difficulty then lies in defining the very irregular boundary of county Dublin. At this stage we knew nothing about shape files (which are files carrying geometrical information on geographical regions). So instead we specified the boundary by manually picking 327 points using Google Earth and forming a polygon from them. </b></P>
 	    <P ALIGN=LEFT><b> To generate the coordinates interior to this polygon we formed the square bounding the polygons extreme latitude and longitude values and defined an x-y mesh over this square with a chosen granularity. The granularity (mesh step-size) was chosen to be approximately 30m. </b></P>
@@ -78,11 +78,11 @@
 	    <P ALIGN=LEFT><b> Attempting this procedure would however take too much computer time. Instead I took 27,222 points from the 885,126 and calculated the distance to nearest pub at each of them. This represents an error inflation of approximately 5.7x so instead of having a maximum error of plus or minus 30Sqrt(2) it'll be ~ 170Sqrt(2). This isn't the biggest deal.   </b></P>        
 	    <P ALIGN=LEFT><b>The picture above uses quadratic interpolation to smooth out the scalar field in between the actual calculated points. This is a procedure to allow the variation to be estimated (and visualised) at a finer scale than was considered initially. To see the effect of the interpolation consider the raw image below. We see that the interpolation smoothes out the effects of the irregularly shaped boundary. To make the scalar field drop off at the boundary I've put in an absorbing wall by appending the defined boundaries of the region with a distance value of 0 to the calculated points.</b></P>
 	    <div class="illustration">
-	    <P ALIGN=CENTER> <img src="../../static/images/GuinDist8000pointsOpoint65NoInt.png" style="width:50%";>
+	    <P ALIGN=CENTER> <img src="../../static/images/GuinDist8000pointsOpoint65NoInt.png" style="width:75%";>
 	    </div>
 	    <P ALIGN=LEFT><b> (The procedure used to find the points constituting county Dublin is analogous to finding the area of some region by integration. Since we know the area of the square we can numerically estimate the area of county Dublin by looking at the fraction of points within the  polygon (Area Dublin = Fraction of points inside Polygon * Area of Square). The fraction of points falling within the polygon ~0.589 which then gives an estimate for the total area of county Dublin of 1.002904*10^9 m^2 which is 9% off the value quoted on wikipedia (9.22*10^8 m^2). Not bad considering how crudely we defined the boundary!)</b></P>
 		<div class="fb-comments" data-href="https://guindex.ie/analysis/geography/" data-width="550px" data-numposts="5" colorscheme="dark"></div>
-	    <P ALIGN=LEFT> <b> <a href="../social/" class="class2">Social</a> <span style="float:right;"> <a href="../travdrnk/" class="class2">Travelling Drunkard</a></span></b></P>
+	    <P ALIGN=RIGHT>  <a href="../geography/" class="class2">Next Article</a></b></P>
 	    </div>
         </div> 
 
