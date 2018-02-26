@@ -276,3 +276,13 @@ GOOGLE_MAPS_API_KEY = secrets.GOOGLE_MAPS_API_KEY
 DROPBOX_API_KEY          = secrets.DROPBOX_API_KEY
 DROPBOX_API_SECRET       = secrets.DROPBOX_API_SECRET
 DROPBOX_API_ACCESS_TOKEN = secrets.DROPBOX_API_ACCESS_TOKEN
+
+# Dashing Widget Configs
+DASHING = {
+	'INSTALLED_WIDGETS': ('number','list','map',),
+	'WIDGET_CONFIGS': {
+		'map': {
+			'GOOGLE_MAPS_API_KEY': GOOGLE_MAPS_API_KEY ,
+		},
+	},
+}
