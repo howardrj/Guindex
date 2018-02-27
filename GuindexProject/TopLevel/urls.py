@@ -5,7 +5,6 @@ from TopLevel import views
 
 urlpatterns = [
     url(r'^$', views.index),
-    url(r'^statistics/$', views.stats),
     url(r'^analysis/$', views.analysis),
     url(r'^analysis/geography/$', views.geo),
     url(r'^analysis/social/$', views.social),

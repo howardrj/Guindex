@@ -6,5 +6,5 @@ from GuindexDashboard import views
 
 
 urlpatterns = [
-    url(r'^dashboard/', include(router.urls)),
+    url(r'^statistics/', include(router.urls)),
 ]

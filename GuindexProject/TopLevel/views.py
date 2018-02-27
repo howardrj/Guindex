@@ -14,9 +14,6 @@ from rest_framework import permissions
 def index(request):    
     return render(request, 'index_new.html')
 
-def stats(request):    
-    return render(request, 'stats.html')
-
 def analysis(request):    
     return render(request, 'analysis.html')
 
