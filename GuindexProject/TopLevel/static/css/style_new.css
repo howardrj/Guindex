@@ -109,6 +109,9 @@ PRE LOADER
     background-position: top center;
     background-color: #F5F0EB;
     margin-bottom:-0px;
+    border-style: solid;
+    border-bottom-color: black;
+    border-bottom-width: 4px;
     height: 31vw;
     margin-top:-1vw;
     top:0;
@@ -152,6 +155,9 @@ PRE LOADER
     background-position: top center;
     background-color: #F5F0EB;
     margin-bottom:-0px;
+    border-style: solid;
+    border-bottom-color: black;
+    border-bottom-width: 3px;
     height: 35vw;
     margin-top:-1vw;
     top:0;
@@ -270,10 +276,10 @@ a.class2:hover {
 @media only screen and (min-width:401px) and (max-width:960px){
 
 .centered {
-    width: 100%;
+    width: 90%;
     height: 100%;
     margin-right:5vw;
-    margin-left:5vw;
+    margin-left:12vw;
     margin-top:33vw;
     margin-bottom:0px;
     padding:0;
