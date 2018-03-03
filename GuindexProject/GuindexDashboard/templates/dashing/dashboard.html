@@ -6,6 +6,12 @@
 <!-- Put our stylesheets in here -->
 {% endblock %}
 
-{% block scripts %}
-<!-- Put our scripts in here -->
+{% block config_file %}
+    <script type="text/javascript" src="{% static 'dashing_config.js' %}"></script>
 {% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{% static 'statistics_dashboard.js' %}" defer></script>
+    <script type="text/javascript" src="{% static 'login_dashboard.js' %}" defer></script>
+{% endblock %}
+

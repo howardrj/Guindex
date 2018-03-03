@@ -1,12 +1,6 @@
-//var API_URL_BASE = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
-var API_URL_BASE = 'https://guindex.ie/api/'
-var dashboard_set = new DashboardSet();
+g_dashboardSet.addDashboard('Statistics');
 
-
-// Statistics Dashboard
-dashboard_set.addDashboard('Statistics');
-
-stats_dashboard = dashboard_set.getDashboard('Statistics');
+stats_dashboard = g_dashboardSet.getDashboard('Statistics');
 
 stats_dashboard.addWidget('PubsNumbers_widget', 'Number', {
 
@@ -36,6 +30,8 @@ stats_dashboard.addWidget('PubsNumbers_widget', 'Number', {
 
             // Get statistics JSON object
             var statistics = JSON.parse(request.responseText);
+
+            console.log(statistics);
 		pubsinDatabase = statistics[0].pubsInDb.toString() ;
 		percentofPubs = statistics[0].percentageVisited.toString() + '%' ;
 		

@@ -422,7 +422,7 @@ class ContributorList(generics.ListAPIView):
 
 class ContributorDetail(generics.RetrieveUpdateAPIView):
     """
-        A contributor can allow patch it's own UserProfile model.
+        A contributor can allow patch its own UserProfile model.
         The alert settings are the only editable fields
     """
 
