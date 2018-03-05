@@ -2,11 +2,10 @@ import logging
 from decimal import Decimal
 
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from GuindexParameters import GuindexParameters
-
-from UserProfile.models import UserProfile
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class PubBase(models.Model):
 
-    creator         = models.ForeignKey(UserProfile,
+    creator         = models.ForeignKey(User,
                                         null    = True,
                                         blank   = True,
                                         default = None)
@@ -97,7 +96,7 @@ class Pub(PubBase):
                 logger.debug("createPendingCreate not in kwargs")
 
             # If not a staff member, save it to PubPendingCreates table instead
-            if not self.creator.user.is_staff and create_pending_create:
+            if not self.creator.is_staff and create_pending_create:
                 self.createPendingCreate()
                 return
 
@@ -136,7 +135,7 @@ class PubPendingPatch(PubBase):
 
 class GuinnessBase(models.Model):
 
-    creator      = models.ForeignKey(UserProfile,
+    creator      = models.ForeignKey(User,
                                      null    = True,
                                      blank   = True,
                                      default = None)
@@ -175,7 +174,7 @@ class Guinness(GuinnessBase):
                 logger.debug("createPendingCreate not in kwargs")
 
             # If not a staff member, save it to GuinnessPendingCreates table instead
-            if not self.creator.user.is_staff and create_pending_create:
+            if not self.creator.is_staff and create_pending_create:
                 self.createPendingCreate()
                 return
 
@@ -258,7 +257,7 @@ class GuindexUser(models.Model):
         Class to keep track of user contributions.
     """
 
-    userProfile          = models.OneToOneField(UserProfile,
+    user                 = models.OneToOneField(User,
                                                 null         = True,
                                                 blank        = True,
                                                 default      = None,

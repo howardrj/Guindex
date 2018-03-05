@@ -1,9 +1,21 @@
 <div>
     <h1> Login with Facebook </h1>
 
-    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();" style="z-index: 9999">
+    <fb:login-button id="login_with_facebook_button" scope="public_profile,email" onlogin="checkLoginState();" style="z-index: 9999">
     </fb:login-button>
 
     <div id="status">
     </div>
+
+    <script>
+        // Load the SDK asynchronously
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
 </div>

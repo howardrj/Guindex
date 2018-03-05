@@ -2,6 +2,7 @@ import logging
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
 
 from rest_framework import generics
@@ -24,9 +25,6 @@ from Guindex.models import StatisticsSingleton
 from GuindexParameters import GuindexParameters
 import GuindexUtils
 
-from UserProfile.models import UserProfile
-from UserProfile.UserProfileParameters import UserProfileParameters
-
 logger = logging.getLogger(__name__)
 
 
@@ -42,14 +40,9 @@ class IsAdminOrReadOnly(permissions.IsAdminUser):
 
     def has_permission(self, request, view):
 
-        try:
-            view.userProfile = GuindexUtils.getUserProfileFromUser(request.user)
-            logger.debug("Found UserProfile %s with user '%s'", view.userProfile, request.user)
-        except:
-            logger.error("Could not retrieve UserProfile with user '%s'", request.user)
-            return False
+        view.user = GuindexUtils.getUser(request.user)
 
-        return request.method in ['GET'] or view.userProfile.user.is_staff
+        return request.method in ['GET'] or view.user.is_staff
 
 
 class IsContributorOrReadOnly(permissions.IsAdminUser):
@@ -66,14 +59,9 @@ class IsContributorOrReadOnly(permissions.IsAdminUser):
         except:
             return False
 
-        try:
-            view.userProfile = GuindexUtils.getUserProfileFromUser(request.user)
-            logger.debug("Found UserProfile %s with user '%s'", view.userProfile, request.user)
-        except:
-            logger.error("Could not retrieve UserProfile with user '%s'", request.user)
-            return False
+        view.user = GuindexUtils.getUser(request.user)
 
-        return request.method in ['GET'] or view.userProfile.id == pk
+        return request.method in ['GET'] or view.user.id == pk
 
 
 #################
@@ -95,16 +83,11 @@ class PubList(generics.ListCreateAPIView):
 
         logger.info("Creating new Pub")
 
-        try:
-            user_profile = GuindexUtils.getUserProfileFromUser(self.request.user)
-            logger.debug("Found UserProfile %s with user '%s'", user_profile, self.request.user)
-        except:
-            logger.error("Could not retrieve UserProfile with user '%s'", self.request.user)
-            return
+        user = GuindexUtils.getUser(self.request.user)
 
         # Sets creator field in Pub object
         # prior to calling object's save method
-        serializer.save(creator = user_profile)
+        serializer.save(creator = user)
 
     def get_serializer_class(self):
 
@@ -132,14 +115,9 @@ class PubDetail(generics.RetrieveUpdateAPIView):
 
         logger.info("Updating Pub object")
 
-        try:
-            user_profile = GuindexUtils.getUserProfileFromUser(self.request.user)
-            logger.debug("Found UserProfile %s with user '%s'", user_profile, self.request.user)
-        except:
-            logger.error("Could not retrieve UserProfile with user '%s'", self.request.user)
-            return
+        user = GuindexUtils.getUser(self.request.user)
 
-        serializer.save(userProfile = user_profile)
+        serializer.save(user = user)
 
     def get_serializer_class(self):
 
@@ -246,16 +224,11 @@ class GuinnessList(generics.ListCreateAPIView):
 
         logger.info("Creating new Guinness")
 
-        try:
-            user_profile = GuindexUtils.getUserProfileFromUser(self.request.user)
-            logger.debug("Found UserProfile %s with user '%s'", user_profile, self.request.user)
-        except:
-            logger.error("Could not retrieve UserProfile with user '%s'", self.request.user)
-            return
+        user = GuindexUtils.getUser(self.request.user)
 
         # Sets creator field in Guinness object
         # prior to calling object's save method
-        serializer.save(creator = user_profile)
+        serializer.save(creator = user)
 
     def get_serializer_class(self):
 
@@ -283,14 +256,9 @@ class GuinnessDetail(generics.RetrieveUpdateAPIView):
 
         logger.info("Updating Guinness object")
 
-        try:
-            user_profile = GuindexUtils.getUserProfileFromUser(self.request.user)
-            logger.debug("Found UserProfile %s with user '%s'", user_profile, self.request.user)
-        except:
-            logger.error("Could not retrieve UserProfile with user '%s'", self.request.user)
-            return
+        user = GuindexUtils.getUser(self.request.user)
 
-        serializer.save(userProfile = user_profile)
+        serializer.save(user = user)
 
     def get_serializer_class(self):
         if self.request.method == 'PATCH':
@@ -415,14 +383,14 @@ class ContributorList(generics.ListAPIView):
 
     def get_queryset(self):
         # Returns null on guindexuser/telegramuser related fields if either
-        # does not exist for a UserProfile
+        # does not exist for a User
         # No need for exclude filter
-        return UserProfile.objects.all()
+        return User.objects.all()
 
 
 class ContributorDetail(generics.RetrieveUpdateAPIView):
     """
-        A contributor can allow patch its own UserProfile model.
+        A contributor can allow patch its own User model.
         The alert settings are the only editable fields
     """
 
@@ -443,6 +411,6 @@ class ContributorDetail(generics.RetrieveUpdateAPIView):
 
     def get_queryset(self):
         # Returns null on guindexuser/telegramuser related fields if either
-        # does not exist for a UserProfile
+        # does not exist for a User
         # No need for exclude filter
-        return UserProfile.objects.all()
+        return User.objects.all()

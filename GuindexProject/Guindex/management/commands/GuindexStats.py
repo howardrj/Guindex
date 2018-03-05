@@ -4,12 +4,12 @@ import math
 from decimal import Decimal
 
 from django.core.management.base import BaseCommand
+from django.contrib.auth.models import User
 
 from Guindex.models import Pub, Guinness, StatisticsSingleton
 from Guindex.GuindexParameters import GuindexParameters
 from Guindex import GuindexUtils
 
-from UserProfile.models import UserProfile
 
 logger = logging.getLogger(__name__.split('.')[-1])
 
@@ -190,19 +190,19 @@ class Command(BaseCommand):
 
     def calculateUserContributions(self):
         """
-            Populate all GuindexUser fields for each UserProfile
+            Populate all GuindexUser fields for each User
         """
 
         logger.info("Calculating User Contributions")
 
-        for user_profile in UserProfile.objects.all():
+        for user in User.objects.all():
 
-            logger.debug("Calculating contributions for UserProfile %s", user_profile)
+            logger.debug("Calculating contributions for User %s", user)
 
-            if not hasattr(user_profile, guindexuser):
-                logger.debug("Need to create GuindexUser for UserProfile %s", user_profile)
+            if not hasattr(user, 'guindexuser'):
+                logger.debug("Need to create GuindexUser for User %s", user)
 
-                GuindexUtils.createNewGuindexUser(user_profile)
+                GuindexUtils.createNewGuindexUser(user)
 
             number_of_current_verifications = 0
             number_of_first_verifications   = 0
@@ -212,17 +212,17 @@ class Command(BaseCommand):
             # for closed and pubs marked as no longer serving Guinness
             for pub in Pub.objects.all():
 
-                if pub.getLastVerifiedGuinness() and pub.getLastVerifiedGuinness().creator == user_profile:
+                if pub.getLastVerifiedGuinness() and pub.getLastVerifiedGuinness().creator == user:
                     number_of_current_verifications = number_of_current_verifications + 1
 
-                if pub.getFirstVerifiedGuinness() and pub.getFirstVerifiedGuinness().creator == user_profile:
+                if pub.getFirstVerifiedGuinness() and pub.getFirstVerifiedGuinness().creator == user:
                     number_of_first_verifications = number_of_first_verifications + 1
 
-                if len(Guinness.objects.filter(pub = pub, creator = user_profile, approved = True)):
+                if len(Guinness.objects.filter(pub = pub, creator = user)):
                     number_of_pubs_visited = number_of_pubs_visited + 1
 
-            user_profile.guindexuser.originalPrices       = number_of_first_verifications
-            user_profile.guindexuser.currentVerifications = number_of_current_verifications
-            user_profile.guindexuser.pubsVisited          = number_of_pubs_visited
+            user.guindexuser.originalPrices       = number_of_first_verifications
+            user.guindexuser.currentVerifications = number_of_current_verifications
+            user.guindexuser.pubsVisited          = number_of_pubs_visited
 
-            user_profile.guindexuser.save()
+            user.guindexuser.save()

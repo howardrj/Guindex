@@ -1,6 +1,7 @@
 import logging
 
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
@@ -8,8 +9,6 @@ from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
 from Guindex.models import Guinness, GuinnessPendingCreate, GuinnessPendingPatch
 from Guindex.models import StatisticsSingleton
 from Guindex.GuindexParameters import GuindexParameters
-
-from UserProfile.models import UserProfile
 
 logger = logging.getLogger(__name__)
 
@@ -69,9 +68,9 @@ class GuinnessPatchSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
 
-        user_profile = kwargs['userProfile']
+        user = kwargs['user']
 
-        if user_profile.user.is_staff:
+        if user.is_staff:
             logger.debug("Contributor is a staff member. Saving changes")
             super(GuinnessPatchSerializer, self).save(**kwargs)
             return
@@ -90,7 +89,7 @@ class GuinnessPatchSerializer(serializers.ModelSerializer):
 
         # Update relevant fields
         guinness_pending_patch.pk         = None
-        guinness_pending_patch.creator    = user_profile
+        guinness_pending_patch.creator    = user
         guinness_pending_patch.clonedFrom = self.instance
         guinness_pending_patch.save()
 
@@ -304,9 +303,9 @@ class PubPatchSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
 
-        user_profile = kwargs['userProfile']
+        user = kwargs['user']
 
-        if user_profile.user.is_staff:
+        if user.is_staff:
             logger.debug("Contributor is a staff member. Saving changes")
             super(PubPatchSerializer, self).save(**kwargs)
             return
@@ -325,7 +324,7 @@ class PubPatchSerializer(serializers.ModelSerializer):
 
         # Update relevant fields
         pub_pending_patch.pk         = None
-        pub_pending_patch.creator    = user_profile
+        pub_pending_patch.creator    = user
         pub_pending_patch.clonedFrom = self.instance
         pub_pending_patch.save()
 
@@ -499,14 +498,13 @@ class StatisticsSerializer(serializers.ModelSerializer):
 
 class ContributorGetSerializer(serializers.ModelSerializer):
 
-    username             = serializers.CharField(source = 'user.username')
     pubsVisited          = serializers.IntegerField(source = 'guindexuser.pubsVisited')
     originalPrices       = serializers.IntegerField(source = 'guindexuser.originalPrices')
     currentVerifications = serializers.IntegerField(source = 'guindexuser.currentVerifications')
     usingTelegramAlerts  = serializers.BooleanField(source = 'telegramuser.usingTelegramAlerts')
 
     class Meta:
-        model = UserProfile
+        model = User
         fields = ['id', 'username', 'pubsVisited', 'originalPrices', 'currentVerifications',
                   'usingEmailAlerts', 'usingTelegramAlerts']
 
@@ -516,7 +514,7 @@ class ContributorPatchSerializer(serializers.ModelSerializer):
     usingTelegramAlerts = serializers.BooleanField(source = 'telegramuser.usingTelegramAlerts')
 
     class Meta:
-        model = UserProfile
+        model = User
         # Can only patch alert settings
         fields = ['usingEmailAlerts', 'usingTelegramAlerts']
 

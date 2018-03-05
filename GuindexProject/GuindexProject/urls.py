@@ -14,9 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
+from django.contrib import admin
 
 from UserProfile import urls as UserProfileUrls
-from UserProfile.views import error404
 
 from Guindex import urls as GuindexUrls
 
@@ -29,6 +29,9 @@ from rest_framework.schemas import get_schema_view
 
 
 urlpatterns = []
+
+# Append django admin url
+urlpatterns.append(url(r'^admin/', admin.site.urls))
 
 # Append UserProfile views
 urlpatterns.extend(UserProfileUrls.urlpatterns)
@@ -49,5 +52,5 @@ urlpatterns.append(url(r'^api/schema/$', schema_view))
 # Append HTTP API docs url
 # urlpatterns.append(url(r'^api/docs/', include_docs_urls(title='Guindex HTTP API')))
 
+# TODO
 # Append 404 view last
-urlpatterns.append(url(r'.*', error404))

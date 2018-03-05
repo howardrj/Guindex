@@ -6,7 +6,8 @@ stats_dashboard.addWidget('PubsNumbers_widget', 'Number', {
 
 	color : '#515BB2',
     getData: function () {
-	this.interval = 10000;
+
+	    this.interval = 10000;
 
         // Retrieve statistics through API
         var request = new XMLHttpRequest();
@@ -17,46 +18,37 @@ stats_dashboard.addWidget('PubsNumbers_widget', 'Number', {
 
         request.send(null);
 
-
         var scope = this.scope
-        
 
         // Update widget in processRequest callback
-
         request.onreadystatechange = function processRequest()
         {
-            if (request.readyState == 4 && request.status == 200) {
-                
+            if (request.readyState == 4 && request.status == 200)
+            {
+                // Get statistics JSON object
+                var statistics = JSON.parse(request.responseText);
 
-            // Get statistics JSON object
-            var statistics = JSON.parse(request.responseText);
-
-            console.log(statistics);
-		pubsinDatabase = statistics[0].pubsInDb.toString() ;
-		percentofPubs = statistics[0].percentageVisited.toString() + '%' ;
+                pubsinDatabase = statistics[0].pubsInDb.toString() ;
+                percentofPubs = statistics[0].percentageVisited.toString() + '%' ;
 		
-	    var data = {
-			title: 'Number of Pubs in Database',
-            		moreInfo: '% Visited',
-            		//updatedAt: 'Last updated at 14:10',
-           		detail: percentofPubs,
-           		value: pubsinDatabase
-		};
-		
-	    
-		}
+                var data = {
+                    title: 'Number of Pubs in Database',
+                    moreInfo: '% Visited',
+                    detail: percentofPubs,
+                    value: pubsinDatabase
+                };
 
-		$.extend(scope,data);
-	}
-
-	
-	
+		        $.extend(scope,data);
+		    }
+	    }
     }
 });
 
 stats_dashboard.addWidget('PriceNumbers_widget', 'Number', {
+
     getData: function () {
-	this.interval = 10000;
+
+	    this.interval = 10000;
 
         // Retrieve statistics through API
         var request = new XMLHttpRequest();
@@ -67,40 +59,28 @@ stats_dashboard.addWidget('PriceNumbers_widget', 'Number', {
 
         request.send(null);
 
-        
-
         var scope = this.scope
-        
 
         // Update widget in processRequest callback
-
         request.onreadystatechange = function processRequest()
         {
-            if (request.readyState == 4 && request.status == 200) {
-                
-
-            // Get statistics JSON object
-            var statistics = JSON.parse(request.responseText);
-		averagePrice = "\u20AC" + statistics[0].averagePrice.toString() ;
-		standardDeviation = statistics[0].standardDeviation.toString() ;
+            if (request.readyState == 4 && request.status == 200)
+            {
+                // Get statistics JSON object
+                var statistics = JSON.parse(request.responseText);
+		        averagePrice = "\u20AC" + statistics[0].averagePrice.toString();
+		        standardDeviation = statistics[0].standardDeviation.toString();
 		
-	    var data = {
-			title: 'Average Price of a pint',
-            		moreInfo: 'Standard Deviation',
-            		//updatedAt: 'Last updated at 14:10',
-           		detail: standardDeviation,
-           		value: averagePrice
-		};
-		
-	    
-		}
+                var data = {
+                    title: 'Average Price of a pint',
+                    moreInfo: 'Standard Deviation',
+                    detail: standardDeviation,
+                    value: averagePrice
+                };
 
-		
-		$.extend(scope,data);
-	}
-
-	
-	
+		        $.extend(scope,data);
+		    }
+	    }
     }
 });
 
@@ -109,7 +89,7 @@ stats_dashboard.addWidget('ClosedPub_widget', 'Number', {
 	color : '#FF6D3A',
     getData: function () {
 	
-	this.interval = 10000;
+	    this.interval = 10000;
 
         // Retrieve statistics through API
         var request = new XMLHttpRequest();
@@ -120,90 +100,29 @@ stats_dashboard.addWidget('ClosedPub_widget', 'Number', {
 
         request.send(null);
 
-
         var scope = this.scope
         
-
         // Update widget in processRequest callback
-
         request.onreadystatechange = function processRequest()
         {
-            if (request.readyState == 4 && request.status == 200) {
-                
+            if (request.readyState == 4 && request.status == 200)
+            {
+                // Get statistics JSON object
+                var statistics = JSON.parse(request.responseText);
+		        closedPubs = statistics[0].closedPubs.toString() ;
+		        notServingGuinness = statistics[0].notServingGuinness.toString() ;
 
-            // Get statistics JSON object
-            var statistics = JSON.parse(request.responseText);
-		closedPubs = statistics[0].closedPubs.toString() ;
-		notServingGuinness = statistics[0].notServingGuinness.toString() ;
-
-	    var data = {
-			title: 'Closed Pubs',
+	            var data = {
+			        title: 'Closed Pubs',
             		moreInfo: 'Not serving Guinness',
-            		//updatedAt: 'Last updated at 14:10',
-           		detail: notServingGuinness,
-           		value: closedPubs
-		};
-		//console.log(data);
-	    
-		}
-
-		$.extend(scope,data);
-	}
-
-	
-	
+           		    detail: notServingGuinness,
+           		    value: closedPubs
+		        };
+        		$.extend(scope,data);
+		    }
+	    }
     }
 });
-
-/*
-stats_dashboard.addWidget('Users_widget', 'Number', {
-
-	color : '#FF6D3A',
-    getData: function () {
-	
-	this.interval = 10000;
-
-        // Retrieve statistics through API
-        var requestCons = new XMLHttpRequest();
-        
-	requestCons.open('GET', API_URL_BASE + 'contributors/', true); 
-        requestCons.setRequestHeader('Content-Type', 'application/json');
-        requestCons.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        requestCons.send(null);
-
-        var scope = this.scope
-        
-
-        // Update widget in processRequest callback
-
-        requestCons.onreadystatechange = function processRequest()
-        {
-            if (requestCons.readyState == 4 && requestCons.status == 200) {
-                
-
-            // Get statistics JSON object
-            var statistics = JSON.parse(requestCons.responseText);
-		console.log(statistics);
-		//closedPubs = statistics[0].closedPubs.toString() ;
-		//notServingGuinness = statistics[0].notServingGuinness.toString() ;
-
-	    var data = {
-			title: 'Users Signed Up',
-            		moreInfo: 'Not serving Guinness',
-            		//updatedAt: 'Last updated at 14:10',
-           		detail: '20',
-           		value: '30'
-		};
-		//console.log(data);
-	    
-		}
-
-		$.extend(scope,data);
-	}
-	
-    }
-});
-*/
 
 stats_dashboard.addWidget('CheapestPints', 'List', {
 
@@ -239,13 +158,10 @@ stats_dashboard.addWidget('CheapestPints', 'List', {
             //var last_calculated_time = last_calculated.toLocaleTimeString();
             //var last_calculated_date = last_calculated.toLocaleDateString();
 
-
             //var last_calculated_string = last_calculated_date + ' - ' + last_calculated_time;
 
-		var statistics_data = [];
+    		var statistics_data = [];
 
-		//console.log(statistics.pubsWithPrices[0]);
-		
             Object.keys(statistics).forEach(function (key, index) {
 
                 if (key == 'pubsWithPrices')

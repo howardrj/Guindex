@@ -13,31 +13,65 @@ Dashing.widgets.LoginWithFacebook = function(dashboard) {
 };
 
 // Below code is borrowed from the Facbook javascript SDK
+// SDK is loaded in login_with_facebook.html
 
 // This is called with the results from from FB.getLoginStatus().
 function statusChangeCallback(response) {
-
-    console.log('statusChangeCallback');
     console.log(response);
-    // The response object is returned with a status field that lets the
-    // app know the current login status of the person.
-    // Full docs on the response object can be found in the documentation
-    // for FB.getLoginStatus().
-    if (response.status === 'connected')
+
+    if (response.status === 'unknown')
+    {
+        // The person is not logged into your app 
+        document.getElementById('status').innerHTML = 'Please login to Facebook to continue.';
+    }
+    else if (response.status === 'not_authorized')
+    {
+        // The person is not logged into your app 
+        document.getElementById('status').innerHTML = 'Please login to guindex.ie to continue.';
+    }
+    else if (response.status === 'connected')
     {
         // Logged into your app and Facebook.
-        console.log("Connected");
+        var access_token = response['authResponse']['accessToken'];
+        var user_id      = response['authResponse']['userID'];
+
+        // Retrieve user name through facebook API
+        FB.api(
+            '/' + user_id,
+            'GET',
+            {},
+            function(response) {
+                document.getElementById('status').innerHTML = 'Logged in as ' + response['name'] + '.';
+                document.getElementById('login_with_facebook_button').style.display = 'none';
+            }
+        );
+
+        // Use REST API to login to guindex.ie
+        var request = new XMLHttpRequest();
+        request.open('POST', API_URL_BASE + 'rest-auth/facebook/', true); 
+
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        request.send(JSON.stringify({'access_token': access_token}));
+
+        // Pull in contributins widgets once user is authenticated
+        // and display log out button
+        request.onreadystatechange = function processRequest()
+        {
+            if (request.readyState == 4 && request.status == 200)
+            {
+                // We have successfully logged in
+                // Get token from response JSON object
+                var response = JSON.parse(request.responseText);
+
+                setupContributionsDashboard(response['key']); 
+		    }
+	    }
     } 
-    else 
-    {
-        // The person is not logged into your app or we are unable to tell.
-        document.getElementById('status').innerHTML = 'Please log into this app.';
-    }
 }
 
-// This function is called when someone finishes with the Login
-// Button. See the onlogin handler attached to it in the sample
-// code below.
+// This function is called when someone finishes with the Login Button
 function checkLoginState() {
     FB.getLoginStatus(function(response) {
         statusChangeCallback(response);
@@ -46,24 +80,12 @@ function checkLoginState() {
 
 window.fbAsyncInit = function() {
     FB.init({
-        appId      : '354311898384914',
+        appId      : '940061452839208',
         cookie     : true,  // enable cookies to allow the server to access 
                           // the session
         xfbml      : true,  // parse social plugins on this page
         version    : 'v2.8' // use graph api version 2.8
     });
-
-    // Now that we've initialized the JavaScript SDK, we call 
-    // FB.getLoginStatus().  This function gets the state of the
-    // person visiting this page and can return one of three states to
-    // the callback you provide.  They can be:
-    //
-    // 1. Logged into your app ('connected')
-    // 2. Logged into Facebook, but not your app ('not_authorized')
-    // 3. Not logged into Facebook and can't tell if they are logged into
-    //    your app or not.
-    //
-    // These three cases are handled in the callback function.
 
     FB.getLoginStatus(function(response) {
         statusChangeCallback(response);
@@ -71,11 +93,11 @@ window.fbAsyncInit = function() {
 
 };
 
-  // Load the SDK asynchronously
-(function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "https://connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));
+var setupContributionsDashboard = function (guindexKey) {
+
+    // Once we come in here, start populating the rest of the dashboard
+
+    
+
+
+}

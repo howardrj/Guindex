@@ -3,53 +3,49 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from Guindex.models import Pub, Guinness, GuindexUser
-
-from UserProfile.models import UserProfile
+from Guindex.models import GuindexUser
 
 from TelegramUser import TelegramUserUtils
 
 logger = logging.getLogger(__name__)
 
 
-def getUserProfileFromUser(user):
+def getUser(user):
+    """
+        Does some checks on request User object and makes
+        sure corresponding GuindexUser and TelegramUser objects 
+        are instantiated.
+    """
 
-    logger.debug("Attempting to find UserProfile with user %s", user)
-
-    # Get UserProfile from user
-    try:
-        user_profile = UserProfile.objects.get(user = user)
-    except ObjectDoesNotExist:
-        logger.error("Could not find UserProfile with user %s", user)
-        raise Exception("Could not find UserProfile with user %s" % user)
+    # TODO Maybe put in some checks to ensure user is logged in and authenticated
 
     # Create TelegramUser if not defined already
-    if not hasattr(user_profile, 'telegramuser'):
+    if not hasattr(user, 'telegramuser'):
 
-        logger.info("UserProfile %s does not have a TelegramUser. Creating one", user_profile)
+        logger.info("User %s does not have a TelegramUser. Creating one", user)
 
-        TelegramUserUtils.createNewTelegramUser(user_profile)
-
-    else:
-        logger.debug("UserProfile %s has a TelegramUser %s. No need to create one", user_profile, user_profile.telegramuser)
-
-    if not hasattr(user_profile, 'guindexuser'):
-
-        logger.info("UserProfile %s does not have a GuindexUser. Creating one", user_profile)
-        createNewGuindexUser(user_profile)
+        # TelegramUserUtils.createNewTelegramUser(user)
 
     else:
-        logger.debug("UserProfile %s has a GuindexUser %s. No need to create one", user_profile, user_profile.guindexuser)
+        logger.debug("User %s has a TelegramUser %s. No need to create one", user, user.telegramuser)
 
-    return user_profile
+    if not hasattr(user, 'guindexuser'):
+
+        logger.info("User %s does not have a GuindexUser. Creating one", user)
+        createNewGuindexUser(user)
+
+    else:
+        logger.debug("User %s has a GuindexUser %s. No need to create one", user, user.guindexuser)
+
+    return user
 
 
-def createNewGuindexUser(userProfile):
+def createNewGuindexUser(user):
 
-    logger.info("Creating new GuindexUser for UserProfile %s", userProfile)
+    logger.info("Creating new GuindexUser for User %s", user)
 
     guindexuser = GuindexUser()
-    guindexuser.userProfile = userProfile
+    guindexuser.user = user
     guindexuser.save()
 
-    logger.info("Successfully created new GuindexUser %s for UserProfile %s", userProfile.guindexuser, userProfile)
+    logger.info("Successfully created new GuindexUser %s for User %s", guindexuser, user)
