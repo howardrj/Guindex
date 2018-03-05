@@ -5,5 +5,4 @@
 [submodule "GuindexProject/UserProfile"]
 	path = GuindexProject/UserProfile
 	url = https://github.com/howardrj/UserProfile
-	branch = UserProfileGuindex
     ignore = dirty
