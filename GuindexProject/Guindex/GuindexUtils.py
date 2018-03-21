@@ -17,7 +17,11 @@ def getUser(user):
         are instantiated.
     """
 
-    # TODO Maybe put in some checks to ensure user is logged in and authenticated
+    if user.is_anonymous: 
+        # Let permission classes decide what to do after this 
+        logger.debug("User is anonymous")
+
+        return user
 
     # Create TelegramUser if not defined already
     if not hasattr(user, 'telegramuser'):

@@ -71,6 +71,7 @@ class IsContributorOrReadOnly(permissions.IsAdminUser):
 class PubList(generics.ListCreateAPIView):
 
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
+    search_fields = ('name',)
 
     def __init__(self, *args, **kwargs):
 

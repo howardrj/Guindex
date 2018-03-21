@@ -170,7 +170,6 @@ stats_dashboard.addWidget('CheapestPints', 'List', {
 
                     var cheapest_first = statistics.pubsWithPrices.slice();
 
-
                     cheapest_first.sort(function(a, b) {
                         return parseFloat(a.price) - parseFloat(b.price); 
                     });

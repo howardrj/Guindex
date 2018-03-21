@@ -17,7 +17,6 @@ Dashing.widgets.LoginWithFacebook = function(dashboard) {
 
 // This is called with the results from from FB.getLoginStatus().
 function statusChangeCallback(response) {
-    console.log(response);
 
     if (response.status === 'unknown')
     {
@@ -94,10 +93,5 @@ window.fbAsyncInit = function() {
 };
 
 var setupContributionsDashboard = function (guindexKey) {
-
-    // Once we come in here, start populating the rest of the dashboard
-
-    
-
 
 }

@@ -295,7 +295,7 @@ DROPBOX_API_ACCESS_TOKEN = secrets.DROPBOX_API_ACCESS_TOKEN
 
 # Dashing Widget Configs
 DASHING = {
-	'INSTALLED_WIDGETS': ('number','list','map', 'login_with_facebook'),
+	'INSTALLED_WIDGETS': ('number','list','map', 'login_with_facebook', 'prices'),
 	'WIDGET_CONFIGS': {
 		'map': {
 			'GOOGLE_MAPS_API_KEY': GOOGLE_MAPS_API_KEY ,
