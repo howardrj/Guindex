@@ -240,9 +240,13 @@ class PubGetSerializer(serializers.ModelSerializer):
             Guinness object serializer that omits pub info
         """
 
+        # We want both id and username to make populating table more efficient
+        creatorId   = serializers.PrimaryKeyRelatedField(source = 'creator.id', read_only = True)  
+        creatorName = serializers.PrimaryKeyRelatedField(source = 'creator.username', read_only = True)
+
         class Meta:
             model = Guinness
-            fields = ['id', 'price', 'creationDate', 'creator']
+            fields = ['id', 'price', 'creationDate', 'creatorId', 'creatorName']
 
     # Returns approved Guinness prices associated with this pub
     prices = ReducedGuinnessSerializer(source = 'getApprovedPrices', many = True, read_only = True)
