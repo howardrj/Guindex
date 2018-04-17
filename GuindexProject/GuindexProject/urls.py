@@ -20,7 +20,7 @@ from UserProfile import urls as UserProfileUrls
 
 from Guindex import urls as GuindexUrls
 
-from GuindexDashboard import urls as GuindexDashboardUrls
+from GuindexWebClient import urls as GuindexWebClientUrls
 
 from TopLevel import urls as TopLevelUrls
 
@@ -39,8 +39,8 @@ urlpatterns.extend(UserProfileUrls.urlpatterns)
 # Append Guindex views
 urlpatterns.extend(GuindexUrls.urlpatterns)
 
-# Append GuindexDashboard views
-urlpatterns.extend(GuindexDashboardUrls.urlpatterns)
+# Append GuindexWebClient views
+urlpatterns.extend(GuindexWebClientUrls.urlpatterns)
 
 # Append TopLevel views
 urlpatterns.extend(TopLevelUrls.urlpatterns)
