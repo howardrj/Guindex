@@ -41,23 +41,22 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
-    'rest_auth.registration',
+    'django.contrib.sites',
     'allauth',
     'allauth.account',
+    'rest_auth.registration',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.twitter',
     'corsheaders',
     'UserProfile',
     'Guindex',
-    'GuindexDashboard',
+    'GuindexWebClient',
     'TelegramUser',
     'TopLevel',
-    'dashing',
 )
 
 SITE_ID = 1 # Need for rest_auth stuff
@@ -103,7 +102,7 @@ WSGI_APPLICATION = 'GuindexProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/usr/share/Guindex.db',
+        'NAME': '/var/www/Testing/Guindex/Guindex.db',
     }
 }
 
@@ -192,6 +191,14 @@ LOGGING = {
             'backupCount': 10,
             'formatter': 'verbose'
         },
+        'GuindexWebClientLogFile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, "/var/log/GuindexWebClient.log"),
+            'maxBytes': 1024 * 1024 * 10,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
         'GuindexStatsLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -241,6 +248,11 @@ LOGGING = {
             'propogate': True,
             'level': 'DEBUG',
         },
+        'GuindexWebClient': {
+            'handlers': ['GuindexWebClientLogFile'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
         'GuindexStats': {
             'handlers': ['GuindexStatsLogFile'],
             'propogate': True,
@@ -281,6 +293,9 @@ REST_FRAMEWORK = {
         'user': '10000/day'
     }
 }
+
+# Allauth settings
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 # Telegram API
 BOT_HTTP_API_TOKEN = secrets.BOT_HTTP_API_TOKEN

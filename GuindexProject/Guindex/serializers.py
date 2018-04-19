@@ -241,8 +241,8 @@ class PubGetSerializer(serializers.ModelSerializer):
         """
 
         # We want both id and username to make populating table more efficient
-        creatorId   = serializers.PrimaryKeyRelatedField(source = 'creator.id', read_only = True)  
-        creatorName = serializers.PrimaryKeyRelatedField(source = 'creator.username', read_only = True)
+        creatorId   = serializers.PrimaryKeyRelatedField(source = 'creator.id', read_only = True)
+        creatorName = serializers.CharField(source = 'creator.username', read_only = True)
 
         class Meta:
             model = Guinness

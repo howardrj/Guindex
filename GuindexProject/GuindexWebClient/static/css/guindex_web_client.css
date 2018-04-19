@@ -1,0 +1,14 @@
+/***********************/
+/* Submit Price Button */
+/***********************/
+.submit_price_button {
+    color: gray;
+    display: block;
+    position:relative;
+    margin: 5px auto;
+}
+
+.hoverable {
+    cursor: hand;
+    cursor: pointer;
+}
