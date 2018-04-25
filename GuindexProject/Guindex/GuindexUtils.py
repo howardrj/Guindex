@@ -28,7 +28,7 @@ def getUser(user):
 
         logger.info("User %s does not have a TelegramUser. Creating one", user)
 
-        # TelegramUserUtils.createNewTelegramUser(user)
+        TelegramUserUtils.createNewTelegramUser(user)
 
     else:
         logger.debug("User %s has a TelegramUser %s. No need to create one", user, user.telegramuser)
