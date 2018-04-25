@@ -56,7 +56,6 @@ INSTALLED_APPS = (
     'Guindex',
     'GuindexWebClient',
     'TelegramUser',
-    'TopLevel',
 )
 
 SITE_ID = 1 # Need for rest_auth stuff
@@ -102,7 +101,7 @@ WSGI_APPLICATION = 'GuindexProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/usr/share/Guindex.db',
+        'NAME': '/var/www/Testing/Guindex/Guindex.db',
     }
 }
 
