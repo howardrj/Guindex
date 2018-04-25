@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% load static %}
+
+<head>
+  <script>
+        // Useful global constants and variables
+        var G_API_BASE = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
+
+        // Global variable to keep track of user log in state
+        var g_loggedIn    = false;
+        var g_accessToken = null;
+
+  </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113016256-1"></script>
+    <script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'UA-113016256-1');
+    </script>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title> Guindex </title>
+  <link rel="icon" href="{% static "images/favicon.png" %}">
+  <!-- Bootstrap core CSS-->
+  <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+  <!-- Custom fonts for this template-->
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Page level plugin CSS-->
+  <link rel="stylesheet" href="{% static "css/dataTables.bootstrap4.css" %}">
+  <!-- Custom styles for this template-->
+  <link rel="stylesheet" href="{% static "css/sb-admin.css" %}">
+  <link rel="stylesheet" href="{% static "css/guindex_web_client.css" %}">
+</head>
+
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+
+  <!-- Navigation-->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+    <a class="navbar-brand" href="">Guindex</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Overview">
+          <a class="nav-link page_content_link" data-content_page_id="overview_page">
+            <i class="fa fa-fw fa-home"></i>
+            <span class="nav-link-text">Overview</span>
+          </a>
+        </li>
+	    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Map">
+          <a class="nav-link page_content_link" data-content_page_id="map_page">
+            <i class="fa fa-fw fa-map-o"></i>
+            <span class="nav-link-text">Map</span>
+          </a>
+        </li>
+	    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Statistics">
+          <a class="nav-link page_content_link" data-content_page_id="statistics_page">
+            <i class="fa fa-fw fa-dashboard"></i>
+            <span class="nav-link-text">Statistics</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Analysis">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseAnalysis" data-parent="#exampleAccordion">
+            <i class="fa fa-fw fa-area-chart"></i>
+            <span class="nav-link-text">Analysis</span>
+          </a>
+          <ul class="sidenav-second-level collapse" id="collapseAnalysis">
+            <li>
+              <a class="nav_link page_content_link" data-content_page_id="analysis_main_page">Analysis Overview</a>
+            </li>
+            <li>
+              <a class="nav_link page_content_link" data-content_page_id="analysis_travelling_drunkard_page">Travelling Drunkard</a>
+            </li>
+            <li>
+              <a class="nav_link page_content_link" data-content_page_id="analysis_social_page">Correlation of Socioeconomic Factors and Guinness Pricing</a>
+            </li>
+            <li>
+              <a class="nav_link page_content_link" data-content_page_id="analysis_geo_page">Geographic Variation of Guinness Pricing</a>
+            </li>
+            <li>
+              <a class="nav_link page_content_link" data-content_page_id="analysis_pubdist_page">Furthest Distance to a Pub in County Dublin</a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Table">
+          <a class="nav-link page_content_link" data-content_page_id="guindex_table_page">
+            <i class="fa fa-fw fa-table"></i>
+            <span class="nav-link-text">Table</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
+          <a class="nav-link page_content_link" data-content_page_id="settings_page">
+            <i class="fa fa-fw fa-wrench"></i>
+            <span class="nav-link-text">Settings</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Contributors">
+          <a class="nav-link page_content_link" data-content_page_id="contributors_page">
+            <i class="fa fa-fw fa-user"></i>
+            <span class="nav-link-text">Contributors</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Pending Contributions">
+          <a class="nav-link page_content_link" data-content_page_id="pending_contributions_page">
+            <i class="fa fa-fw fa-clock-o"></i>
+            <span class="nav-link-text">Pending Contributions</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Links">
+          <a class="nav-link page_content_link" data-content_page_id="links_page">
+            <i class="fa fa-fw fa-link"></i>
+            <span class="nav-link-text">Links</span>
+          </a>
+        </li>
+
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Info">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseInfo" data-parent="#exampleAccordion">
+            <i class="fa fa-fw fa-info-circle"></i>
+            <span class="nav-link-text">Info</span>
+          </a>
+          <ul class="sidenav-second-level collapse" id="collapseInfo">
+            <li>
+              <a class="nav_link page_content_link" data-content_page_id="info_about_page">About</a>
+            </li>
+            <li>
+              <a class="nav_link page_content_link" data-content_page_id="info_privacy_page">Privacy Policy</a>
+            </li>
+            <li>
+              <a class="nav_link page_content_link" data-content_page_id="info_tos_page">Terms of Service</a>
+            </li>
+          </ul>
+        </li>
+
+      </ul>
+      <ul class="navbar-nav sidenav-toggler">
+        <li class="nav-item">
+          <a class="nav-link text-center" id="sidenavToggler">
+            <i class="fa fa-fw fa-angle-left"></i>
+          </a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="modal" id="login_link" data-target="#exampleModal">
+            <i class="fa fa-fw fa-sign-in"></i>Login</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Content Pages -->
+  {% include "overview.html" %}
+  {% include "statistics.html" %}
+  {% include "map.html" %}
+  {% include "analysis_main.html" %}
+  {% include "analysis_travelling_drunkard.html" %}
+  {% include "analysis_social.html" %}
+  {% include "analysis_geo.html" %}
+  {% include "analysis_pubdist.html" %}
+  {% include "guindex_table.html" %}
+  {% include "contributors.html" %}
+  {% include "pending_contributions.html" %}
+  {% include "settings.html" %}
+  {% include "links.html" %}
+  {% include "info_about.html" %}
+  {% include "info_privacy.html" %}
+  {% include "info_tos.html" %}
+
+  <!-- /.container-fluid-->
+  <!-- /.content-wrapper-->
+  <footer class="sticky-footer">
+    <div class="container">
+      <div class="text-center">
+        <small>Copyright © guindex.ie 2018</small>
+      </div>
+    </div>
+  </footer>
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fa fa-angle-up"></i>
+  </a>
+  <!-- Login Modal-->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Login With Facebook</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body" id="facebook_login_modal_body">Login with Facebook below if you would like to start contributing to the Guindex.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <fb:login-button id="login_with_facebook_button" scope="public_profile,email" onlogin="checkLoginState();">
+          </fb:login-button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap core JavaScript-->
+  <script type="text/javascript" src="{% static "javascript/jquery.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/bootstrap.bundle.min.js" %}"></script>
+  <!-- Core plugin JavaScript-->
+  <script type="text/javascript" src="{% static "javascript/jquery.easing.min.js" %}"></script>
+  <!-- Page level plugin JavaScript-->
+  <script type="text/javascript" src="{% static "javascript/Chart.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/jquery.dataTables.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/dataTables.bootstrap4.js" %}"></script>
+  <!-- Custom scripts for all pages-->
+  <script type="text/javascript" src="{% static "javascript/sb-admin.min.js" %}"></script>
+  <!-- Custom scripts for this page-->
+  <script type="text/javascript" src="{% static "javascript/sb-admin-datatables.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/login_with_facebook.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"></script>
+  <!-- TODO Get key from server -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3ljMm1aO1IAI-IVIAF1vLtKmW1qEWjCM&callback=initMap"></script>
+
+  <script>
+      // Load the Facebook SDK asynchronously
+      (function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "https://connect.facebook.net/en_US/sdk.js";
+          fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+  </script>   
+
+  </div>
+
+</body>
+
+</html>
