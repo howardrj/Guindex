@@ -476,3 +476,20 @@ footer.sticky-footer {
     width: calc(100% - 55px);
   }
 }
+.pint-head{
+    background-image:url(../images/rsz_1guin1_2_recol2.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: 50% 0%;
+    background-color: #F5F0EB;
+    border-style: solid;
+    border-bottom-color: black;
+    border-bottom-width: 6px;
+    margin-bottom:-0px;
+    margin-top:-17px;
+    height: 8vw;
+    width: 100%;
+    top:0vw;
+    z-index:99;
+    width:100%;
+}

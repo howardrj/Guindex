@@ -102,7 +102,7 @@ WSGI_APPLICATION = 'GuindexProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/var/www/Testing/Guindex/Guindex.db',
+        'NAME': '/usr/share/Guindex.db',
     }
 }
 
