@@ -16,6 +16,19 @@ var initMap = function ()
     onError("remove this");
 }
 
+var checkPubListForMap = function ()
+{
+    if (g_pubsList.length)
+    { 
+        populateMap();
+    }
+    else
+    {
+        // Check later if pub data has been retrived
+        setTimeout(checkPubListForMap, 1000);
+    }
+}
+
 var onSuccess = function (position)
 {
     // Set map center to user's location
@@ -23,7 +36,15 @@ var onSuccess = function (position)
 
     createMap(map_center, true);
 
-    getPubData();
+    if (g_pubsList.length)
+    { 
+        populateMap();
+    }
+    else
+    {
+        // Check later if pub data has been retrived
+        setTimeout(checkPubListForMap, 500);
+    }
 }
 
 var onError = function (error)
@@ -33,7 +54,15 @@ var onError = function (error)
     
     createMap(map_center, false);
 
-    getPubData();
+    if (g_pubsList.length)
+    { 
+        populateMap();
+    }
+    else
+    {
+        // Check later if pub data has been retrived
+        setTimeout(checkPubListForMap, 500);
+    }
 }
 
 var createMap = function (mapCenter, foundUserLocation)
@@ -58,30 +87,6 @@ var createMap = function (mapCenter, foundUserLocation)
             title: 'My Location',
             zIndex: google.maps.Marker.MAX_ZINDEX + 1
         });
-    }
-}
-
-var getPubData = function ()
-{
-    // Retrieve pub data and place parsed JSON in g_pubsList object
-    var request = new XMLHttpRequest();
-    request.open('GET', G_API_BASE + 'pubs/', true); 
-
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-    request.send(null);
-
-    request.onreadystatechange = processRequest;
-
-    function processRequest()
-    {
-        if (request.readyState == 4 && request.status == 200)
-        {
-            g_pubsList = JSON.parse(request.responseText);    
-
-            populateMap();
-        }
     }
 }
 

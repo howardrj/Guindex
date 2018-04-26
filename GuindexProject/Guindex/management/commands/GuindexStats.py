@@ -6,9 +6,8 @@ from decimal import Decimal
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
-from Guindex.models import Pub, Guinness, StatisticsSingleton
+from Guindex.models import Pub, Guinness, StatisticsSingleton, GuindexUser
 from Guindex.GuindexParameters import GuindexParameters
-from Guindex import GuindexUtils
 
 
 logger = logging.getLogger(__name__.split('.')[-1])
@@ -202,7 +201,10 @@ class Command(BaseCommand):
             if not hasattr(user, 'guindexuser'):
                 logger.debug("Need to create GuindexUser for User %s", user)
 
-                GuindexUtils.createNewGuindexUser(user)
+                guindexuser = GuindexUser()
+
+                guindexuser.user = user
+                guindexuser.save()
 
             number_of_current_verifications = 0
             number_of_first_verifications   = 0

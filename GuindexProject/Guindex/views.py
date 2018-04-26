@@ -23,7 +23,6 @@ from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
 from Guindex.models import Guinness, GuinnessPendingCreate, GuinnessPendingPatch
 from Guindex.models import StatisticsSingleton
 from GuindexParameters import GuindexParameters
-import GuindexUtils
 
 logger = logging.getLogger(__name__)
 
@@ -40,9 +39,7 @@ class IsAdminOrReadOnly(permissions.IsAdminUser):
 
     def has_permission(self, request, view):
 
-        view.user = GuindexUtils.getUser(request.user)
-
-        return request.method in ['GET'] or view.user.is_staff
+        return request.method in ['GET'] or request.user.is_staff
 
 
 class IsContributorOrReadOnly(permissions.IsAdminUser):
@@ -59,9 +56,7 @@ class IsContributorOrReadOnly(permissions.IsAdminUser):
         except:
             return False
 
-        view.user = GuindexUtils.getUser(request.user)
-
-        return request.method in ['GET'] or view.user.id == pk
+        return request.method in ['GET'] or request.user.id == pk
 
 
 #################
@@ -84,11 +79,9 @@ class PubList(generics.ListCreateAPIView):
 
         logger.info("Creating new Pub")
 
-        user = GuindexUtils.getUser(self.request.user)
-
         # Sets creator field in Pub object
         # prior to calling object's save method
-        serializer.save(creator = user)
+        serializer.save(creator = request.user)
 
     def get_serializer_class(self):
 
@@ -116,9 +109,7 @@ class PubDetail(generics.RetrieveUpdateAPIView):
 
         logger.info("Updating Pub object")
 
-        user = GuindexUtils.getUser(self.request.user)
-
-        serializer.save(user = user)
+        serializer.save(user = self.request.user)
 
     def get_serializer_class(self):
 
@@ -225,11 +216,9 @@ class GuinnessList(generics.ListCreateAPIView):
 
         logger.info("Creating new Guinness")
 
-        user = GuindexUtils.getUser(self.request.user)
-
         # Sets creator field in Guinness object
         # prior to calling object's save method
-        serializer.save(creator = user)
+        serializer.save(creator = self.request.user)
 
     def get_serializer_class(self):
 
@@ -257,9 +246,7 @@ class GuinnessDetail(generics.RetrieveUpdateAPIView):
 
         logger.info("Updating Guinness object")
 
-        user = GuindexUtils.getUser(self.request.user)
-
-        serializer.save(user = user)
+        serializer.save(user = self.request.user)
 
     def get_serializer_class(self):
         if self.request.method == 'PATCH':

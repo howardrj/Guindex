@@ -17,15 +17,18 @@ function statusChangeCallback(response) {
         // Logged into your app and Facebook.
         var access_token = response['authResponse']['accessToken'];
         var user_id      = response['authResponse']['userID'];
-        var username     = null;
+
+        // Assign access token to global variable 
+        g_facebookAccessToken = access_token;
 
         // Retrieve user name through facebook API
         FB.api(
             '/' + user_id,
             'GET',
-            {},
+            {fields: 'name, email'},
             function(response) {
-                username = response.name;
+                g_username = response.name;
+                g_email    = response.email;
             }
         );
 
@@ -39,25 +42,33 @@ function statusChangeCallback(response) {
 
         request.send(JSON.stringify({'access_token': access_token}));
 
-        // Pull in contributins widgets once user is authenticated
-        // and display log out button
         request.onreadystatechange = function processRequest()
         {
-            if (request.readyState == 4 && request.status == 200)
+            if (request.readyState == 4)
             {
-                // We have successfully logged in
-                // Get token from response JSON object
                 var response = JSON.parse(request.responseText);
 
-                g_loggedIn = true;
-                g_accessToken = response['key'];
+                if (request.status == 200)
+                {
+                    // We have successfully logged in
+                    // Get token from response JSON object
 
-                var login_link = document.getElementById('login_link');
-                login_link.innerHTML = username;
+                    g_loggedIn = true;
+                    g_accessToken = response['key'];
 
-                // Hide facebook button
-                document.getElementById('facebook_login_modal_body').innerHTML = 'Logged in as ' + username + '.';
-                document.getElementById('login_with_facebook_button').style.display = 'none';
+                    var login_link = document.getElementById('login_link');
+                    login_link.innerHTML = g_username;
+
+                    // Hide facebook button
+                    document.getElementById('facebook_login_modal_body').innerHTML = 'Logged in as ' + g_username + '.';
+                    document.getElementById('login_with_facebook_button').style.display = 'none';
+                }    
+                else if (request.status == 400 && response['non_field_errors'][0] === "User is already registered with this e-mail address.")
+                {
+                    document.getElementById('facebook_email').innerHTML = g_email;
+                    document.getElementById('facebook_connect_nav_item').style.display = 'block';
+                    document.getElementById('facebook_connect_modal_link').click();
+                }
             }
         }
     } 
@@ -84,3 +95,77 @@ window.fbAsyncInit = function() {
         statusChangeCallback(response);
     });
 };
+
+
+// Add event listener for facebook connect button
+(function () {
+
+    document.getElementById('facebook_connect_button').addEventListener('click', function (evt) {
+
+        var password = document.getElementById('facebook_connect_password_input').value;
+
+        // Don't post empty password
+        if (!password)
+            return;
+
+        // TODO Change buttons to loader
+
+        // Use REST API to check password is correct
+        var request = new XMLHttpRequest();
+
+        request.open('POST', G_API_BASE + 'rest-auth/login/', true);
+
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        request.send(JSON.stringify({'email': g_email, 'password': password}));
+
+        request.onreadystatechange = function processRequest()
+        {
+            if (request.readyState == 4 && request.status == 200)
+            {
+                var response = JSON.parse(request.responseText);
+
+                g_accessToken = response['key'];
+
+                connectAccounts();
+            }
+        }
+    });
+
+    var connectAccounts = function ()
+    {
+        // Use REST API to connect accounts
+        var request = new XMLHttpRequest();
+
+        request.open('POST', G_API_BASE + 'rest-auth/facebook/connect/', true);
+
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        request.setRequestHeader('Authorization', 'Token ' + g_accessToken);
+
+        request.send(JSON.stringify({'access_token': g_facebookAccessToken}));
+
+        request.onreadystatechange = function processRequest()
+        {
+            if (request.readyState == 4 && request.status == 200)
+            {
+                var response = JSON.parse(request.responseText);
+
+                g_loggedIn = true;
+                g_accessToken = response['key'];
+
+                var login_link = document.getElementById('login_link');
+                login_link.innerHTML = g_username;
+
+                // Hide facebook button
+                document.getElementById('facebook_login_modal_body').innerHTML = 'Logged in as ' + g_username + '.';
+                document.getElementById('login_with_facebook_button').style.display = 'none';
+
+                // Hide connect button and close modal
+                document.getElementById('facebook_connect_nav_item').style.display = 'none';
+                document.getElementById('facebook_connect_cancel_button').click();
+            }
+        }
+    }
+})();

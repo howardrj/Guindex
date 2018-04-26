@@ -27,6 +27,8 @@
 #guindex_map_container {
     padding: auto 0;
     text-align: center;
+    height: 80vh;
+    position: relative;
 }
 
 #guindex_map {

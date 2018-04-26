@@ -266,3 +266,4 @@ class GuindexUser(models.Model):
     originalPrices       = models.IntegerField(default = 0)
     currentVerifications = models.IntegerField(default = 0)
     lastCalculated       = models.DateTimeField(auto_now = True)
+    usingEmailAlerts     = models.BooleanField(default = False)

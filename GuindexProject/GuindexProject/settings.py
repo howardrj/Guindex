@@ -307,12 +307,15 @@ DROPBOX_API_KEY          = secrets.DROPBOX_API_KEY
 DROPBOX_API_SECRET       = secrets.DROPBOX_API_SECRET
 DROPBOX_API_ACCESS_TOKEN = secrets.DROPBOX_API_ACCESS_TOKEN
 
-# Dashing Widget Configs
-DASHING = {
-	'INSTALLED_WIDGETS': ('number','list','map', 'login_with_facebook', 'prices'),
-	'WIDGET_CONFIGS': {
-		'map': {
-			'GOOGLE_MAPS_API_KEY': GOOGLE_MAPS_API_KEY ,
-		},
-	},
-}
+# Settings for rest-auth login
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True   
+ACCOUNT_USERNAME_REQUIRED = False
+
+AUTHENTICATION_BACKENDS = (
+ # Needed to login by username in Django admin, regardless of `allauth`
+ "django.contrib.auth.backends.ModelBackend",
+
+ # `allauth` specific authentication methods, such as login by e-mail
+ "allauth.account.auth_backends.AuthenticationBackend",
+)

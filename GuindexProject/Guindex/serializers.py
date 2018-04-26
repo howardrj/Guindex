@@ -505,6 +505,7 @@ class ContributorGetSerializer(serializers.ModelSerializer):
     pubsVisited          = serializers.IntegerField(source = 'guindexuser.pubsVisited')
     originalPrices       = serializers.IntegerField(source = 'guindexuser.originalPrices')
     currentVerifications = serializers.IntegerField(source = 'guindexuser.currentVerifications')
+    usingEmailAlerts     = serializers.BooleanField(source = 'guindexuser.usingEmailAlerts')
     usingTelegramAlerts  = serializers.BooleanField(source = 'telegramuser.usingTelegramAlerts')
 
     class Meta:
@@ -515,6 +516,7 @@ class ContributorGetSerializer(serializers.ModelSerializer):
 
 class ContributorPatchSerializer(serializers.ModelSerializer):
 
+    usingEmailAlerts    = serializers.BooleanField(source = 'guindexuser.usingEmailAlerts')
     usingTelegramAlerts = serializers.BooleanField(source = 'telegramuser.usingTelegramAlerts')
 
     class Meta:
@@ -546,5 +548,17 @@ class ContributorPatchSerializer(serializers.ModelSerializer):
             # Update instance field here instead
             self.instance.telegramuser.usingTelegramAlerts = self.validated_data['telegramuser']['usingTelegramAlerts']
             del self.validated_data['telegramuser']
+
+        if 'guindexuser' in self.validated_data:
+
+            # This is a horrible but necessary hack
+            # Needed to update email alert settings via API
+            # since source field does not seem to work when deserializing
+
+            logger.debug("Attempting to update Email alerts setting")
+
+            # Update instance field here instead
+            self.instance.guindexuser.usingEmailAlerts = self.validated_data['guindexuser']['usingEmailAlerts']
+            del self.validated_data['guindexuser']
 
         super(ContributorPatchSerializer, self).save(**kwargs)

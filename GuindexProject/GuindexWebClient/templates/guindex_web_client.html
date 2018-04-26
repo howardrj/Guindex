@@ -9,8 +9,32 @@
         var G_API_BASE = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
 
         // Global variable to keep track of user log in state
-        var g_loggedIn    = false;
-        var g_accessToken = null;
+        var g_loggedIn            = false;
+        var g_accessToken         = null;
+        var g_username            = null;
+        var g_email               = null; 
+        var g_facebookAccessToken = null;
+
+        var g_pubsList = []
+
+        // Retrieve pub data and place parsed JSON in g_pubsList object
+        var request = new XMLHttpRequest();
+        request.open('GET', G_API_BASE + 'pubs/', true); 
+
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        request.send(null);
+
+        request.onreadystatechange = processRequest;
+
+        function processRequest()
+        {
+            if (request.readyState == 4 && request.status == 200)
+            {
+                g_pubsList = JSON.parse(request.responseText);    
+            }
+        }
 
   </script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -142,6 +166,21 @@
           </ul>
         </li>
 
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Help">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseHelp" data-parent="#exampleAccordion">
+            <i class="fa fa-fw fa-question-circle"></i>
+            <span class="nav-link-text">Help</span>
+          </a>
+          <ul class="sidenav-second-level collapse" id="collapseHelp">
+            <li>
+              <a class="nav_link page_content_link" data-content_page_id="help_contact_page">Contact</a>
+            </li>
+            <li>
+              <a class="nav_link page_content_link" data-content_page_id="help_api_page">Guindex API</a>
+            </li>
+          </ul>
+        </li>
+
       </ul>
       <ul class="navbar-nav sidenav-toggler">
         <li class="nav-item">
@@ -154,6 +193,11 @@
         <li class="nav-item">
           <a class="nav-link" data-toggle="modal" id="login_link" data-target="#exampleModal">
             <i class="fa fa-fw fa-sign-in"></i>Login</a>
+        </li>
+        <li class="nav-item" id="facebook_connect_nav_item" style="display:none">
+          <a class="nav-link" data-toggle="modal" id="facebook_connect_modal_link" data-target="#facebook_connect_modal">
+            <i class="fa fa-fw fa-plug"></i>Connect
+          </a>
         </li>
       </ul>
     </div>
@@ -176,6 +220,8 @@
   {% include "info_about.html" %}
   {% include "info_privacy.html" %}
   {% include "info_tos.html" %}
+  {% include "help_contact.html" %}
+  {% include "help_api.html" %}
 
   <!-- /.container-fluid-->
   <!-- /.content-wrapper-->
@@ -190,6 +236,7 @@
   <a class="scroll-to-top rounded" href="#page-top">
     <i class="fa fa-angle-up"></i>
   </a>
+
   <!-- Login Modal-->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -209,6 +256,37 @@
       </div>
     </div>
   </div>
+
+  <!-- Connect Accounts Modal -->
+  <div class="modal fade" id="facebook_connect_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Connect Accounts</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+            We have detected that an account was previously created with the email <span id="facebook_email"></span>.
+            We assume this is you but to be sure, please enter the password of your previously created account below to 
+            connect your Guindex and Facebook accounts.    
+
+            <div class="form-group" style="margin-top:10px">
+                <input class="form-control" id="facebook_connect_password_input" type="password" placeholder="Enter password">
+            </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="facebook_connect_cancel_button" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" id="facebook_connect_button">Connect</a>
+          <button style="font-size:24px" id="facebokk_connect_loader" style="display:none"><i class="fa fa-spinner"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Bootstrap core JavaScript-->
   <script type="text/javascript" src="{% static "javascript/jquery.min.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/bootstrap.bundle.min.js" %}"></script>
