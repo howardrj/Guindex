@@ -18,6 +18,36 @@ body.sticky-footer .content-wrapper {
 body.fixed-nav {
   padding-top: 56px;
 }
+/*==========================================
+PRE LOADER 
+==========================================*/
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #fefefe;
+    z-index: 99999;
+    height: 100%;
+    width: 100%;
+    overflow: hidden !important;
+}
+
+.loaded {
+    width: 40vw;
+    height: 50vw;
+    position: absolute;
+    left: 32%;
+    top: 7%;
+    background-image: url(../images/GuinPour.gif);
+    background-repeat: no-repeat;
+    background-position: center;
+	background-size: 45%;
+    margin: -2vw 0 0 -2vw;
+}
+
+
 
 .content-wrapper {
   min-height: calc(100vh - 56px);
@@ -281,7 +311,10 @@ body.sidenav-toggled #mainNav.static-top #sidenavToggler i {
 
 .content-wrapper {
   overflow-x: hidden;
-  background: white;
+  background-image:url("../images/bg4_refl_big-min_recol.jpg");
+  top:2vw;
+  color: #ffffff;
+  -webkit-text-stroke:0.025vw black;
 }
 
 @media (min-width: 992px) {
@@ -476,6 +509,7 @@ footer.sticky-footer {
     width: calc(100% - 55px);
   }
 }
+@media only screen and (min-width:961px){
 .pint-head{
     background-image:url(../images/rsz_1guin1_2_recol2.png);
     background-repeat: no-repeat;
@@ -493,3 +527,61 @@ footer.sticky-footer {
     z-index:99;
     width:100%;
 }
+}
+@media only screen and (min-width:401px) and (max-width:960px){
+.pint-head{
+    background-image:url(../images/rsz_1guin1_2_recol2.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: 50% 0%;
+    background-color: #F5F0EB;
+    border-style: solid;
+    border-bottom-color: black;
+    border-bottom-width: 6px;
+    margin-bottom:-0px;
+    margin-top:-17px;
+    height: 15vw;
+    width: 100%;
+    top:0vw;
+    z-index:99;
+    width:100%;
+}
+}
+@media only screen and (max-width:400px){
+.pint-head{
+    background-image:url(../images/rsz_1guin1_2_recol2.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: 50% 0%;
+    background-color: #F5F0EB;
+    border-style: solid;
+    border-bottom-color: black;
+    border-bottom-width: 6px;
+    margin-bottom:-0px;
+    margin-top:-17px;
+    height: 20vw;
+    width: 100%;
+    top:0vw;
+    z-index:99;
+    width:100%;
+}
+}
+@media only screen and (min-width:961px){
+.bigshiftedcontainer{
+     margin-left: 5vw;
+     margin-right: 5vw;
+     margin-top: 2vw;
+     margin-bottom: 2vw;
+     font-size: 2.1vw;
+}
+}
+@media only screen and (min-width:401px) and (max-width:960px){
+.bigshiftedcontainer{
+
+}
+@media only screen and (max-width:400px){
+.bigshiftedcontainer{
+   
+}
+}
+
