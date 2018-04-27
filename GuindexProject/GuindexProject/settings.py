@@ -319,3 +319,7 @@ AUTHENTICATION_BACKENDS = (
  # `allauth` specific authentication methods, such as login by e-mail
  "allauth.account.auth_backends.AuthenticationBackend",
 )
+
+REST_AUTH_SERIALIZERS = {
+    'TOKEN_SERIALIZER': 'UserProfile.serializers.TokenSerializer',
+}

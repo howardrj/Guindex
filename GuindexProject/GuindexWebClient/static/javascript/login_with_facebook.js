@@ -53,8 +53,9 @@ function statusChangeCallback(response) {
                     // We have successfully logged in
                     // Get token from response JSON object
 
-                    g_loggedIn = true;
+                    g_loggedIn    = true;
                     g_accessToken = response['key'];
+                    g_userId      = response['user'];
 
                     var login_link = document.getElementById('login_link');
                     login_link.innerHTML = g_username;
@@ -152,8 +153,9 @@ window.fbAsyncInit = function() {
             {
                 var response = JSON.parse(request.responseText);
 
-                g_loggedIn = true;
+                g_loggedIn    = true;
                 g_accessToken = response['key'];
+                g_userId      = response['user'];
 
                 var login_link = document.getElementById('login_link');
                 login_link.innerHTML = g_username;
