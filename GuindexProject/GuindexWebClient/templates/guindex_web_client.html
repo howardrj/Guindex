@@ -15,10 +15,12 @@
         var g_username            = null;
         var g_email               = null; 
         var g_facebookAccessToken = null;
+        var g_facebookAppId       = '{{facebook_app_id}}';
 
         var g_pubsList = []
 
         // Retrieve pub data and place parsed JSON in g_pubsList object
+        // for other javacript modules to use
         var request = new XMLHttpRequest();
         request.open('GET', G_API_BASE + 'pubs/', true); 
 
@@ -36,7 +38,6 @@
                 g_pubsList = JSON.parse(request.responseText);    
             }
         }
-
   </script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113016256-1"></script>
@@ -283,7 +284,29 @@
         <div class="modal-footer">
           <button class="btn btn-secondary" id="facebook_connect_cancel_button" type="button" data-dismiss="modal">Cancel</button>
           <a class="btn btn-primary" id="facebook_connect_button">Connect</a>
-          <button style="font-size:24px" id="facebokk_connect_loader" style="display:none"><i class="fa fa-spinner"></i></button>
+          <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic Message Modal (with hidden button to open it)-->
+  <a class="nav-link" data-toggle="modal" id="message_link" data-target="#message_modal" style="display:none"></a>
+
+  <div class="modal fade" id="message_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:9999">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="message_severity"></h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body" id="message_body">
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">OK</button>
         </div>
       </div>
     </div>
@@ -302,12 +325,14 @@
   <script type="text/javascript" src="{% static "javascript/sb-admin.min.js" %}"></script>
   <!-- Custom scripts for this page-->
   <script type="text/javascript" src="{% static "javascript/sb-admin-datatables.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/login_with_facebook.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"></script>
-  <!-- TODO Get key from server -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3ljMm1aO1IAI-IVIAF1vLtKmW1qEWjCM&callback=initMap"></script>
+  <script type="text/javascript" src="{% static "javascript/main.js" %}"></script>
+
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key={{google_maps_api_key}}&callback=initMap"></script>
 
   <script>
       // Load the Facebook SDK asynchronously
@@ -321,11 +346,6 @@
   </script>   
 
   </div>
-  
-  <script src="../static/javascript/jquery-1.11.2.min.js"></script>
-
-
-        <script src="../static/javascript/main.js"></script>
 
 </body>
 

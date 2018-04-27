@@ -13,16 +13,6 @@
         }
     }
 
-    // Check g_pubsList is populated
-    if (g_pubsList.length)
-    {
-        populateTable();
-    }
-    else
-    {
-        checkPubListForTable();
-    }
-
     var populateTable = function ()
     {
         var table_data = [];
@@ -87,7 +77,9 @@
             // Append submit price button
             var input_field   = '<input class="price_input" type="number" step="0.01" min="0" max="10"/>';
             var submit_button = '<i class="fa fa-paper-plane submit_price_button" title="Submit Price (only available when logged in)" data-pub_id="' + pubs_list[i]['id'] + '"></i>';
-            pub_data.push(input_field + submit_button);
+            var loader        = '<i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>';
+
+            pub_data.push(input_field + submit_button + loader);
 
             table_data.push(pub_data.slice());
         } 
@@ -135,6 +127,10 @@
             
                 if (evt.target.classList.contains('hoverable'))
                 {
+                    var button = evt.target;
+    
+                    toggleLoader(button);
+
                     var price  = parseFloat(evt.target.parentNode.getElementsByTagName('input')[0].value);
                     var pub_id = parseInt(evt.target.getAttribute('data-pub_id'));
 
@@ -159,12 +155,15 @@
 
                                 // TODO Open success modal and reload table
                                 // Message should be different depending on if user is staff or not
+
+                                toggleLoader(button);
                             }
                             else
                             {
                                 console.log("Error");
 
                                 // TODO Open Error Modal
+                                toggleLoader(button);
                             }
                         }   
                     }
@@ -172,4 +171,14 @@
             });
         }
     } 
+
+    // Check g_pubsList is populated
+    if (g_pubsList.length)
+    {
+        populateTable();
+    }
+    else
+    {
+        checkPubListForTable();
+    }
 })();

@@ -48,3 +48,11 @@
     cursor:hand;
     cursor:pointer;
 }
+
+/*******************/
+/* Spinning Loader */
+/*******************/
+.guindex_web_client_loader {
+    color: black;
+    display: none;
+}

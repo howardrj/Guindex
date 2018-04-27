@@ -61,7 +61,7 @@ function statusChangeCallback(response) {
                     login_link.innerHTML = g_username;
 
                     // Hide facebook button
-                    document.getElementById('facebook_login_modal_body').innerHTML = 'Logged in as ' + g_username + '.';
+                    document.getElementById('facebook_login_modal_body').innerHTML = 'Logged in as ' + g_username.trim() + '.';
                     document.getElementById('login_with_facebook_button').style.display = 'none';
                 }    
                 else if (request.status == 400 && response['non_field_errors'][0] === "User is already registered with this e-mail address.")
@@ -85,7 +85,7 @@ function checkLoginState() {
 window.fbAsyncInit = function() {
 
     FB.init({
-        appId      : '940061452839208',
+        appId      : g_facebookAppId,
         cookie     : true,  // enable cookies to allow the server to access 
                           // the session
         xfbml      : true,  // parse social plugins on this page
@@ -109,7 +109,9 @@ window.fbAsyncInit = function() {
         if (!password)
             return;
 
-        // TODO Change buttons to loader
+        // Change buttons to loader
+        var connect_button = evt.target;
+        toggleLoader(connect_button);
 
         // Use REST API to check password is correct
         var request = new XMLHttpRequest();
@@ -123,18 +125,28 @@ window.fbAsyncInit = function() {
 
         request.onreadystatechange = function processRequest()
         {
-            if (request.readyState == 4 && request.status == 200)
+            if (request.readyState == 4)
             {
                 var response = JSON.parse(request.responseText);
 
-                g_accessToken = response['key'];
+                if (request.status == 200)
+                {
+                    g_accessToken = response['key'];
 
-                connectAccounts();
+                    connectAccounts(connect_button);
+                }
+                else if (request.status == 400 && response['non_field_errors'][0] === "Unable to log in with provided credentials.")
+                {
+                    // Incorrect password
+                    toggleLoader(connect_button);
+
+                    displayMessage("Error", "Incorrect password. Try again.");
+                }
             }
         }
     });
 
-    var connectAccounts = function ()
+    var connectAccounts = function (connectButton)
     {
         // Use REST API to connect accounts
         var request = new XMLHttpRequest();
@@ -149,24 +161,35 @@ window.fbAsyncInit = function() {
 
         request.onreadystatechange = function processRequest()
         {
-            if (request.readyState == 4 && request.status == 200)
+            if (request.readyState == 4)
             {
-                var response = JSON.parse(request.responseText);
+                toggleLoader(connectButton);
 
-                g_loggedIn    = true;
-                g_accessToken = response['key'];
-                g_userId      = response['user'];
+                if (request.status == 200)
+                {
+                    var response = JSON.parse(request.responseText);
 
-                var login_link = document.getElementById('login_link');
-                login_link.innerHTML = g_username;
+                    g_loggedIn    = true;
+                    g_accessToken = response['key'];
+                    g_userId      = response['user'];
 
-                // Hide facebook button
-                document.getElementById('facebook_login_modal_body').innerHTML = 'Logged in as ' + g_username + '.';
-                document.getElementById('login_with_facebook_button').style.display = 'none';
+                    var login_link = document.getElementById('login_link');
+                    login_link.innerHTML = g_username;
 
-                // Hide connect button and close modal
-                document.getElementById('facebook_connect_nav_item').style.display = 'none';
-                document.getElementById('facebook_connect_cancel_button').click();
+                    // Hide facebook button
+                    document.getElementById('facebook_login_modal_body').innerHTML = 'Logged in as ' + g_username + '.';
+                    document.getElementById('login_with_facebook_button').style.display = 'none';
+
+                    // Hide connect button and close modal
+                    document.getElementById('facebook_connect_nav_item').style.display = 'none';
+                    document.getElementById('facebook_connect_cancel_button').click();
+
+                    displayMessage("Info", "Succesfully connected accounts. You are now logged in as " + g_username + " .");
+                }
+                else
+                {
+                    displayMessage("Info", "Failed to connect accounts.");
+                }
             }
         }
     }

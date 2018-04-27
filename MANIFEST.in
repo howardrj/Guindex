@@ -1,0 +1,5 @@
+include GuindexProject/Guindex/service_scripts/GuindexGunicorn.service
+include GuindexProject/Guindex/service_scripts/GuindexAlerts.service
+include GuindexProject/Guindex/service_scripts/GuindexDbBackup.service
+include GuindexProject/Guindex/service_scripts/GuindexStats.service
+include GuindexProject/Guindex/service_scripts/GuindexTelegramBot.service
