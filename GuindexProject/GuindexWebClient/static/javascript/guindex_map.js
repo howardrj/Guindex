@@ -12,8 +12,7 @@ var g_pubMarkers          = [];
 
 var initMap = function ()
 {
-    //navigator.geolocation.getCurrentPosition(onSuccess, onError);
-    onError("remove this");
+    navigator.geolocation.getCurrentPosition(onSuccess, onError);
 }
 
 var checkPubListForMap = function ()
@@ -24,7 +23,7 @@ var checkPubListForMap = function ()
     }
     else
     {
-        // Check later if pub data has been retrived
+        // Check later if pub data has been retreived
         setTimeout(checkPubListForMap, 1000);
     }
 }
@@ -42,7 +41,7 @@ var onSuccess = function (position)
     }
     else
     {
-        // Check later if pub data has been retrived
+        // Check later if pub data has been retreived
         setTimeout(checkPubListForMap, 500);
     }
 }

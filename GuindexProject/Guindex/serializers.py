@@ -510,7 +510,7 @@ class ContributorGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'pubsVisited', 'originalPrices', 'currentVerifications',
+        fields = ['id', 'username', 'is_staff', 'pubsVisited', 'originalPrices', 'currentVerifications',
                   'usingEmailAlerts', 'usingTelegramAlerts']
 
 

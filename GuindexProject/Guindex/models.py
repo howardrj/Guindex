@@ -38,7 +38,7 @@ class PubBase(models.Model):
         abstract = True
 
     def __unicode__(self):
-        return "'%s(%d)'" % (self.name, self.id)
+        return "'%s(%s)'" % (self.name, str(self.id) if self.id else "No DB ID")
 
 
 class Pub(PubBase):
@@ -149,7 +149,7 @@ class GuinnessBase(models.Model):
         abstract = True
 
     def __unicode__(self):
-        return "'%s(%d) - Price: %.2f'" % (self.pub, self.id, self.price)
+        return "'%s(%s) - Price: %.2f'" % (self.pub, str(self.id) if self.id else "No DB ID", self.price)
 
 
 class Guinness(GuinnessBase):
@@ -178,8 +178,11 @@ class Guinness(GuinnessBase):
                 self.createPendingCreate()
                 return
 
-            # Append to pub prices list
+            super(Guinness, self).save(*args, **kwargs)
+        
+            # Append to pub prices list (must have DB ID at this point)
             self.pub.prices.add(self)
+            return
 
         super(Guinness, self).save(*args, **kwargs)
 

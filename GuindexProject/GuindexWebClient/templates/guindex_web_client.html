@@ -6,38 +6,21 @@
 <head>
   <script>
         // Useful global constants and variables
-        var G_API_BASE = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
+        var G_API_BASE        = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
+        var G_FACEBOOK_APP_ID = '{{facebook_app_id}}';
 
-        // Global variable to keep track of user log in state
+        // Global variables to keep track of user state
         var g_loggedIn            = false;
         var g_accessToken         = null;
         var g_userId              = null;
         var g_username            = null;
+        var g_isStaffMember       = null;
         var g_email               = null; 
         var g_facebookAccessToken = null;
-        var g_facebookAppId       = '{{facebook_app_id}}';
 
-        var g_pubsList = []
+        var g_pubsList = [];
+        var g_contributorsList = [];
 
-        // Retrieve pub data and place parsed JSON in g_pubsList object
-        // for other javacript modules to use
-        var request = new XMLHttpRequest();
-        request.open('GET', G_API_BASE + 'pubs/', true); 
-
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-        request.send(null);
-
-        request.onreadystatechange = processRequest;
-
-        function processRequest()
-        {
-            if (request.readyState == 4 && request.status == 200)
-            {
-                g_pubsList = JSON.parse(request.responseText);    
-            }
-        }
   </script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113016256-1"></script>
@@ -327,6 +310,7 @@
   <script type="text/javascript" src="{% static "javascript/sb-admin-datatables.min.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/login_with_facebook.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_contributors.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"></script>
@@ -344,6 +328,29 @@
           fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
   </script>   
+
+  <script>
+        // Retrieve pub data and place parsed JSON in g_pubsList object
+        // for other javacript modules to use
+        var request = new XMLHttpRequest();
+        request.open('GET', G_API_BASE + 'pubs/', true); 
+
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        request.send(null);
+
+        request.onreadystatechange = processRequest;
+
+        function processRequest()
+        {
+            if (request.readyState == 4 && request.status == 200)
+            {
+                g_pubsList = JSON.parse(request.responseText);    
+                populateGuindexTable();
+            }
+        }
+   </script>
 
   </div>
 

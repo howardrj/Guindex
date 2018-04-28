@@ -63,6 +63,9 @@ function statusChangeCallback(response) {
                     // Hide facebook button
                     document.getElementById('facebook_login_modal_body').innerHTML = 'Logged in as ' + g_username.trim() + '.';
                     document.getElementById('login_with_facebook_button').style.display = 'none';
+
+                    // Get contributor info
+                    getContributorInfo();
                 }    
                 else if (request.status == 400 && response['non_field_errors'][0] === "User is already registered with this e-mail address.")
                 {
@@ -85,7 +88,7 @@ function checkLoginState() {
 window.fbAsyncInit = function() {
 
     FB.init({
-        appId      : g_facebookAppId,
+        appId      : G_FACEBOOK_APP_ID,
         cookie     : true,  // enable cookies to allow the server to access 
                           // the session
         xfbml      : true,  // parse social plugins on this page
@@ -185,10 +188,12 @@ window.fbAsyncInit = function() {
                     document.getElementById('facebook_connect_cancel_button').click();
 
                     displayMessage("Info", "Succesfully connected accounts. You are now logged in as " + g_username + " .");
+
+                    getContributorInfo();
                 }
                 else
                 {
-                    displayMessage("Info", "Failed to connect accounts.");
+                    displayMessage("Error", "Failed to connect accounts.");
                 }
             }
         }
