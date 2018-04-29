@@ -505,14 +505,26 @@ class ContributorGetSerializer(serializers.ModelSerializer):
     pubsVisited          = serializers.IntegerField(source = 'guindexuser.pubsVisited')
     originalPrices       = serializers.IntegerField(source = 'guindexuser.originalPrices')
     currentVerifications = serializers.IntegerField(source = 'guindexuser.currentVerifications')
-    usingEmailAlerts     = serializers.BooleanField(source = 'guindexuser.usingEmailAlerts')
-    usingTelegramAlerts  = serializers.BooleanField(source = 'telegramuser.usingTelegramAlerts')
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'pubsVisited', 'originalPrices', 'currentVerifications']
+
+
+class ContributorDetailedGetSerializer(serializers.ModelSerializer):
+
+    pubsVisited           = serializers.IntegerField(source = 'guindexuser.pubsVisited')
+    originalPrices        = serializers.IntegerField(source = 'guindexuser.originalPrices')
+    currentVerifications  = serializers.IntegerField(source = 'guindexuser.currentVerifications')
+    usingEmailAlerts      = serializers.BooleanField(source = 'guindexuser.usingEmailAlerts')
+    usingTelegramAlerts   = serializers.BooleanField(source = 'telegramuser.usingTelegramAlerts')
+    telegramActivated     = serializers.BooleanField(source = 'telegramuser.activated') 
+    telegramActivationKey = serializers.CharField(source = 'telegramuser.activationKey') 
 
     class Meta:
         model = User
         fields = ['id', 'username', 'is_staff', 'pubsVisited', 'originalPrices', 'currentVerifications',
-                  'usingEmailAlerts', 'usingTelegramAlerts']
-
+                  'usingEmailAlerts', 'usingTelegramAlerts', 'telegramActivated', 'telegramActivationKey']
 
 class ContributorPatchSerializer(serializers.ModelSerializer):
 
@@ -535,6 +547,14 @@ class ContributorPatchSerializer(serializers.ModelSerializer):
 
         return data
 
+    def validate_usingTelegramAlerts(self, usingTelegramAlerts):
+        
+        if not self.instance.telegramuser.activated:
+            logger.error("User has not activated Telegram account yet") 
+            raise ValidationError("You must activate your Telegram account before Telegram alerts can be enabled.")
+            
+        return usingTelegramAlerts
+
     def save(self, **kwargs):
 
         if 'telegramuser' in self.validated_data:
@@ -545,8 +565,9 @@ class ContributorPatchSerializer(serializers.ModelSerializer):
 
             logger.debug("Attempting to update Telegram alerts setting")
 
-            # Update instance field here instead
+            # Update and save instance field here instead
             self.instance.telegramuser.usingTelegramAlerts = self.validated_data['telegramuser']['usingTelegramAlerts']
+            self.instance.telegramuser.save()
             del self.validated_data['telegramuser']
 
         if 'guindexuser' in self.validated_data:
@@ -557,8 +578,9 @@ class ContributorPatchSerializer(serializers.ModelSerializer):
 
             logger.debug("Attempting to update Email alerts setting")
 
-            # Update instance field here instead
+            # Update and save instance field here instead
             self.instance.guindexuser.usingEmailAlerts = self.validated_data['guindexuser']['usingEmailAlerts']
+            self.instance.guindexuser.save()
             del self.validated_data['guindexuser']
 
         super(ContributorPatchSerializer, self).save(**kwargs)

@@ -17,7 +17,7 @@ from Guindex.serializers import GuinnessGetSerializer, GuinnessPostSerializer, G
 from Guindex.serializers import GuinnessPendingCreateGetSerializer, GuinnessPendingCreatePatchSerializer
 from Guindex.serializers import GuinnessPendingPatchGetSerializer, GuinnessPendingPatchPatchSerializer
 from Guindex.serializers import StatisticsSerializer
-from Guindex.serializers import ContributorGetSerializer, ContributorPatchSerializer
+from Guindex.serializers import ContributorGetSerializer, ContributorDetailedGetSerializer, ContributorPatchSerializer
 
 from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
 from Guindex.models import Guinness, GuinnessPendingCreate, GuinnessPendingPatch
@@ -42,10 +42,10 @@ class IsAdminOrReadOnly(permissions.IsAdminUser):
         return request.method in ['GET'] or request.user.is_staff
 
 
-class IsContributorOrReadOnly(permissions.IsAdminUser):
+class IsContributor(permissions.IsAdminUser):
     """
         Custom permissions class that only allows a contributor
-        to update it's own fields
+        to update it's own fields and read sensitive data
     """
 
     def has_permission(self, request, view):
@@ -56,7 +56,7 @@ class IsContributorOrReadOnly(permissions.IsAdminUser):
         except:
             return False
 
-        return request.method in ['GET'] or request.user.id == pk
+        return request.user.id == pk
 
 
 #################
@@ -378,11 +378,13 @@ class ContributorList(generics.ListAPIView):
 
 class ContributorDetail(generics.RetrieveUpdateAPIView):
     """
-        A contributor can allow patch its own User model.
-        The alert settings are the only editable fields
+        A contributor can only patch its own User model.
+        The alert settings are the only editable fields.
+        A contributor can access detailed serializer for 
+        its own User model.
     """
 
-    permission_classes = (IsContributorOrReadOnly, )
+    permission_classes = (IsContributor, )
     http_method_names  = ['get', 'patch'] # Disallow PUTS
 
     def __init__(self, *args, **kwargs):
@@ -395,7 +397,7 @@ class ContributorDetail(generics.RetrieveUpdateAPIView):
     def get_serializer_class(self):
         if self.request.method == 'PATCH':
             return ContributorPatchSerializer
-        return ContributorGetSerializer
+        return ContributorDetailedGetSerializer
 
     def get_queryset(self):
         # Returns null on guindexuser/telegramuser related fields if either

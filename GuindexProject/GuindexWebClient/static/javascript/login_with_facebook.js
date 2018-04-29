@@ -66,6 +66,7 @@ function statusChangeCallback(response) {
 
                     // Get contributor info
                     getContributorInfo();
+                    getDetailedContributorInfo();
                 }    
                 else if (request.status == 400 && response['non_field_errors'][0] === "User is already registered with this e-mail address.")
                 {
@@ -190,6 +191,7 @@ window.fbAsyncInit = function() {
                     displayMessage("Info", "Succesfully connected accounts. You are now logged in as " + g_username + " .");
 
                     getContributorInfo();
+                    getDetailedContributorInfo();
                 }
                 else
                 {

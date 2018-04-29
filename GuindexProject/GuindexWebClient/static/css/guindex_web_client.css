@@ -56,3 +56,14 @@
     color: black;
     display: none;
 }
+
+/*****************/
+/* Toggle Switch */
+/*****************/
+.toggler {
+    color: grey;
+}
+
+.on {
+    color: black !important;
+}

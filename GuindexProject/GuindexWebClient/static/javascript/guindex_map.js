@@ -23,7 +23,7 @@ var checkPubListForMap = function ()
     }
     else
     {
-        // Check later if pub data has been retreived
+        // Check later if pub data has been retrieved
         setTimeout(checkPubListForMap, 1000);
     }
 }
@@ -41,7 +41,7 @@ var onSuccess = function (position)
     }
     else
     {
-        // Check later if pub data has been retreived
+        // Check later if pub data has been retrieved
         setTimeout(checkPubListForMap, 500);
     }
 }
@@ -59,7 +59,7 @@ var onError = function (error)
     }
     else
     {
-        // Check later if pub data has been retrived
+        // Check later if pub data has been retrieved
         setTimeout(checkPubListForMap, 500);
     }
 }
