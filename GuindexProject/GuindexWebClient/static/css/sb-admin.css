@@ -312,6 +312,7 @@ body.sidenav-toggled #mainNav.static-top #sidenavToggler i {
 .content-wrapper {
   overflow-x: hidden;
   background-image:url("../images/bg4_refl_big-min_recol.jpg");
+  background-size:contain;
   top:2vw;
   color: #ffffff;
   -webkit-text-stroke:0.025vw black;
@@ -577,11 +578,20 @@ footer.sticky-footer {
 }
 @media only screen and (min-width:401px) and (max-width:960px){
 .bigshiftedcontainer{
+     margin-left: 5vw;
+     margin-right: 5vw;
+     margin-top: 3.5vw;
+     margin-bottom: 2vw;
+     font-size: 2.1vw;
 
 }
 @media only screen and (max-width:400px){
 .bigshiftedcontainer{
-   
+     margin-left: 5vw;
+     margin-right: 5vw;
+     margin-top: 6vw;
+     margin-bottom: 2vw;
+     font-size: 2.1vw;
 }
 }
 
