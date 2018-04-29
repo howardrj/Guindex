@@ -235,8 +235,6 @@ PRE LOADER
 @media (min-width: 992px) {
   #mainNav.fixed-top .navbar-sidenav {
     height: calc(100vh - 112px);
-    min-width: 250px;
-    max-width: 250px;
     overflow:auto !important;
   }
   #mainNav.fixed-top .sidenav-toggler {
