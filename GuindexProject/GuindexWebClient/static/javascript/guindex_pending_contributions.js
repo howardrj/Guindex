@@ -373,19 +373,35 @@ var populatePendingPubPatchTable = function (pubs)
 // Add event listeners for pending contributions buttons
 $(document).on('click', '.pending_contribution_button', function () {
 
-    var button          = this;
-    var adjacent_button = button.parentNode.getElementsByClassName('pending_contribution_button')[0];
-
-    if (button.isEqualNode(adjacent_button))
-    {
-        adjacent_button = button.parentNode.getElementsByClassName('pending_contribution_button')[1];
-    }
-
-    var request = new XMLHttpRequest();
-
     var table_type = this.getAttribute('data-table_type');
     var obj_id     = this.getAttribute('data-obj_id');
     var method     = this.getAttribute('data-action');
+
+    if (this.method == "reject")
+    {
+        if (this.id == "final_reject_submit_button")
+        {
+            // Close reject reason modal
+            document.getElementById('reject_reason_link').click();
+        }
+        else
+        {
+            var reject_submit_button = document.getElementById('final_reject_submit_button');
+
+            reject_submit_button.setAttribute('data-table_type', table_type);    
+            reject_submit_button.setAttribute('data-obj_id', obj_id);    
+            reject_submit_button.setAttribute('data-action', method);    
+        
+            // Open reject reason modal
+            document.getElementById('reject_reason_link').click();
+            return;
+        }
+    }
+
+    // TODO Fix this somenode
+    var buttons = someNode.getElementsByClassName('pending_contribution_button');
+
+    var request = new XMLHttpRequest();
 
     if (table_type == "pending_price_create")
     {
@@ -410,9 +426,9 @@ $(document).on('click', '.pending_contribution_button', function () {
 
     request.send(JSON.stringify({'approved': method == "approve"}));
 
-    toggleLoader(button);
-    toggleLoader(adjacent_button);
-    button.parentNode.getElementsByClassName('slash')[0].style.display = 'none';
+    toggleLoader(buttons[0]);
+    toggleLoader(buttons[1]);
+    buttons[0].parentNode.getElementsByClassName('slash')[0].style.display = 'none';
 
     request.onreadystatechange = function processRequest()
     {
@@ -421,12 +437,12 @@ $(document).on('click', '.pending_contribution_button', function () {
             if (method == "approve")
             {
                 displayMessage("Info", "Successfully approved pending contribution.");
-                button.parentNode.innerHTML = "Approved";
+                buttons[0].parentNode.innerHTML = "Approved";
             }
             else
             {
                 displayMessage("Info", "Successfully rejected pending contribution.");
-                button.parentNode.innerHTML = "Rejected";
+                buttons[0].parentNode.innerHTML = "Rejected";
             }
 
             // Reload tables
@@ -438,9 +454,9 @@ $(document).on('click', '.pending_contribution_button', function () {
         else
         {
             displayMessage("Error", "Failed to " + method + " pending contribution.");
-            toggleLoader(button);
-            toggleLoader(adjacent_button);
-            button.parentNode.getElementsByClassName('slash')[0].style.display = 'inline';
+            toggleLoader(buttons[0]);
+            toggleLoader(buttons[0]);
+            buttons[0].parentNode.getElementsByClassName('slash')[0].style.display = 'inline';
         }
     }
 });
