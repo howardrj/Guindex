@@ -1,5 +1,8 @@
 var getContributorInfo = function ()
 {
+    // Clear contributors list
+    g_contributorsList = [];
+
     // Use REST API to get contributor information list
     var request = new XMLHttpRequest();
 

@@ -19,13 +19,18 @@
         var g_email               = null; 
         var g_facebookAccessToken = null;
 
+        // Global object lists
         var g_pubsList                = [];
         var g_contributorsList        = [];
-        var g_detailedContributorInfo = [];
+        var g_detailedContributorInfo = {};
 
-        var g_guindexDataTable  = null;
-        var g_contributorsTable = null;
-        var g_userSettingsTable = null;
+        // Global DataTable objects
+        var g_guindexDataTable        = null;
+        var g_contributorsTable       = null;
+        var g_userSettingsTable       = null;
+        var g_pendingPriceCreateTable = null;
+        var g_pendingPubCreateTable   = null;
+        var g_pendingPubPatchTable    = null;
 
   </script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -317,6 +322,7 @@
   <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/login_with_facebook.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_contributors.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_pending_contributions.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_settings.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
@@ -337,34 +343,11 @@
   </script>   
 
   <script>
-        // Retrieve pub data and place parsed JSON in g_pubsList object
-        // for other javacript modules to use
-        var populateGuindexTableUsingRestApi = function ()
-        {
-            var request = new XMLHttpRequest();
-            request.open('GET', G_API_BASE + 'pubs/', true); 
 
-            request.setRequestHeader('Content-Type', 'application/json');
-            request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-            request.send(null);
-
-            request.onreadystatechange = processRequest;
-
-            function processRequest()
-            {
-                if (request.readyState == 4 && request.status == 200)
-                {
-                    g_pubsList = JSON.parse(request.responseText);    
-                    populateGuindexTable();
-                }
-            }
-        }
-        
-        populateGuindexTableUsingRestApi();
+        getPubInfo();
 
         // Refresh tables periodically
-        setInterval(populateGuindexTableUsingRestApi, G_GUI_REFRESH_INTERVAL);
+        setInterval(getPubInfo, G_GUI_REFRESH_INTERVAL);
         setInterval(initMap, G_GUI_REFRESH_INTERVAL);
 
    </script>
