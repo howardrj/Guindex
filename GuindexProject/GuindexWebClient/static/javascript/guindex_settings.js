@@ -54,18 +54,26 @@ var populateUserSettingsTable = function ()
 
     user_settings_table_data.push(telegram_alerts_list);
 
-    $('#GuindexUserSettingsTable').DataTable({
-        responsive: true,
-        "paging":   false,
-        "ordering": false,
-        "searching": false,
-        data: user_settings_table_data,
-        columns: [
-            { title: "Setting" },
-            { title: "Description" },
-            { title: "Toggle" },
-        ]
-    });
+    // Check if table is being drawn from scratch or refreshed
+    if (!g_userSettingsTable)
+    {
+        g_userSettingsTable = $('#GuindexUserSettingsTable').DataTable({
+                                responsive: true,
+                                "paging":   false,
+                                "ordering": false,
+                                "searching": false,
+                                data: user_settings_table_data,
+                                columns: [
+                                    { title: "Setting" },
+                                    { title: "Description" },
+                                    { title: "Toggle" },
+                                ]
+                            });
+    }
+    else
+    {
+        // TODO Redraw table
+    }
 
     $('.toggler').on('click', function () {
         $(this).toggleClass('fa-rotate-180 on');

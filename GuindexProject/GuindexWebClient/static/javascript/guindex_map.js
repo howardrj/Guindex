@@ -152,6 +152,9 @@ var populateMap = function ()
 
     // Show filter
     document.getElementById('floating_panel').style.display = 'block';
+
+    // Apply filter
+    applyMapFilter();
 }
 
 var applyMapFilter = function ()

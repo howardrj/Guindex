@@ -22,6 +22,10 @@
         var g_contributorsList        = [];
         var g_detailedContributorInfo = [];
 
+        var g_guindexDataTable  = null;
+        var g_contributorsTable = null;
+        var g_userSettingsTable = null;
+
   </script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113016256-1"></script>
@@ -334,24 +338,34 @@
   <script>
         // Retrieve pub data and place parsed JSON in g_pubsList object
         // for other javacript modules to use
-        var request = new XMLHttpRequest();
-        request.open('GET', G_API_BASE + 'pubs/', true); 
-
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-        request.send(null);
-
-        request.onreadystatechange = processRequest;
-
-        function processRequest()
+        var populateGuindexTableUsingRestApi = function ()
         {
-            if (request.readyState == 4 && request.status == 200)
+            var request = new XMLHttpRequest();
+            request.open('GET', G_API_BASE + 'pubs/', true); 
+
+            request.setRequestHeader('Content-Type', 'application/json');
+            request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+            request.send(null);
+
+            request.onreadystatechange = processRequest;
+
+            function processRequest()
             {
-                g_pubsList = JSON.parse(request.responseText);    
-                populateGuindexTable();
+                if (request.readyState == 4 && request.status == 200)
+                {
+                    g_pubsList = JSON.parse(request.responseText);    
+                    populateGuindexTable();
+                }
             }
         }
+        
+        populateGuindexTableUsingRestApi();
+
+        // Refresh tables and map every minute
+        setTimeout(populateTablesUsingRestApi, 60000);
+        setTimeout(initMap, 60000);
+
    </script>
 
   </div>

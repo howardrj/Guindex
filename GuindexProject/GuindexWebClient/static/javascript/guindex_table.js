@@ -69,17 +69,29 @@ var populateGuindexTable = function ()
         table_data.push(pub_data.slice());
     } 
 
-    $('#GuindexDataTable').DataTable({
-        responsive: true,
-        data: table_data,
-        columns: [
-            {title: "Name"},
-            {title: "Price (€)"},
-            {title: "Last Submitted By"},
-            {title: "Last Submitted Date"},
-            {title: "Submit Price", "className": "text-center", "orderable": false},
-        ] 
-    });
+    // Check if table is being drawn from scratch or refreshed
+    if (!g_guindexDataTable)
+    {
+        g_guindexDataTable = $('#GuindexDataTable').DataTable({
+                                responsive: true,
+                                data: table_data,
+                                columns: [
+                                    {title: "Name"},
+                                    {title: "Price (€)"},
+                                    {title: "Last Submitted By"},
+                                    {title: "Last Submitted Date"},
+                                    {title: "Submit Price", "className": "text-center", "orderable": false},
+                                ] 
+                            });
+    }
+    else
+    {
+        // Redraw table
+        datatable.clear().draw();
+        datatable.rows.add(NewlyCreatedData); // Add new data
+        datatable.columns.adjust().draw(); // Redraw the DataTable
+      
+    }
 
     // Add event listeners for price input field
     var input_fields = document.getElementsByClassName('price_input');
@@ -150,7 +162,10 @@ var populateGuindexTable = function ()
                                 displayMessage("Info", "Thank you. A member of staff will verify your submision shortly.");
                             }
                                 
-                            // TODO Reload table
+                            // Reload relevant tables
+                            populateGuindexTableUsingRestApi();
+                            initMap();
+                            getContributorInfo();
                         }
                         else
                         {

@@ -62,14 +62,22 @@ var populateContributorsTable = function ()
         contributors_table_data.push(contributors_table_data_local.slice());
     } 
 
-    $('#GuindexContributorsTable').DataTable({
-        responsive: true,
-        data: contributors_table_data,
-        columns: [
-            { title: "Username" },
-            { title: "Pubs Visited" },
-            { title: "Current Verifications" },
-            { title: "Original Verifications" },
-        ]
-    });
+    // Check if table is being drawn from scratch or refreshed
+    if (!g_contributorsTable)
+    {
+       g_contributorsTable = $('#GuindexContributorsTable').DataTable({
+                                responsive: true,
+                                data: contributors_table_data,
+                                columns: [
+                                    { title: "Username" },
+                                    { title: "Pubs Visited" },
+                                    { title: "Current Verifications" },
+                                    { title: "Original Verifications" },
+                                ]
+                             });
+    }
+    else
+    {
+        // TODO Redraw table
+    }
 }
