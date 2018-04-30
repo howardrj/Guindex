@@ -87,9 +87,9 @@ var populateGuindexTable = function ()
     else
     {
         // Redraw table
-        datatable.clear().draw();
-        datatable.rows.add(NewlyCreatedData); // Add new data
-        datatable.columns.adjust().draw(); // Redraw the DataTable
+        g_guindexDataTable.clear().draw();
+        g_guindexDataTable.rows.add(table_data);
+        g_guindexDataTable.columns.adjust().draw();
       
     }
 

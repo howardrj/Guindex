@@ -78,6 +78,9 @@ var populateContributorsTable = function ()
     }
     else
     {
-        // TODO Redraw table
+        // Redraw table
+        g_contributorsTable.clear().draw();
+        g_contributorsTable.rows.add(contributors_table_data);
+        g_contributorsTable.columns.adjust().draw();
     }
 }

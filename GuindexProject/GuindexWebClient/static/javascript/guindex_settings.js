@@ -72,61 +72,65 @@ var populateUserSettingsTable = function ()
     }
     else
     {
-        // TODO Redraw table
+        // Redraw table
+        g_userSettingsTable.clear().draw();
+        g_userSettingsTable.rows.add(user_settings_table_data);
+        g_userSettingsTable.columns.adjust().draw();
     }
 
-    $('.toggler').on('click', function () {
-        $(this).toggleClass('fa-rotate-180 on');
-
-        var toggler = this;
-
-        // Post settings change to Guindex
-        var request = new XMLHttpRequest();
-
-        var data = {};
-        var field;
-        
-        if (this.id == "email_alerts_toggler")
-        {
-            var field = 'usingEmailAlerts';
-        }
-        else if (this.id == "telegram_alerts_toggler")
-        {
-            var field = 'usingTelegramAlerts';
-        } 
-        else
-        {
-            // Can't get field
-            $(this).toggleClass('fa-rotate-180 on');
-            return;
-        }
-
-        data[field] = this.classList.contains('on');   
-
-        request.open('PATCH', G_API_BASE + 'contributors/' + g_userId +'/', true); 
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        request.setRequestHeader('Authorization', 'Token ' + g_accessToken);
-
-        request.send(JSON.stringify(data));
-
-        request.onreadystatechange = function processRequest()
-        {
-            if (request.readyState == 4)
-            {
-                var response = JSON.parse(request.responseText);
-
-                if (request.status == 200)
-                {
-                    // Success
-                }
-                else
-                {
-                    // Error: Revert toggler to original state
-                    $('#' + toggler.id).toggleClass('fa-rotate-180 on');
-                    displayMessage('Error', response['usingTelegramAlerts'])
-                }
-            }   
-        }
-    });
 }
+
+$('.toggler').on('click', function () {
+    $(this).toggleClass('fa-rotate-180 on');
+
+    var toggler = this;
+
+    // Post settings change to Guindex
+    var request = new XMLHttpRequest();
+
+    var data = {};
+    var field;
+    
+    if (this.id == "email_alerts_toggler")
+    {
+        var field = 'usingEmailAlerts';
+    }
+    else if (this.id == "telegram_alerts_toggler")
+    {
+        var field = 'usingTelegramAlerts';
+    } 
+    else
+    {
+        // Can't get field
+        $(this).toggleClass('fa-rotate-180 on');
+        return;
+    }
+
+    data[field] = this.classList.contains('on');   
+
+    request.open('PATCH', G_API_BASE + 'contributors/' + g_userId +'/', true); 
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    request.setRequestHeader('Authorization', 'Token ' + g_accessToken);
+
+    request.send(JSON.stringify(data));
+
+    request.onreadystatechange = function processRequest()
+    {
+        if (request.readyState == 4)
+        {
+            var response = JSON.parse(request.responseText);
+
+            if (request.status == 200)
+            {
+                // Success
+            }
+            else
+            {
+                // Error: Revert toggler to original state
+                $('#' + toggler.id).toggleClass('fa-rotate-180 on');
+                displayMessage('Error', response['usingTelegramAlerts'])
+            }
+        }   
+    }
+});

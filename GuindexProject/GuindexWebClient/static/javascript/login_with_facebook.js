@@ -69,8 +69,8 @@ function statusChangeCallback(response) {
                     getDetailedContributorInfo();
 
                     // Call these in a loop
-                    setTimeout(getContributorInfo, 60000);
-                    setTimeout(getDetailedContributorInfo, 60000);
+                    setInterval(getContributorInfo, G_GUI_REFRESH_INTERVAL);
+                    setInterval(getDetailedContributorInfo, G_GUI_REFRESH_INTERVAL);
                 }    
                 else if (request.status == 400 && response['non_field_errors'][0] === "User is already registered with this e-mail address.")
                 {
@@ -198,8 +198,8 @@ window.fbAsyncInit = function() {
                     getDetailedContributorInfo();
 
                     // Call these in a loop
-                    setTimeout(getContributorInfo, 60000);
-                    setTimeout(getDetailedContributorInfo, 60000);
+                    setInterval(getContributorInfo, G_GUI_REFRESH_INTERVAL);
+                    setInterval(getDetailedContributorInfo, G_GUI_REFRESH_INTERVAL);
                 }
                 else
                 {

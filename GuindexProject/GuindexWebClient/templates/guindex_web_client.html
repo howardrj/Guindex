@@ -6,8 +6,9 @@
 <head>
   <script>
         // Useful global constants and variables
-        var G_API_BASE        = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
-        var G_FACEBOOK_APP_ID = '{{facebook_app_id}}';
+        var G_API_BASE             = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
+        var G_FACEBOOK_APP_ID      = '{{facebook_app_id}}';
+        var G_GUI_REFRESH_INTERVAL = 120000;
 
         // Global variables to keep track of user state
         var g_loggedIn            = false;
@@ -362,9 +363,9 @@
         
         populateGuindexTableUsingRestApi();
 
-        // Refresh tables and map every minute
-        setTimeout(populateTablesUsingRestApi, 60000);
-        setTimeout(initMap, 60000);
+        // Refresh tables periodically
+        setInterval(populateGuindexTableUsingRestApi, G_GUI_REFRESH_INTERVAL);
+        setInterval(initMap, G_GUI_REFRESH_INTERVAL);
 
    </script>
 
