@@ -318,7 +318,7 @@
             <span aria-hidden="true">×</span>
           </button>
         </div>
-        <div class="modal-body" id="message_body">
+        <div class="modal-body">
             Include an (optional) reason for rejecting this pending contribution:
             <textarea id="reject_reason_text_area" style="margin: 10px auto; display:block; position:relative">
 
@@ -326,8 +326,63 @@
         </div>
         <div class="modal-footer">
           <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
-          <button id="final_reject_submit_button" class="pending_contribution_button btn btn-secondary" type="button" data-dismiss="modal">Submit</button>
           <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <button id="final_reject_submit_button" class="pending_contribution_button btn btn-primary" type="button" data-dismiss="modal">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Pub Modal (with hidden button to open it)-->
+  <a class="nav-link" data-toggle="modal" id="edit_pub_link" data-target="#edit_pub_modal" style="display:none"></a>
+
+  <div class="modal fade" id="edit_pub_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:9999">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="message_severity"> Edit Pub </h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+            <p> Change the value of any fields below you would like to edit: </p>
+
+            <table align="left" border="0">
+
+                <tr>
+                    <td> Name:</td>
+                    <td> <input type="text" id="edit_pub_name"> </td>
+                </tr>
+
+                <tr>
+                    <td> Latitude:</td>
+                    <td> <input type="number" step=0.0000001 id="edit_pub_latitude"> </td>
+                </tr>
+
+                <tr>
+                    <td> Longitude:</td>
+                    <td> <input type="number" step=0.0000001 id="edit_pub_longitude"> </td>
+                </tr>
+
+                <tr>
+                    <td> Closed:</td>
+                    <td> <input type="checkbox" step=0.0000001 id="edit_pub_closed"> </td>
+                </tr>
+
+                <tr>
+                    <td> Serving Guinness:</td>
+                    <td> <input type="checkbox" id="edit_pub_serving_guinness"> </td>
+                </tr>
+
+            </table>
+
+        </div>
+        <div class="modal-footer">
+          <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <button id="edit_pub_submit_button" class="btn btn-primary" type="button" data-dismiss="modal">Submit</button>
         </div>
       </div>
     </div>

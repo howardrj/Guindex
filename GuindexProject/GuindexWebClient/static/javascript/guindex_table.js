@@ -91,6 +91,11 @@ var populateGuindexTable = function ()
 
         pub_data.push(input_field + submit_button + loader);
 
+        // Append edit Pub button
+        var edit_pub_button = '<i class="fa fa-edit edit_pub_button hoverable" title="Edit pub (only available when logged in)" data-pub_id="' + pubs_list[i]['id'] + '"></i>';
+
+        pub_data.push(edit_pub_button);
+
         table_data.push(pub_data.slice());
     } 
 
@@ -106,6 +111,7 @@ var populateGuindexTable = function ()
                                     {title: "Last Submitted By"},
                                     {title: "Last Submitted Date"},
                                     {title: "Submit Price", "className": "text-center", "orderable": false},
+                                    {title: "Edit Pub", "className": "text-center", "orderable": false},
                                 ] 
                             });
     }
@@ -194,3 +200,98 @@ $(document).on('input', '.price_input', function () {
         submit_button.classList.remove('hoverable');
     }
 }); 
+
+$(document).on('click', '.edit_pub_button', function () {
+
+    if (!g_loggedIn || ! g_accessToken)
+    {
+        displayMessage("Error", "You must be logged in to edit a pub.");
+    }
+    else
+    {
+        // Set form values
+        var pub_id = parseInt(this.getAttribute('data-pub_id'));
+
+        var pub = $.grep(g_pubsList, function(obj) { return obj['id'] === pub_id;})[0];
+
+        document.getElementById('edit_pub_name').value             = pub['name'];
+        document.getElementById('edit_pub_latitude').value         = pub['latitude'];
+        document.getElementById('edit_pub_longitude').value        = pub['longitude'];
+        document.getElementById('edit_pub_closed').value           = pub['closed'];
+        document.getElementById('edit_pub_serving_guinness').value = pub['servingGuinness'];
+
+        document.getElementById('edit_pub_submit_button').setAttribute('data-pub_id', pub_id);
+
+        // Open modal
+        document.getElementById('edit_pub_link').click();
+    }
+});
+
+$('#edit_pub_submit_button').on('click', function () {
+
+    var button1 = this.parentNode.getElementsByTagName('button')[0];
+    var button2 = this.parentNode.getElementsByTagName('button')[1];
+
+    toggleLoader(button1);
+    toggleLoader(button2);
+
+    // Send form values in PATCH REST API request
+    var id               = this.getAttribute('data-pub_id');
+    var name             = document.getElementById('edit_pub_name').value;
+    var latitude         = document.getElementById('edit_pub_latitude').value;
+    var longitude        = document.getElementById('edit_pub_longitude').value;
+    var closed           = document.getElementById('edit_pub_closed').value;
+    var serving_guinness = document.getElementById('edit_pub_serving_guinness').value;
+
+    var request = new XMLHttpRequest();
+    request.open('PATCH', G_API_BASE + 'pubs/' + id + '/', true); 
+
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    request.setRequestHeader('Authorization', 'Token ' + g_accessToken);
+
+    var pub_patch_obj = {
+        'name': name,
+        'latitude': latitude,
+        'longitude': longitude,
+        'closed': closed,
+        'servingGuinness': serving_guinness,
+    };
+
+    request.send(JSON.stringify(pub_patch_obj));
+
+    request.onreadystatechange = processRequest;
+
+    function processRequest()
+    {
+        if (request.readyState == 4) 
+        {
+            toggleLoader(button1);
+            toggleLoader(button2);
+
+            response = JSON.parse(request.responseText);    
+
+            if (request.status == 200)
+            {
+                if (g_isStaffMember)
+                {
+                    displayMessage("Info", "Thank you. Your submission was successful.");
+                }
+                else
+                {
+                    displayMessage("Info", "Thank you. A member of staff will verify your submission shortly.");
+                }
+    
+                // Reload relevant tables
+                getPubInfo();
+                initMap();
+                getContributorInfo();
+                getPendingContributionsInfo();
+            }
+            else
+            {
+                // TODO Display errors
+            }
+        }
+    }
+});
