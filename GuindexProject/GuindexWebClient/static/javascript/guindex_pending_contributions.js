@@ -377,9 +377,9 @@ $(document).on('click', '.pending_contribution_button', function () {
     var obj_id     = this.getAttribute('data-obj_id');
     var method     = this.getAttribute('data-action');
 
-    if (this.method == "reject")
+    if (method.indexOf("reject") != -1)
     {
-        if (this.id == "final_reject_submit_button")
+        if (this.id.indexOf("final_reject_submit_button") != -1)
         {
             // Close reject reason modal
             document.getElementById('reject_reason_link').click();
@@ -398,20 +398,19 @@ $(document).on('click', '.pending_contribution_button', function () {
         }
     }
 
-    // TODO Fix this somenode
-    var buttons = someNode.getElementsByClassName('pending_contribution_button');
+    var buttons = document.getElementById('pending_contributions_page').getElementsByClassName('pending_contribution_button');
 
     var request = new XMLHttpRequest();
 
-    if (table_type == "pending_price_create")
+    if (table_type.indexOf("pending_price_create") != -1)
     {
         request.open('PATCH', G_API_BASE + 'guinness/pending/create/' + obj_id + '/', true); 
     }
-    else if (table_type == "pending_pub_create")
+    else if (table_type.indexOf("pending_pub_create") != -1)
     {
         request.open('PATCH', G_API_BASE + 'pubs/pending/create/' + obj_id + '/', true); 
     }
-    else if (table_type == "pending_pub_patch")
+    else if (table_type.indexOf("pending_pub_patch") != -1)
     {
         request.open('PATCH', G_API_BASE + 'pubs/pending/patch/' + obj_id + '/', true); 
     }
@@ -424,7 +423,16 @@ $(document).on('click', '.pending_contribution_button', function () {
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     request.setRequestHeader('Authorization', 'Token ' + g_accessToken);
 
-    request.send(JSON.stringify({'approved': method == "approve"}));
+    if (method.indexOf("approve") != -1)
+    {
+        request.send(JSON.stringify({'approved': method == "approve"}));
+    }
+    else
+    {
+        var reject_reason = document.getElementById('reject_reason_text_area').value;
+
+        request.send(JSON.stringify({'approved': method == "approve", 'rejectReason': reject_reason}));
+    }
 
     toggleLoader(buttons[0]);
     toggleLoader(buttons[1]);
@@ -434,7 +442,7 @@ $(document).on('click', '.pending_contribution_button', function () {
     {
         if (request.readyState == 4 && request.status == 200)
         {
-            if (method == "approve")
+            if (method.indexOf("approve") != -1)
             {
                 displayMessage("Info", "Successfully approved pending contribution.");
                 buttons[0].parentNode.innerHTML = "Approved";
@@ -455,7 +463,7 @@ $(document).on('click', '.pending_contribution_button', function () {
         {
             displayMessage("Error", "Failed to " + method + " pending contribution.");
             toggleLoader(buttons[0]);
-            toggleLoader(buttons[0]);
+            toggleLoader(buttons[1]);
             buttons[0].parentNode.getElementsByClassName('slash')[0].style.display = 'inline';
         }
     }
