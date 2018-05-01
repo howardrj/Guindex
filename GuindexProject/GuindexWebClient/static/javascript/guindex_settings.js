@@ -1,5 +1,7 @@
 var getDetailedContributorInfo = function ()
 {
+    g_detailedContributorInfo = {};
+
     // Function to get detailed info about this user using REST API
     var request = new XMLHttpRequest();
 
@@ -80,7 +82,7 @@ var populateUserSettingsTable = function ()
 
 }
 
-$('.toggler').on('click', function () {
+$(document).on('click', '.toggler', function () {
     $(this).toggleClass('fa-rotate-180 on');
 
     var toggler = this;

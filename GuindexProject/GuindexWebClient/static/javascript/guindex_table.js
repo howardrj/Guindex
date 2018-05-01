@@ -1,3 +1,28 @@
+var getPubInfo = function ()
+{
+    // Clear pubs list
+    g_pubsList = [];
+
+    var request = new XMLHttpRequest();
+    request.open('GET', G_API_BASE + 'pubs/', true); 
+
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+    request.send(null);
+
+    request.onreadystatechange = processRequest;
+
+    function processRequest()
+    {
+        if (request.readyState == 4 && request.status == 200)
+        {
+            g_pubsList = JSON.parse(request.responseText);    
+            populateGuindexTable();
+        }
+    }
+} 
+
 var populateGuindexTable = function ()
 {
     var table_data = [];
@@ -93,89 +118,79 @@ var populateGuindexTable = function ()
       
     }
 
-    // Add event listeners for price input field
-    var input_fields = document.getElementsByClassName('price_input');
+}
 
-    for (var i = 0; i < input_fields.length; i++)
+// Add event listeners
+
+$(document).on('click', '.submit_price_button', function () {
+
+    if (this.classList.contains('hoverable'))
     {
-        input_fields[i].addEventListener('input', function (evt) {
-            
-            var submit_button = evt.target.parentNode.getElementsByClassName('submit_price_button')[0];
+        var button = this;
 
-            if (evt.target.value && g_loggedIn && g_accessToken && g_isStaffMember != null)
+        toggleLoader(button);
+
+        var price  = parseFloat(this.parentNode.getElementsByTagName('input')[0].value);
+        var pub_id = parseInt(this.getAttribute('data-pub_id'));
+
+        // POST price to the guindex
+        var request = new XMLHttpRequest();
+        request.open('POST', G_API_BASE + 'guinness/', true); 
+
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        request.setRequestHeader('Authorization', 'Token ' + g_accessToken);
+
+        request.send(JSON.stringify({'pub': pub_id, 'price': price}));
+
+        request.onreadystatechange = function processRequest()
+        {
+            if (request.readyState == 4)
             {
-                submit_button.style.color = 'black';
-                submit_button.classList.add('hoverable');
-            }
-            else
-            {
-                submit_button.style.color = 'gray';
-                submit_button.classList.remove('hoverable');
-            }
-        }); 
-    }
+                var response = JSON.parse(request.responseText);
 
-    // Add event listeners for price submit buttons
-    var submit_price_buttons = document.getElementsByClassName('submit_price_button'); 
-
-    for (var i = 0; i < submit_price_buttons.length; i++)
-    {
-        submit_price_buttons[i].addEventListener('click', function (evt) {
-        
-            if (evt.target.classList.contains('hoverable'))
-            {
-                var button = evt.target;
-
-                toggleLoader(button);
-
-                var price  = parseFloat(evt.target.parentNode.getElementsByTagName('input')[0].value);
-                var pub_id = parseInt(evt.target.getAttribute('data-pub_id'));
-
-                // POST price to the guindex
-                var request = new XMLHttpRequest();
-                request.open('POST', G_API_BASE + 'guinness/', true); 
-
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-                request.setRequestHeader('Authorization', 'Token ' + g_accessToken);
-
-                request.send(JSON.stringify({'pub': pub_id, 'price': price}));
-
-                request.onreadystatechange = function processRequest()
+                if (request.status == 201) // => Created
                 {
-                    if (request.readyState == 4)
+                    toggleLoader(button);
+
+                    if (g_isStaffMember)
                     {
-                        var response = JSON.parse(request.responseText);
-
-                        console.log(response);
-
-                        if (request.status == 201) // => Created
-                        {
-                            toggleLoader(button);
-
-                            if (g_isStaffMember)
-                            {
-                                displayMessage("Info", "Thank you. Your submission was successful.");
-                            }
-                            else
-                            {
-                                displayMessage("Info", "Thank you. A member of staff will verify your submision shortly.");
-                            }
-                                
-                            // Reload relevant tables
-                            populateGuindexTableUsingRestApi();
-                            initMap();
-                            getContributorInfo();
-                        }
-                        else
-                        {
-                            var error_message = response['price'][0];
-                            toggleLoader(button);
-                            displayMessage("Error", error_message);
-                        }
-                    }   
+                        displayMessage("Info", "Thank you. Your submission was successful.");
+                    }
+                    else
+                    {
+                        displayMessage("Info", "Thank you. A member of staff will verify your submission shortly.");
+                    }
+                       
+                    // Reload relevant tables
+                    getPubInfo();
+                    initMap();
+                    getContributorInfo();
+                    getPendingContributionsInfo();
                 }
-            }
-        });
+                else
+                {
+                    var error_message = response['price'][0];
+                    toggleLoader(button);
+                    displayMessage("Error", error_message);
+                }
+            }   
+        }
     }
-} 
+});
+
+$(document).on('input', '.price_input', function () {
+            
+    var submit_button = this.parentNode.getElementsByClassName('submit_price_button')[0];
+
+    if (this.value && g_loggedIn && g_accessToken && g_isStaffMember != null)
+    {
+        submit_button.style.color = 'black';
+        submit_button.classList.add('hoverable');
+    }
+    else
+    {
+        submit_button.style.color = 'gray';
+        submit_button.classList.remove('hoverable');
+    }
+}); 

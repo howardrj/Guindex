@@ -19,13 +19,18 @@
         var g_email               = null; 
         var g_facebookAccessToken = null;
 
+        // Global object lists
         var g_pubsList                = [];
         var g_contributorsList        = [];
-        var g_detailedContributorInfo = [];
+        var g_detailedContributorInfo = {};
 
-        var g_guindexDataTable  = null;
-        var g_contributorsTable = null;
-        var g_userSettingsTable = null;
+        // Global DataTable objects
+        var g_guindexDataTable        = null;
+        var g_contributorsTable       = null;
+        var g_userSettingsTable       = null;
+        var g_pendingPriceCreateTable = null;
+        var g_pendingPubCreateTable   = null;
+        var g_pendingPubPatchTable    = null;
 
   </script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -301,6 +306,33 @@
     </div>
   </div>
 
+  <!-- Pending Contribution Reject Reason Modal (with hidden button to open it)-->
+  <a class="nav-link" data-toggle="modal" id="reject_reason_link" data-target="#reject_reason_modal" style="display:none"></a>
+
+  <div class="modal fade" id="reject_reason_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:9999">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="message_severity"> Reject Reason </h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body" id="message_body">
+            Include an (optional) reason for rejecting this pending contribution:
+            <textarea id="reject_reason_text_area">
+
+            </textarea>
+        </div>
+        <div class="modal-footer">
+          <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+          <button id="final_reject_submit_button" class="pending_contribution_button btn btn-secondary" type="button" data-dismiss="modal">Submit</button>
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Bootstrap core JavaScript-->
   <script type="text/javascript" src="{% static "javascript/jquery.min.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/bootstrap.bundle.min.js" %}"></script>
@@ -317,6 +349,7 @@
   <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/login_with_facebook.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_contributors.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_pending_contributions.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_settings.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
@@ -337,34 +370,11 @@
   </script>   
 
   <script>
-        // Retrieve pub data and place parsed JSON in g_pubsList object
-        // for other javacript modules to use
-        var populateGuindexTableUsingRestApi = function ()
-        {
-            var request = new XMLHttpRequest();
-            request.open('GET', G_API_BASE + 'pubs/', true); 
 
-            request.setRequestHeader('Content-Type', 'application/json');
-            request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-            request.send(null);
-
-            request.onreadystatechange = processRequest;
-
-            function processRequest()
-            {
-                if (request.readyState == 4 && request.status == 200)
-                {
-                    g_pubsList = JSON.parse(request.responseText);    
-                    populateGuindexTable();
-                }
-            }
-        }
-        
-        populateGuindexTableUsingRestApi();
+        getPubInfo();
 
         // Refresh tables periodically
-        setInterval(populateGuindexTableUsingRestApi, G_GUI_REFRESH_INTERVAL);
+        setInterval(getPubInfo, G_GUI_REFRESH_INTERVAL);
         setInterval(initMap, G_GUI_REFRESH_INTERVAL);
 
    </script>
