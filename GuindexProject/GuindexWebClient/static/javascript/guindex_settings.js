@@ -28,12 +28,15 @@ var populateUserSettingsTable = function ()
 {
     var user_settings_table_data = [];
 
+    var prefix = '<label class="switch">';
+    var suffix = '<div id="email_alerts_toggler_div" class="slider round"> </div></label>';
+
     // Email alerts setting
     var email_alerts_list = ['Email Alerts', 
                              "Receive email alerts when new prices and pubs are added to the Guindex.",
                              g_detailedContributorInfo['usingEmailAlerts']
-                             ? '<i id="email_alerts_toggler" class="fa fa-3x fa-toggle-on toggler on hoverable"></i>'
-                             : '<i id="email_alerts_toggler" class="fa fa-3x fa-toggle-on fa-rotate-180 toggler hoverable"></i>'
+                             ? prefix + '<input type="checkbox" id="email_alerts_toggler" class="toggler hoverable checked">' + suffix;
+                             : prefix + '<input type="checkbox" id="email_alerts_toggler" class="toggler hoverable">' + suffix;
                             ];
 
     user_settings_table_data.push(email_alerts_list);
@@ -47,11 +50,13 @@ var populateUserSettingsTable = function ()
                                 " the Telegram app and send: /activate " + g_detailedContributorInfo['telegramActivationKey'] + '.';
     }
 
+    suffix = '<div id="telegram_alerts_toggler_div" class="slider round"> </div></label>';
+
     var telegram_alerts_list = ['Telegram Alerts',
                                 telegram_description,
                                 g_detailedContributorInfo['usingTelegramAlerts']
-                                ? '<i id="telegram_alerts_toggler" class="fa fa-3x fa-toggle-on toggler on hoverable"></i>'
-                                : '<i id="telegram_alerts_toggler" class="fa fa-3x fa-toggle-on fa-rotate-180 toggler hoverable"></i>'
+                                ? prefix + '<input type="checkbox" id="telegram_alerts_toggler" class="toggler hoverable checked">' + suffix;
+                                : prefix + '<input type="checkbox" id="telegram_alerts_toggler" class="toggler hoverable">' + suffix;
                                 ];
 
     user_settings_table_data.push(telegram_alerts_list);
@@ -83,7 +88,6 @@ var populateUserSettingsTable = function ()
 }
 
 $(document).on('click', '.toggler', function () {
-    $(this).toggleClass('fa-rotate-180 on');
 
     var toggler = this;
 
@@ -104,11 +108,11 @@ $(document).on('click', '.toggler', function () {
     else
     {
         // Can't get field
-        $(this).toggleClass('fa-rotate-180 on');
+        toggler.checked = !toggler.checked;
         return;
     }
 
-    data[field] = this.classList.contains('on');   
+    data[field] = togger.checked;
 
     request.open('PATCH', G_API_BASE + 'contributors/' + g_userId +'/', true); 
     request.setRequestHeader('Content-Type', 'application/json');
@@ -130,8 +134,8 @@ $(document).on('click', '.toggler', function () {
             else
             {
                 // Error: Revert toggler to original state
-                $('#' + toggler.id).toggleClass('fa-rotate-180 on');
                 displayMessage('Error', response['usingTelegramAlerts'])
+                toggler.checked = !toggler.checked;
             }
         }   
     }

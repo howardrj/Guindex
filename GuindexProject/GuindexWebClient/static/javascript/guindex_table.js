@@ -214,11 +214,11 @@ $(document).on('click', '.edit_pub_button', function () {
 
         var pub = $.grep(g_pubsList, function(obj) { return obj['id'] === pub_id;})[0];
 
-        document.getElementById('edit_pub_name').value             = pub['name'];
-        document.getElementById('edit_pub_latitude').value         = pub['latitude'];
-        document.getElementById('edit_pub_longitude').value        = pub['longitude'];
-        document.getElementById('edit_pub_closed').value           = pub['closed'];
-        document.getElementById('edit_pub_serving_guinness').value = pub['servingGuinness'];
+        document.getElementById('edit_pub_name').value               = pub['name'];
+        document.getElementById('edit_pub_latitude').value           = pub['latitude'];
+        document.getElementById('edit_pub_longitude').value          = pub['longitude'];
+        document.getElementById('edit_pub_closed').checked           = pub['closed'];
+        document.getElementById('edit_pub_serving_guinness').checked = pub['servingGuinness'];
 
         document.getElementById('edit_pub_submit_button').setAttribute('data-pub_id', pub_id);
 
@@ -240,8 +240,8 @@ $('#edit_pub_submit_button').on('click', function () {
     var name             = document.getElementById('edit_pub_name').value;
     var latitude         = document.getElementById('edit_pub_latitude').value;
     var longitude        = document.getElementById('edit_pub_longitude').value;
-    var closed           = document.getElementById('edit_pub_closed').value;
-    var serving_guinness = document.getElementById('edit_pub_serving_guinness').value;
+    var closed           = document.getElementById('edit_pub_closed').checked;
+    var serving_guinness = document.getElementById('edit_pub_serving_guinness§').checked;
 
     var request = new XMLHttpRequest();
     request.open('PATCH', G_API_BASE + 'pubs/' + id + '/', true); 
