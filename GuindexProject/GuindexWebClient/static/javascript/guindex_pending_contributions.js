@@ -231,7 +231,7 @@ var populatePendingPubCreateTable = function (pubs)
 var populatePendingPubPatchTable = function (pubs)
 {
     // Check pubs and contributors lists are loaded
-    if (!g_contributorsList.length || $.isEmptyObject(g_detailedContributorInfo))
+    if (!g_pubsList.length || !g_contributorsList.length || $.isEmptyObject(g_detailedContributorInfo))
     {
         setTimeout(populatePendingPubPatchTable, 500, pubs);
         return;
@@ -259,7 +259,7 @@ var populatePendingPubPatchTable = function (pubs)
 
             changed_fields += '<td> Name: </td>';
             changed_fields += '<td>' + cloned_pub['name'] + '</td>';
-            changed_fields += '<td> --> </td>';
+            changed_fields += '<td> <i class="fa fa-arrow-right"></i> </td>';
             changed_fields += '<td>'+ pubs[i]['name'] + '</td>';
 
             changed_fields += '</tr>';
@@ -271,7 +271,7 @@ var populatePendingPubPatchTable = function (pubs)
 
             changed_fields += '<td> Latitude: </td>';
             changed_fields += '<td>' + cloned_pub['latitude'] + '</td>';
-            changed_fields += '<td> --> </td>';
+            changed_fields += '<td> <i class="fa fa-arrow-right"></i> </td>';
             changed_fields += '<td>'+ pubs[i]['latitude'] + '</td>';
 
             changed_fields += '</tr>';
@@ -283,7 +283,7 @@ var populatePendingPubPatchTable = function (pubs)
 
             changed_fields += '<td> Longitude: </td>';
             changed_fields += '<td>' + cloned_pub['longitude'] + '</td>';
-            changed_fields += '<td> --> </td>';
+            changed_fields += '<td> <i class="fa fa-arrow-right"></i> </td>';
             changed_fields += '<td>'+ pubs[i]['longitude'] + '</td>';
 
             changed_fields += '</tr>';
@@ -294,7 +294,7 @@ var populatePendingPubPatchTable = function (pubs)
             changed_fields += '<tr>';
             changed_fields += '<td> Closed: </td>';
             changed_fields += '<td>' + cloned_pub['closed'] + '</td>';
-            changed_fields += '<td> --> </td>';
+            changed_fields += '<td> <i class="fa fa-arrow-right"></i> </td>';
             changed_fields += '<td>'+ pubs[i]['closed'] + '</td>';
             changed_fields += '</tr>';
         }
@@ -304,7 +304,7 @@ var populatePendingPubPatchTable = function (pubs)
             changed_fields += '<tr>';
             changed_fields += '<td> Serving Guinness: </td>';
             changed_fields += '<td>' + cloned_pub['servingGuinness'] + '</td>';
-            changed_fields += '<td> --> </td>';
+            changed_fields += '<td> <i class="fa fa-arrow-right"></i> </td>';
             changed_fields += '<td>'+ pubs[i]['servingGuinness'] + '</td>';
             changed_fields += '</tr>';
         }
