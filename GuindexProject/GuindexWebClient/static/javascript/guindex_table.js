@@ -118,6 +118,7 @@ var populateGuindexTable = function ()
     else
     {
         // Redraw table
+        // TODO Stay on same page table
         g_guindexDataTable.clear().draw();
         g_guindexDataTable.rows.add(table_data);
         g_guindexDataTable.columns.adjust().draw();

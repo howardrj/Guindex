@@ -1,7 +1,7 @@
 (function () {
 
     var page_content_links = document.getElementsByClassName('page_content_link'); 
-    var page_content_divs  = document.getElementsByClassName('page_content')
+    var page_content_divs  = document.getElementsByClassName('page_content');
 
     for (var i = 0; i < page_content_links.length; i++)
     {
@@ -25,8 +25,10 @@
 
             // Display corresponding page content
             document.getElementById(page_content_id).style.display = 'block';
-
-            // If displaying the map, trigger resize
+    
+            // Send analytics page view
+            ga('send', 'pageview', page_content_id);
+            
         });
     }
 })();

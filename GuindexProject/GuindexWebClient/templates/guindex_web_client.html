@@ -8,7 +8,7 @@
         // Useful global constants and variables
         var G_API_BASE             = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
         var G_FACEBOOK_APP_ID      = '{{facebook_app_id}}';
-        var G_GUI_REFRESH_INTERVAL = 120000;
+        var G_GUI_REFRESH_INTERVAL = 300000;
 
         // Global variables to keep track of user state
         var g_loggedIn            = false;
@@ -33,15 +33,17 @@
         var g_pendingPubPatchTable    = null;
 
   </script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113016256-1"></script>
-    <script>
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
+  <script>
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 
-	gtag('config', 'UA-113016256-1');
-    </script>
+    // TODO Get GA access code from the server
+    ga('create', 'UA-113016256-1', 'auto'); 
+
+    // Send overview page view
+    ga('create', 'overview_page'); 
+
+  </script>
+  <script async src='https://www.google-analytics.com/analytics.js'></script>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -114,11 +116,19 @@
           </ul>
         </li>
 
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Table">
-          <a class="nav-link page_content_link" data-content_page_id="guindex_table_page">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Data">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseData" data-parent="#exampleAccordion">
             <i class="fa fa-fw fa-table"></i>
-            <span class="nav-link-text">Table</span>
+            <span class="nav-link-text">Data</span>
           </a>
+          <ul class="sidenav-second-level collapse" id="collapseData">
+            <li>
+              <a class="nav-link page_content_link" data-content_page_id="data_table_page"> Table </a>
+            </li>
+            <li>
+              <a class="nav-link page_content_link" data-content_page_id="data_add_pub_page"> Add a Pub </a>
+            </li>
+          </ul>
         </li>
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
           <a class="nav-link page_content_link" data-content_page_id="settings_page">
@@ -209,7 +219,8 @@
   {% include "analysis_social.html" %}
   {% include "analysis_geo.html" %}
   {% include "analysis_pubdist.html" %}
-  {% include "guindex_table.html" %}
+  {% include "data_table.html" %}
+  {% include "data_add_pub.html" %}
   {% include "contributors.html" %}
   {% include "pending_contributions.html" %}
   {% include "settings.html" %}
