@@ -34,9 +34,7 @@ var populateUserSettingsTable = function ()
     // Email alerts setting
     var email_alerts_list = ['Email Alerts', 
                              "Receive email alerts when new prices and pubs are added to the Guindex.",
-                             g_detailedContributorInfo['usingEmailAlerts']
-                             ? prefix + '<input type="checkbox" id="email_alerts_toggler" class="toggler hoverable checked">' + suffix;
-                             : prefix + '<input type="checkbox" id="email_alerts_toggler" class="toggler hoverable">' + suffix;
+                             prefix + '<input type="checkbox" id="email_alerts_toggler" class="toggler hoverable">' + suffix
                             ];
 
     user_settings_table_data.push(email_alerts_list);
@@ -54,9 +52,7 @@ var populateUserSettingsTable = function ()
 
     var telegram_alerts_list = ['Telegram Alerts',
                                 telegram_description,
-                                g_detailedContributorInfo['usingTelegramAlerts']
-                                ? prefix + '<input type="checkbox" id="telegram_alerts_toggler" class="toggler hoverable checked">' + suffix;
-                                : prefix + '<input type="checkbox" id="telegram_alerts_toggler" class="toggler hoverable">' + suffix;
+                                prefix + '<input type="checkbox" id="telegram_alerts_toggler" class="toggler hoverable">' + suffix
                                 ];
 
     user_settings_table_data.push(telegram_alerts_list);
@@ -85,6 +81,12 @@ var populateUserSettingsTable = function ()
         g_userSettingsTable.columns.adjust().draw();
     }
 
+    // Need this since setting checked in HTML does not leave toggler in correct state
+    if (g_detailedContributorInfo['usingEmailAlerts'])
+        document.getElementById('email_alerts_toggler').checked = true;
+
+    if (g_detailedContributorInfo['usingTelegramAlerts'])
+        document.getElementById('telegram_alerts_toggler').checked = true;
 }
 
 $(document).on('click', '.toggler', function () {
@@ -112,7 +114,7 @@ $(document).on('click', '.toggler', function () {
         return;
     }
 
-    data[field] = togger.checked;
+    data[field] = toggler.checked;
 
     request.open('PATCH', G_API_BASE + 'contributors/' + g_userId +'/', true); 
     request.setRequestHeader('Content-Type', 'application/json');
