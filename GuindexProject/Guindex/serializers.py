@@ -2,6 +2,9 @@ import logging
 
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+from django.conf import settings
+from django.core.validators import validate_email as validateEmail
+from django.core.mail import send_mail as sendMail
 
 from rest_framework import serializers
 
@@ -584,3 +587,61 @@ class ContributorPatchSerializer(serializers.ModelSerializer):
             del self.validated_data['guindexuser']
 
         super(ContributorPatchSerializer, self).save(**kwargs)
+
+
+#######################
+# Contact Serializers #
+#######################
+
+class ContactSerializer(serializers.Serializer):
+
+    name = serializers.CharField(max_length  = GuindexParameters.MAX_CONTACT_FORM_NAME_LEN,
+                                 required    = True,
+                                 write_only  = True,
+                                 allow_blank = False)   
+
+    email = serializers.CharField(max_length  = GuindexParameters.MAX_CONTACT_FORM_EMAIL_LEN,
+                                  required    = True,
+                                  write_only  = True,
+                                  allow_blank = False)   
+
+    subject = serializers.CharField(max_length  = GuindexParameters.MAX_CONTACT_FORM_SUBJECT_LEN,
+                                    required    = True,
+                                    write_only  = True,
+                                    allow_blank = False)   
+
+    message = serializers.CharField(max_length  = GuindexParameters.MAX_CONTACT_FORM_MESSAGE_LEN,
+                                   required    = True,
+                                   write_only  = True,
+                                   allow_blank = False)   
+
+    def validate_email(self, email):
+
+        try:
+            validateEmail(email)
+        except:
+            raise ValidationError("Please use valid email.")
+
+        return email
+
+    def create(self, validated_data):
+        """
+            Sends contact form message to Guindex email
+            and sender.
+        """
+
+        name    = validated_data['name']
+        email   = validated_data['email']
+        subject = validated_data['subject']
+        message = validated_data['message']
+
+        sender    = settings.EMAIL_HOST_USER
+        receivers = [sender, ] # Only send to ourselves for now (prevents spamming someone else's inbox)
+        subject   = "Guindex Contact Message from %s (%s) - %s" % (name, email, subject)
+
+        try:
+            sendMail(subject, message, sender, receivers)
+        except:
+            logger.error("Failed to send contact email")
+
+        return self

@@ -13,6 +13,7 @@ from Guindex.serializers import GuinnessPendingCreateGetSerializer, GuinnessPend
 from Guindex.serializers import GuinnessPendingPatchGetSerializer, GuinnessPendingPatchPatchSerializer
 from Guindex.serializers import StatisticsSerializer
 from Guindex.serializers import ContributorGetSerializer, ContributorDetailedGetSerializer, ContributorPatchSerializer
+from Guindex.serializers import ContactSerializer
 
 from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
 from Guindex.models import Guinness, GuinnessPendingCreate, GuinnessPendingPatch
@@ -398,3 +399,17 @@ class ContributorDetail(generics.RetrieveUpdateAPIView):
         # does not exist for a User
         # No need for exclude filter
         return User.objects.all()
+
+#####################
+# Contact API Views #
+#####################
+class Contact(generics.CreateAPIView):
+    
+    serializer_class = ContactSerializer
+
+    def __init__(self, *args, **kwargs):
+
+        logger.debug("Received Contact request")
+
+        # Access base class constructor
+        super(Contact, self).__init__(*args, **kwargs)

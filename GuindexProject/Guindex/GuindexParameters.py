@@ -36,6 +36,12 @@ class GuindexParameters:
 
     REJECT_REASON_MAX_LEN = 100
 
+    # Contact Form Parameters
+    MAX_CONTACT_FORM_NAME_LEN    = 30
+    MAX_CONTACT_FORM_EMAIL_LEN   = 50
+    MAX_CONTACT_FORM_SUBJECT_LEN = 30
+    MAX_CONTACT_FORM_MESSAGE_LEN = 500
+
     @staticmethod
     def getParameters():
 

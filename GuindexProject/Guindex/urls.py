@@ -19,4 +19,5 @@ urlpatterns = [
     url(r'^api/statistics/$', views.StatisticsList.as_view()),
     url(r'^api/contributors/$', views.ContributorList.as_view()),
     url(r'^api/contributors/(?P<pk>[0-9]+)/$', views.ContributorDetail.as_view()),
+    url(r'^api/contact/$', views.Contact.as_view()),
 ]
