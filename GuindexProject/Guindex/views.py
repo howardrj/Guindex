@@ -1,14 +1,9 @@
 import logging
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.views.decorators.http import require_http_methods
 
 from rest_framework import generics
 from rest_framework import permissions
-
-from Guindex.forms import NewPubForm, NewGuinnessForm
 
 from Guindex.serializers import PubGetSerializer, PubPostSerializer, PubPatchSerializer
 from Guindex.serializers import PubPendingCreateGetSerializer, PubPendingCreatePatchSerializer
@@ -22,7 +17,6 @@ from Guindex.serializers import ContributorGetSerializer, ContributorDetailedGet
 from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
 from Guindex.models import Guinness, GuinnessPendingCreate, GuinnessPendingPatch
 from Guindex.models import StatisticsSingleton
-from GuindexParameters import GuindexParameters
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +75,7 @@ class PubList(generics.ListCreateAPIView):
 
         # Sets creator field in Pub object
         # prior to calling object's save method
-        serializer.save(creator = request.user)
+        serializer.save(creator = self.request.user)
 
     def get_serializer_class(self):
 
@@ -380,7 +374,7 @@ class ContributorDetail(generics.RetrieveUpdateAPIView):
     """
         A contributor can only patch its own User model.
         The alert settings are the only editable fields.
-        A contributor can access detailed serializer for 
+        A contributor can access detailed serializer for
         its own User model.
     """
 

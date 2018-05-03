@@ -36,8 +36,7 @@
   <script>
     window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 
-    // TODO Get GA access code from the server
-    ga('create', 'UA-113016256-1', 'auto'); 
+    ga('create', '{{ google_analytics_key }}', 'auto'); 
 
     // Send overview page view
     ga('create', 'overview_page'); 
@@ -51,14 +50,10 @@
   <meta name="author" content="">
   <title> Guindex </title>
   <link rel="icon" href="{% static "images/favicon.png" %}">
-  <!-- Bootstrap core CSS-->
   <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
-  <!-- Custom fonts for this template-->
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <!-- Page level plugin CSS-->
   <link rel="stylesheet" href="{% static "css/dataTables.bootstrap4.css" %}">
-  <!-- Custom styles for this template-->
   <link rel="stylesheet" href="{% static "css/sb-admin.css" %}">
   <link rel="stylesheet" href="{% static "css/guindex_web_client.css" %}">
 </head>
@@ -231,8 +226,6 @@
   {% include "help_contact.html" %}
   {% include "help_api.html" %}
 
-  <!-- /.container-fluid-->
-  <!-- /.content-wrapper-->
   <footer class="sticky-footer">
     <div class="container">
       <div class="text-center">
@@ -409,18 +402,13 @@
     </div>
   </div>
 
-  <!-- Bootstrap core JavaScript-->
   <script type="text/javascript" src="{% static "javascript/jquery.min.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/bootstrap.bundle.min.js" %}"></script>
-  <!-- Core plugin JavaScript-->
   <script type="text/javascript" src="{% static "javascript/jquery.easing.min.js" %}"></script>
-  <!-- Page level plugin JavaScript-->
   <script type="text/javascript" src="{% static "javascript/Chart.min.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/jquery.dataTables.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/dataTables.bootstrap4.js" %}"></script>
-  <!-- Custom scripts for all pages-->
   <script type="text/javascript" src="{% static "javascript/sb-admin.min.js" %}"></script>
-  <!-- Custom scripts for this page-->
   <script type="text/javascript" src="{% static "javascript/sb-admin-datatables.min.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/login_with_facebook.js" %}"></script>
@@ -430,6 +418,7 @@
   <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/main.js" %}"></script>
 
   <script async defer src="https://maps.googleapis.com/maps/api/js?key={{google_maps_api_key}}&callback=initMap"></script>

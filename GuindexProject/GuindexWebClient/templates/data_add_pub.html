@@ -1,6 +1,34 @@
-<div id="data_add_pub_page" class="page_content content-wrapper" style="display:none">
+<div id="data_add_pub_page" class="page_content content-wrapper" style="display:none; color:black;">
     <div class="pint-head">
     </div>
     <div class="container-fluid">
-    </div>
+
+    <div class="card card-register mx-auto mt-5">
+      <div class="card-header">Add a Pub</div>
+      <div class="card-body">
+        <form>
+          <div class="form-group">
+            <label for="exampleInputEmail1">Pub Name</label>
+            <input class="form-control" id="add_pub_name" type="text" placeholder="Enter pub name">
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div class="col-md-6">
+                <label for="add_pub_latitude">Latitude</label>
+                <input class="form-control" id="add_pub_latitude" type="number" step=0.0000001>
+              </div>
+              <div class="col-md-6">
+                <label for="add_pub_longitude">Longitude</label>
+                <input class="form-control" id="add_pub_longitude" type="number" step=0.0000001>
+              </div>
+            </div>
+          </div>
+          <div class="card_footer">
+            <a class="btn btn-primary btn-block" id="add_pub_submit_button">Submit</a>
+            <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+          </div>
+        </form>
+     </div>
+  </div>
+  </div>
 </div>

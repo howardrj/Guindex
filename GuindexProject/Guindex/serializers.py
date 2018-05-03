@@ -391,7 +391,7 @@ class PubPendingCreatePatchSerializer(serializers.ModelSerializer):
             pub.save(createPendingCreate = False)
 
         else:
-            logger.info("PubPendingCreate object was approved")
+            logger.info("PubPendingCreate object was not approved")
 
         logger.info("Deleting pending contribution")
         self.instance.delete()
@@ -518,8 +518,8 @@ class ContributorDetailedGetSerializer(serializers.ModelSerializer):
     currentVerifications  = serializers.IntegerField(source = 'guindexuser.currentVerifications')
     usingEmailAlerts      = serializers.BooleanField(source = 'guindexuser.usingEmailAlerts')
     usingTelegramAlerts   = serializers.BooleanField(source = 'telegramuser.usingTelegramAlerts')
-    telegramActivated     = serializers.BooleanField(source = 'telegramuser.activated') 
-    telegramActivationKey = serializers.CharField(source = 'telegramuser.activationKey') 
+    telegramActivated     = serializers.BooleanField(source = 'telegramuser.activated')
+    telegramActivationKey = serializers.CharField(source = 'telegramuser.activationKey')
 
     class Meta:
         model = User
@@ -548,11 +548,11 @@ class ContributorPatchSerializer(serializers.ModelSerializer):
         return data
 
     def validate_usingTelegramAlerts(self, usingTelegramAlerts):
-        
+
         if not self.instance.telegramuser.activated:
-            logger.error("User has not activated Telegram account yet") 
+            logger.error("User has not activated Telegram account yet")
             raise ValidationError("You must activate your Telegram account before Telegram alerts can be enabled.")
-            
+
         return usingTelegramAlerts
 
     def save(self, **kwargs):
