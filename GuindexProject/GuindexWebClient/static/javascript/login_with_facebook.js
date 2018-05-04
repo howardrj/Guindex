@@ -57,7 +57,6 @@ window.fbAsyncInit = function() {
     });
 };
 
-
 // Add event listener for facebook connect button
 (function () {
 

@@ -1,0 +1,32 @@
+echo "Building Guindex tarball ..."
+python setup.py bdist_rpm
+
+if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to build Guindex tarball"
+    echo "Do you have python-setuptools installed?"
+    exit -1
+fi
+
+echo "Building Guindex RPM ..."
+
+# Create directories needed by rpmbuild
+mkdir -p rpmbuild/SOURCES/
+mkdir -p rpmbuild/RPMS/
+mkdir -p rpmbuild/SRPMS/
+mkdir -p rpmbuild/BUILD/
+
+cp dist/Guindex-@PACKAGE_VERSION@.tar.gz rpmbuild/SOURCES/
+
+if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to copy tarball to buildroot"
+    exit -1
+fi
+
+rpmbuild -ba --clean rpmbuild/SPECS/Guindex.spec
+
+if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to build Guindex RPM"
+    exit -1
+fi
+
+rm rpmbuild/SOURCES/Guindex-@PACKAGE_VERSION@.tar.gz

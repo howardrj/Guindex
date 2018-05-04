@@ -373,6 +373,12 @@ var populatePendingPubPatchTable = function (pubs)
 // Add event listeners for pending contributions buttons
 $(document).on('click', '.pending_contribution_button', function () {
 
+    if (!g_loggedIn || !g_accessToken)
+    {
+        displayMessage("Error", "You must be logged in.");
+        return;
+    }
+
     var table_type = this.getAttribute('data-table_type');
     var obj_id     = this.getAttribute('data-obj_id');
     var method     = this.getAttribute('data-action');

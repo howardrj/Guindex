@@ -3,9 +3,14 @@ Description=Monitor Guindex Alerts
 After=network.target
 
 [Service]
+Type=simple
+Environment="PYTHONPATH=$PYTHONPATH:/var/www/"
+ExecStart=/usr/bin/manage.py GuindexAlerts
 User=root
-WorkingDirectory=/var/www/Guindex/GuindexProject
-ExecStart=/usr/bin/python /var/www/Guindex/GuindexProject/manage.py GuindexAlerts
+Group=root
+Restart=always
+RestartSec=1
+StartLimitBurst=0
 
 [Install]
 WantedBy=multi-user.target

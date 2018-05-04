@@ -101,7 +101,7 @@ WSGI_APPLICATION = 'GuindexProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/var/www/Testing/Guindex/Guindex.db',
+        'NAME': '/usr/share/Guindex.db',
     }
 }
 
@@ -143,7 +143,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "CDN/")
+STATIC_ROOT = os.path.join("/var/www/Guindex_CDN/")
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'

@@ -3,9 +3,14 @@ Description=Guindex Gunicorn HTTP Server
 After=network.target
 
 [Service]
+Type=simple
+Environment="PYTHONPATH=$PYTHONPATH:/var/www/"
+ExecStart=/usr/bin/gunicorn --workers 3 --bind unix:/var/www/Guindex.sock GuindexProject.wsgi:application
 User=root
-WorkingDirectory=/var/www/Guindex/GuindexProject
-ExecStart=/usr/local/bin/gunicorn --workers 3 --bind unix:/var/www/Guindex/GuindexProject/Guindex.sock GuindexProject.wsgi:application
+Group=root
+Restart=always
+RestartSec=1
+StartLimitBurst=0
 
 [Install]
 WantedBy=multi-user.target

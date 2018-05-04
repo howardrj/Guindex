@@ -35,6 +35,8 @@ var onSuccess = function (position)
 
     createMap(map_center, true);
 
+    createAddPubMap(map_center);
+
     if (g_pubsList.length)
     { 
         populateMap();
@@ -52,6 +54,8 @@ var onError = function (error)
     var map_center = G_DUBLIN_CENTER;
     
     createMap(map_center, false);
+
+    createAddPubMap(map_center);
 
     if (g_pubsList.length)
     { 
@@ -79,13 +83,11 @@ var createMap = function (mapCenter, foundUserLocation)
     // If we have user's location, add a marker
     if (foundUserLocation)
     {
-        var my_marker =  new google.maps.Marker({
-            position: mapCenter,
-            map: g_guindexMap,
-            icon: G_MAP_ICON_BASE + 'my_location.png',
-            title: 'My Location',
-            zIndex: google.maps.Marker.MAX_ZINDEX + 1
-        });
+        var my_marker =  new google.maps.Marker({position: mapCenter,
+                                                 map: g_guindexMap,
+                                                 icon: G_MAP_ICON_BASE + 'my_location.png',
+                                                 title: 'My Location',
+                                                 zIndex: google.maps.Marker.MAX_ZINDEX + 1});
     }
 }
 
@@ -122,14 +124,12 @@ var populateMap = function ()
             pub_label   = "No yet visited";
         }
 
-        var marker = new google.maps.Marker({
-                position: {lat: parseFloat(g_pubsList[i]['latitude']), lng: parseFloat(g_pubsList[i]['longitude'])},
-                map: g_guindexMap,
-                icon: icon_to_use,
-                title: g_pubsList[i]['name'],
-                zIndex: g_pubsList[i]['id'],
-                disableAutoPan: true,
-            });
+        var marker = new google.maps.Marker({position: {lat: parseFloat(g_pubsList[i]['latitude']), lng: parseFloat(g_pubsList[i]['longitude'])},
+                                             map: g_guindexMap,
+                                             icon: icon_to_use,
+                                             title: g_pubsList[i]['name'],
+                                             zIndex: g_pubsList[i]['id'],
+                                             disableAutoPan: true});
 
         var content = '<h3>' + "Pub: " + g_pubsList[i]['name'] + '</h3>' + '<p>' + pub_label + '</p>';
 

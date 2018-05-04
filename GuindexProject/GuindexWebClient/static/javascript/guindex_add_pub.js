@@ -1,11 +1,18 @@
+var g_addPubMap          = null;
+var g_addPubMapContainer = document.getElementById('add_pub_map');
+var g_pubLocationMarker  = null;
+
 $('#add_pub_submit_button').on('click', function () {
 
     if (!g_loggedIn || !g_accessToken)
+    {
+        displayMessage("Error", "You must be logged in to add a pub.");
         return;
+    }
 
     var name      = document.getElementById('add_pub_name').value;
-    var latitude  = document.getElementById('add_pub_latitude').value;
-    var longitude = document.getElementById('add_pub_longitude').value;
+    var latitude  = g_pubLocationMarker.getPosition().lat();
+    var longitude = g_pubLocationMarker.getPosition().lng();
 
     var new_pub_data = {
         'name'     : name,
@@ -45,9 +52,7 @@ $('#add_pub_submit_button').on('click', function () {
                 }
 
                 // Clear form
-                document.getElementById('add_pub_name').value      = "";
-                document.getElementById('add_pub_latitude').value  = "";
-                document.getElementById('add_pub_longitude').value = "";
+                document.getElementById('add_pub_name').value = "";
     
                 // Reload relevant tables
                 getPubInfo();
@@ -82,3 +87,37 @@ $('#add_pub_submit_button').on('click', function () {
         }   
     }
 });
+
+function createAddPubMap (mapCenter) 
+{
+	var map_options = {
+        zoom: G_ZOOM,
+        center: mapCenter,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        fullscreenControl: false,
+	}
+
+    // Create Map object
+    g_addPubMap = new google.maps.Map(g_addPubMapContainer, map_options);
+
+    // If we have user's location, add a marker
+    g_pubLocationMarker = new google.maps.Marker({position: mapCenter,
+                                                  map: g_addPubMap,
+                                                  title: 'New Pub Location',
+                                                  zIndex: google.maps.Marker.MAX_ZINDEX + 1});
+
+    // Create map click event listener
+    google.maps.event.addListener(g_addPubMap, 'click', function(evt) {
+
+        // Hide old marker
+        if (g_pubLocationMarker)
+        {
+            g_pubLocationMarker.setVisible(false);    
+        }
+        
+        g_pubLocationMarker = new google.maps.Marker({position: evt.latLng,
+                                                      map: g_addPubMap,
+                                                      title: 'New Pub Location',
+                                                      zIndex: google.maps.Marker.MAX_ZINDEX + 1});
+    });
+}

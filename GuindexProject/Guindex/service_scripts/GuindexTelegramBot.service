@@ -3,9 +3,14 @@ Description=Guindex Telegram Bot
 After=network.target
 
 [Service]
+Type=simple
+Environment="PYTHONPATH=$PYTHONPATH:/var/www/"
+ExecStart=/usr/bin/manage.py GuindexTelegramBot
 User=root
-WorkingDirectory=/var/www/Guindex/GuindexProject
-ExecStart=/usr/bin/python /var/www/Guindex/GuindexProject/manage.py GuindexTelegramBot
+Group=root
+Restart=always
+RestartSec=1
+StartLimitBurst=0
 
 [Install]
 WantedBy=multi-user.target

@@ -16,4 +16,6 @@ AM_INIT_AUTOMAKE([foreign])
 # Checks for library functions.
 
 AC_OUTPUT([Makefile
-           setup.py])
+           build_guindex_rpm.sh
+           setup.py
+           rpmbuild/SPECS/Guindex.spec])
