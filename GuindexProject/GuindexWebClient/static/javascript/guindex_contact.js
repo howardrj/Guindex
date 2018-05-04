@@ -34,6 +34,12 @@ $('#contact_form_submit_button').on('click', function () {
             if (request.status == 201)
             {
                 displayMessage("Info", "Thank you for your message. A member of the Guindex team will be in touch with you shortly.");
+
+                // Clear form
+                document.getElementById('contact_form_name').value    = "";
+                document.getElementById('contact_form_email').value   = "";
+                document.getElementById('contact_form_subject').value = "";
+                document.getElementById('contact_form_message').value = "";
             }
             else
             {

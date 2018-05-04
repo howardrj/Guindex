@@ -43,6 +43,11 @@ $('#add_pub_submit_button').on('click', function () {
                 {
                     displayMessage("Info", "Thank you. A member of staff will verify your submission shortly.");
                 }
+
+                // Clear form
+                document.getElementById('add_pub_name').value      = "";
+                document.getElementById('add_pub_latitude').value  = "";
+                document.getElementById('add_pub_longitude').value = "";
     
                 // Reload relevant tables
                 getPubInfo();
