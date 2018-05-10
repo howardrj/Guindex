@@ -126,7 +126,85 @@ var API_URL_BASE = 'https://guindex.ie/api/'
 	}
 
 	
-	
+	var requestpubs = new XMLHttpRequest();
+        requestpubs.open('GET', API_URL_BASE + 'statistics/', true); 
+
+        requestpubs.setRequestHeader('Content-Type', 'application/json');
+        requestpubs.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        requestpubs.send(null);
+
+        requestpubs.onreadystatechange = processRequest;
+
+
+
+        // Update widget in processRequest callback
+
+        function processRequest()
+        {
+            if (requestpubs.readyState != 4 || requestpubs.status != 200)
+                return;
+
+            // Get statistics JSON object
+            var statistics = JSON.parse(requestpubs.responseText)[0];    
+
+		var statistics_data = [];
+
+		
+            Object.keys(statistics).forEach(function (key, index) {
+
+                if (key == 'pubsWithPrices')
+                {
+                    // Copy pubs with prices list into two lists that will be sorted
+
+                    var cheapest_first = statistics.pubsWithPrices.slice();
+
+
+                    cheapest_first.sort(function(a, b) {
+                        return parseFloat(a.price) - parseFloat(b.price); 
+                    });
+
+			//statistics_data.push({label: key, value: statistics[key]});
+			for(i=0; i<16;i++) {
+
+                   		statistics_data.push({label: cheapest_first[i].name , value: "\u20AC" + cheapest_first[i].price.toString()});
+
+			};
+                    
+                }
+  
+		
+            });
+
+		var dataset = {
+			title: 'Cheapest Pints',
+                	data: statistics_data
+		};
+
+		document.getElementById("testagain").innerHTML = dataset.data[0].label; 
+		document.getElementById("testagain2").innerHTML = dataset.data[0].value;
+		document.getElementById("testagain3").innerHTML = dataset.data[1].label; 
+		document.getElementById("testagain4").innerHTML = dataset.data[1].value;
+		document.getElementById("testagain5").innerHTML = dataset.data[2].label; 
+		document.getElementById("testagain6").innerHTML = dataset.data[2].value;
+		document.getElementById("testagain7").innerHTML = dataset.data[3].label; 
+		document.getElementById("testagain8").innerHTML = dataset.data[3].value;
+		document.getElementById("testagain9").innerHTML = dataset.data[4].label; 
+		document.getElementById("testagain10").innerHTML = dataset.data[4].value;
+		document.getElementById("testagain11").innerHTML = dataset.data[5].label; 
+		document.getElementById("testagain12").innerHTML = dataset.data[5].value;
+		document.getElementById("testagain13").innerHTML = dataset.data[6].label; 
+		document.getElementById("testagain14").innerHTML = dataset.data[6].value;
+		document.getElementById("testagain15").innerHTML = dataset.data[7].label; 
+		document.getElementById("testagain16").innerHTML = dataset.data[7].value;
+		document.getElementById("testagain17").innerHTML = dataset.data[8].label; 
+		document.getElementById("testagain18").innerHTML = dataset.data[8].value;
+		document.getElementById("testagain19").innerHTML = dataset.data[9].label; 
+		document.getElementById("testagain20").innerHTML = dataset.data[9].value;
+
+        }
+
+
 
 
 	
