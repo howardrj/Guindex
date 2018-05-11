@@ -12,6 +12,7 @@ from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
 from Guindex.models import Guinness, GuinnessPendingCreate, GuinnessPendingPatch
 from Guindex.models import StatisticsSingleton
 from Guindex.GuindexParameters import GuindexParameters
+from Guindex.GuindexAlertsClient import GuindexAlertsClient
 
 logger = logging.getLogger(__name__)
 
@@ -157,8 +158,24 @@ class GuinnessPendingCreatePatchSerializer(serializers.ModelSerializer):
         else:
             logger.info("GuinnessPendingCreate object was not approved")
 
+            try:
+                reason = self._validated_data['rejectReason']
+            except:
+                reason = ""
+
         logger.info("Deleting pending contribution")
         self.instance.delete()
+
+        # Send accept/reject alert to contributor here
+        try:
+            guindex_alerts_client = GuindexAlertsClient()
+        except:
+            logger.error("Failed to create GuindexAlertsClient object")
+
+        try:
+            guindex_alerts_client.sendGuinnessPendingCreateDecisionAlertRequest(self.instance, approved, reason)
+        except:
+            logger.error("Failed to send Guinness Pending Create Decision Alert Request")
 
 
 ####################################
@@ -304,7 +321,16 @@ class PubPatchSerializer(serializers.ModelSerializer):
 
         # Check there are no pending contributions for this Pub
         if len(PubPendingPatch.objects.filter(clonedFrom = self.instance)):
-            raise ValidationError('There are already pending contributions for this Pub')
+            raise ValidationError('There are already pending contributions for this Pub.')
+
+        # Check fields have actually changed
+        if self.instance.name            == data['name']      and \
+           self.instance.latitude        == data['latitude']  and \
+           self.instance.longitude       == data['longitude'] and \
+           self.instance.closed          == data['closed']    and \
+           self.instance.servingGuinness == data['servingGuinness']:
+
+            raise ValidationError('You have not altered any fields.')
 
         return data
 
@@ -312,9 +338,29 @@ class PubPatchSerializer(serializers.ModelSerializer):
 
         user = kwargs['user']
 
+        # Get changed fields and add to JSONizable object
+        changed_fields = {}
+        for value in self.validated_data.items():
+            if value[1] != getattr(self.instance, value[0]):
+                changed_fields[value[0]] = [getattr(self.instance, value[0]), value[1]]
+
         if user.is_staff:
             logger.debug("Contributor is a staff member. Saving changes")
+
+            # Send pub patch alert
+            try:
+                guindex_alerts_client = GuindexAlertsClient()
+            except:
+                logger.error("Failed to create GuindexAlertsClient object")
+
+            try:
+                guindex_alerts_client.sendPubPatchAlertRequest(self.instance, user, changed_fields, True)
+            except:
+                logger.error("Failed to send Pub Patch Alert Request")
+
+            # Bit of a risk saving after sending request but it makes tracking diffs easier
             super(PubPatchSerializer, self).save(**kwargs)
+
             return
 
         logger.debug("Contributor is not a staff member. Creating PubPendingPatch object")
@@ -334,6 +380,17 @@ class PubPatchSerializer(serializers.ModelSerializer):
         pub_pending_patch.creator    = user
         pub_pending_patch.clonedFrom = self.instance
         pub_pending_patch.save()
+
+        # Send pending pub patch alert
+        try:
+            guindex_alerts_client = GuindexAlertsClient()
+        except:
+            logger.error("Failed to create GuindexAlertsClient object")
+
+        try:
+            guindex_alerts_client.sendPubPatchAlertRequest(self.instance, user, changed_fields, False)
+        except:
+            logger.error("Failed to send Pub Patch Alert Request")
 
 
 ################################
@@ -396,8 +453,24 @@ class PubPendingCreatePatchSerializer(serializers.ModelSerializer):
         else:
             logger.info("PubPendingCreate object was not approved")
 
+            try:
+                reason = self._validated_data['rejectReason']
+            except:
+                reason = ""
+
         logger.info("Deleting pending contribution")
         self.instance.delete()
+
+        # Send accept/reject alert to contributor here
+        try:
+            guindex_alerts_client = GuindexAlertsClient()
+        except:
+            logger.error("Failed to create GuindexAlertsClient object")
+
+        try:
+            guindex_alerts_client.sendPubPendingCreateDecisionAlertRequest(self.instance, approved, reason)
+        except:
+            logger.error("Failed to send Pub Pending Create Decision Alert Request")
 
 
 ###############################
@@ -450,21 +523,62 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
 
             pub = self.instance.clonedFrom
 
+            # Get changed fields and add to JSONizable object
+            changed_fields = {}
             for field in self.instance._meta.fields:
 
                 # Don't merge these fields
                 if field.name in ['id', 'clonedFrom', 'creator', 'creationDate']:
                     continue
 
+                # Get changed fields and add to JSONizable object
+                if getattr(self.instance, field.name) != getattr(pub, field.name):
+                    changed_field[field_name] = [getattr(self.instance, field.name), getattr(pub, field.name)]
+
+            # Send pub change update
+            try:
+                guindex_alerts_client = GuindexAlertsClient()
+            except:
+                logger.error("Failed to create GuindexAlertsClient object")
+
+            try:
+                guindex_alerts_client.sendPubPatchAlertRequest(pub, self.instance.creator, changed_fields, True)
+            except:
+                logger.error("Failed to send Pub Patch Alert Request")
+
+            # Bit of a risk saving after sending request but it makes tracking diffs easier
+            for field in self.instance._meta.fields:
+
+                # Don't merge these fields
+                if field.name in ['id', 'clonedFrom', 'creator', 'creationDate']:
+                    continue
+
+                # Merge new fields
                 setattr(pub, field.name, getattr(self.instance, field.name))
 
             pub.save()
 
         else:
-            logger.info("GuinnessPendingCreate object was not approved")
+            logger.info("PubPendingPatch object was not approved")
+
+            try:
+                reason = self._validated_data['rejectReason']
+            except:
+                reason = ""
 
         logger.info("Deleting pending contribution")
         self.instance.delete()
+
+        # Send pub change accept/reject to contributor
+        try:
+            guindex_alerts_client = GuindexAlertsClient()
+        except:
+            logger.error("Failed to create GuindexAlertsClient object")
+
+        try:
+            guindex_alerts_client.sendPubPendingPatchDecisionAlertRequest(self.instance, approved, reason)
+        except:
+            logger.error("Failed to send Pub Pending Patch Decision Alert Request")
 
 
 ##########################
@@ -595,25 +709,25 @@ class ContributorPatchSerializer(serializers.ModelSerializer):
 
 class ContactSerializer(serializers.Serializer):
 
-    name = serializers.CharField(max_length  = GuindexParameters.MAX_CONTACT_FORM_NAME_LEN,
-                                 required    = True,
-                                 write_only  = True,
-                                 allow_blank = False)   
+    name    = serializers.CharField(max_length  = GuindexParameters.MAX_CONTACT_FORM_NAME_LEN,
+                                    required    = True,
+                                    write_only  = True,
+                                    allow_blank = False)
 
-    email = serializers.CharField(max_length  = GuindexParameters.MAX_CONTACT_FORM_EMAIL_LEN,
-                                  required    = True,
-                                  write_only  = True,
-                                  allow_blank = False)   
+    email   = serializers.CharField(max_length  = GuindexParameters.MAX_CONTACT_FORM_EMAIL_LEN,
+                                    required    = True,
+                                    write_only  = True,
+                                    allow_blank = False)
 
     subject = serializers.CharField(max_length  = GuindexParameters.MAX_CONTACT_FORM_SUBJECT_LEN,
                                     required    = True,
                                     write_only  = True,
-                                    allow_blank = False)   
+                                    allow_blank = False)
 
     message = serializers.CharField(max_length  = GuindexParameters.MAX_CONTACT_FORM_MESSAGE_LEN,
-                                   required    = True,
-                                   write_only  = True,
-                                   allow_blank = False)   
+                                    required    = True,
+                                    write_only  = True,
+                                    allow_blank = False)
 
     def validate_email(self, email):
 

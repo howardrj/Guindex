@@ -101,7 +101,7 @@ WSGI_APPLICATION = 'GuindexProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/usr/share/Guindex.db',
+        'NAME': '/var/www/Testing/Guindex/Guindex.db',
     }
 }
 
@@ -166,14 +166,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'UserProfileLogFile': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/UserProfileGuindex.log"),
-            'maxBytes': 1024 * 1024 * 10,
-            'backupCount': 10,
-            'formatter': 'verbose'
-        },
         'TelegramUserLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -232,11 +224,6 @@ LOGGING = {
         },
     },
     'loggers': {
-        'UserProfile': {
-            'handlers': ['UserProfileLogFile'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
         'TelegramUser': {
             'handlers': ['TelegramUserLogFile'],
             'propogate': True,
