@@ -5,7 +5,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from GuindexParameters import GuindexParameters
+from Guindex.GuindexParameters import GuindexParameters
+from Guindex.GuindexAlertsClient import GuindexAlertsClient
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +101,20 @@ class Pub(PubBase):
                 self.createPendingCreate()
                 return
 
-        super(Pub, self).save(*args, **kwargs)
+            super(Pub, self).save(*args, **kwargs)
+
+            # Send new pub alert here (Make sure save works first)
+            try:
+                guindex_alerts_client = GuindexAlertsClient()
+            except:
+                logger.error("Failed to create GuindexAlertsClient object")
+
+            try:
+                guindex_alerts_client.sendPubCreateAlertRequest(self, True)
+            except:
+                logger.error("Failed to send Pub Create Alert Request")
+        else:
+            super(Pub, self).save(*args, **kwargs)
 
     def createPendingCreate(self):
 
@@ -113,6 +127,17 @@ class Pub(PubBase):
 
         pub_pending_create.pk = None
         pub_pending_create.save()
+
+        # Send new pub alert here (Make sure save works first)
+        try:
+            guindex_alerts_client = GuindexAlertsClient()
+        except:
+            logger.error("Failed to create GuindexAlertsClient object")
+
+        try:
+            guindex_alerts_client.sendPubCreateAlertRequest(pub_pending_create, False)
+        except:
+            logger.error("Failed to send Pub Create Alert Request")
 
 
 class PubPendingCreate(PubBase):
@@ -179,12 +204,23 @@ class Guinness(GuinnessBase):
                 return
 
             super(Guinness, self).save(*args, **kwargs)
-        
+
             # Append to pub prices list (must have DB ID at this point)
             self.pub.prices.add(self)
-            return
 
-        super(Guinness, self).save(*args, **kwargs)
+            # Send new price alert here (Make sure save works first)
+            try:
+                guindex_alerts_client = GuindexAlertsClient()
+            except:
+                logger.error("Failed to create GuindexAlertsClient object")
+
+            try:
+                guindex_alerts_client.sendGuinnessCreateAlertRequest(self, True)
+            except:
+                logger.error("Failed to send Guinness Create Alert Request")
+
+        else:
+            super(Guinness, self).save(*args, **kwargs)
 
     def createPendingCreate(self):
 
@@ -197,6 +233,17 @@ class Guinness(GuinnessBase):
 
         guinness_pending_create.pk = None
         guinness_pending_create.save()
+
+        # Send new price alert here (Make sure save works first)
+        try:
+            guindex_alerts_client = GuindexAlertsClient()
+        except:
+            logger.error("Failed to create GuindexAlertsClient object")
+
+        try:
+            guindex_alerts_client.sendGuinnessCreateAlertRequest(guinness_pending_create, False)
+        except:
+            logger.error("Failed to send Guinness Create Alert Request")
 
 
 class GuinnessPendingCreate(GuinnessBase):
@@ -250,6 +297,7 @@ class StatisticsSingleton(models.Model):
     def load(cls):
         obj, created = cls.objects.get_or_create(pk = 1)
         return obj
+
 
 ######################
 # GuindexUser Models #

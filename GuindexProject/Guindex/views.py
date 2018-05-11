@@ -400,9 +400,11 @@ class ContributorDetail(generics.RetrieveUpdateAPIView):
         # No need for exclude filter
         return User.objects.all()
 
+
 #####################
 # Contact API Views #
 #####################
+
 class Contact(generics.CreateAPIView):
     
     serializer_class = ContactSerializer

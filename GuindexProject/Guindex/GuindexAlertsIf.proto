@@ -1,0 +1,69 @@
+syntax = "proto2";
+
+package GuindexAlertsIf;
+
+// Message to send to AlertsServer when new price is added
+message GuinnessCreateAlertRequest {
+    required string pub          = 1;
+    required string price        = 2;
+    required string username     = 3;
+    required string creationDate = 4;
+    required bool   approved     = 5;
+}
+
+// Message to send to AlertsServer when pending Guinness create decision is made
+message GuinnessPendingCreateDecisionAlertRequest {
+    required string pub          = 1;
+    required string price        = 2;
+    required uint32 userId       = 3;
+    required string creationDate = 4;
+    required bool   approved     = 5;
+    optional string reason       = 6;
+}
+
+// Message to send to AlertsServer when new Pub is added
+message PubCreateAlertRequest {
+    required string pub          = 1;
+    required string latitude     = 2;
+    required string longitude    = 3;
+    required string username     = 4;
+    required string creationDate = 5;
+    required bool   approved     = 6;
+}
+
+// Message to send to AlertsServer when Pub is patched
+message PubPatchAlertRequest {
+    required string pub           = 1;
+    required string username      = 2;
+    required string changedFields = 3; // TODO Can we add constraints so this is encoded correctly?
+    required bool   approved      = 4;
+}
+
+// Message to send to AlertsServer when pending Pub create decision is made
+message PubPendingCreateDecisionAlertRequest {
+    required string pub          = 1;
+    required string latitude     = 2;
+    required string longitude    = 3;
+    required uint32 userId       = 4;
+    required string creationDate = 5;
+    required bool   approved     = 6;
+    optional string reason       = 7;
+}
+
+// Message to send to AlertsServer when pending Pub patch decision is made
+message PubPendingPatchDecisionAlertRequest {
+    required string pub           = 1;
+    required uint32 userId        = 2;
+    required string creationDate  = 3;
+    required bool   approved      = 4;
+    optional string reason        = 5;
+}
+
+message GuindexAlertsIfMessage {
+    optional GuinnessCreateAlertRequest                guinnessCreateAlertRequest                = 1;
+    optional GuinnessPendingCreateDecisionAlertRequest guinnessPendingCreateDecisionAlertRequest = 2;
+    optional PubCreateAlertRequest                     pubCreateAlertRequest                     = 3;
+    optional PubPatchAlertRequest                      pubPatchAlertRequest                      = 4;
+    optional PubPendingCreateDecisionAlertRequest      pubPendingCreateDecisionAlertRequest      = 5;
+    optional PubPendingPatchDecisionAlertRequest       pubPendingPatchDecisionAlertRequest       = 6;
+}

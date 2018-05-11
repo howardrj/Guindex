@@ -19,3 +19,7 @@ missing
 build
 dist
 Guindex.egg-info/
+build_guindex_rpm.sh
+*.spec
+rpmbuild/RPMS/
+rpmbuild/SRPMS/

@@ -16,13 +16,8 @@ class GuindexParameters:
 
     # Alerts Server Parameters
     ALERTS_LISTEN_IP   = '127.0.0.1'
-    ALERTS_LISTEN_PORT = 8080
+    ALERTS_LISTEN_PORT = 8088
     ALERTS_BACKLOG     = 50
-
-    # Stats Server Parameters
-    STATS_LISTEN_IP   = '127.0.0.1'
-    STATS_LISTEN_PORT = 8081
-    STATS_BACKLOG     = 50
 
     # GPS Parameters
     GPS_COORD_DECIMAL_PLACES     = 20
