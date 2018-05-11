@@ -82,5 +82,15 @@ var API_URL_BASE = 'https://guindex.ie/api/'
 		document.getElementById("testagaind18").innerHTML = datasetd.datad[8].value;
 		document.getElementById("testagaind19").innerHTML = datasetd.datad[9].label; 
 		document.getElementById("testagaind20").innerHTML = datasetd.datad[9].value;
+		document.getElementById("testagaind21").innerHTML = datasetd.datad[10].label; 
+		document.getElementById("testagaind22").innerHTML = datasetd.datad[10].value;
+		document.getElementById("testagaind23").innerHTML = datasetd.datad[11].label; 
+		document.getElementById("testagaind24").innerHTML = datasetd.datad[11].value;
+		document.getElementById("testagaind25").innerHTML = datasetd.datad[12].label; 
+		document.getElementById("testagaind26").innerHTML = datasetd.datad[12].value;
+		document.getElementById("testagaind27").innerHTML = datasetd.datad[13].label; 
+		document.getElementById("testagaind28").innerHTML = datasetd.datad[13].value;
+		document.getElementById("testagaind29").innerHTML = datasetd.datad[14].label; 
+		document.getElementById("testagaind30").innerHTML = datasetd.datad[14].value;
       
         }

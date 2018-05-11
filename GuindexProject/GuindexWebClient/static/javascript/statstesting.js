@@ -115,7 +115,7 @@ var API_URL_BASE = 'https://guindex.ie/api/'
            		value: closedPubs
 		};
 
-		 document.getElementById("test9").innerHTML = dataclose.title;
+		  document.getElementById("test9").innerHTML = dataclose.title;
 		  document.getElementById("test10").innerHTML = dataclose.value;
  		  document.getElementById("test11").innerHTML = dataclose.moreInfo;
 		  document.getElementById("test12").innerHTML = dataclose.detail;
@@ -180,7 +180,13 @@ var API_URL_BASE = 'https://guindex.ie/api/'
 			title: 'Cheapest Pints',
                 	data: statistics_data
 		};
+/*
+		var i 
+		for (i=0; i<14; i++){
+			document.getElementById('"' + "testagain"+ ((2*i).toString()) + '"').innerHTML = dataset.data[i].label; 
+			document.getElementById('"' + "testagain"+ ((2*i).toString()) + '"').innerHTML = dataset.data[i].value;
 
+}*/
 		document.getElementById("testagain").innerHTML = dataset.data[0].label; 
 		document.getElementById("testagain2").innerHTML = dataset.data[0].value;
 		document.getElementById("testagain3").innerHTML = dataset.data[1].label; 
@@ -201,6 +207,16 @@ var API_URL_BASE = 'https://guindex.ie/api/'
 		document.getElementById("testagain18").innerHTML = dataset.data[8].value;
 		document.getElementById("testagain19").innerHTML = dataset.data[9].label; 
 		document.getElementById("testagain20").innerHTML = dataset.data[9].value;
+		document.getElementById("testagain21").innerHTML = dataset.data[10].label; 
+		document.getElementById("testagain22").innerHTML = dataset.data[10].value;
+		document.getElementById("testagain23").innerHTML = dataset.data[11].label; 
+		document.getElementById("testagain24").innerHTML = dataset.data[11].value;
+		document.getElementById("testagain25").innerHTML = dataset.data[12].label; 
+		document.getElementById("testagain26").innerHTML = dataset.data[12].value;
+		document.getElementById("testagain27").innerHTML = dataset.data[13].label; 
+		document.getElementById("testagain28").innerHTML = dataset.data[13].value;
+		document.getElementById("testagain29").innerHTML = dataset.data[14].label; 
+		document.getElementById("testagain30").innerHTML = dataset.data[14].value;
 
         }
 
