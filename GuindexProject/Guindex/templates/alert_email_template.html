@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Oswald">
+    </head>
+
+    <body>
+
+        <style>
+
+            h1 {
+                font-family: "Oswald";
+                font-size: 90px;
+                color: black;
+                position: relative;
+                white-space: nowrap;
+                margin-top: 40px;
+                text-align: center;
+            }
+
+            .content_div {
+                margin-top: 0px;
+                margin-bottom: 30px;
+                font-family: "Oswald";
+                font-size: 16.5px;
+                text-align: center;
+            }
+
+        </style>
+
+        <h1> Guindex </h1>
+
+        <div class="content_div">
+
+            <p> Hello {{ username }}, </p>
+
+            <p> {{ summary }} </p>
+
+            <br>
+
+            {% for key, value in data.items %}
+                <p> {{ key }}: {{ value }} </p>
+            {% endfor %}
+
+            <br>
+
+            {% if add_text %}
+                <p> {{ add_text }} </p>
+                <br>
+            {% endif %}
+            
+
+            <p> Regards, </p>
+            <p> Guindex Team </p>
+
+        </div>
+
+    </body>
+
+</html>
+

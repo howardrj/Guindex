@@ -29,6 +29,7 @@ function statusChangeCallback(response) {
             function(response) {
                 g_username = response.name;
                 g_email    = response.email;
+
                 loginToGuindex();
             }
         );
@@ -128,6 +129,8 @@ window.fbAsyncInit = function() {
                 {
                     var response = JSON.parse(request.responseText);
 
+                    // TODO Clear old login info from locolStorage
+
                     g_loggedIn    = true;
                     g_accessToken = response['key'];
                     g_userId      = response['user'];
@@ -185,6 +188,8 @@ var loginToGuindex = function ()
             {
                 // We have successfully logged in
                 // Get token from response JSON object
+
+                // TODO Clear old login info from locolStorage
 
                 g_loggedIn    = true;
                 g_accessToken = response['key'];
