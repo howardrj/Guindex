@@ -453,10 +453,10 @@ class PubPendingCreatePatchSerializer(serializers.ModelSerializer):
         else:
             logger.info("PubPendingCreate object was not approved")
 
-            try:
-                reason = self._validated_data['rejectReason']
-            except:
-                reason = ""
+        try:
+            reason = self._validated_data['rejectReason']
+        except:
+            reason = ""
 
         logger.info("Deleting pending contribution")
         self.instance.delete()
@@ -533,7 +533,7 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
 
                 # Get changed fields and add to JSONizable object
                 if getattr(self.instance, field.name) != getattr(pub, field.name):
-                    changed_field[field_name] = [getattr(self.instance, field.name), getattr(pub, field.name)]
+                    changed_fields[field.name] = [getattr(self.instance, field.name), getattr(pub, field.name)]
 
             # Send pub change update
             try:
@@ -561,10 +561,10 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
         else:
             logger.info("PubPendingPatch object was not approved")
 
-            try:
-                reason = self._validated_data['rejectReason']
-            except:
-                reason = ""
+        try:
+            reason = self._validated_data['rejectReason']
+        except:
+            reason = ""
 
         logger.info("Deleting pending contribution")
         self.instance.delete()
@@ -575,8 +575,9 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
         except:
             logger.error("Failed to create GuindexAlertsClient object")
 
+        guindex_alerts_client.sendPubPendingPatchDecisionAlertRequest(self.instance, approved, reason)
         try:
-            guindex_alerts_client.sendPubPendingPatchDecisionAlertRequest(self.instance, approved, reason)
+            pass
         except:
             logger.error("Failed to send Pub Pending Patch Decision Alert Request")
 

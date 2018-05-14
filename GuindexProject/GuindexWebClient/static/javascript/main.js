@@ -67,6 +67,7 @@ jQuery(document).ready(function ($) {
     /* ---------------------------------------------------------------------
      Carousel
      ---------------------------------------------------------------------= */
+    /*
 
     $('').owlCarousel({
         responsiveClass: true,
@@ -82,7 +83,7 @@ jQuery(document).ready(function ($) {
        autoplayHoverPause: true
 
     });
-
+    */
 
 
 	

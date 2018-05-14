@@ -75,8 +75,8 @@ class GuindexAlertsClient(GuindexClient):
         guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
 
         guindex_alerts_msg.pubCreateAlertRequest.pub          = pub.name
-        guindex_alerts_msg.pubCreateAlertRequest.latitude     = str(pub.latitude)
-        guindex_alerts_msg.pubCreateAlertRequest.longitude    = str(pub.longitude)
+        guindex_alerts_msg.pubCreateAlertRequest.latitude     = str(round(pub.latitude, 7))
+        guindex_alerts_msg.pubCreateAlertRequest.longitude    = str(round(pub.longitude, 7))
         guindex_alerts_msg.pubCreateAlertRequest.username     = pub.creator.username
         guindex_alerts_msg.pubCreateAlertRequest.creationDate = '%s' % pub.creationDate # TODO Display this nicer
         guindex_alerts_msg.pubCreateAlertRequest.approved     = approved
@@ -117,8 +117,8 @@ class GuindexAlertsClient(GuindexClient):
         guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
 
         guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.pub          = pub.name
-        guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.latitude     = str(pub.latitude)
-        guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.longitude    = str(pub.longitude)
+        guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.latitude     = str(round(pub.latitude, 7))
+        guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.longitude    = str(round(pub.longitude, 7))
         guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.userId       = pub.creator.id
         guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.creationDate = '%s' % pub.creationDate # TODO Display this nicer
         guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.approved     = approved
@@ -144,10 +144,10 @@ class GuindexAlertsClient(GuindexClient):
         guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.pub          = pub.name
         guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.userId       = pub.creator.id
         guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.creationDate = '%s' % pub.creationDate # TODO Display this nicer
-        guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.approved    = approved
+        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.approved     = approved
 
         if not approved and reason:
-            guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.reason = reason
+            guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.reason = reason
 
         try:
             message_string = guindex_alerts_msg.SerializeToString()

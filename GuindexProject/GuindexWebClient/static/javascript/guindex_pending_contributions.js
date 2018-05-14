@@ -194,8 +194,8 @@ var populatePendingPubCreateTable = function (pubs)
         // Approve/Reject button
         if (g_isStaffMember)
         {
-            var approve_button = '<i data-obj_id="' + prices[i]['id'] + '"data-table_type="pending_pub_create" data-action="approve" class="fa fa-check pending_contribution_button hoverable"></i>';
-            var reject_button  = '<i data-obj_id="' + prices[i]['id'] + '"data-table_type="pending_pub_create" data-action="reject"  class="fa fa-times pending_contribution_button hoverable"></i>';
+            var approve_button = '<i data-obj_id="' + pubs[i]['id'] + '"data-table_type="pending_pub_create" data-action="approve" class="fa fa-check pending_contribution_button hoverable"></i>';
+            var reject_button  = '<i data-obj_id="' + pubs[i]['id'] + '"data-table_type="pending_pub_create" data-action="reject"  class="fa fa-times pending_contribution_button hoverable"></i>';
             var loader         = '<i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>';
 
             pub_data.push(approve_button + '<span class="slash"> / </span>' + reject_button + loader);
@@ -335,8 +335,8 @@ var populatePendingPubPatchTable = function (pubs)
         // Approve/Reject button
         if (g_isStaffMember)
         {
-            var approve_button = '<i data-obj_id="' + prices[i]['id'] + '"data-table_type="pending_pub_patch" data-action="approve" class="fa fa-check pending_contribution_button hoverable"></i>';
-            var reject_button  = '<i data-obj_id="' + prices[i]['id'] + '"data-table_type="pending_pub_patch" data-action="reject"  class="fa fa-times pending_contribution_button hoverable"></i>';
+            var approve_button = '<i data-obj_id="' + pubs[i]['id'] + '"data-table_type="pending_pub_patch" data-action="approve" class="fa fa-check pending_contribution_button hoverable"></i>';
+            var reject_button  = '<i data-obj_id="' + pubs[i]['id'] + '"data-table_type="pending_pub_patch" data-action="reject"  class="fa fa-times pending_contribution_button hoverable"></i>';
             var loader         = '<i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>';
 
             pub_data.push(approve_button + '<span class="slash"> / </span>' + reject_button + loader);

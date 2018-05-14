@@ -298,7 +298,7 @@ class GuindexAlertsServer(Int16StringReceiver):
 
         for user in User.objects.all():
 
-            self.logger.debug("Processing Guinness Pub Alert Request for user %d", user.id)
+            self.logger.debug("Processing Pub Create Alert Request for user %d", user.id)
 
             self._validateAlertsSettings(user)
 
@@ -585,7 +585,6 @@ class GuindexAlertsServer(Int16StringReceiver):
             context['username'] = user.username
             context['summary']  = "Your below Pub update submission has been %s:" % decision
             context['data']     = OrderedDict([('Pub', message.pub),
-                                               ('Updates', self._formatChangedFieldsEmail(message.changedFields)),
                                                ('Time', message.creationDate),
                                               ])
 
@@ -611,7 +610,6 @@ class GuindexAlertsServer(Int16StringReceiver):
             telegram_message = "Your below Pub update submission has been %s:\n\n" % decision
 
             telegram_message += "Pub: %s\n"     % message.pub
-            telegram_message += "Updates: %s\n" % self._formatChangedFieldsTelegram(message.changedFields)
             telegram_message += "Time: %s\n"    % message.creationDate
 
             if message.HasField('reason'):
