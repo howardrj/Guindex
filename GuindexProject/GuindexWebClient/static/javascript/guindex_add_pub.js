@@ -11,11 +11,13 @@ $('#add_pub_submit_button').on('click', function () {
     }
 
     var name      = document.getElementById('add_pub_name').value;
+    var county    = document.getElementById('add_pub_county').value;
     var latitude  = g_pubLocationMarker.getPosition().lat();
     var longitude = g_pubLocationMarker.getPosition().lng();
 
     var new_pub_data = {
         'name'     : name,
+	'county'   : county;
         'latitude' : latitude,
         'longitude': longitude, 
     }
