@@ -203,7 +203,7 @@ $(document).on('input', '.price_input', function () {
 
 $(document).on('click', '.edit_pub_button', function () {
 
-    if (!g_loggedIn || ! g_accessToken)
+    if (!g_loggedIn || !g_accessToken)
     {
         displayMessage("Error", "You must be logged in to edit a pub.");
     }

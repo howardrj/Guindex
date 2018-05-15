@@ -575,9 +575,8 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
         except:
             logger.error("Failed to create GuindexAlertsClient object")
 
-        guindex_alerts_client.sendPubPendingPatchDecisionAlertRequest(self.instance, approved, reason)
         try:
-            pass
+            guindex_alerts_client.sendPubPendingPatchDecisionAlertRequest(self.instance, approved, reason)
         except:
             logger.error("Failed to send Pub Pending Patch Decision Alert Request")
 

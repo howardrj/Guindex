@@ -382,11 +382,25 @@ $(document).on('click', '.pending_contribution_button', function () {
     var table_type = this.getAttribute('data-table_type');
     var obj_id     = this.getAttribute('data-obj_id');
     var method     = this.getAttribute('data-action');
+    var buttons    = this.parentNode.getElementsByClassName('pending_contribution_button');
 
     if (method.indexOf("reject") != -1)
     {
         if (this.id.indexOf("final_reject_submit_button") != -1)
         {
+            // Get correct button to replace with loader
+            var table_type_buttons = document.querySelectorAll('[data-table_type="' + table_type + '"]');
+
+            // Overwrite buttons
+            for (var i = 0; i < table_type_buttons.length; i++)
+            {
+                if (table_type_buttons[i].getAttribute('data-obj_id') == obj_id)
+                {
+                    buttons = table_type_buttons[i].parentNode.getElementsByClassName('pending_contribution_button');
+                    break;
+                }
+            }
+
             // Close reject reason modal
             document.getElementById('reject_reason_link').click();
         }
@@ -403,8 +417,6 @@ $(document).on('click', '.pending_contribution_button', function () {
             return;
         }
     }
-
-    var buttons = document.getElementById('pending_contributions_page').getElementsByClassName('pending_contribution_button');
 
     var request = new XMLHttpRequest();
 
