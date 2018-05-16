@@ -129,7 +129,7 @@ window.fbAsyncInit = function() {
                 {
                     var response = JSON.parse(request.responseText);
 
-                    // TODO Clear old login info from locolStorage
+                    // TODO Clear old login info from localStorage
 
                     g_loggedIn    = true;
                     g_accessToken = response['key'];
@@ -189,7 +189,7 @@ var loginToGuindex = function ()
                 // We have successfully logged in
                 // Get token from response JSON object
 
-                // TODO Clear old login info from locolStorage
+                // TODO Clear old login info from localStorage
 
                 g_loggedIn    = true;
                 g_accessToken = response['key'];
@@ -203,7 +203,7 @@ var loginToGuindex = function ()
                 document.getElementById('login_with_facebook_button').style.display = 'none';
 
                 // Get contributor info
-                getContributorInfo();
+                getContributorInfo(;
                 getDetailedContributorInfo();
                 getPendingContributionsInfo();
 

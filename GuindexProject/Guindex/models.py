@@ -15,9 +15,6 @@ logger = logging.getLogger(__name__)
 # Pub Models #
 ##############
 
-counties=(
-		)
-
 class PubBase(models.Model):
 
     creator         = models.ForeignKey(User,
@@ -26,7 +23,7 @@ class PubBase(models.Model):
                                         default = None)
     creationDate    = models.DateTimeField(auto_now_add = True)
     name            = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN)
-    county	        = models.CharField(max_length = GuindexParameters.MAX_COUNTY_NAME_LEN, 
+    county          = models.CharField(max_length = GuindexParameters.MAX_COUNTY_NAME_LEN, 
                                        choices    = [(x, x) for x in GuindexParameters.SUPPORTED_COUNTIES],
                                        default    = 'Dublin')
     longitude       = models.DecimalField(decimal_places = GuindexParameters.GPS_COORD_DECIMAL_PLACES,

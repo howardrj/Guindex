@@ -4,6 +4,8 @@ import logging
 from django.shortcuts import render
 from django.conf import settings
 
+from Guindex.GuindexParameters import GuindexParameters
+
 logger = logging.getLogger(__name__)
 
 
@@ -15,6 +17,7 @@ def guindexWebClient(request):
         'google_maps_api_key' : settings.GOOGLE_MAPS_API_KEY,
         'google_analytics_key': settings.GOOGLE_ANALYTICS_KEY,
         'facebook_app_id'     : settings.FACEBOOK_APP_ID,
+        'guindex_counties'    : GuindexParameters.SUPPORTED_COUNTIES,
     }
     
     return render(request, 'guindex_web_client.html', context_dict)

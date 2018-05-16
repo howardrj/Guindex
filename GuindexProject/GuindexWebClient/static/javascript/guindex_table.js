@@ -217,6 +217,7 @@ $(document).on('click', '.edit_pub_button', function () {
         document.getElementById('edit_pub_name').value               = pub['name'];
         document.getElementById('edit_pub_latitude').value           = pub['latitude'];
         document.getElementById('edit_pub_longitude').value          = pub['longitude'];
+        document.getElementById('edit_pub_county').value             = pub['county'];
         document.getElementById('edit_pub_closed').checked           = pub['closed'];
         document.getElementById('edit_pub_serving_guinness').checked = pub['servingGuinness'];
 
@@ -240,6 +241,7 @@ $('#edit_pub_submit_button').on('click', function () {
     var name             = document.getElementById('edit_pub_name').value;
     var latitude         = document.getElementById('edit_pub_latitude').value;
     var longitude        = document.getElementById('edit_pub_longitude').value;
+    var county           = document.getElementById('edit_pub_county').value;
     var closed           = document.getElementById('edit_pub_closed').checked;
     var serving_guinness = document.getElementById('edit_pub_serving_guinness').checked;
 
@@ -254,6 +256,7 @@ $('#edit_pub_submit_button').on('click', function () {
         'name': name,
         'latitude': latitude,
         'longitude': longitude,
+        'county': county,
         'closed': closed,
         'servingGuinness': serving_guinness,
     };

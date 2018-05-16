@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
@@ -301,7 +302,19 @@ class PubPostSerializer(serializers.ModelSerializer):
         if unknown_keys:
             raise ValidationError("Got unknown fields: {}".format(unknown_keys))
 
-        # TODO Check latitude, longitude and county combination is valid
+        # Check latitude, longitude and county combination is valid
+        county = data['county']
+
+        min_latitude  = Decimal(getattr(GuindexParameters, "GPS_" + county.upper() + "_MIN_LATITUDE"))
+        max_latitude  = Decimal(getattr(GuindexParameters, "GPS_" + county.upper() + "_MAX_LATITUDE"))
+        min_longitude = Decimal(getattr(GuindexParameters, "GPS_" + county.upper() + "_MIN_LONGITUDE"))
+        max_longitude = Decimal(getattr(GuindexParameters, "GPS_" + county.upper() + "_MAX_LONGITUDE"))
+
+        if data['latitude'] < min_latitude or data['latitude'] > max_latitude:
+            raise ValidationError("Latitude must be between %s - %s for this county." % (min_latitude, max_latitude))
+
+        if data['longitude'] < min_longitude or data['longitude'] > max_longitude:
+            raise ValidationError("Longitude must be between %s - %s for this county." % (min_longitude, max_longitude))
 
         return data
 
@@ -325,17 +338,32 @@ class PubPatchSerializer(serializers.ModelSerializer):
         if len(PubPendingPatch.objects.filter(clonedFrom = self.instance)):
             raise ValidationError('There are already pending contributions for this Pub.')
 
-        # Check fields have actually changed
-        if self.instance.name            == data['name']      and \
-           self.instance.latitude        == data['latitude']  and \
-           self.instance.longitude       == data['longitude'] and \
-           self.instance.county          == data['county']    and \
-           self.instance.closed          == data['closed']    and \
-           self.instance.servingGuinness == data['servingGuinness']:
+        # Check fields have actually changed, don't want to send alerts for no reason
+        changed_fields = False
+        for field in data.keys():
 
+            if getattr(self.instance, field) != data[field]:
+                changed_fields = True
+                break
+
+        if not changed_fields:
             raise ValidationError('You have not altered any fields.')
 
-        # TODO Check latitude, longitude and county combination is valid
+        # Check latitude, longitude and county combination is valid
+        county    = self.instance.county if not 'county' in data else data['county']
+        latitude  = self.instance.county if not 'latitude' in data else data['latitude']
+        longitude = self.instance.county if not 'longitude' in data else data['longitude']
+
+        min_latitude  = Decimal(getattr(GuindexParameters, "GPS_" + county.upper() + "_MIN_LATITUDE"))
+        max_latitude  = Decimal(getattr(GuindexParameters, "GPS_" + county.upper() + "_MAX_LATITUDE"))
+        min_longitude = Decimal(getattr(GuindexParameters, "GPS_" + county.upper() + "_MIN_LONGITUDE"))
+        max_longitude = Decimal(getattr(GuindexParameters, "GPS_" + county.upper() + "_MAX_LONGITUDE"))
+
+        if latitude < min_latitude or latitude > max_latitude:
+            raise ValidationError("Latitude must be between %s - %s for this county." % (min_latitude, max_latitude))
+
+        if longitude < min_longitude or longitude > max_longitude:
+            raise ValidationError("Longitude must be between %s - %s for this county." % (min_longitude, max_longitude))
 
         return data
 

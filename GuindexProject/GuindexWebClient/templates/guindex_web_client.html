@@ -244,46 +244,77 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Login With Facebook</h5>
+          <ul class="nav nav-tabs" roles="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" href="#facebook_login" data-toggle="tab">Login with Facebook</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#password_login" data-toggle="tab">Login with Password</a>
+            </li>
+          </ul>
+
           <button class="close" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
 
-<!--
-         <ul class="nav nav-tabs" id="tabContent">
-    <li class="active"><a href="#details" data-toggle="tab">Details</a></li>
-    <li><a href="#access-security" data-toggle="tab">Access / Security</a></li>
-    <li><a href="#networking" data-toggle="tab">Networking</a></li>
-</ul>
+        <div class="tab-content">
+            <div class="tab-pane active" role="tabpanel" id="facebook_login">
 
-<div class="tab-content">
-    <div class="tab-pane active" id="details">
+                <div class="modal-body" id="facebook_login_modal_body">
+                    Login with Facebook below if you would like to start contributing to the Guindex.
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <fb:login-button id="login_with_facebook_button" scope="public_profile,email" onlogin="checkLoginState();">
+                    </fb:login-button>
+                </div>
+            </div>
 
-            Details tab
-       <div class="control-group">
-           <label class="control-label">Instance Name</label>
-       </div>
-    </div>
+            <div class="tab-pane" role="tabpanel" id="password_login">
+                <div class="modal-body" id="password_login_modal_body">
+                    
+                    <p>
+                        Login with your previously created account credentials if you would like to start contributing to the Guindex.
+                    </p>
 
-    <div class="tab-pane" id="access-security">
-        content 0
-    </div> 
-    <div class="tab-pane" id="networking">
-        content 1
-    </div> 
-</div> 
--->
+                    <br>
 
-        <div class="modal-body" id="facebook_login_modal_body">Login with Facebook below if you would like to start contributing to the Guindex.</div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-          <fb:login-button id="login_with_facebook_button" scope="public_profile,email" onlogin="checkLoginState();">
-          </fb:login-button>
-        </div>
-      </div>
-    </div>
-  </div>
+                    <p>
+                        Please note that this option is only available to users who signed up for the first version of the Guindex.
+                        As a security measure, the Guindex now only offers sign up via Facebook. Support for authentication via other social apps will be added in due course.
+                    </p>
+
+                    <br>
+
+                    <form>
+                        <div class="form-group">
+                            <div class="form-row">
+                                <label for="password_login_email">Email</label>
+                                <input class="form-control" id="password_login_email" type="text" placeholder="Enter email">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-row">
+                                <label for="password_login_password">Password</label>
+                                <input class="form-control" id="password_login_password" type="password" placeholder="Enter password">
+                            </div>
+                        </div>
+
+
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" id="password_login_button">Submit</a>
+                    <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+                </div>
+            </div> 
+        </div> 
+     </div>
+   </div>
+ </div>
 
   <!-- Connect Accounts Modal -->
   <div class="modal fade" id="facebook_connect_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -395,6 +426,17 @@
                 <tr>
                     <td> Longitude:</td>
                     <td> <input type="number" step=0.0000001 id="edit_pub_longitude"> </td>
+                </tr>
+
+                <tr>
+                    <td> County:</td>
+                    <td> 
+    			        <select class="form-control" id="edit_pub_county">
+                            {% for county in guindex_counties %}
+                                <option> {{ county }} </option>
+                            {% endfor %}
+    			        </select>
+                    </td>
                 </tr>
 
                 <tr>
