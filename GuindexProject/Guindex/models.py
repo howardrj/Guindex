@@ -16,32 +16,6 @@ logger = logging.getLogger(__name__)
 ##############
 
 counties=(
-			('Cavan', 'Cavan'),
-			('Carlow', 'Carlow'),
-			('Clare', 'Clare'),
-			('Cork', 'Cork'),
-			('Donegal', 'Donegal'),
-			('Dublin', 'Dublin'),
-			('Galway', 'Galway'),
-			('Kerry', 'Kerry'),
-			('Kildare', 'Kildare'),
-			('Kilkenny', 'Kilkenny'),
-			('Laois', 'Laois'),
-			('Leitrim', 'Leitrim'),
-			('Limerick', 'Limerick'),
-			('Longford', 'Longford'),
-			('Louth', 'Louth'),
-			('Mayo', 'Mayo'),
-			('Meath', 'Meath'),
-			('Monaghan', 'Monaghan'),
-			('Offaly', 'Offaly'),
-			('Roscommon', 'Roscommon'),
-			('Sligo', 'Sligo'),
-			('Tipperary', 'Tipperary'),
-			('Waterford', 'Waterford'),
-			('Westmeath', 'Westmeath'),
-			('Wexford', 'Wexford'),
-			('Wicklow', 'Wicklow'),
 		)
 
 class PubBase(models.Model):
@@ -52,15 +26,13 @@ class PubBase(models.Model):
                                         default = None)
     creationDate    = models.DateTimeField(auto_now_add = True)
     name            = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN)
-    county	    = models.CharField(max_length = 15, choices=counties)
+    county	        = models.CharField(max_length = GuindexParameters.MAX_COUNTY_NAME_LEN, 
+                                       choices    = [(x, x) for x in GuindexParameters.SUPPORTED_COUNTIES],
+                                       default    = 'Dublin')
     longitude       = models.DecimalField(decimal_places = GuindexParameters.GPS_COORD_DECIMAL_PLACES,
-                                          max_digits     = GuindexParameters.GPS_COORD_MAX_DIGITS,
-                                          validators     = [MinValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MIN_LONGITUDE)),
-                                                            MaxValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MAX_LONGITUDE))])
+                                          max_digits     = GuindexParameters.GPS_COORD_MAX_DIGITS)
     latitude        = models.DecimalField(decimal_places = GuindexParameters.GPS_COORD_DECIMAL_PLACES,
-                                          max_digits     = GuindexParameters.GPS_COORD_MAX_DIGITS,
-                                          validators     = [MinValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MIN_LATITUDE)),
-                                                            MaxValueValidator(Decimal(GuindexParameters.GPS_DUBLIN_MAX_LATITUDE))])
+                                          max_digits     = GuindexParameters.GPS_COORD_MAX_DIGITS)
     mapLink         = models.TextField(default = "") # Set this in save method
     closed          = models.BooleanField(default = False)
     servingGuinness = models.BooleanField(default = True)

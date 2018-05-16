@@ -36,7 +36,37 @@ class GuindexParameters:
     MAX_CONTACT_FORM_SUBJECT_LEN = 30
     MAX_CONTACT_FORM_MESSAGE_LEN = 500
 
-    @staticmethod
+    # County Parameters
+    MAX_COUNTY_NAME_LEN = 15
+    SUPPORTED_COUNTIES  = [
+        'Cavan',
+	    'Carlow',
+        'Clare',
+        'Cork',
+		'Donegal',
+	    'Dublin',
+		'Galway',
+		'Kerry',
+		'Kildare',
+		'Kilkenny',
+		'Laois',
+		'Leitrim',
+		'Limerick',
+		'Longford',
+		'Louth',
+		'Mayo',
+		'Meath',
+		'Monaghan',
+		'Offaly',
+		'Roscommon',
+	    'Sligo',
+		'Tipperary',
+		'Waterford',
+		'Westmeath',
+		'Wexford',
+		'Wicklow',
+    ]
+
     def getParameters():
 
         parameter_dict = {}

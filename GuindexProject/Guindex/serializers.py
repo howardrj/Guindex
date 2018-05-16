@@ -290,7 +290,7 @@ class PubPostSerializer(serializers.ModelSerializer):
 
         # Note: Creator is extracted from request object,
         # not message payload so don't include it in fields
-        fields = ['name', 'latitude', 'longitude']
+        fields = ['name', 'latitude', 'longitude', 'county']
 
     def validate(self, data):
         """
@@ -301,6 +301,8 @@ class PubPostSerializer(serializers.ModelSerializer):
         if unknown_keys:
             raise ValidationError("Got unknown fields: {}".format(unknown_keys))
 
+        # TODO Check latitude, longitude and county combination is valid
+
         return data
 
 
@@ -308,7 +310,7 @@ class PubPatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pub
-        fields = ['name', 'latitude', 'longitude', 'closed', 'servingGuinness']
+        fields = ['name', 'latitude', 'longitude', 'county', 'closed', 'servingGuinness']
 
     def validate(self, data):
         """
@@ -327,10 +329,13 @@ class PubPatchSerializer(serializers.ModelSerializer):
         if self.instance.name            == data['name']      and \
            self.instance.latitude        == data['latitude']  and \
            self.instance.longitude       == data['longitude'] and \
+           self.instance.county          == data['county']    and \
            self.instance.closed          == data['closed']    and \
            self.instance.servingGuinness == data['servingGuinness']:
 
             raise ValidationError('You have not altered any fields.')
+
+        # TODO Check latitude, longitude and county combination is valid
 
         return data
 

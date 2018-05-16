@@ -17,7 +17,7 @@ $('#add_pub_submit_button').on('click', function () {
 
     var new_pub_data = {
         'name'     : name,
-	'county'   : county;
+	    'county'   : county,
         'latitude' : latitude,
         'longitude': longitude, 
     }
