@@ -39,17 +39,14 @@
 
             <p> {{ summary }} </p>
 
-            <br>
-
-            {% for key, value in data.items %}
-                <p> {{ key }}: {{ value }} </p>
-            {% endfor %}
-
-            <br>
+            {% autoescape off %}
+                {% for key, value in data.items %}
+                    <p> {{ key }}: {{ value }} </p>
+                {% endfor %}
+            {% endautoescape %}
 
             {% if add_text %}
                 <p> {{ add_text }} </p>
-                <br>
             {% endif %}
             
 

@@ -36,7 +36,8 @@ message PubPatchAlertRequest {
     required string pub           = 1;
     required string username      = 2;
     required string changedFields = 3; // TODO Can we add constraints so this is encoded correctly?
-    required bool   approved      = 4;
+    required string creationDate  = 4;
+    required bool   approved      = 5;
 }
 
 // Message to send to AlertsServer when pending Pub create decision is made
@@ -54,9 +55,10 @@ message PubPendingCreateDecisionAlertRequest {
 message PubPendingPatchDecisionAlertRequest {
     required string pub           = 1;
     required uint32 userId        = 2;
-    required string creationDate  = 3;
-    required bool   approved      = 4;
-    optional string reason        = 5;
+    required string changedFields = 3; // TODO Can we add constraints so this is encoded correctly?
+    required string creationDate  = 4;
+    required bool   approved      = 5;
+    optional string reason        = 6;
 }
 
 message GuindexAlertsIfMessage {

@@ -71,10 +71,10 @@ class GuindexAlertsServer(Int16StringReceiver):
         updates        = json.loads(changedFields)
         updates_string = ""
 
-        updates_string += "<br>"
+        updates_string += "\n"
 
         for key in updates:
-            updates_string += "    " + key + ": " + updates[key][0] + " --> " + updates[key][1] + "<br>"
+            updates_string += "    " + str(key) + ": " + str(updates[key][0]) + " --> " + str(updates[key][1]) + "\n"
 
         return updates_string
 
@@ -83,10 +83,10 @@ class GuindexAlertsServer(Int16StringReceiver):
         updates        = json.loads(changedFields)
         updates_string = ""
 
-        updates_string += "\n"
+        updates_string += "<br/>"
 
         for key in updates:
-            updates_string += "    " + key + ": " + updates[key][0] + " --> " + updates[key][1] + "\n"
+            updates_string += "    " + str(key) + ": " + str(updates[key][0]) + " --> " + str(updates[key][1]) + "<br/>"
         
         return updates_string
 
@@ -585,6 +585,7 @@ class GuindexAlertsServer(Int16StringReceiver):
             context['username'] = user.username
             context['summary']  = "Your below Pub update submission has been %s:" % decision
             context['data']     = OrderedDict([('Pub', message.pub),
+                                               ('Updates', self._formatChangedFieldsEmail(message.changedFields)),
                                                ('Time', message.creationDate),
                                               ])
 
@@ -610,6 +611,7 @@ class GuindexAlertsServer(Int16StringReceiver):
             telegram_message = "Your below Pub update submission has been %s:\n\n" % decision
 
             telegram_message += "Pub: %s\n"     % message.pub
+            telegram_message += "Updates: %s\n" % self._formatChangedFieldsTelegram(message.changedFields)
             telegram_message += "Time: %s\n"    % message.creationDate
 
             if message.HasField('reason'):

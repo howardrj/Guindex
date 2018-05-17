@@ -62,3 +62,5 @@ class GuindexClient(object):
         except:
             logger.error("Failed to send message to %s server", self.serverName)
             raise Exception("Failed to send message to %s server" % self.serverName)
+
+            logger.info("Successfully sent message to %s server", self.serverName)

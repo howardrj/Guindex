@@ -90,15 +90,16 @@ class GuindexAlertsClient(GuindexClient):
 
         self.sendMessage(message_string)
 
-    def sendPubPatchAlertRequest(self, pub, contributor, changedFields, approved):
+    def sendPubPatchAlertRequest(self, pub, contributor, changedFields, creationDate, approved):
 
-        logger.info("Sending Pub Create Alert Request")
+        logger.info("Sending Pub Patch Alert Request")
 
         guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
 
         guindex_alerts_msg.pubPatchAlertRequest.pub           = pub.name
         guindex_alerts_msg.pubPatchAlertRequest.username      = contributor.username
-        guindex_alerts_msg.pubPatchAlertRequest.changedFields = json.dump(changedFields) # Encode as JSON
+        guindex_alerts_msg.pubPatchAlertRequest.changedFields = json.dumps(changedFields) # Encode as JSON
+        guindex_alerts_msg.pubPatchAlertRequest.creationDate  = '%s' % creationDate
         guindex_alerts_msg.pubPatchAlertRequest.approved      = approved
 
         try:
@@ -135,16 +136,17 @@ class GuindexAlertsClient(GuindexClient):
 
         self.sendMessage(message_string)
 
-    def sendPubPendingPatchDecisionAlertRequest(self, pub, approved, reason):
+    def sendPubPendingPatchDecisionAlertRequest(self, pub, creatorId, changedFields, creationDate, approved, reason):
 
         logger.info("Sending Pub Pending Patch Decision Alert Request")
 
         guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
 
-        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.pub          = pub.name
-        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.userId       = pub.creator.id
-        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.creationDate = '%s' % pub.creationDate # TODO Display this nicer
-        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.approved     = approved
+        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.pub           = pub.name
+        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.userId        = creatorId
+        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.changedFields = json.dumps(changedFields)
+        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.creationDate  = '%s' % creationDate
+        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.approved      = approved
 
         if not approved and reason:
             guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.reason = reason

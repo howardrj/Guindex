@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 from Guindex.GuindexParameters import GuindexParameters
 from Guindex.GuindexAlertsClient import GuindexAlertsClient
@@ -21,7 +22,7 @@ class PubBase(models.Model):
                                         null    = True,
                                         blank   = True,
                                         default = None)
-    creationDate    = models.DateTimeField(auto_now_add = True)
+    creationDate    = models.DateTimeField(default = timezone.now())
     name            = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN)
     county          = models.CharField(max_length = GuindexParameters.MAX_COUNTY_NAME_LEN, 
                                        choices    = [(x, x) for x in GuindexParameters.SUPPORTED_COUNTIES],
@@ -163,7 +164,7 @@ class GuinnessBase(models.Model):
                                      null    = True,
                                      blank   = True,
                                      default = None)
-    creationDate = models.DateTimeField(auto_now_add = True)
+    creationDate = models.DateTimeField(default = timezone.now())
     price        = models.DecimalField(decimal_places = GuindexParameters.GUINNESS_PRICE_DECIMAL_PLACES,
                                        max_digits     = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
                                        validators     = [MinValueValidator(Decimal(GuindexParameters.MIN_GUINNESS_PRICE))])

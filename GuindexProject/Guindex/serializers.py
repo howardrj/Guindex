@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.validators import validate_email as validateEmail
 from django.core.mail import send_mail as sendMail
+from django.utils import timezone
 
 from rest_framework import serializers
 
@@ -159,10 +160,10 @@ class GuinnessPendingCreatePatchSerializer(serializers.ModelSerializer):
         else:
             logger.info("GuinnessPendingCreate object was not approved")
 
-            try:
-                reason = self._validated_data['rejectReason']
-            except:
-                reason = ""
+        try:
+            reason = self._validated_data['rejectReason']
+        except:
+            reason = ""
 
         logger.info("Deleting pending contribution")
         self.instance.delete()
@@ -351,8 +352,8 @@ class PubPatchSerializer(serializers.ModelSerializer):
 
         # Check latitude, longitude and county combination is valid
         county    = self.instance.county if not 'county' in data else data['county']
-        latitude  = self.instance.county if not 'latitude' in data else data['latitude']
-        longitude = self.instance.county if not 'longitude' in data else data['longitude']
+        latitude  = self.instance.latitude if not 'latitude' in data else data['latitude']
+        longitude = self.instance.longitude if not 'longitude' in data else data['longitude']
 
         min_latitude  = Decimal(getattr(GuindexParameters, "GPS_" + county.upper() + "_MIN_LATITUDE"))
         max_latitude  = Decimal(getattr(GuindexParameters, "GPS_" + county.upper() + "_MAX_LATITUDE"))
@@ -387,7 +388,11 @@ class PubPatchSerializer(serializers.ModelSerializer):
                 logger.error("Failed to create GuindexAlertsClient object")
 
             try:
-                guindex_alerts_client.sendPubPatchAlertRequest(self.instance, user, changed_fields, True)
+                guindex_alerts_client.sendPubPatchAlertRequest(self.instance,
+                                                               user,
+                                                               changed_fields,
+                                                               timezone.now(),
+                                                               True)
             except:
                 logger.error("Failed to send Pub Patch Alert Request")
 
@@ -421,7 +426,11 @@ class PubPatchSerializer(serializers.ModelSerializer):
             logger.error("Failed to create GuindexAlertsClient object")
 
         try:
-            guindex_alerts_client.sendPubPatchAlertRequest(self.instance, user, changed_fields, False)
+            guindex_alerts_client.sendPubPatchAlertRequest(self.instance,
+                                                           user,
+                                                           changed_fields,
+                                                           timezone.now(),
+                                                           False)
         except:
             logger.error("Failed to send Pub Patch Alert Request")
 
@@ -550,11 +559,11 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
             logger.error("No approved value included in request")
             return
 
+        pub = self.instance.clonedFrom
+
         if approved:
 
             logger.info("PubPendingPatch object was approved. Merging changes")
-
-            pub = self.instance.clonedFrom
 
             # Get changed fields and add to JSONizable object
             changed_fields = {}
@@ -575,7 +584,11 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
                 logger.error("Failed to create GuindexAlertsClient object")
 
             try:
-                guindex_alerts_client.sendPubPatchAlertRequest(pub, self.instance.creator, changed_fields, True)
+                guindex_alerts_client.sendPubPatchAlertRequest(pub, 
+                                                               self.instance.creator,
+                                                               changed_fields,
+                                                               self.instance.creationDate,
+                                                               True)
             except:
                 logger.error("Failed to send Pub Patch Alert Request")
 
@@ -609,7 +622,12 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
             logger.error("Failed to create GuindexAlertsClient object")
 
         try:
-            guindex_alerts_client.sendPubPendingPatchDecisionAlertRequest(self.instance, approved, reason)
+            guindex_alerts_client.sendPubPendingPatchDecisionAlertRequest(pub,
+                                                                          self.instance.creator.id,
+                                                                          changed_fields,
+                                                                          self.instance.creationDate,
+                                                                          approved,
+                                                                          reason)
         except:
             logger.error("Failed to send Pub Pending Patch Decision Alert Request")
 

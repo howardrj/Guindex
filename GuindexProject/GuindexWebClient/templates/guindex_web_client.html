@@ -239,7 +239,6 @@
   </a>
 
   <!-- Login Modal-->
-  <!-- TODO Make this a tab -->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -262,7 +261,17 @@
             <div class="tab-pane active" role="tabpanel" id="facebook_login">
 
                 <div class="modal-body" id="facebook_login_modal_body">
-                    Login with Facebook below if you would like to start contributing to the Guindex.
+                    <span id="facebook_login_modal_body_default">
+                        Login with Facebook below if you would like to start contributing to the Guindex.
+                    </span>
+                    <span id="facebook_login_modal_body_logged_in_this_way" style="display:none">
+                        You are currently logged in via Facebook as <span id="facebook_login_username"></span>.
+                    </span>
+                    <span id="facebook_login_modal_body_logged_in_other_way" style="display:none">
+                        You are currently logged via password authentication. To login via Facebook
+                        please click the logout button in the next tab and login again using the login with Facebook
+                        button that appears on this tab.  
+                    </span>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
@@ -274,40 +283,48 @@
             <div class="tab-pane" role="tabpanel" id="password_login">
                 <div class="modal-body" id="password_login_modal_body">
                     
-                    <p>
-                        Login with your previously created account credentials if you would like to start contributing to the Guindex.
-                    </p>
+                    <span id="password_login_modal_body_default">
+                        <p>
+                            Login with your previously created account credentials if you would like to start contributing to the Guindex.
+                        </p>
 
-                    <br>
+                        <br>
 
-                    <p>
-                        Please note that this option is only available to users who signed up for the first version of the Guindex.
-                        As a security measure, the Guindex now only offers sign up via Facebook. Support for authentication via other social apps will be added in due course.
-                    </p>
+                        <p>
+                            Please note that this option is only available to users who signed up for the first version of the Guindex.
+                            As a security measure, the Guindex now only offers sign up via Facebook. Support for authentication via other social apps will be added in due course.
+                        </p>
 
-                    <br>
+                        <br>
 
-                    <form>
-                        <div class="form-group">
-                            <div class="form-row">
-                                <label for="password_login_email">Email</label>
-                                <input class="form-control" id="password_login_email" type="text" placeholder="Enter email">
+                        <form>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <label for="password_login_email">Email</label>
+                                    <input class="form-control" id="password_login_email" type="text" placeholder="Enter email">
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="form-row">
-                                <label for="password_login_password">Password</label>
-                                <input class="form-control" id="password_login_password" type="password" placeholder="Enter password">
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <label for="password_login_password">Password</label>
+                                    <input class="form-control" id="password_login_password" type="password" placeholder="Enter password">
+                                </div>
                             </div>
-                        </div>
-
-
-                    </form>
-
+                        </form>
+                    </span>
+                    <span id="password_login_modal_body_logged_in_this_way" style="display:none">
+                        You are currently logged in as <span id="password_login_username"></span>.
+                    </span>
+                    <span id="password_login_modal_body_logged_in_other_way" style="display:none">
+                        You are currently logged in via Facebook. To login using a previously created account credentials instead,
+                        please disconnect from the Guindex in your Facebook app settings, refresh this page and submit your email
+                        and password through this tab.
+                    </span>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                     <a class="btn btn-primary" id="password_login_button">Submit</a>
+                    <a class="btn btn-primary" id="logout_button" style="display:none">Logout</a>
                     <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
                 </div>
             </div> 
@@ -328,7 +345,7 @@
         </div>
         <div class="modal-body">
 
-            We have detected that an account was previously created with the email <span id="facebook_email"></span>.
+            We have detected that an account was previously created with the email <span id="facebook_connect_email"></span>.
             We assume this is you but to be sure, please enter the password of your previously created account below to 
             connect your Guindex and Facebook accounts.    
 
@@ -396,6 +413,7 @@
   </div>
 
   <!-- Edit Pub Modal (with hidden button to open it)-->
+  <!-- TODO Need to clean this up to look more like the otehr forms (using form-groups etc.) -->
   <a class="nav-link" data-toggle="modal" id="edit_pub_link" data-target="#edit_pub_modal" style="display:none"></a>
 
   <div class="modal fade" id="edit_pub_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:9999">
@@ -479,7 +497,7 @@
   <script type="text/javascript" src="{% static "javascript/sb-admin.min.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/sb-admin-datatables.min.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/login_with_facebook.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_login.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_contributors.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_pending_contributions.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_settings.js" %}"></script>
