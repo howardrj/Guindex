@@ -135,8 +135,8 @@ class GuindexParameters:
     
     MAX_COUNTY_NAME_LEN = 15
     SUPPORTED_COUNTIES  = [
-        'Cavan',
-        'Carlow',
+	'Carlow',        
+	'Cavan',
         'Clare',
         'Cork',
         'Donegal',
