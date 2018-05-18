@@ -1,0 +1,26 @@
+// REGISTER
+curl 45.79.148.4:8000/api/rest-auth/register/ -X POST -H "Content-Type: application/json" -d '{"username": $username, "email": $email, "password1": $password, "password2": $password}'
+
+// LOGIN
+curl 45.79.148.4:8000/api/rest-auth/login/ -X POST -H "Content-Type: application/json" -d '{"email": $email, "password": $password}'
+
+// CREATE PUB
+curl 45.79.148.4:8000/api/pubs/ -X POST -H "Authorization: Token $token" -H "Content-Type: application/json" -d '{"name": "TEST PUB", "county": "Dublin", "latitude": 53.3058716, "longitude": -6.2174034}'
+
+// CREATE PRICE
+curl 45.79.148.4:8000/api/guinness/ -X POST -H "Authorization: Token $token" -H "Content-Type: application/json" -d '{"pub": 1, "price": 1.23}'
+
+// UPDATE SETTINGS
+curl 45.79.148.4:8000/api/contributors/$user_id/ -X PATCH -H "Authorization: Token $token" -H "Content-Type: application/json" -d '{"usingEmailAlerts": 1, "usingTelegramAlerts": 1}'
+
+// PENDING PUB CREATE DECISION
+curl 45.79.148.4:8000/api/pubs/pending/create/$pub_id/ -X PATCH -H "Authorization: Token $token" -H "Content-Type: application/json" -d '{"approved": 1, "rejectReason": "rejected"}'
+
+// PENDING PRICE CREATE DECISION
+curl 45.79.148.4:8000/api/guinness/pending/create/$guinness_id/ -X PATCH -H "Authorization: Token $token" -H "Content-Type: application/json" -d '{"approved": 1, "rejectReason": "rejected"}'
+
+// PATCH PUB
+curl 45.79.148.4:8000/api/pubs/$pubs_id/ -X PATCH -H "Authorization: Token $token" -H "Content-Type: application/json" -d '{"name": "newname, "r": "rejected"}'
+
+// PENDING PUB PATCH DECISION
+curl 45.79.148.4:8000/api/pubs/pending/patch/$pub_id/ -X PATCH -H "Authorization: Token $token" -H "Content-Type: application/json" -d '{"approved": 1, "rejectReason": "rejected"}'
