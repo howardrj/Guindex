@@ -22,7 +22,7 @@ class PubBase(models.Model):
                                         null    = True,
                                         blank   = True,
                                         default = None)
-    creationDate    = models.DateTimeField(default = timezone.now())
+    creationDate    = models.DateTimeField(default = timezone.now)
     name            = models.CharField(max_length = GuindexParameters.MAX_PUB_NAME_LEN)
     county          = models.CharField(max_length = GuindexParameters.MAX_COUNTY_NAME_LEN, 
                                        choices    = [(x, x) for x in GuindexParameters.SUPPORTED_COUNTIES],
@@ -164,7 +164,7 @@ class GuinnessBase(models.Model):
                                      null    = True,
                                      blank   = True,
                                      default = None)
-    creationDate = models.DateTimeField(default = timezone.now())
+    creationDate = models.DateTimeField(default = timezone.now)
     price        = models.DecimalField(decimal_places = GuindexParameters.GUINNESS_PRICE_DECIMAL_PLACES,
                                        max_digits     = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
                                        validators     = [MinValueValidator(Decimal(GuindexParameters.MIN_GUINNESS_PRICE))])
