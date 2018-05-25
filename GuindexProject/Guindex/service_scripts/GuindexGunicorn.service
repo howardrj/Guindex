@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-Environment="PYTHONPATH=$PYTHONPATH:/var/www/"
-ExecStart=/usr/bin/gunicorn --workers 3 --bind unix:/var/www/Guindex.sock GuindexProject.wsgi:application
+WorkingDirectory=/var/www/Guindex/GuindexProject
+ExecStart=/usr/local/bin/gunicorn --workers 3 --bind unix:/var/www/Guindex/GuindexProject/Guindex.sock GuindexProject.wsgi:application
 User=root
 Group=root
 Restart=always

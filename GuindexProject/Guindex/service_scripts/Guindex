@@ -1,6 +1,6 @@
 upstream guindex_gunicorn_http_server {
 
-    server unix:/var/www/Guindex.sock fail_timeout=0;
+    server unix:/var/www/Guindex/GuindexProject/Guindex.sock fail_timeout=0;
 
 }
 
@@ -27,7 +27,7 @@ server {
     location = /favicon.ico { access_log off; log_not_found off; }
 
     location /static/ {
-        alias /var/www/Guindex_CDN/;
+        alias /var/www/Guindex/GuindexProject/CDN/;
     }
 
    location / {

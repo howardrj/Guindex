@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-Environment="PYTHONPATH=$PYTHONPATH:/var/www/"
-ExecStart=/usr/bin/manage.py GuindexStats
+WorkingDirectory=/var/www/Guindex/GuindexProject
+ExecStart=/usr/bin/python /var/www/Guindex/GuindexProject/manage.py GuindexStats
 User=root
 Group=root
 Restart=always
