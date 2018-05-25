@@ -560,22 +560,22 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
             return
 
         pub = self.instance.clonedFrom
+        pub_name = pub.name
+
+        # Get changed fields and add to JSONizable object
+        changed_fields = {}
+        for field in self.instance._meta.fields:
+
+            # Don't merge these fields
+            if field.name in ['id', 'clonedFrom', 'creator', 'creationDate']:
+                continue
+
+            if getattr(self.instance, field.name) != getattr(pub, field.name):
+                changed_fields[field.name] = [getattr(pub, field.name), getattr(self.instance, field.name)]
 
         if approved:
 
             logger.info("PubPendingPatch object was approved. Merging changes")
-
-            # Get changed fields and add to JSONizable object
-            changed_fields = {}
-            for field in self.instance._meta.fields:
-
-                # Don't merge these fields
-                if field.name in ['id', 'clonedFrom', 'creator', 'creationDate']:
-                    continue
-
-                # Get changed fields and add to JSONizable object
-                if getattr(self.instance, field.name) != getattr(pub, field.name):
-                    changed_fields[field.name] = [getattr(self.instance, field.name), getattr(pub, field.name)]
 
             # Send pub change update
             try:
@@ -622,10 +622,10 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
             logger.error("Failed to create GuindexAlertsClient object")
 
         try:
-            guindex_alerts_client.sendPubPendingPatchDecisionAlertRequest(pub,
+            guindex_alerts_client.sendPubPendingPatchDecisionAlertRequest(pub_name,
                                                                           self.instance.creator.id,
                                                                           changed_fields,
-                                                                          self.instance.creationDate,
+                                                                          timezone.now(),
                                                                           approved,
                                                                           reason)
         except:

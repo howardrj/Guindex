@@ -32,5 +32,6 @@ setup(name='Guindex',
         'django-rest-auth[with_social]',
         'google',
         'protobuf',
+        'simplejson',
       ],
     )

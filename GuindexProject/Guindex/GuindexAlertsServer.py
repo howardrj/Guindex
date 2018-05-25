@@ -1,4 +1,4 @@
-import json
+import simplejson as json
 from collections import OrderedDict
 from twisted.internet import protocol
 from twisted.protocols.basic import Int16StringReceiver

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-import json
+import simplejson as json
 
 from Guindex.GuindexClient import GuindexClient
 from Guindex import GuindexAlertsIf_pb2 as GuindexAlertsIf
@@ -136,13 +136,13 @@ class GuindexAlertsClient(GuindexClient):
 
         self.sendMessage(message_string)
 
-    def sendPubPendingPatchDecisionAlertRequest(self, pub, creatorId, changedFields, creationDate, approved, reason):
+    def sendPubPendingPatchDecisionAlertRequest(self, pubName, creatorId, changedFields, creationDate, approved, reason):
 
         logger.info("Sending Pub Pending Patch Decision Alert Request")
 
         guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
 
-        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.pub           = pub.name
+        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.pub           = pubName
         guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.userId        = creatorId
         guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.changedFields = json.dumps(changedFields)
         guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.creationDate  = '%s' % creationDate
