@@ -4,7 +4,7 @@ import inspect
 class GuindexParameters:
 
     # Pub Parameters
-    MAX_PUB_NAME_LEN = 40
+    MAX_PUB_NAME_LEN = 100
     MAP_LINK_STRING = "https://www.google.ie/maps/place/%f,%f"
 
     # Guinness price parameters

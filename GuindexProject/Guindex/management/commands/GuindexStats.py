@@ -113,9 +113,7 @@ class Command(BaseCommand):
             Counts approved, open pubs
         """
 
-        self.stats.pubsInDb = len(Pub.objects.filter(closed = False,
-                                                     pendingApproval = False,
-                                                     pendingApprovalRejected = False))
+        self.stats.pubsInDb = len(Pub.objects.all())
 
     def calculatePubsWithPrices(self):
         """
@@ -125,9 +123,7 @@ class Command(BaseCommand):
 
         self.stats.pubsWithPrices.clear()
 
-        for pub in Pub.objects.filter(closed = False,
-                                      pendingApproval = False,
-                                      pendingApprovalRejected = False):
+        for pub in Pub.objects.all():
 
             if pub.getLastVerifiedGuinness() and pub.servingGuinness:
                 self.stats.pubsWithPrices.add(pub)

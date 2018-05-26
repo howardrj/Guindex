@@ -38,7 +38,7 @@ function statusChangeCallback(response) {
         // not connected via Facebook
         // If this an inconvenience for some users we can change the logic accordingly.
 
-        // Logged into your app and Facebook.
+        // Logged into Facebook and user has authorised app.
         var access_token = response['authResponse']['accessToken'];
         var user_id      = response['authResponse']['userID'];
 
@@ -134,7 +134,7 @@ $(document).on('click', '#facebook_connect_button', function () {
     if (!password)
         return;
 
-    var connect_button = evt.target;
+    var connect_button = this;
     toggleLoader(connect_button);
 
     // Use REST API to check password is correct

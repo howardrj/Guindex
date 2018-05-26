@@ -44,23 +44,21 @@ var populateContributorsTable = function ()
         var username               = contributors_list[i]['username'];
         var pubs_visited           = contributors_list[i]['pubsVisited'] ? contributors_list[i]['pubsVisited'] : 0;
         var current_verifications  = contributors_list[i]['currentVerifications'] ? contributors_list[i]['currentVerifications'] : 0;
-        var original_verifications = contributors_list[i]['originalVerifications'] ? contributors_list[i]['originalVerifications'] : 0;
+        var original_verifications = contributors_list[i]['originalPrices'] ? contributors_list[i]['originalPrices'] : 0;
 
         // Make own row appear bold
         if (contributors_list[i]['id'] == g_userId)
         {
             contributors_table_data_local.push('<em>' + username + '</em>');
-            contributors_table_data_local.push('<em>' + pubs_visited + '</em>');
-            contributors_table_data_local.push('<em>' + current_verifications + '</em>');
-            contributors_table_data_local.push('<em>' + original_verifications + '</em>');
         }
         else
         {
             contributors_table_data_local.push(username);
-            contributors_table_data_local.push(pubs_visited);
-            contributors_table_data_local.push(current_verifications);
-            contributors_table_data_local.push(original_verifications);
         }
+
+        contributors_table_data_local.push(pubs_visited);
+        contributors_table_data_local.push(current_verifications);
+        contributors_table_data_local.push(original_verifications);
 
         contributors_table_data.push(contributors_table_data_local.slice());
     } 
@@ -73,9 +71,9 @@ var populateContributorsTable = function ()
                                 data: contributors_table_data,
                                 columns: [
                                     { title: "Username" },
-                                    { title: "Pubs Visited" },
-                                    { title: "Current Verifications" },
-                                    { title: "Original Verifications" },
+                                    { title: "Pubs Visited", "type": "num"},
+                                    { title: "Current Verifications", "type": "num" },
+                                    { title: "Original Verifications", "type": "num" },
                                 ]
                              });
     }
