@@ -66,6 +66,12 @@ var populateContributorsTable = function ()
     // Check if table is being drawn from scratch or refreshed
     if (!g_contributorsTable)
     {
+       // Clear log in warning
+       var contributors_page = document.getElementById('contributors_page');
+
+       contributors_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
+       contributors_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
+
        g_contributorsTable = $('#GuindexContributorsTable').DataTable({
                                 responsive: true,
                                 data: contributors_table_data,

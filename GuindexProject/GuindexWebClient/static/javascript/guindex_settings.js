@@ -60,6 +60,12 @@ var populateUserSettingsTable = function ()
     // Check if table is being drawn from scratch or refreshed
     if (!g_userSettingsTable)
     {
+        // Clear log in warning
+        var settings_page = document.getElementById('settings_page');
+
+        settings_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
+        settings_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
+
         g_userSettingsTable = $('#GuindexUserSettingsTable').DataTable({
                                 responsive: true,
                                 "paging":   false,

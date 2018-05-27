@@ -3,6 +3,14 @@ var getPendingContributionsInfo = function ()
     getPendingPriceCreates();
     getPendingPubCreates();
     getPendingPubPatches();
+
+    // Clear log in warning
+    // Note we have mutliple tables so it's a bit easier to do it here instead of just 
+    // before drawing the table.
+    var pending_contributions_page = document.getElementById('pending_contributions_page');
+
+    pending_contributions_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
+    pending_contributions_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
 }
 
 var getPendingPriceCreates = function ()
