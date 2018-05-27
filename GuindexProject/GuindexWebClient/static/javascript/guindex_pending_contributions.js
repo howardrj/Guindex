@@ -98,7 +98,11 @@ var populatePendingPriceCreateTable = function (prices)
         var pub_name_link = '<a target="_blank" href="' + pub['mapLink'] + '">' + pub['name'] + '</a>';
 
         price_data.push(pub_name_link);
-
+	
+	//County
+	var pub_county = pub[i]['county'];
+	price_data.push(pub_county);
+	
         // Price
         price_data.push(prices[i]['price']);
 
@@ -138,6 +142,7 @@ var populatePendingPriceCreateTable = function (prices)
     if (!g_pendingPriceCreateTable)
     {
         var data_columns = [{ title: "Pub" },
+		            { title: "County" },
                             { title: "Price (€)" },
                             { title: "Submitted By" },
                             { title: "Submission Date" }];
@@ -180,6 +185,10 @@ var populatePendingPubCreateTable = function (pubs)
 
         pub_data.push(pub_name_link);
 
+	//Pub County
+	var pub_county = pubs[i]['county'];
+	pub_data.push(pub_county);
+
         // Contributor
         var contributor_id = parseInt(pubs[i]['creator']);
         var contributor    = $.grep(g_contributorsList, function(obj) { return obj['id'] === contributor_id;})[0];
@@ -215,6 +224,7 @@ var populatePendingPubCreateTable = function (pubs)
     if (!g_pendingPubCreateTable)
     {
         var data_columns =  [{ title: "Name" },
+			     { title: "County" },
                              { title: "Submitted By" },
                              { title: "Submission Date" }];
 
@@ -255,6 +265,10 @@ var populatePendingPubPatchTable = function (pubs)
         var pub_name_link = '<a target="_blank" href="' + pubs[i]['mapLink'] + '">' + pubs[i]['name'] + '</a>';
 
         pub_data.push(pub_name_link);
+
+	//Pub County
+	var pub_county = pubs[i]['county'];
+	pub_data.push(pub_county);
 
         // Changed fields
         var cloned_pub = $.grep(g_pubsList, function(obj) { return obj['id'] === pubs[i]['clonedFrom'];})[0];
@@ -356,6 +370,7 @@ var populatePendingPubPatchTable = function (pubs)
     if (!g_pendingPubPatchTable)
     {
         var data_columns = [{ title: "Name" },
+			    { title: "County" },
                             { title: "Changed Fields", "className": "text-center", "orderable": false },
                             { title: "Submitted By" },
                             { title: "Submission Date" }];
