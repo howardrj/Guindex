@@ -318,3 +318,4 @@ class GuindexUser(models.Model):
     currentVerifications = models.IntegerField(default = 0)
     lastCalculated       = models.DateTimeField(auto_now = True)
     usingEmailAlerts     = models.BooleanField(default = False)
+    isDeveloper          = models.BooleanField(default = False)

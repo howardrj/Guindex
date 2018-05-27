@@ -307,6 +307,7 @@ function onLoginWithPasswordSuccess ()
     getContributorInfo();
     getDetailedContributorInfo();
     getPendingContributionsInfo();
+    getPubInfo();
 
     // Call these in a loop
     setInterval(getContributorInfo, G_GUI_REFRESH_INTERVAL);
@@ -343,6 +344,7 @@ function onLoginWithFacebookSuccess ()
     getContributorInfo();
     getDetailedContributorInfo();
     getPendingContributionsInfo();
+    getPubInfo();
 
     // Call these in a loop
     setInterval(getContributorInfo, G_GUI_REFRESH_INTERVAL);

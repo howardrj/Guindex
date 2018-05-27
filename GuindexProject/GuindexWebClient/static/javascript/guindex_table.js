@@ -54,16 +54,6 @@ var populateGuindexTable = function ()
             pub_data.push('-');
         } 
 
-        // Append last submitted by
-        if (pubs_list[i]['prices'].length)
-        {
-            pub_data.push(pubs_list[i]['prices'].slice(-1)[0]['creatorName']);
-        }
-        else
-        {
-            pub_data.push('-');
-        } 
-
         // Append last submitted date
         if (pubs_list[i]['prices'].length)
         {
@@ -78,6 +68,16 @@ var populateGuindexTable = function ()
             var date_sortable_format = date[3] + ("0" + (date.getMonth() + 1)).slice(-2) + ("0" + date.getDate()).slice(-2);
 
             pub_data.push('<span style="display:none">' + date_sortable_format + '</span>' + date_pretty_format);
+        }
+        else
+        {
+            pub_data.push('-');
+        } 
+
+        // Append last submitted by
+        if (pubs_list[i]['prices'].length)
+        {
+            pub_data.push(pubs_list[i]['prices'].slice(-1)[0]['creatorName']);
         }
         else
         {
@@ -102,18 +102,27 @@ var populateGuindexTable = function ()
     // Check if table is being drawn from scratch or refreshed
     if (!g_guindexDataTable)
     {
+        data_columns = [
+            {title: "Name"},
+            {title: "Price (€)"},
+            {title: "Last Submitted Date"},
+            {title: "Last Submitted By"},
+            {title: "Submit Price", "className": "text-center", "orderable": false},
+            {title: "Edit Pub", "className": "text-center", "orderable": false},
+        ]
+
         g_guindexDataTable = $('#GuindexDataTable').DataTable({
                                 responsive: true,
                                 data: table_data,
-                                columns: [
-                                    {title: "Name"},
-                                    {title: "Price (€)"},
-                                    {title: "Last Submitted By"},
-                                    {title: "Last Submitted Date"},
-                                    {title: "Submit Price", "className": "text-center", "orderable": false},
-                                    {title: "Edit Pub", "className": "text-center", "orderable": false},
-                                ] 
+                                columns: data_columns,
                             });
+
+        if (!g_loggedIn)
+        {
+            g_guindexDataTable.column(3).visible(false);
+            g_guindexDataTable.column(4).visible(false);
+            g_guindexDataTable.column(5).visible(false);
+        }
     }
     else
     {
@@ -122,7 +131,13 @@ var populateGuindexTable = function ()
         g_guindexDataTable.clear().draw();
         g_guindexDataTable.rows.add(table_data);
         g_guindexDataTable.columns.adjust().draw();
-      
+
+        if (g_loggedIn)
+        {
+            g_guindexDataTable.column(3).visible(true);
+            g_guindexDataTable.column(4).visible(true);
+            g_guindexDataTable.column(5).visible(true);
+        }
     }
 }
 
