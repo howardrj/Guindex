@@ -560,7 +560,8 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
             return
 
         pub = self.instance.clonedFrom
-        pub_name = pub.name
+        pub_name   = pub.name
+        pub_county = pub.county
 
         # Get changed fields and add to JSONizable object
         changed_fields = {}
@@ -623,6 +624,7 @@ class PubPendingPatchPatchSerializer(serializers.ModelSerializer):
 
         try:
             guindex_alerts_client.sendPubPendingPatchDecisionAlertRequest(pub_name,
+                                                                          pub_county,
                                                                           self.instance.creator.id,
                                                                           changed_fields,
                                                                           timezone.now(),

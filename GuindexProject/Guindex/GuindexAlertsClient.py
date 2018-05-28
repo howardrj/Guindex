@@ -28,6 +28,7 @@ class GuindexAlertsClient(GuindexClient):
         price = '€%.2f' % guinness.price
 
         guindex_alerts_msg.guinnessCreateAlertRequest.pub          = guinness.pub.name
+        guindex_alerts_msg.guinnessCreateAlertRequest.county       = guinness.pub.county
         guindex_alerts_msg.guinnessCreateAlertRequest.price        = price.decode('utf-8')
         guindex_alerts_msg.guinnessCreateAlertRequest.username     = guinness.creator.username
         guindex_alerts_msg.guinnessCreateAlertRequest.creationDate = '%s' % guinness.creationDate # TODO Display this nicer
@@ -51,6 +52,7 @@ class GuindexAlertsClient(GuindexClient):
         price = '€%.2f' % guinness.price
 
         guindex_alerts_msg.guinnessPendingCreateDecisionAlertRequest.pub          = guinness.pub.name
+        guindex_alerts_msg.guinnessPendingCreateDecisionAlertRequest.county       = guinness.pub.county
         guindex_alerts_msg.guinnessPendingCreateDecisionAlertRequest.price        = price.decode('utf-8')
         guindex_alerts_msg.guinnessPendingCreateDecisionAlertRequest.userId       = guinness.creator.id
         guindex_alerts_msg.guinnessPendingCreateDecisionAlertRequest.creationDate = '%s' % guinness.creationDate # TODO Display this nicer
@@ -75,6 +77,7 @@ class GuindexAlertsClient(GuindexClient):
         guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
 
         guindex_alerts_msg.pubCreateAlertRequest.pub          = pub.name
+        guindex_alerts_msg.pubCreateAlertRequest.county       = pub.county
         guindex_alerts_msg.pubCreateAlertRequest.latitude     = str(round(pub.latitude, 7))
         guindex_alerts_msg.pubCreateAlertRequest.longitude    = str(round(pub.longitude, 7))
         guindex_alerts_msg.pubCreateAlertRequest.username     = pub.creator.username
@@ -97,6 +100,7 @@ class GuindexAlertsClient(GuindexClient):
         guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
 
         guindex_alerts_msg.pubPatchAlertRequest.pub           = pub.name
+        guindex_alerts_msg.pubPatchAlertRequest.county        = pub.county
         guindex_alerts_msg.pubPatchAlertRequest.username      = contributor.username
         guindex_alerts_msg.pubPatchAlertRequest.changedFields = json.dumps(changedFields) # Encode as JSON
         guindex_alerts_msg.pubPatchAlertRequest.creationDate  = '%s' % creationDate
@@ -118,6 +122,7 @@ class GuindexAlertsClient(GuindexClient):
         guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
 
         guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.pub          = pub.name
+        guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.county       = pub.county
         guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.latitude     = str(round(pub.latitude, 7))
         guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.longitude    = str(round(pub.longitude, 7))
         guindex_alerts_msg.pubPendingCreateDecisionAlertRequest.userId       = pub.creator.id
@@ -136,13 +141,14 @@ class GuindexAlertsClient(GuindexClient):
 
         self.sendMessage(message_string)
 
-    def sendPubPendingPatchDecisionAlertRequest(self, pubName, creatorId, changedFields, creationDate, approved, reason):
+    def sendPubPendingPatchDecisionAlertRequest(self, pubName, pubCounty, creatorId, changedFields, creationDate, approved, reason):
 
         logger.info("Sending Pub Pending Patch Decision Alert Request")
 
         guindex_alerts_msg = GuindexAlertsIf.GuindexAlertsIfMessage()
 
         guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.pub           = pubName
+        guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.county        = pubCounty
         guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.userId        = creatorId
         guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.changedFields = json.dumps(changedFields)
         guindex_alerts_msg.pubPendingPatchDecisionAlertRequest.creationDate  = '%s' % creationDate

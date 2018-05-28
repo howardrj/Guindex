@@ -98,11 +98,11 @@ var populatePendingPriceCreateTable = function (prices)
         var pub_name_link = '<a target="_blank" href="' + pub['mapLink'] + '">' + pub['name'] + '</a>';
 
         price_data.push(pub_name_link);
-	
-	//County
-	var pub_county = pub[i]['county'];
-	price_data.push(pub_county);
-	
+    
+        // County
+        var pub_county = pub['county'];
+        price_data.push(pub_county);
+    
         // Price
         price_data.push(prices[i]['price']);
 
@@ -142,7 +142,7 @@ var populatePendingPriceCreateTable = function (prices)
     if (!g_pendingPriceCreateTable)
     {
         var data_columns = [{ title: "Pub" },
-		            { title: "County" },
+                            { title: "County" },
                             { title: "Price (€)" },
                             { title: "Submitted By" },
                             { title: "Submission Date" }];
@@ -185,9 +185,9 @@ var populatePendingPubCreateTable = function (pubs)
 
         pub_data.push(pub_name_link);
 
-	//Pub County
-	var pub_county = pubs[i]['county'];
-	pub_data.push(pub_county);
+        // County
+        var pub_county = pubs[i]['county'];
+        pub_data.push(pub_county);
 
         // Contributor
         var contributor_id = parseInt(pubs[i]['creator']);
@@ -224,7 +224,7 @@ var populatePendingPubCreateTable = function (pubs)
     if (!g_pendingPubCreateTable)
     {
         var data_columns =  [{ title: "Name" },
-			     { title: "County" },
+                             { title: "County" },
                              { title: "Submitted By" },
                              { title: "Submission Date" }];
 
@@ -260,19 +260,18 @@ var populatePendingPubPatchTable = function (pubs)
     for (var i = 0; i < pubs.length; i++)
     {
         var pub_data = [];
+        var cloned_pub = $.grep(g_pubsList, function(obj) { return obj['id'] === pubs[i]['clonedFrom'];})[0];
 
         // Pub name
-        var pub_name_link = '<a target="_blank" href="' + pubs[i]['mapLink'] + '">' + pubs[i]['name'] + '</a>';
+        var pub_name_link = '<a target="_blank" href="' + cloned_pub['mapLink'] + '">' + cloned_pub['name'] + '</a>';
 
         pub_data.push(pub_name_link);
 
-	//Pub County
-	var pub_county = pubs[i]['county'];
-	pub_data.push(pub_county);
+        // County
+        var pub_county = cloned_pub['county'];
+        pub_data.push(pub_county);
 
         // Changed fields
-        var cloned_pub = $.grep(g_pubsList, function(obj) { return obj['id'] === pubs[i]['clonedFrom'];})[0];
-
         var changed_fields = '<table border="0"> <tbody>';
 
         if (cloned_pub['name'] != pubs[i]['name'])
@@ -283,6 +282,18 @@ var populatePendingPubPatchTable = function (pubs)
             changed_fields += '<td>' + cloned_pub['name'] + '</td>';
             changed_fields += '<td> <i class="fa fa-arrow-right"></i> </td>';
             changed_fields += '<td>'+ pubs[i]['name'] + '</td>';
+
+            changed_fields += '</tr>';
+        }
+
+        if (cloned_pub['county'] != pubs[i]['county'])
+        {
+            changed_fields += '<tr>';
+
+            changed_fields += '<td> County: </td>';
+            changed_fields += '<td>' + cloned_pub['county'] + '</td>';
+            changed_fields += '<td> <i class="fa fa-arrow-right"></i> </td>';
+            changed_fields += '<td>'+ pubs[i]['county'] + '</td>';
 
             changed_fields += '</tr>';
         }
@@ -370,7 +381,7 @@ var populatePendingPubPatchTable = function (pubs)
     if (!g_pendingPubPatchTable)
     {
         var data_columns = [{ title: "Name" },
-			    { title: "County" },
+                            { title: "County" },
                             { title: "Changed Fields", "className": "text-center", "orderable": false },
                             { title: "Submitted By" },
                             { title: "Submission Date" }];

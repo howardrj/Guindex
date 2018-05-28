@@ -8,12 +8,13 @@ import dropbox
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django import db
 
 from Guindex.GuindexParameters import GuindexParameters
 
 logger = logging.getLogger(__name__.split('.')[-1])
 
-DB_NAME = '/usr/share/Guindex.db'
+G_DB_NAME = db.settings.DATABASES['default']['NAME']
 
 
 class Command(BaseCommand):
@@ -30,11 +31,11 @@ class Command(BaseCommand):
             # Append current time to database
             current_time = datetime.now().strftime('%Y-%B-%d_%H:%M:%S')
 
-            copied_db_name = "%s-%s" % (DB_NAME, current_time)
+            copied_db_name = "%s-%s" % (G_DB_NAME, current_time)
             copied_db_leaf = copied_db_name.split('/')[-1] 
             
             # Copy file locally
-            copyfile(DB_NAME, copied_db_name)
+            copyfile(G_DB_NAME, copied_db_name)
 
             # Copy file to dropbox
             dropbox_context = dropbox.Dropbox(settings.DROPBOX_API_ACCESS_TOKEN)

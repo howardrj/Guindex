@@ -151,6 +151,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     context['username'] = user.username
                     context['summary']  = "The following Guinness price was submitted to the Guindex by a non-staff member:"
                     context['data']     = OrderedDict([('Pub', message.pub),
+                                                       ('County', message.county),
                                                        ('Price', message.price),
                                                        ('Contributor', message.username),
                                                        ('Time', message.creationDate),
@@ -179,6 +180,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     context['username'] = user.username
                     context['summary']  = "The following Guinness price has been added to the Guindex:"
                     context['data']     = OrderedDict([('Pub', message.pub),
+                                                       ('County', message.county),
                                                        ('Price', message.price),
                                                        ('Contributor', message.username),
                                                        ('Time', message.creationDate),
@@ -204,6 +206,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     telegram_message = "The following Guinness price has been added to the Guindex by a non-staff member:\n\n"
 
                     telegram_message += "Pub: %s\n"         % message.pub
+                    telegram_message += "County: %s\n"      % message.county
                     telegram_message += "Price: %s\n"       % message.price[1:]
                     telegram_message += "Contributor: %s\n" % message.username
                     telegram_message += "Time: %s\n\n"      % message.creationDate
@@ -222,6 +225,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     telegram_message = "The following Guinness price has been added to the Guindex:\n\n"
 
                     telegram_message += "Pub: %s\n"         % message.pub
+                    telegram_message += "County: %s\n"      % message.county
                     telegram_message += "Price: %s\n"       % message.price[1:]
                     telegram_message += "Contributor: %s\n" % message.username
                     telegram_message += "Time: %s\n"        % message.creationDate
@@ -255,6 +259,7 @@ class GuindexAlertsServer(Int16StringReceiver):
             context['username'] = user.username
             context['summary']  = "Your below price submission has been %s:" % decision
             context['data']     = OrderedDict([('Pub', message.pub),
+                                               ('County', message.county),
                                                ('Price', message.price),
                                                ('Time', message.creationDate),
                                               ])
@@ -280,9 +285,10 @@ class GuindexAlertsServer(Int16StringReceiver):
 
             telegram_message = "Your below Guinness price submission has been %s:\n\n" % decision
 
-            telegram_message += "Pub: %s\n"   % message.pub
-            telegram_message += "Price: %s\n" % message.price[1:]
-            telegram_message += "Time: %s\n"  % message.creationDate
+            telegram_message += "Pub: %s\n"    % message.pub
+            telegram_message += "County: %s\n" % message.county
+            telegram_message += "Price: %s\n"  % message.price[1:]
+            telegram_message += "Time: %s\n"   % message.creationDate
 
             if message.HasField('reason'):
                 telegram_message += "Reason: %s\n" % message.reason
@@ -313,6 +319,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     context['username'] = user.username
                     context['summary']  = "The following Pub was submitted to the Guindex by a non-staff member:"
                     context['data']     = OrderedDict([('Pub', message.pub),
+                                                       ('County', message.county),
                                                        ('Latitude', message.latitude),
                                                        ('Longitude', message.longitude),
                                                        ('Contributor', message.username),
@@ -342,6 +349,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     context['username'] = user.username
                     context['summary']  = "The following Pub has been added to the Guindex:"
                     context['data']     = OrderedDict([('Pub', message.pub),
+                                                       ('County', message.county),
                                                        ('Latitude', message.latitude),
                                                        ('Longitude', message.longitude),
                                                        ('Contributor', message.username),
@@ -369,6 +377,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     telegram_message = "The following Pub has been added to the Guindex by a non-staff member:\n\n"
 
                     telegram_message += "Pub: %s\n"         % message.pub
+                    telegram_message += "County: %s\n"      % message.county
                     telegram_message += "Latitude: %s\n"    % message.latitude
                     telegram_message += "Longitude: %s\n"   % message.longitude
                     telegram_message += "Contributor: %s\n" % message.username
@@ -388,6 +397,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     telegram_message = "The following Pub has been added to the Guindex:\n\n"
 
                     telegram_message += "Pub: %s\n"         % message.pub
+                    telegram_message += "County: %s\n"      % message.county
                     telegram_message += "Latitude: %s\n"    % message.latitude
                     telegram_message += "Longitude: %s\n"   % message.longitude
                     telegram_message += "Contributor: %s\n" % message.username
@@ -419,6 +429,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     context['username'] = user.username
                     context['summary']  = "The following Pub updates have been submitted to the Guindex by a non-staff member:"
                     context['data']     = OrderedDict([('Pub', message.pub),
+                                                       ('County', message.county),
                                                        ('Updates', self._formatChangedFieldsEmail(message.changedFields)),
                                                        ('Contributor', message.username),
                                                        ('Time', message.creationDate),
@@ -447,6 +458,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     context['username'] = user.username
                     context['summary']  = "The following Pub updates have been applied:"
                     context['data']     = OrderedDict([('Pub', message.pub),
+                                                       ('County', message.county),
                                                        ('Updates', self._formatChangedFieldsEmail(message.changedFields)),
                                                        ('Contributor', message.username),
                                                        ('Time', message.creationDate),
@@ -472,6 +484,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     telegram_message = "The following Pub updates have been submitted to the Guindex by a non-staff member:\n\n"
 
                     telegram_message += "Pub: %s\n"         % message.pub
+                    telegram_message += "County: %s\n"      % message.county
                     telegram_message += "Updates: %s\n"     % self._formatChangedFieldsTelegram(message.changedFields)
                     telegram_message += "Contributor: %s\n" % message.username
                     telegram_message += "Time: %s\n\n"      % message.creationDate
@@ -490,6 +503,7 @@ class GuindexAlertsServer(Int16StringReceiver):
                     telegram_message = "The following Pub updates have been applied:\n\n"
 
                     telegram_message += "Pub: %s\n"         % message.pub
+                    telegram_message += "County: %s\n"      % message.county
                     telegram_message += "Updates: %s\n"     % self._formatChangedFieldsTelegram(message.changedFields)
                     telegram_message += "Contributor: %s\n" % message.username
                     telegram_message += "Time: %s\n"        % message.creationDate
@@ -523,6 +537,7 @@ class GuindexAlertsServer(Int16StringReceiver):
             context['username'] = user.username
             context['summary']  = "Your below Pub submission has been %s:" % decision
             context['data']     = OrderedDict([('Pub', message.pub),
+                                               ('County', message.county),
                                                ('Latitude', message.latitude),
                                                ('Longitude', message.longitude),
                                                ('Time', message.creationDate),
@@ -549,6 +564,7 @@ class GuindexAlertsServer(Int16StringReceiver):
             telegram_message = "Your below Pub submission has been %s:\n\n" % decision
 
             telegram_message += "Pub: %s\n"       % message.pub
+            telegram_message += "County: %s\n"    % message.county
             telegram_message += "Latitude: %s\n"  % message.latitude
             telegram_message += "Longitude: %s\n" % message.longitude
             telegram_message += "Time: %s\n"      % message.creationDate
@@ -585,6 +601,7 @@ class GuindexAlertsServer(Int16StringReceiver):
             context['username'] = user.username
             context['summary']  = "Your below Pub update submission has been %s:" % decision
             context['data']     = OrderedDict([('Pub', message.pub),
+                                               ('County', message.county),
                                                ('Updates', self._formatChangedFieldsEmail(message.changedFields)),
                                                ('Time', message.creationDate),
                                               ])
@@ -611,6 +628,7 @@ class GuindexAlertsServer(Int16StringReceiver):
             telegram_message = "Your below Pub update submission has been %s:\n\n" % decision
 
             telegram_message += "Pub: %s\n"     % message.pub
+            telegram_message += "County: %s\n"  % message.county
             telegram_message += "Updates: %s\n" % self._formatChangedFieldsTelegram(message.changedFields)
             telegram_message += "Time: %s\n"    % message.creationDate
 
