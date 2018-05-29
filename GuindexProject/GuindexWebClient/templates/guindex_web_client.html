@@ -510,6 +510,14 @@
   <script type="text/javascript" src="{% static "javascript/statstesting.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/statstesting2.js" %}"></script>
 
+<script>
+$(".nav-item").on( "click", function( event ) {        
+    	if($('.navbar-toggler').is(':visible')) {    
+            $(".navbar-toggler").trigger('click');
+        }
+});
+</script>
+
   <script async defer src="https://maps.googleapis.com/maps/api/js?key={{google_maps_api_key}}&callback=initMap"></script>
 
   <script>
