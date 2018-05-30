@@ -508,6 +508,7 @@ $(document).on('click', '.pending_contribution_button', function () {
             // Reload tables
             getPubInfo();
             initMap();
+            getStats();
             getContributorInfo();
             getPendingContributionsInfo();
         }

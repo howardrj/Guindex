@@ -59,6 +59,7 @@ $('#add_pub_submit_button').on('click', function () {
                 // Reload relevant tables
                 getPubInfo();
                 initMap();
+                getStats();
                 getContributorInfo();
                 getPendingContributionsInfo();
             }

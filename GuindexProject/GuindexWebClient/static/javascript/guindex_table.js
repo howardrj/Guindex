@@ -44,10 +44,10 @@ var populateGuindexTable = function ()
         var pub_name_link = '<a target="_blank" href="' + pubs_list[i]['mapLink'] + '">' + pubs_list[i]['name'] + '</a>';
         pub_data.push(pub_name_link);
 
-	// Append county
-	var pub_county = pubs_list[i]['county'];
-	pub_data.push(pub_county);
-	
+        // Append county
+        var pub_county = pubs_list[i]['county'];
+        pub_data.push(pub_county);
+
         // Append price
         if (pubs_list[i]['prices'].length)
         {
@@ -108,7 +108,7 @@ var populateGuindexTable = function ()
     {
         data_columns = [
             {title: "Name"},
-	    {title: "County"},
+            {title: "County"},
             {title: "Price (€)"},
             {title: "Last Submitted Date"},
             {title: "Last Submitted By"},
@@ -191,6 +191,7 @@ $(document).on('click', '.submit_price_button', function () {
                     // Reload relevant tables
                     getPubInfo();
                     initMap();
+                    getStats();
                     getContributorInfo();
                     getPendingContributionsInfo();
                 }
@@ -308,6 +309,7 @@ $('#edit_pub_submit_button').on('click', function () {
                 // Reload relevant tables
                 getPubInfo();
                 initMap();
+                getStats();
                 getContributorInfo();
                 getPendingContributionsInfo();
             }

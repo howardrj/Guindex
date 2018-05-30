@@ -21,7 +21,7 @@ class GuindexParameters:
 
     # Alerts Server Parameters
     ALERTS_LISTEN_IP   = '127.0.0.1'
-    ALERTS_LISTEN_PORT = 8088
+    ALERTS_LISTEN_PORT = 8080
     ALERTS_BACKLOG     = 50
 
     # GPS Parameters
@@ -135,8 +135,8 @@ class GuindexParameters:
     
     MAX_COUNTY_NAME_LEN = 15
     SUPPORTED_COUNTIES  = [
-	'Carlow',        
-	'Cavan',
+        'Carlow',        
+        'Cavan',
         'Clare',
         'Cork',
         'Donegal',

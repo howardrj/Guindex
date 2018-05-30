@@ -654,7 +654,7 @@ class StatisticsSerializer(serializers.ModelSerializer):
 
         class Meta:
             model = Pub
-            fields = ['id', 'name', 'price']
+            fields = ['id', 'name', 'county', 'price']
 
     # Return this list and let javascript sort it
     pubsWithPrices = ReducedPubSerializer(many = True, read_only = True)

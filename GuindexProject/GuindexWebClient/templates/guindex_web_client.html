@@ -22,10 +22,13 @@
         // Global object lists
         var g_pubsList                = [];
         var g_contributorsList        = [];
+        var g_stats                   = {};
         var g_detailedContributorInfo = {};
 
         // Global DataTable objects
         var g_guindexDataTable        = null;
+        var g_guindexStatsTable       = null;
+        var g_guindexPriceTable       = null;
         var g_contributorsTable       = null;
         var g_userSettingsTable       = null;
         var g_pendingPriceCreateTable = null;
@@ -62,13 +65,15 @@
   <div class='preloader'><div class='loaded'>&nbsp;</div></div>
 
   <!-- Navigation-->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-    <a class="navbar-brand" href="">Guindex</a>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color:black" id="mainNav">
+    <a class="navbar-brand" href="">
+        <img src="{% static "images/black_guindex_logo.jpeg" %}" alt="Guindex" width="150" height="30">
+    </a>
     <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
-      <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+      <ul class="navbar-nav navbar-sidenav" id="exampleAccordion" style="background-color:black">
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Overview">
           <a class="nav-link page_content_link" data-content_page_id="overview_page">
             <i class="fa fa-fw fa-home"></i>
@@ -92,7 +97,7 @@
             <i class="fa fa-fw fa-area-chart"></i>
             <span class="nav-link-text">Analysis</span>
           </a>
-          <ul class="sidenav-second-level collapse" id="collapseAnalysis">
+          <ul class="sidenav-second-level collapse" id="collapseAnalysis" style="background-color:black">
             <li>
               <a class="nav_link page_content_link" data-content_page_id="analysis_main_page">Analysis Overview</a>
             </li>
@@ -116,7 +121,7 @@
             <i class="fa fa-fw fa-table"></i>
             <span class="nav-link-text">Data</span>
           </a>
-          <ul class="sidenav-second-level collapse" id="collapseData">
+          <ul class="sidenav-second-level collapse" id="collapseData" style="background-color:black">
             <li>
               <a class="nav-link page_content_link" data-content_page_id="data_table_page"> Table </a>
             </li>
@@ -155,7 +160,7 @@
             <i class="fa fa-fw fa-info-circle"></i>
             <span class="nav-link-text">Info</span>
           </a>
-          <ul class="sidenav-second-level collapse" id="collapseInfo">
+          <ul class="sidenav-second-level collapse" id="collapseInfo" style="background-color:black">
             <li>
               <a class="nav_link page_content_link" data-content_page_id="info_about_page">About</a>
             </li>
@@ -173,7 +178,7 @@
             <i class="fa fa-fw fa-question-circle"></i>
             <span class="nav-link-text">Help</span>
           </a>
-          <ul class="sidenav-second-level collapse" id="collapseHelp">
+          <ul class="sidenav-second-level collapse" id="collapseHelp" style="background-color:black">
             <li>
               <a class="nav_link page_content_link" data-content_page_id="help_contact_page">Contact</a>
             </li>
@@ -184,7 +189,7 @@
         </li>
 
       </ul>
-      <ul class="navbar-nav sidenav-toggler">
+      <ul class="navbar-nav sidenav-toggler" style="background-color: black">
         <li class="nav-item">
           <a class="nav-link text-center" id="sidenavToggler">
             <i class="fa fa-fw fa-angle-left"></i>
@@ -226,15 +231,15 @@
   {% include "help_contact.html" %}
   {% include "help_api.html" %}
 
-  <footer class="sticky-footer">
+  <footer class="sticky-footer" style="background-color:black; color: white;">
     <div class="container">
       <div class="text-center">
-        <small>Copyright © guindex.ie 2018</small>
+        <small>Copyright © guindex.ie {% now "Y" %}</small>
       </div>
     </div>
   </footer>
   <!-- Scroll to Top Button-->
-  <a class="scroll-to-top rounded" href="#page-top">
+  <a class="scroll-to-top rounded" style="background-color:black" href="#page-top">
     <i class="fa fa-angle-up"></i>
   </a>
 
@@ -506,17 +511,16 @@
   <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_contact.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_stats.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/main.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/statstesting.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/statstesting2.js" %}"></script>
 
-<script>
-$(".nav-item").on( "click", function( event ) {        
-    	if($('.navbar-toggler').is(':visible')) {    
+  <script>
+    $(".nav-item").on( "click", function( event ) {        
+        if($('.navbar-toggler').is(':visible')) {    
             $(".navbar-toggler").trigger('click');
         }
-});
-</script>
+    });
+  </script>
 
   <script async defer src="https://maps.googleapis.com/maps/api/js?key={{google_maps_api_key}}&callback=initMap"></script>
 
@@ -534,10 +538,12 @@ $(".nav-item").on( "click", function( event ) {
   <script>
 
         getPubInfo();
+        getStats();
 
         // Refresh tables periodically
         setInterval(getPubInfo, G_GUI_REFRESH_INTERVAL);
-        setInterval(initMap, G_GUI_REFRESH_INTERVAL);
+        setInterval(initMap,    G_GUI_REFRESH_INTERVAL);
+        setInterval(getStats,   G_GUI_REFRESH_INTERVAL);
 
    </script>
 

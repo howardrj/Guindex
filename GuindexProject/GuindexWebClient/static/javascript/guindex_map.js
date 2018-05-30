@@ -1,11 +1,9 @@
 // Global constants
 var G_MAP_ICON_BASE = location.protocol + '//' + location.hostname + ':' + location.port + '/static/images/';
-var G_API_BASE      = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
 var G_ZOOM          = 16;
 var G_DUBLIN_CENTER = {lat: 53.345280, lng: -6.272161};
 
 // Globally accessible objects
-var g_pubsList            = []; 
 var g_guindexMap          = null; // Google maps object
 var g_guindexMapContainer = document.getElementById('guindex_map');
 var g_pubMarkers          = [];
@@ -70,6 +68,10 @@ var onError = function (error)
 
 var createMap = function (mapCenter, foundUserLocation)
 {
+    // Map already created, return
+    if (g_guindexMap)
+        return;
+        
 	var map_options = {
         zoom: G_ZOOM,
         center: mapCenter,
@@ -93,6 +95,15 @@ var createMap = function (mapCenter, foundUserLocation)
 
 var populateMap = function ()
 {
+    // Delete old markers from map
+    if (g_pubMarkers.length)
+    {
+        for (var i = 0; i < g_pubMarkers.length; i++)
+        {
+            g_pubMarkers[i].setMap(null);
+        }
+    }
+
     g_pubMarkers = [];
 
     // Loop over all pub JSON objects

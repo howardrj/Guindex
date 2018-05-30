@@ -24,10 +24,16 @@
 /************************/
 /* Guindex Map Elements */
 /************************/
+#map_page {
+    margin-bottom: 0;
+    padding:0;
+}
+
 #guindex_map_container {
     padding: auto 0;
+    margin: 0;
     text-align: center;
-    height: 80vh;
+    height: 100vh;
     position: relative;
 }
 
