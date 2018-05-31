@@ -99,19 +99,19 @@
           </a>
           <ul class="sidenav-second-level collapse" id="collapseAnalysis" style="background-color:black">
             <li>
-              <a class="nav_link page_content_link" data-content_page_id="analysis_main_page">Analysis Overview</a>
+              <a class="nav-link page_content_link" data-content_page_id="analysis_main_page">Analysis Overview</a>
             </li>
             <li>
-              <a class="nav_link page_content_link" data-content_page_id="analysis_travelling_drunkard_page">Travelling Drunkard</a>
+              <a class="nav-link page_content_link" data-content_page_id="analysis_travelling_drunkard_page">Travelling Drunkard</a>
             </li>
             <li>
-              <a class="nav_link page_content_link" data-content_page_id="analysis_social_page">Correlation of Socioeconomic Factors and Guinness Pricing</a>
+              <a class="nav-link page_content_link" data-content_page_id="analysis_social_page">Correlation of Socioeconomic Factors and Guinness Pricing</a>
             </li>
             <li>
-              <a class="nav_link page_content_link" data-content_page_id="analysis_geo_page">Geographic Variation of Guinness Pricing</a>
+              <a class="nav-link page_content_link" data-content_page_id="analysis_geo_page">Geographic Variation of Guinness Pricing</a>
             </li>
             <li>
-              <a class="nav_link page_content_link" data-content_page_id="analysis_pubdist_page">Furthest Distance to a Pub in County Dublin</a>
+              <a class="nav-link page_content_link" data-content_page_id="analysis_pubdist_page">Furthest Distance to a Pub in County Dublin</a>
             </li>
           </ul>
         </li>
@@ -162,13 +162,13 @@
           </a>
           <ul class="sidenav-second-level collapse" id="collapseInfo" style="background-color:black">
             <li>
-              <a class="nav_link page_content_link" data-content_page_id="info_about_page">About</a>
+              <a class="nav-link page_content_link" data-content_page_id="info_about_page">About</a>
             </li>
             <li>
-              <a class="nav_link page_content_link" data-content_page_id="info_privacy_page">Privacy Policy</a>
+              <a class="nav-link page_content_link" data-content_page_id="info_privacy_page">Privacy Policy</a>
             </li>
             <li>
-              <a class="nav_link page_content_link" data-content_page_id="info_tos_page">Terms of Service</a>
+              <a class="nav-link page_content_link" data-content_page_id="info_tos_page">Terms of Service</a>
             </li>
           </ul>
         </li>
@@ -180,10 +180,10 @@
           </a>
           <ul class="sidenav-second-level collapse" id="collapseHelp" style="background-color:black">
             <li>
-              <a class="nav_link page_content_link" data-content_page_id="help_contact_page">Contact</a>
+              <a class="nav-link page_content_link" data-content_page_id="help_contact_page">Contact</a>
             </li>
             <li>
-              <a class="nav_link page_content_link" data-content_page_id="help_api_page">Guindex API</a>
+              <a class="nav-link page_content_link" data-content_page_id="help_api_page">Guindex API</a>
             </li>
           </ul>
         </li>
@@ -515,8 +515,34 @@
   <script type="text/javascript" src="{% static "javascript/main.js" %}"></script>
 
   <script>
-    $(".nav-item").on( "click", function( event ) {        
-        if($('.navbar-toggler').is(':visible')) {    
+    // Close dropdown when new page is opened
+
+    $(".nav-item").on("click", function(evt) {        
+
+        var node = evt.target;
+
+        while (!node.classList.contains('nav-item'))
+        {
+            node = node.parentNode;
+        }
+
+        // Don't close menu if link is collapsable
+        if (node.children[0].classList.contains('nav-link-collapse'))
+            return;
+        
+        if($('.navbar-toggler').is(':visible'))
+        {    
+            $(".navbar-toggler").trigger('click');
+        }
+    });
+
+    $(".nav-link").on("click", function(evt) {        
+
+        if (!evt.target.classList.contains('page_content_link'))
+            return;
+
+        if($('.navbar-toggler').is(':visible'))
+        {    
             $(".navbar-toggler").trigger('click');
         }
     });
