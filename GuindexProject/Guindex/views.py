@@ -379,7 +379,7 @@ class ContributorDetail(generics.RetrieveUpdateAPIView):
         its own User model.
     """
 
-    permission_classes = (IsContributor, )
+    permission_classes = (permissions.IsAdminUser, )
     http_method_names  = ['get', 'patch'] # Disallow PUTS
 
     def __init__(self, *args, **kwargs):
@@ -406,7 +406,7 @@ class ContributorDetail(generics.RetrieveUpdateAPIView):
 #####################
 
 class Contact(generics.CreateAPIView):
-    
+
     serializer_class = ContactSerializer
 
     def __init__(self, *args, **kwargs):

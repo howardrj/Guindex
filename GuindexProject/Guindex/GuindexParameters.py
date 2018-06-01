@@ -16,8 +16,8 @@ class GuindexParameters:
     REJECT_REASON_MAX_LEN = 100
 
     # Background script run periods (in seconds)
-    DB_BACKUP_PERIOD         = 84600
-    STATS_CALCULATION_PERIOD = 3600
+    DB_BACKUP_PERIOD         = 86400
+    STATS_CALCULATION_PERIOD = 86400
 
     # Alerts Server Parameters
     ALERTS_LISTEN_IP   = '127.0.0.1'

@@ -78,6 +78,12 @@ class Command(BaseCommand):
                 logger.error("Failed to calculate percentage visited")
 
             try:
+                logger.info("Calculating number of users")
+                self.calculateNumberOfUsers()
+            except:
+                logger.error("Failed to calculate number of users")                
+
+            try:
                 logger.info("Saving statistics")
                 self.stats.save()
             except:
@@ -182,6 +188,10 @@ class Command(BaseCommand):
 
         self.stats.percentageVisited = 100 * (len(self.stats.pubsWithPrices.all()) + self.stats.notServingGuinness) / \
                                        Decimal(self.stats.pubsInDb)
+
+    def calculateNumberOfUsers(self):
+
+        self.stats.numUsers = len(User.objects.all())
 
     def calculateUserContributions(self):
         """

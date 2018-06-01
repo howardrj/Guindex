@@ -20,6 +20,7 @@ var getDetailedContributorInfo = function ()
             g_detailedContributorInfo = JSON.parse(request.responseText);
             g_isStaffMember = g_detailedContributorInfo['is_staff'];
             populateUserSettingsTable();
+            populateUserContributionsTable();
         }
     }
 }
@@ -77,7 +78,7 @@ var populateUserSettingsTable = function ()
                                     { title: "Description" },
                                     { title: "Toggle" },
                                 ]
-                            });
+                              });
     }
     else
     {
@@ -93,6 +94,45 @@ var populateUserSettingsTable = function ()
 
     if (g_detailedContributorInfo['usingTelegramAlerts'])
         document.getElementById('telegram_alerts_toggler').checked = true;
+}
+
+var populateUserContributionsTable = function ()
+{
+    var table_data = [];
+
+    table_data.push(["Pubs Visited",          g_detailedContributorInfo['pubsVisited']]);
+    table_data.push(["Current Verifications", g_detailedContributorInfo['currentVerifications']]);
+    table_data.push(["Original Prices",       g_detailedContributorInfo['originalPrices']]);
+
+    // Check if table is being drawn from scratch or refreshed
+    if (!g_userContributionsTable)
+    {
+        // Clear log in warning
+        var contributions_page = document.getElementById('contributions_page');
+
+        contributions_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
+        contributions_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
+
+        data_columns = [
+            {title: "Statistic", "orderable": false},
+            {title: "Value",     "orderable": false},
+        ]
+
+        g_userContributionsTable = $('#GuindexContributionsTable').DataTable({
+                                    responsive: true,
+                                    data: table_data,
+                                    columns: data_columns,
+                                    paging: false,
+                                   });
+    }
+    else
+    {
+        // Redraw table
+        // TODO Stay on same page table
+        g_userContributionsTable.clear().draw();
+        g_userContributionsTable.rows.add(table_data);
+        g_userContributionsTable.columns.adjust().draw();
+    }
 }
 
 $(document).on('click', '.toggler', function () {

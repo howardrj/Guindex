@@ -78,16 +78,6 @@ var populateGuindexTable = function ()
             pub_data.push('-');
         } 
 
-        // Append last submitted by
-        if (pubs_list[i]['prices'].length)
-        {
-            pub_data.push(pubs_list[i]['prices'].slice(-1)[0]['creatorName']);
-        }
-        else
-        {
-            pub_data.push('-');
-        } 
-
         // Append submit price button
         var input_field   = '<input class="price_input" type="number" step="0.01" min="0" max="10"/>';
         var submit_button = '<i class="fa fa-paper-plane submit_price_button" title="Submit Price (only available when logged in)" data-pub_id="' + pubs_list[i]['id'] + '"></i>';
@@ -111,7 +101,6 @@ var populateGuindexTable = function ()
             {title: "County"},
             {title: "Price (€)"},
             {title: "Last Submitted Date"},
-            {title: "Last Submitted By"},
             {title: "Submit Price", "className": "text-center", "orderable": false},
             {title: "Edit Pub", "className": "text-center", "orderable": false},
         ]
@@ -126,7 +115,6 @@ var populateGuindexTable = function ()
         {
             g_guindexDataTable.column(4).visible(false);
             g_guindexDataTable.column(5).visible(false);
-            g_guindexDataTable.column(6).visible(false);
         }
     }
     else
@@ -141,7 +129,6 @@ var populateGuindexTable = function ()
         {
             g_guindexDataTable.column(4).visible(true);
             g_guindexDataTable.column(5).visible(true);
-            g_guindexDataTable.column(6).visible(true);
         }
     }
 }
@@ -193,6 +180,7 @@ $(document).on('click', '.submit_price_button', function () {
                     initMap();
                     getStats();
                     getContributorInfo();
+                    getDetailedContributorInfo();
                     getPendingContributionsInfo();
                 }
                 else
@@ -311,6 +299,7 @@ $('#edit_pub_submit_button').on('click', function () {
                 initMap();
                 getStats();
                 getContributorInfo();
+                getDetailedContributorInfo();
                 getPendingContributionsInfo();
             }
             else

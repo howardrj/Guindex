@@ -281,6 +281,7 @@ class StatisticsSingleton(models.Model):
     closedPubs         = models.IntegerField(default = 0)
     notServingGuinness = models.IntegerField(default = 0)
     lastCalculated     = models.DateTimeField(auto_now = True)
+    numUsers           = models.IntegerField(default = 0)
 
     def __unicode__(self):
 

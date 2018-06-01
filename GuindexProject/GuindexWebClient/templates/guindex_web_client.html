@@ -29,7 +29,7 @@
         var g_guindexDataTable        = null;
         var g_guindexStatsTable       = null;
         var g_guindexPriceTable       = null;
-        var g_contributorsTable       = null;
+        var g_userContributionsTable  = null;
         var g_userSettingsTable       = null;
         var g_pendingPriceCreateTable = null;
         var g_pendingPubCreateTable   = null;
@@ -136,10 +136,10 @@
             <span class="nav-link-text">Settings</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Contributors">
-          <a class="nav-link page_content_link" data-content_page_id="contributors_page">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Contributions">
+          <a class="nav-link page_content_link" data-content_page_id="contributions_page">
             <i class="fa fa-fw fa-user"></i>
-            <span class="nav-link-text">Contributors</span>
+            <span class="nav-link-text">Contributions</span>
           </a>
         </li>
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Pending Contributions">
@@ -221,7 +221,7 @@
   {% include "analysis_pubdist.html" %}
   {% include "data_table.html" %}
   {% include "data_add_pub.html" %}
-  {% include "contributors.html" %}
+  {% include "contributions.html" %}
   {% include "pending_contributions.html" %}
   {% include "settings.html" %}
   {% include "links.html" %}
@@ -505,7 +505,7 @@
   <script type="text/javascript" src="{% static "javascript/guindex_login.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_contributors.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_pending_contributions.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/guindex_settings.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_detailed_contributor_info.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"></script>

@@ -78,8 +78,8 @@ var getPendingPubPatches = function ()
 
 var populatePendingPriceCreateTable = function (prices)
 {
-    // Check pubs and contributors lists are loaded
-    if (!g_pubsList.length || !g_contributorsList.length || $.isEmptyObject(g_detailedContributorInfo))
+    // Check relevant objects are loaded
+    if (!g_pubsList.length || (g_isStaffMember && !g_contributorsList.length))
     {
         setTimeout(populatePendingPriceCreateTable, 500, prices);
         return;
@@ -106,12 +106,6 @@ var populatePendingPriceCreateTable = function (prices)
         // Price
         price_data.push(prices[i]['price']);
 
-        // Contributor
-        var contributor_id = parseInt(prices[i]['creator']);
-        var contributor    = $.grep(g_contributorsList, function(obj) { return obj['id'] === contributor_id;})[0];
-
-        price_data.push(contributor['username']);
-
         // Contribution time
         // This is ugly but it works
         // Allows datetime column to be sortable and still presentable
@@ -125,9 +119,15 @@ var populatePendingPriceCreateTable = function (prices)
 
         price_data.push('<span style="display:none">' + date_sortable_format + '</span>' + date_pretty_format);
         
-        // Approve/Reject button
         if (g_isStaffMember)
         {
+            // Contributor
+            var contributor_id = parseInt(prices[i]['creator']);
+            var contributor    = $.grep(g_contributorsList, function(obj) { return obj['id'] === contributor_id;})[0];
+
+            price_data.push(contributor['username']);
+
+            // Approve/Reject button
             var approve_button = '<i data-obj_id="' + prices[i]['id'] + '"data-table_type="pending_price_create" data-action="approve" class="fa fa-check pending_contribution_button hoverable"></i>';
             var reject_button  = '<i data-obj_id="' + prices[i]['id'] + '"data-table_type="pending_price_create" data-action="reject"  class="fa fa-times pending_contribution_button hoverable"></i>';
             var loader         = '<i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>';
@@ -144,11 +144,13 @@ var populatePendingPriceCreateTable = function (prices)
         var data_columns = [{ title: "Pub" },
                             { title: "County" },
                             { title: "Price (€)" },
-                            { title: "Submitted By" },
                             { title: "Submission Date" }];
 
         if (g_isStaffMember)
+        {
+            data_columns.push({ title: "Submitted By" });
             data_columns.push({ title: "Approve / Reject", "className": "text-center", "orderable": false });
+        }
 
         g_pendingPriceCreateTable = $('#GuindexPendingGuinnessCreateTable').DataTable({
                                         responsive: true,
@@ -167,12 +169,12 @@ var populatePendingPriceCreateTable = function (prices)
 
 var populatePendingPubCreateTable = function (pubs)
 {
-    // Check contributor info is loaded
-    if (!g_contributorsList.length || $.isEmptyObject(g_detailedContributorInfo))
+    // Check relevant objects are loaded
+    if (g_isStaffMember && !g_contributorsList.length)
     {
-        setTimeout(populatePendingPubCreateTable, 500, pubs);
+        setTimeout(populatePendingPubCreateTable, 500, prices);
         return;
-    }
+    }        
 
     var pending_pub_create_table_data = [];
 
@@ -189,12 +191,6 @@ var populatePendingPubCreateTable = function (pubs)
         var pub_county = pubs[i]['county'];
         pub_data.push(pub_county);
 
-        // Contributor
-        var contributor_id = parseInt(pubs[i]['creator']);
-        var contributor    = $.grep(g_contributorsList, function(obj) { return obj['id'] === contributor_id;})[0];
-
-        pub_data.push(contributor['username']);
-
         // Contribution time
         // This is ugly but it works
         // Allows datetime column to be sortable and still presentable
@@ -208,9 +204,15 @@ var populatePendingPubCreateTable = function (pubs)
 
         pub_data.push('<span style="display:none">' + date_sortable_format + '</span>' + date_pretty_format);
         
-        // Approve/Reject button
         if (g_isStaffMember)
         {
+            // Contributor
+            var contributor_id = parseInt(pubs[i]['creator']);
+            var contributor    = $.grep(g_contributorsList, function(obj) { return obj['id'] === contributor_id;})[0];
+
+            pub_data.push(contributor['username']);
+
+            // Approve/Reject button
             var approve_button = '<i data-obj_id="' + pubs[i]['id'] + '"data-table_type="pending_pub_create" data-action="approve" class="fa fa-check pending_contribution_button hoverable"></i>';
             var reject_button  = '<i data-obj_id="' + pubs[i]['id'] + '"data-table_type="pending_pub_create" data-action="reject"  class="fa fa-times pending_contribution_button hoverable"></i>';
             var loader         = '<i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>';
@@ -225,11 +227,13 @@ var populatePendingPubCreateTable = function (pubs)
     {
         var data_columns =  [{ title: "Name" },
                              { title: "County" },
-                             { title: "Submitted By" },
                              { title: "Submission Date" }];
 
         if (g_isStaffMember)
+        {
+            data_columns.push({ title: "Submitted By" });
             data_columns.push({ title: "Approve / Reject", "className": "text-center", "orderable": false });
+        }
 
         g_pendingPubCreateTable = $('#GuindexPendingPubCreateTable').DataTable({
                                     responsive: true,
@@ -248,8 +252,8 @@ var populatePendingPubCreateTable = function (pubs)
 
 var populatePendingPubPatchTable = function (pubs)
 {
-    // Check pubs and contributors lists are loaded
-    if (!g_pubsList.length || !g_contributorsList.length || $.isEmptyObject(g_detailedContributorInfo))
+    // Check relevant objects are loaded
+    if (!g_pubsList.length || (g_isStaffMember && !g_contributorsList.length))
     {
         setTimeout(populatePendingPubPatchTable, 500, pubs);
         return;
@@ -346,12 +350,6 @@ var populatePendingPubPatchTable = function (pubs)
 
         pub_data.push(changed_fields);
 
-        // Contributor
-        var contributor_id = parseInt(pubs[i]['creator']);
-        var contributor    = $.grep(g_contributorsList, function(obj) { return obj['id'] === contributor_id;})[0];
-
-        pub_data.push(contributor['username']);
-
         // Contribution time
         // This is ugly but it works
         // Allows datetime column to be sortable and still presentable
@@ -365,9 +363,15 @@ var populatePendingPubPatchTable = function (pubs)
 
         pub_data.push('<span style="display:none">' + date_sortable_format + '</span>' + date_pretty_format);
         
-        // Approve/Reject button
         if (g_isStaffMember)
         {
+            // Contributor
+            var contributor_id = parseInt(pubs[i]['creator']);
+            var contributor    = $.grep(g_contributorsList, function(obj) { return obj['id'] === contributor_id;})[0];
+
+            pub_data.push(contributor['username']);
+
+            // Approve/Reject button
             var approve_button = '<i data-obj_id="' + pubs[i]['id'] + '"data-table_type="pending_pub_patch" data-action="approve" class="fa fa-check pending_contribution_button hoverable"></i>';
             var reject_button  = '<i data-obj_id="' + pubs[i]['id'] + '"data-table_type="pending_pub_patch" data-action="reject"  class="fa fa-times pending_contribution_button hoverable"></i>';
             var loader         = '<i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>';
@@ -383,11 +387,13 @@ var populatePendingPubPatchTable = function (pubs)
         var data_columns = [{ title: "Name" },
                             { title: "County" },
                             { title: "Changed Fields", "className": "text-center", "orderable": false },
-                            { title: "Submitted By" },
                             { title: "Submission Date" }];
 
         if (g_isStaffMember)
+        {
+            data_columns.push({ title: "Submitted By" });
             data_columns.push({ title: "Approve / Reject", "className": "text-center", "orderable": false });
+        }
 
         g_pendingPubPatchTable = $('#GuindexPendingPubPatchTable').DataTable({
                                     responsive: true,
@@ -510,6 +516,7 @@ $(document).on('click', '.pending_contribution_button', function () {
             initMap();
             getStats();
             getContributorInfo();
+            getDetailedContributorInfo();
             getPendingContributionsInfo();
         }
         else
