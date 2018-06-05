@@ -172,7 +172,7 @@ var populatePendingPubCreateTable = function (pubs)
     // Check relevant objects are loaded
     if (g_isStaffMember && !g_contributorsList.length)
     {
-        setTimeout(populatePendingPubCreateTable, 500, prices);
+        setTimeout(populatePendingPubCreateTable, 500, pubs);
         return;
     }        
 

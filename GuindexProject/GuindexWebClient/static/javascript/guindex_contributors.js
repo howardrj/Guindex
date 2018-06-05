@@ -3,7 +3,13 @@ var getContributorInfo = function ()
     // Clear contributors list
     g_contributorsList = [];
 
-    if (!g_isStaffMember)
+    if (g_isStaffMember == null) // Has not been set yet
+    {
+        setTimeout(getContributorInfo, 1000);
+        return;
+    }
+
+    if (g_isStaffMember == false)
         return;
 
     // Use REST API to get contributor information list
