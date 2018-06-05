@@ -8,13 +8,12 @@ import dropbox
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django import db
 
 from Guindex.GuindexParameters import GuindexParameters
 
 logger = logging.getLogger(__name__.split('.')[-1])
 
-G_DB_NAME = db.settings.DATABASES['default']['NAME']
+G_DB_NAME = settings.DATABASES['default']['NAME']
 
 
 class Command(BaseCommand):

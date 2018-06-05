@@ -1,8 +1,0 @@
-[submodule "GuindexProject/TelegramUser"]
-	path = GuindexProject/TelegramUser
-	url = https://github.com/howardrj/TelegramUser
-    ignore = dirty
-[submodule "GuindexProject/UserProfile"]
-	path = GuindexProject/UserProfile
-	url = https://github.com/howardrj/UserProfile
-    ignore = dirty
