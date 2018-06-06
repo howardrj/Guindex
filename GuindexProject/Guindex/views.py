@@ -355,7 +355,7 @@ class StatisticsList(generics.ListAPIView):
 class ContributorList(generics.ListAPIView):
 
     serializer_class   = ContributorGetSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAdminUser, )
 
     def __init__(self, *args, **kwargs):
 
@@ -379,7 +379,7 @@ class ContributorDetail(generics.RetrieveUpdateAPIView):
         its own User model.
     """
 
-    permission_classes = (permissions.IsAdminUser, )
+    permission_classes = (IsContributor, )
     http_method_names  = ['get', 'patch'] # Disallow PUTS
 
     def __init__(self, *args, **kwargs):

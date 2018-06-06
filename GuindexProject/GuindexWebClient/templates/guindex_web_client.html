@@ -246,11 +246,11 @@
       <div class="modal-content">
         <div class="modal-header">
           <ul class="nav nav-tabs" roles="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" href="#facebook_login" data-toggle="tab">Login with Facebook</a>
+            <li class="nav-item login_state_link">
+                <a class="nav-link active login_state_link" href="#facebook_login" data-toggle="tab">Login with Facebook</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#password_login" data-toggle="tab">Login with Password</a>
+            <li class="nav-item login_state_link">
+                <a class="nav-link login_state_link" href="#password_login" data-toggle="tab">Login with Password</a>
             </li>
           </ul>
 
@@ -524,7 +524,7 @@
         }
 
         // Don't close menu if link is collapsable
-        if (node.children[0].classList.contains('nav-link-collapse'))
+        if (node.children[0].classList.contains('nav-link-collapse') || evt.target.classList.contains('login_state_link'))
             return;
         
         if($('.navbar-toggler').is(':visible'))
@@ -535,7 +535,7 @@
 
     $(".nav-link").on("click", function(evt) {        
 
-        if (!evt.target.classList.contains('page_content_link'))
+        if (!evt.target.classList.contains('page_content_link') || evt.target.classList.contains('login_state_link'))
             return;
 
         if($('.navbar-toggler').is(':visible'))
