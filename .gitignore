@@ -23,3 +23,4 @@ build_guindex_rpm.sh
 *.spec
 rpmbuild/RPMS/
 rpmbuild/SRPMS/
+guindex_*.min.js

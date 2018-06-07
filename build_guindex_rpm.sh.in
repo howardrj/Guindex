@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "Building Guindex tarball ..."
 python setup.py bdist_rpm
 

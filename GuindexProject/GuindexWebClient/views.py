@@ -18,6 +18,7 @@ def guindexWebClient(request):
         'google_analytics_key': settings.GOOGLE_ANALYTICS_KEY,
         'facebook_app_id'     : settings.FACEBOOK_APP_ID,
         'guindex_counties'    : GuindexParameters.SUPPORTED_COUNTIES,
+        'debug'               : settings.DEBUG,
     }
     
     return render(request, 'guindex_web_client.html', context_dict)
