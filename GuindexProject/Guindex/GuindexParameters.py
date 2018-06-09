@@ -169,6 +169,9 @@ class GuindexParameters:
     MAX_CONTACT_FORM_SUBJECT_LEN = 30
     MAX_CONTACT_FORM_MESSAGE_LEN = 500
 
+    # Caching
+    CACHE_TIMEOUT = 60 * 60
+
     def getParameters():
 
         parameter_dict = {}
