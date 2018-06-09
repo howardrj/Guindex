@@ -77,6 +77,8 @@ var createMap = function (mapCenter, foundUserLocation)
         center: mapCenter,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         fullscreenControl: false,
+	gestureHandling: 'greedy'
+
 	}
 
     // Create Map object

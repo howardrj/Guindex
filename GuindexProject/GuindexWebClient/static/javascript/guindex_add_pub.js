@@ -98,6 +98,7 @@ function createAddPubMap (mapCenter)
         center: mapCenter,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         fullscreenControl: false,
+	gestureHandling: 'greedy'
 	}
 
     // Create Map object
