@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from django.core.cache import cache
 
 from Guindex.GuindexParameters import GuindexParameters
 from Guindex.GuindexAlertsClient import GuindexAlertsClient
@@ -103,6 +104,9 @@ class Pub(PubBase):
 
             super(Pub, self).save(*args, **kwargs)
 
+            # Clear cache so /api/pubs/ endpoint is up to date
+            cache.clear()
+
             # Send new pub alert here (Make sure save works first)
             try:
                 guindex_alerts_client = GuindexAlertsClient()
@@ -115,6 +119,9 @@ class Pub(PubBase):
                 logger.error("Failed to send Pub Create Alert Request")
         else:
             super(Pub, self).save(*args, **kwargs)
+
+            # Clear cache so /api/pubs/ endpoint is up to date
+            cache.clear()
 
     def createPendingCreate(self):
 
@@ -208,6 +215,9 @@ class Guinness(GuinnessBase):
             # Append to pub prices list (must have DB ID at this point)
             self.pub.prices.add(self)
 
+            # Clear cache so /api/pubs/ endpoint is up to date
+            cache.clear()
+
             # Send new price alert here (Make sure save works first)
             try:
                 guindex_alerts_client = GuindexAlertsClient()
@@ -221,6 +231,9 @@ class Guinness(GuinnessBase):
 
         else:
             super(Guinness, self).save(*args, **kwargs)
+
+            # Clear cache so /api/pubs/ endpoint is up to date
+            cache.clear()
 
     def createPendingCreate(self):
 

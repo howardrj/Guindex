@@ -1,7 +1,6 @@
 // Useful global constants and variables
 var G_API_BASE             = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
-var G_FACEBOOK_APP_ID      = '{{facebook_app_id}}';
-var G_GUI_REFRESH_INTERVAL = 300000;
+var G_GUI_REFRESH_INTERVAL = 3000000;
 
 // Global variables to keep track of user state
 var g_loggedIn            = false;

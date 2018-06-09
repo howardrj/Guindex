@@ -33,5 +33,6 @@ setup(name='Guindex',
         'google',
         'protobuf',
         'simplejson',
+        'python-memcached',
       ],
     )
