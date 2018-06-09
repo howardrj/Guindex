@@ -1,10 +1,11 @@
 from django.conf.urls import url
 
 from Guindex import views
+from django.views.decorators.cache import cache_page
 
 
 urlpatterns = [
-    url(r'^api/pubs/$', views.PubList.as_view()),
+    url(r'^api/pubs/$', cache_page(60 * 30)(views.PubList.as_view())),
     url(r'^api/pubs/(?P<pk>[0-9]+)/$', views.PubDetail.as_view()),
     url(r'^api/pubs/pending/create/$', views.PubPendingCreateList.as_view()),
     url(r'^api/pubs/pending/create/(?P<pk>[0-9]+)/$', views.PubPendingCreateDetail.as_view()),
