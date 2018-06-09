@@ -135,7 +135,7 @@ var populateMap = function ()
         else
         {
             icon_to_use = G_MAP_ICON_BASE + 'add_icon.png';
-            pub_label   = "No yet visited";
+            pub_label   = 'Not yet visited';
         }
 
         var marker = new google.maps.Marker({position: {lat: parseFloat(g_pubsList[i]['latitude']), lng: parseFloat(g_pubsList[i]['longitude'])},
