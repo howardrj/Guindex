@@ -7,6 +7,7 @@ var G_DUBLIN_CENTER = {lat: 53.345280, lng: -6.272161};
 var g_guindexMap          = null; // Google maps object
 var g_guindexMapContainer = document.getElementById('guindex_map');
 var g_pubMarkers          = [];
+var popup, Popup;
 
 var initMap = function ()
 {
@@ -144,10 +145,11 @@ var populateMap = function ()
                                              zIndex: g_pubsList[i]['id'],
                                              disableAutoPan: true});
 
-        var content = '<h3>' + "Pub: " + g_pubsList[i]['name'] + '</h3>' + '<p>' + pub_label + '</p>';
+        var content = '<h5>' + g_pubsList[i]['name'] + '</h5>' + '<p>' + pub_label + '</p>';
 
         var info_window = new google.maps.InfoWindow({
-      		disableAutoPan: true
+      		disableAutoPan: true,
+		maxWidth:200
 	    });
 
         google.maps.event.addListener(marker, 'click', (function (marker, content, info_window) {
@@ -206,6 +208,9 @@ var showHide = function ()
 		HideButton.style.display = "none";
     }
 }
+
+
+
 
 // Add event listeners
 document.getElementById('map_search_filter').addEventListener('input', applyMapFilter);
