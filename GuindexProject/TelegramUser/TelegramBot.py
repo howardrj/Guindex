@@ -57,7 +57,7 @@ class TelegramBot(Updater):
             Used by ProcessAlerts.py script.
             Make it static so we don't need TelegramBot object.
         """
-        message = urllib.quote_plus(text)
+        message = urllib.quote_plus(text.encode('utf-8'))
 
         url = "https://api.telegram.org/bot{}/".format(apiKey) + "sendMessage?text={}&chat_id={}".format(message, chatId)
 
