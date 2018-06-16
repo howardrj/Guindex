@@ -49,7 +49,13 @@ class Pub(PubBase):
     """
 
     # Only in this state can we start adding prices to the Pub object
-    prices = models.ManyToManyField('Guinness', related_name = 'prices')
+    prices             = models.ManyToManyField('Guinness', related_name = 'prices')
+    lastPrice          = models.DecimalField(decimal_places = GuindexParameters.GUINNESS_PRICE_DECIMAL_PLACES,
+                                             max_digits     = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
+                                             null           = True,
+                                             default        = None)
+    lastSubmissionTime = models.DateTimeField(null    = True,
+                                              default = None)
 
     def getApprovedPrices(self):
         """
@@ -214,6 +220,9 @@ class Guinness(GuinnessBase):
 
             # Append to pub prices list (must have DB ID at this point)
             self.pub.prices.add(self)
+            self.pub.lastPrice = self.price
+            self.pub.lastSubmissionTime = self.creationDate
+            self.pub.save()
 
             # Clear cache so /api/pubs/ endpoint is up to date
             cache.clear()

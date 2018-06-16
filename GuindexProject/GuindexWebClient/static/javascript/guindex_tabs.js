@@ -46,7 +46,8 @@
             }
     
             // Send analytics page view
-            ga('send', 'pageview', page_content_id);
+            if (!g_debug)
+                ga('send', 'pageview', page_content_id);
         });
     }
 

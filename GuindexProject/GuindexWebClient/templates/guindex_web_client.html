@@ -6,6 +6,7 @@
 <head>
   <script>
     var G_FACEBOOK_APP_ID = '{{facebook_app_id}}';
+    var g_debug = ('{{debug}}' == 'True')
   </script>
   {% if not debug %}
     <script type="text/javascript" src="{% static "javascript/guindex_globals.min.js" %}"> </script>

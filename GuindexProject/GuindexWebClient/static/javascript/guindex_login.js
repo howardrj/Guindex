@@ -307,7 +307,12 @@ function onLoginWithPasswordSuccess ()
     getContributorInfo();
     getDetailedContributorInfo();
     getPendingContributionsInfo();
-    getPubInfo();
+
+    if (g_guindexDataTable)
+    {
+        g_guindexDataTable.column(5).visible(true);
+        g_guindexDataTable.column(6).visible(true);
+    }
 
     // Call these in a loop
     setInterval(getContributorInfo, G_GUI_REFRESH_INTERVAL);
@@ -344,7 +349,12 @@ function onLoginWithFacebookSuccess ()
     getContributorInfo();
     getDetailedContributorInfo();
     getPendingContributionsInfo();
-    getPubInfo();
+
+    if (g_guindexDataTable)
+    {
+        g_guindexDataTable.column(5).visible(true);
+        g_guindexDataTable.column(6).visible(true);
+    }
 
     // Call these in a loop
     setInterval(getContributorInfo, G_GUI_REFRESH_INTERVAL);

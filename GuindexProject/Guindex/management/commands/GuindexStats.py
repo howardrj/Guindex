@@ -108,9 +108,17 @@ class Command(BaseCommand):
 
             pub.prices.clear()
 
-            for guin in Guinness.objects.filter(pub = pub):
+            last_price = True
+
+            for guin in Guinness.objects.filter(pub = pub).order_by('-id'):
 
                 pub.prices.add(guin)
+
+                if last_price:
+                    pub.lastPrice          = guin.price
+                    pub.lastSubmissionTime = guin.creationDate
+
+                    last_price = False
 
             pub.save()
 

@@ -34,5 +34,6 @@ setup(name='Guindex',
         'protobuf',
         'simplejson',
         'python-memcached',
+        'djangorestframework-datatables',
       ],
     )
