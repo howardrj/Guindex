@@ -310,8 +310,8 @@ function onLoginWithPasswordSuccess ()
 
     if (g_guindexDataTable)
     {
+        g_guindexDataTable.column(4).visible(true);
         g_guindexDataTable.column(5).visible(true);
-        g_guindexDataTable.column(6).visible(true);
     }
 
     // Call these in a loop
@@ -352,8 +352,8 @@ function onLoginWithFacebookSuccess ()
 
     if (g_guindexDataTable)
     {
+        g_guindexDataTable.column(4).visible(true);
         g_guindexDataTable.column(5).visible(true);
-        g_guindexDataTable.column(6).visible(true);
     }
 
     // Call these in a loop

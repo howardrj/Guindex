@@ -78,8 +78,7 @@ var createMap = function (mapCenter, foundUserLocation)
         center: mapCenter,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         fullscreenControl: false,
-	gestureHandling: 'greedy'
-
+        gestureHandling: 'greedy'
 	}
 
     // Create Map object
@@ -149,7 +148,7 @@ var populateMap = function ()
 
         var info_window = new google.maps.InfoWindow({
       		disableAutoPan: true,
-		maxWidth:200
+            maxWidth:200
 	    });
 
         google.maps.event.addListener(marker, 'click', (function (marker, content, info_window) {
@@ -208,9 +207,6 @@ var showHide = function ()
 		HideButton.style.display = "none";
     }
 }
-
-
-
 
 // Add event listeners
 document.getElementById('map_search_filter').addEventListener('input', applyMapFilter);

@@ -38,11 +38,6 @@ var populateGuindexTable = function ()
                 }
             },
             {
-                title: "Map Link",
-                data: "mapLink",
-                visible: false,
-            },
-            {
                 title: "County",
                 data: "county",
             },
@@ -72,6 +67,7 @@ var populateGuindexTable = function ()
                 data: null,
                 orderable: false,
                 searchable: false,
+                className: "text-center",
                 render: function (data, type, row) {
 
                     var input_field   = '<input class="price_input" type="number" step="0.01" min="0" max="10"/>';
@@ -86,12 +82,50 @@ var populateGuindexTable = function ()
                 data: null,
                 orderable: false,
                 searchable: false,
+                className: "text-center",
                 render: function (data, type, row) {
 
-                    var edit_pub_button = '<i class="fa fa-edit edit_pub_button hoverable" title="Edit pub (only available when logged in)" data-pub_id="' + row['id'] + '"></i>';
+                    var edit_pub_button = '<i class="fa fa-edit edit_pub_button hoverable" title="Edit pub (only available when logged in)" data-pub_id="' + row['id'] + 
+                                          '" data-name="'            +  row['name'] +
+                                          '" data-latitude="'        +  row['latitude'] +
+                                          '" data-longitude="'       +  row['longitude'] +
+                                          '" data-county="'          +  row['county'] +
+                                          '" data-closed="'          + (row['closed'] ? '1' : '0') +
+                                          '" data-servingGuinness="' + (row['servingGuinness'] ? '1' : '0') +
+                                          '"></i>';
                     
                     return edit_pub_button
                 },
+            },
+            {
+                title: "ID",
+                data: "id",
+                visible: false,
+            },
+            {
+                title: "Latitude",
+                data: "latitude",
+                visible: false,
+            },
+            {
+                title: "Longitude",
+                data: "longitude",
+                visible: false,
+            },
+            {
+                title: "Map Link",
+                data: "mapLink",
+                visible: false,
+            },
+            {
+                title: "Seving Guinness",
+                data: "servingGuinness",
+                visible: false,
+            },
+            {
+                title: "Closed",
+                data: "closed",
+                visible: false,
             },
         ]
 
@@ -106,8 +140,8 @@ var populateGuindexTable = function ()
 
         if (!g_loggedIn)
         {
+            g_guindexDataTable.column(4).visible(false);
             g_guindexDataTable.column(5).visible(false);
-            g_guindexDataTable.column(6).visible(false);
         }
     }
 }

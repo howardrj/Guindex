@@ -1,5 +1,8 @@
 GuindexMinifyJs:
 	./compress_guindex_js_files.sh
 
-.PHONY: GuindexMinifyJs
+clean:
+	rm -f guindex_*.min.js
+
+.PHONY: GuindexMinifyJs clean
 all: GuindexMinifyJs
