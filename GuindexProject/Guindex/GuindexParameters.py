@@ -11,6 +11,7 @@ class GuindexParameters:
     MAX_GUINNESS_PRICE_DIGITS     = 4
     MIN_GUINNESS_PRICE            = '0.01'
     GUINNESS_PRICE_DECIMAL_PLACES = 2
+    STAR_RATING_DECIMAL_PLACES    = 2
 
     # Pending Contribution Accept/Reject Parameters
     REJECT_REASON_MAX_LEN = 100
@@ -21,7 +22,7 @@ class GuindexParameters:
 
     # Alerts Server Parameters
     ALERTS_LISTEN_IP   = '127.0.0.1'
-    ALERTS_LISTEN_PORT = 8080
+    ALERTS_LISTEN_PORT = 8088
     ALERTS_BACKLOG     = 50
 
     # GPS Parameters

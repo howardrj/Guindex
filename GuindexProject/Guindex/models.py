@@ -56,13 +56,12 @@ class Pub(PubBase):
                                              default        = None)
     lastSubmissionTime = models.DateTimeField(null    = True,
                                               default = None)
-
-    def getApprovedPrices(self):
-        """
-            Return list of prices that have been approved
-        """
-
-        return self.prices.all()
+    averageRating      = models.DecimalField(decimal_places = GuindexParameters.STAR_RATING_DECIMAL_PLACES,
+                                             max_digits     = 3,
+                                             validators     = [MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('5.00'))],
+                                             null           = True,
+                                             blank          = True,
+                                             default        = None)
 
     def getFirstVerifiedGuinness(self):
         """
@@ -182,6 +181,9 @@ class GuinnessBase(models.Model):
                                        max_digits     = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
                                        validators     = [MinValueValidator(Decimal(GuindexParameters.MIN_GUINNESS_PRICE))])
     pub          = models.ForeignKey(Pub)
+    starRating   = models.IntegerField(validators = [MinValueValidator(0), MaxValueValidator(5)],
+                                       null       = True,
+                                       default    = None)
 
     class Meta:
         abstract = True
@@ -223,6 +225,8 @@ class Guinness(GuinnessBase):
             self.pub.lastPrice = self.price
             self.pub.lastSubmissionTime = self.creationDate
             self.pub.save()
+
+            # TODO Update pub average rating here
 
             # Clear cache so /api/pubs/ endpoint is up to date
             cache.clear()

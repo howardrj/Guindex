@@ -44,7 +44,33 @@ var populateGuindexTable = function ()
             {
                 title: "Price",
                 data: "lastPrice",
-                defaultContent: " ",
+                defaultContent: "N.A.",
+            },
+            {
+                title: "Average Star Rating",
+                data: "averageRating",
+                render: function (data, type, row) {
+
+                    if (!data)
+                        return "N.A.";
+
+                    var star_rating = Math.round(parseFloat(data));
+                    var html_string = "";
+
+                    for (var i = 0; i < 5; i++)
+                    {
+                        if (i < star_rating)
+                        {
+                            html_string += '<i class="fa fa-star" aria-hidden="true"></i>';
+                        }
+                        else
+                        {
+                            html_string += '<i class="fa fa-star" aria-hidden="true" style="color:white"></i>';
+                        }
+                    } 
+                    return html_string;
+                },
+                defaultContent: "N.A."
             },
             {
                 title: "Last Submitted Date",
@@ -52,29 +78,44 @@ var populateGuindexTable = function ()
                 render: function (data, type, row) {
 
                     if (!data)
-                        return " ";
+                        return "N.A.";
 
                     var date_as_list = new Date(data).toString().split(' ');
 
                     var date_pretty_format = date_as_list[0] + ' ' + date_as_list[2] + ' ' + date_as_list[1] + ' ' + date_as_list[3];
 
-                    return date_pretty_format
+                    return date_pretty_format;
                 },
-                defaultContent: " ",
+                defaultContent: "N.A.",
             },
             {
-                title: "Submit Price",
+                title: "Submit Price (with Star Rating)",
                 data: null,
                 orderable: false,
                 searchable: false,
                 className: "text-center",
                 render: function (data, type, row) {
 
-                    var input_field   = '<input class="price_input" type="number" step="0.01" min="0" max="10"/>';
+                    var input_field = '<input class="price_input" type="number" step="0.01" min="0" max="10"/> <br>';
+
+                    var stars = "";
+
+                    for (var i = 0; i < 5; i++)
+                    {
+                        if (i < 3)
+                        {
+                            stars += '<i class="fa fa-star guindex_price_star" data-guindex_price_star_id="' + i + '" aria-hidden="true" style="color:black"></i>';
+                        }
+                        else
+                        {
+                            stars += '<i class="fa fa-star guindex_price_star" data-guindex_price_star_id="' + i + '" aria-hidden="true" style="color:white"></i>';
+                        }
+                    }
+
                     var submit_button = '<i class="fa fa-paper-plane submit_price_button" title="Submit Price (only available when logged in)" data-pub_id="' + row['id'] + '"></i>';
                     var loader        = '<i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>';
 
-                    return input_field + submit_button + loader;
+                    return input_field + stars + submit_button + loader;
                 },
             },
             {
@@ -140,8 +181,8 @@ var populateGuindexTable = function ()
 
         if (!g_loggedIn)
         {
-            g_guindexDataTable.column(4).visible(false);
             g_guindexDataTable.column(5).visible(false);
+            g_guindexDataTable.column(6).visible(false);
         }
     }
 }
@@ -167,7 +208,24 @@ $(document).on('click', '.submit_price_button', function () {
         request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         request.setRequestHeader('Authorization', 'Token ' + g_accessToken);
 
-        request.send(JSON.stringify({'pub': pub_id, 'price': price}));
+        // Get star rating
+        var star_rating = 0; 
+
+        var stars = this.parentNode.getElementsByClassName('guindex_price_star');
+
+        for (var i = 0; i < stars.length; i++)
+        {
+            if (stars[i].style.color.indexOf("black") != -1)
+            {
+                star_rating++;
+            }
+        }
+
+        request.send(JSON.stringify({
+            'pub': pub_id,
+            'price': price,
+            'starRating': star_rating,
+        }));
 
         request.onreadystatechange = function processRequest()
         {
@@ -339,6 +397,27 @@ $('#edit_pub_submit_button').on('click', function () {
 
                 displayMessage("Error", error_message + error_table);
             }
+        }
+    }
+});
+
+$(document).on('click', '.guindex_price_star', function () {
+
+    var clicked_star_id = parseInt(this.getAttribute('data-guindex_price_star_id'));
+
+    var stars = this.parentNode.getElementsByClassName('guindex_price_star');
+
+    for (var i = 0; i < stars.length; i++)
+    {
+        var star_id = parseInt(stars[i].getAttribute('data-guindex_price_star_id')) 
+
+        if (star_id <= clicked_star_id)
+        {
+            stars[i].style.color = "black";
+        }
+        else
+        {
+            stars[i].style.color = "white";
         }
     }
 });

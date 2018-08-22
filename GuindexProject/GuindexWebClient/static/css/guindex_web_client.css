@@ -139,3 +139,11 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+/*****************/
+/* Guindex stars */
+/*****************/
+.guindex_price_star:hover {
+    cursor:hand;
+    cursor:pointer;
+}

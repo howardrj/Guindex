@@ -102,9 +102,13 @@ class Command(BaseCommand):
     def gatherPubPrices(self):
         """
             Fill up prices list for each pub in database
+            Also calculates average star rating for each pub.
         """
 
         for pub in Pub.objects.all():
+
+            cumulative_star_rating  = Decimal('0.00')
+            prices_with_star_rating = 0
 
             pub.prices.clear()
 
@@ -119,6 +123,13 @@ class Command(BaseCommand):
                     pub.lastSubmissionTime = guin.creationDate
 
                     last_price = False
+
+                if guin.starRating:
+
+                    prices_with_star_rating += 1
+                    cumulative_star_rating  += guin.starRating
+
+            pub.averageRating = (cumulative_star_rating / prices_with_star_rating) if prices_with_star_rating else None
 
             pub.save()
 

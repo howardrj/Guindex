@@ -37,7 +37,7 @@ class GuinnessPostSerializer(serializers.ModelSerializer):
         model = Guinness
         # Note: Creator is extracted from request object,
         # not message payload so don't include it in fields
-        fields = ['pub', 'price']
+        fields = ['pub', 'price', 'starRating']
 
     def validate(self, data):
         """
@@ -267,7 +267,7 @@ class PubGetSerializer(serializers.ModelSerializer):
             fields = ['id', 'price', 'creationDate', 'creator']
 
     # Returns approved Guinness prices associated with this pub
-    prices = ReducedGuinnessSerializer(source = 'getApprovedPrices', many = True, read_only = True)
+    prices = ReducedGuinnessSerializer(many = True, read_only = True)
 
     class Meta:
         model = Pub
