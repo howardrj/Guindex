@@ -19,6 +19,8 @@
 .page_content_link:hover {
     cursor:hand;
     cursor:pointer;
+    color:black;
+    opacity:0.4;
 }
 
 /************************/

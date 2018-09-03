@@ -51,7 +51,7 @@
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Overview">
           <a class="nav-link page_content_link" data-content_page_id="overview_page">
             <i class="fa fa-fw fa-home"></i>
-            <span class="nav-link-text">Overview</span>
+            <span class="nav-link-text">Home</span>
           </a>
         </li>
 	    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Map">
@@ -136,7 +136,10 @@
           </a>
           <ul class="sidenav-second-level collapse" id="collapseInfo" style="background-color:black">
             <li>
-              <a class="nav-link page_content_link" data-content_page_id="info_about_page">About</a>
+              <a class="nav-link page_content_link" data-content_page_id="info_introduction_page">Introduction</a>
+            </li>
+            <li>
+              <a class="nav-link page_content_link" data-content_page_id="info_about_page">History</a>
             </li>
 	    <li>
               <a class="nav-link page_content_link" data-content_page_id="info_faq_page">Submissions FAQ</a>
@@ -202,6 +205,7 @@
   {% include "pending_contributions.html" %}
   {% include "settings.html" %}
   {% include "links.html" %}
+  {% include "info_introduction.html" %}
   {% include "info_about.html" %}
   {% include "info_faq.html" %}
   {% include "info_privacy.html" %}
