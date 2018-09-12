@@ -67,21 +67,6 @@ function checkLoginState() {
     });
 }
 
-window.fbAsyncInit = function() {
-
-    FB.init({
-        appId      : G_FACEBOOK_APP_ID,
-        cookie     : true,  // enable cookies to allow the server to access 
-                          // the session
-        xfbml      : true,  // parse social plugins on this page
-        version    : 'v2.8' // use graph api version 2.8
-    });
-
-    FB.getLoginStatus(function(response) {
-        statusChangeCallback(response);
-    });
-};
-
 var loginToGuindexViaFacebook = function ()
 {
     // Use REST API to login to guindex.ie

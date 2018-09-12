@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/var/www/Guindex/GuindexProject
-ExecStart=/usr/local/bin/gunicorn --workers 3 --bind unix:/var/www/Guindex/GuindexProject/Guindex.sock GuindexProject.wsgi:application
+ExecStart=/usr/local/bin/gunicorn --workers 9 --bind unix:/var/www/Guindex/GuindexProject/Guindex.sock GuindexProject.wsgi:application
 User=root
 Group=root
 Restart=always
