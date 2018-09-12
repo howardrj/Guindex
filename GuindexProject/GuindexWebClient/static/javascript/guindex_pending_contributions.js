@@ -1,5 +1,11 @@
 var getPendingContributionsInfo = function ()
 {
+    if (g_isStaffMember == null) // Has not been set yet
+    {
+        setTimeout(getPendingContributionsInfo, 1000);
+        return;
+    }
+
     getPendingPriceCreates();
     getPendingPubCreates();
     getPendingPubPatches();
