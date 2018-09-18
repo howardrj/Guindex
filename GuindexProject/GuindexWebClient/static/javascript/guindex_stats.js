@@ -1,30 +1,28 @@
-var getStats = function ()
+function populateGuindexStatsTable = function ()
 {
-    g_stats = {};
-
-    // Function to get detailed info about this user using REST API
-    var request = new XMLHttpRequest();
-
-    request.open('GET', G_API_BASE + 'statistics/', true);
-
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-    request.send(null);
-
-    request.onreadystatechange = function processRequest()
+    function getStats ()
     {
-        if (request.readyState == 4 && request.status == 200)
+        g_stats = {};
+
+        // Function to get detailed info about this user using REST API
+        var request = new XMLHttpRequest();
+
+        request.open('GET', 'statistics/', true);
+
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        request.send(null);
+
+        request.onreadystatechange = function processRequest()
         {
-            g_stats = JSON.parse(request.responseText)[0];
-            populateStatsTable();
-            populatePriceTable();
+            if (request.readyState == 4 && request.status == 200)
+            {
+                g_stats = JSON.parse(request.responseText)[0];
+            }
         }
     }
-}
 
-var populateStatsTable = function ()
-{
     var table_data = [];
 
     var last_calculated               = new Date(g_stats['lastCalculated']).toString().split(' ');
@@ -61,44 +59,5 @@ var populateStatsTable = function ()
         g_guindexStatsTable.clear().draw();
         g_guindexStatsTable.rows.add(table_data);
         g_guindexStatsTable.columns.adjust().draw();
-    }
-}
-
-var populatePriceTable = function ()
-{
-    var table_data = [];
-
-    for (var i = 0; i < g_stats['pubsWithPrices'].length; i++)
-    {
-        table_data.push([
-            g_stats['pubsWithPrices'][i]['name'],
-            g_stats['pubsWithPrices'][i]['county'],
-            g_stats['pubsWithPrices'][i]['price'],
-        ]);
-    }
-
-    // Check if table is being drawn from scratch or refreshed
-    if (!g_guindexPriceTable)
-    {
-        data_columns = [
-            {title: "Pub Name", "orderable": false},
-            {title: "County",   "orderable": false},
-            {title: "Price (€)"},
-        ]
-
-        g_guindexPriceTable = $('#GuindexPriceTable').DataTable({
-                                    responsive: true,
-                                    data: table_data,
-                                    columns: data_columns,
-                                    "order": [[ 2, "desc" ]]
-                                });
-    }
-    else
-    {
-        // Redraw table
-        // TODO Stay on same page table
-        g_guindexPriceTable.clear().draw();
-        g_guindexPriceTable.rows.add(table_data);
-        g_guindexPriceTable.columns.adjust().draw();
     }
 }

@@ -20,9 +20,9 @@
 
   </script>
   <script async src='https://www.google-analytics.com/analytics.js'></script>
+  <script type="text/javascript" src="{% static "javascript/particles.js" %}"></script>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
   <meta name="author" content="">
   <title> Guindex </title>
@@ -35,7 +35,20 @@
   <link rel="stylesheet" href="{% static "css/guindex_web_client.css" %}">
 </head>
 
-<body class="fixed-nav sticky-footer" id="page-top" style="background-color:black">
+<body class="fixed-nav sticky-footer" id="page-top">
+
+  <div id="particles_js_container">
+    <div id="main_loader_container">
+        <i id="main_loader_spinner" class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+        <span class="blink"> Loading guindex.ie ...</span>
+    </div> 
+  </div>
+
+  <script>
+    particlesJS.load('particles_js_container', '/static/javascript/particles.json', function() {
+    console.log('callback - particles.js config loaded');
+    });
+  </script>
 
   <script>
 
@@ -64,8 +77,6 @@
       }(document, 'script', 'facebook-jssdk'));
 
   </script>   
-
-  <div class='preloader'><div class='loaded'>&nbsp;</div></div>
 
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color:black" id="mainNav">
@@ -170,7 +181,7 @@
             <li>
               <a class="nav-link page_content_link" data-content_page_id="info_about_page">History</a>
             </li>
-	    <li>
+      	    <li>
               <a class="nav-link page_content_link" data-content_page_id="info_faq_page">Submissions FAQ</a>
             </li>	
             <li>
@@ -521,7 +532,6 @@
     <script type="text/javascript" src="{% static "javascript/guindex_detailed_contributor_info.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_table.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.min.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_map.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_add_pub.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_contact.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_stats.min.js" %}"></script>
@@ -534,7 +544,6 @@
     <script type="text/javascript" src="{% static "javascript/guindex_detailed_contributor_info.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_contact.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_stats.js" %}"></script>
@@ -575,17 +584,10 @@
     });
   </script>
 
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key={{google_maps_api_key}}&callback=initMap"></script>
-
   <script>
 
-        getPubInfo();
-        getStats();
-
-        // Refresh tables periodically
-        setInterval(getPubInfo, G_GUI_REFRESH_INTERVAL);
-        setInterval(initMap,    G_GUI_REFRESH_INTERVAL);
-        setInterval(getStats,   G_GUI_REFRESH_INTERVAL);
+        populateGuindexDataTable();
+        populateGuindexStatsTable();
 
    </script>
 

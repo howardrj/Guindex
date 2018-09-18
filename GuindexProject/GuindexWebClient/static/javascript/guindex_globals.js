@@ -1,7 +1,3 @@
-// Useful global constants and variables
-var G_API_BASE             = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
-var G_GUI_REFRESH_INTERVAL = 3000000;
-
 // Global variables to keep track of user state
 var g_loggedIn            = false;
 var g_accessToken         = null;
@@ -14,13 +10,10 @@ var g_facebookAccessToken = null;
 // Global object lists
 var g_pubsList                = [];
 var g_contributorsList        = [];
-var g_stats                   = {};
 var g_detailedContributorInfo = {};
 
 // Global DataTable objects
-var g_guindexDataTable        = null;
 var g_guindexStatsTable       = null;
-var g_guindexPriceTable       = null;
 var g_userContributionsTable  = null;
 var g_userSettingsTable       = null;
 var g_pendingPriceCreateTable = null;

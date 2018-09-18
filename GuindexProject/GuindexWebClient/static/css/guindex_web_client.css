@@ -149,3 +149,46 @@ input:checked + .slider:before {
     cursor:hand;
     cursor:pointer;
 }
+
+/***************/
+/* Particle JS */
+/***************/
+#particles_js_container {
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    position: fixed;
+    background-color:white;
+    top: 0;
+    left: 0;
+    padding: 0;
+}
+
+#main_loader_container {
+    text-align: center;
+    position: absolute;
+    margin: 0 auto;
+    top: 45%;
+    width: 100%;
+}
+
+#main_loader_spinner {
+    font-size: 100px;
+    display: block !important;
+    margin-bottom: 5px;
+}
+
+#particles_js_container canvas {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.blink {
+    animation: blinker 3s linear infinite;
+}
+
+@keyframes blinker {
+  50% { opacity: 0; }
+}
