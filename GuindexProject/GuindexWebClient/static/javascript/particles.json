@@ -54,7 +54,7 @@
     },
     "move": {
       "enable": true,
-      "speed": 8,
+      "speed": 6,
       "direction": "none",
       "random": false,
       "straight": false,
@@ -75,7 +75,7 @@
         "mode": "repulse"
       },
       "onclick": {
-        "enable": true,
+        "enable": false,
         "mode": "push"
       },
       "resize": true
@@ -105,6 +105,5 @@
         "particles_nb": 2
       }
     }
-  },
-  "retina_detect": true
+  }
 }

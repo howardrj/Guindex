@@ -1,3 +1,5 @@
+var G_API_BASE = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
+
 // Global variables to keep track of user state
 var g_loggedIn            = false;
 var g_accessToken         = null;
@@ -13,7 +15,6 @@ var g_contributorsList        = [];
 var g_detailedContributorInfo = {};
 
 // Global DataTable objects
-var g_guindexStatsTable       = null;
 var g_userContributionsTable  = null;
 var g_userSettingsTable       = null;
 var g_pendingPriceCreateTable = null;

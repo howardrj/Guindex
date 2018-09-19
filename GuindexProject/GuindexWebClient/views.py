@@ -32,9 +32,12 @@ def guindexWebClientWithTemplate(request, template):
         template = template[:-1]
 
     try:
-        render(request, template + '.html', {})
+        rendered_template = render(request, template + '.html', {})
     except:
         return HttpResponseNotFound('<h1> Page not found </h1>')
+
+    if template == 'guindex_map':
+        return rendered_template
 
     context_dict = {
         'google_maps_api_key' : settings.GOOGLE_MAPS_API_KEY,

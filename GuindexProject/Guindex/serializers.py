@@ -30,7 +30,9 @@ class GuinnessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guinness
         fields = '__all__'
-        read_only_fields = ('id', 'creator', 'creationDate')
+
+        # This is a nested resource so pub ID is taken from url
+        read_only_fields = ('id', 'creator', 'creationDate', 'pub')
 
     def validate(self, data):
         """
@@ -42,6 +44,18 @@ class GuinnessSerializer(serializers.ModelSerializer):
             raise ValidationError("Got unknown fields: {}".format(unknown_keys))
 
         return data
+
+    def save(self, **kwargs):
+
+        # Add user to validated data
+        self.validated_data['creator'] = self.context['request'].user
+
+        # Add pub to validated data
+        # TODO This needs to be more robust in case format of url changes
+        pub_id = self.context['request'].path.split('/')[3]
+        self.validated_data['pub'] = Pub.objects.get(id = int(pub_id))
+
+        super(GuinnessSerializer, self).save(**kwargs)
 
 
 #####################################
@@ -133,7 +147,8 @@ class PubSerializer(serializers.ModelSerializer):
         if unknown_keys:
             raise ValidationError("Got unknown fields: {}".format(unknown_keys))
 
-        if self.instance.pk:  # If Pub already exists i.e. patch
+        if self.instance and self.instance.pk:  # If Pub already exists i.e. patch
+
             # Check there are no pending contributions for this Pub
             if len(PubPendingPatch.objects.filter(clonedFrom = self.instance)):
                 raise ValidationError('There are already pending patches for this Pub.')
@@ -164,9 +179,9 @@ class PubSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
 
-        user = kwargs['user']
+        user = self.context['request'].user
 
-        if self.instance.pk and not user.is_staff:
+        if self.instance and self.instance.pk and not user.is_staff:
 
             logger.debug("Contributor is not a staff member. Creating PubPendingPatch object")
 
@@ -187,6 +202,10 @@ class PubSerializer(serializers.ModelSerializer):
             pub_pending_patch.save()
 
         else:  # If Pub does not already exist i.e. create
+
+            # Add user to validated data
+            self.validated_data['creator'] = user
+
             super(PubSerializer, self).save(**kwargs)
 
     def _validateLatLongCountyCombo(self, county, latitude, longitude):
@@ -227,7 +246,7 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id', 'creator', 'creationDate', 'name', 'county',
                             'longitude', 'latitude', 'mapLink', 'closed',
-                            'servingGuinness') 
+                            'servingGuinness')
 
     def validate(self, data):
         """
@@ -290,7 +309,7 @@ class PubPendingPatchSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id', 'creator', 'creationDate', 'name', 'county',
                             'longitude', 'latitude', 'mapLink', 'closed',
-                            'servingGuinness', 'clonedFrom') 
+                            'servingGuinness', 'clonedFrom')
 
     def validate(self, data):
         """
@@ -376,7 +395,7 @@ class ContributorSerializer(serializers.ModelSerializer):
                                                  source = 'telegramuser.activated')
 
     telegramActivationKey = serializers.CharField(help_text = 'Telegram activation key for this contributor.',
-                                                    source = 'telegramuser.activationKey')
+                                                  source = 'telegramuser.activationKey')
 
     class Meta:
         model = User

@@ -31,14 +31,6 @@
     padding:0;
 }
 
-#guindex_map_container {
-    padding: auto 0;
-    margin: 0;
-    text-align: center;
-    height: 100vh;
-    position: relative;
-}
-
 #add_pub_map_container {
     padding: auto 0;
     margin:0 auto;
@@ -47,28 +39,16 @@
     position:relative;
 }
 
-#guindex_map {
-    position: absolute;
-    width: 100%;
-    height: 94%;
-}
-
 #add_pub_map {
     position: absolute;
     width: 100%;
     height: 90%;
 }
 
-#floating_panel {
+#guindex_map_iframe {
     position: relative;
-    margin:0 auto;
-    text-align:center;
-    top: 10px;
-}
-
-#ShowButton:hover, #HideButton:hover {
-    cursor:hand;
-    cursor:pointer;
+    width: 100%;
+    height: 100vh;
 }
 
 /*******************/

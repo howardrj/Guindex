@@ -29,6 +29,8 @@ function statusChangeCallback(response) {
 
             // Carry on as normal ...
         }
+        
+        clearLoader();
     }
     else if (response.status === 'connected')
     {
@@ -57,6 +59,13 @@ function statusChangeCallback(response) {
                 loginToGuindexViaFacebook();
             }
         );
+
+        clearLoader();
+    }
+
+    function clearLoader ()
+    {
+        $('#particles_js_container').delay(1000).fadeOut('slow');
     }
 }
 
@@ -299,11 +308,6 @@ function onLoginWithPasswordSuccess ()
         g_guindexDataTable.column(6).visible(true);
     }
 
-    // Call these in a loop
-    setInterval(getContributorInfo, G_GUI_REFRESH_INTERVAL);
-    setInterval(getDetailedContributorInfo, G_GUI_REFRESH_INTERVAL);
-    setInterval(getPendingContributionsInfo, G_GUI_REFRESH_INTERVAL);
-
     // Set login status link to display username
     var login_link = document.getElementById('login_link');
     login_link.innerHTML = g_username;
@@ -340,11 +344,6 @@ function onLoginWithFacebookSuccess ()
         g_guindexDataTable.column(5).visible(true);
         g_guindexDataTable.column(6).visible(true);
     }
-
-    // Call these in a loop
-    setInterval(getContributorInfo, G_GUI_REFRESH_INTERVAL);
-    setInterval(getDetailedContributorInfo, G_GUI_REFRESH_INTERVAL);
-    setInterval(getPendingContributionsInfo, G_GUI_REFRESH_INTERVAL);
 
     // Set login status link to display username
     var login_link = document.getElementById('login_link');

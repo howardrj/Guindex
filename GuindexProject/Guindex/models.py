@@ -228,12 +228,12 @@ class StatisticsSingleton(models.Model):
                                             default = Decimal('0.0'))
 
     percentageVisited = models.DecimalField(help_text = 'Percentage of pubs in database visited by one or more users',
-                                           decimal_places = 2,
-                                           max_digits = 5,
-                                           default = Decimal('0.0'))
+                                            decimal_places = 2,
+                                            max_digits = 5,
+                                            default = Decimal('0.0'))
 
     closedPubs = models.IntegerField(help_text = 'Number of pubs marked as closed',
-                                    default = 0)
+                                     default = 0)
 
     notServingGuinness = models.IntegerField(help_text = 'Number of pubs marked as not serving Guinness',
                                              default = 0)
@@ -245,7 +245,6 @@ class StatisticsSingleton(models.Model):
                                    default = 0)
 
     def __unicode__(self):
-
         return "'StatisticsSingleton'"
 
     def save(self, *args, **kwargs):

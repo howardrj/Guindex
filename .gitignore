@@ -2,7 +2,7 @@
 *.sqlite3
 *.swp
 *pb2.py
-secrets.py
+secrets.py*
 *.db
 aclocal.m4
 autom4te.cache
@@ -24,3 +24,4 @@ build_guindex_rpm.sh
 rpmbuild/RPMS/
 rpmbuild/SRPMS/
 guindex_*.min.js
+guindex_map.html

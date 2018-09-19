@@ -1,13 +1,16 @@
-function populateGuindexStatsTable = function ()
+var g_stats = null;
+var g_guindexStatsTable = null;
+
+function populateGuindexStatsTable ()
 {
     function getStats ()
     {
-        g_stats = {};
+        g_stats = null;
 
         // Function to get detailed info about this user using REST API
         var request = new XMLHttpRequest();
 
-        request.open('GET', 'statistics/', true);
+        request.open('GET', G_API_BASE + 'statistics/', true);
 
         request.setRequestHeader('Content-Type', 'application/json');
         request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -21,6 +24,13 @@ function populateGuindexStatsTable = function ()
                 g_stats = JSON.parse(request.responseText)[0];
             }
         }
+    }
+
+    if (g_stats == null)
+    {
+        getStats();
+        setTimeout(populateGuindexStatsTable, 1000);
+        return;
     }
 
     var table_data = [];

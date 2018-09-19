@@ -30,22 +30,10 @@ class Command(BaseCommand):
             # Be careful if you shuffle them around
 
             try:
-                logger.info("Gathering pub price list")
-                self.gatherPubPrices()
-            except:
-                logger.error("Failed to gather pub prices")
-
-            try:
                 logger.info("Calculating number of pubs")
                 self.calculateNumberOfPubs()
             except:
                 logger.error("Failed to calculate number of pubs")
-
-            try:
-                logger.info("Calculating pubs with prices")
-                self.calculatePubsWithPrices()
-            except:
-                logger.error("Failed to calculate pubs with prices")
 
             try:
                 logger.info("Calculating average price")
@@ -99,39 +87,6 @@ class Command(BaseCommand):
 
             time.sleep(GuindexParameters.STATS_CALCULATION_PERIOD)
 
-    def gatherPubPrices(self):
-        """
-            Fill up prices list for each pub in database
-            Also calculates average star rating for each pub.
-        """
-
-        for pub in Pub.objects.all():
-
-            cumulative_star_rating  = Decimal('0.00')
-            prices_with_star_rating = 0
-
-            pub.prices.clear()
-
-            last_price = True
-
-            for guin in Guinness.objects.filter(pub = pub).order_by('-id'):
-
-                pub.prices.add(guin)
-
-                if last_price:
-                    pub.lastPrice          = guin.price
-                    pub.lastSubmissionTime = guin.creationDate
-
-                    last_price = False
-
-                if guin.starRating:
-
-                    prices_with_star_rating += 1
-                    cumulative_star_rating  += guin.starRating
-
-            pub.averageRating = (cumulative_star_rating / prices_with_star_rating) if prices_with_star_rating else None
-
-            pub.save()
 
     def calculateNumberOfPubs(self):
         """
@@ -139,19 +94,6 @@ class Command(BaseCommand):
         """
 
         self.stats.pubsInDb = len(Pub.objects.all())
-
-    def calculatePubsWithPrices(self):
-        """
-            Store approved, open pubs that are serving Guinness
-            and have at least one verified price
-        """
-
-        self.stats.pubsWithPrices.clear()
-
-        for pub in Pub.objects.all():
-
-            if pub.getLastVerifiedGuinness() and pub.servingGuinness:
-                self.stats.pubsWithPrices.add(pub)
 
     def calculateAveragePrice(self):
         """

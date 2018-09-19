@@ -102,7 +102,7 @@ WSGI_APPLICATION = 'GuindexProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/usr/share/Guindex.db',
+        'NAME': '/var/www/Testing/Guindex/Guindex.db',
     }
 }
 
@@ -230,6 +230,14 @@ LOGGING = {
             'backupCount': 10,
             'formatter': 'verbose'
         },
+        'GuindexMapLogFile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, "/var/log/GuindexMap.log"),
+            'maxBytes': 1024 * 1024 * 10,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'TelegramUser': {
@@ -267,6 +275,11 @@ LOGGING = {
             'propogate': True,
             'level': 'DEBUG',
         },
+        'GuindexMap': {
+            'handlers': ['GuindexMapLogFile'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
     }
 }
 
@@ -280,6 +293,7 @@ REST_FRAMEWORK = {
         'rest_framework_datatables.filters.DatatablesFilterBackend',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework_datatables.pagination.DatatablesPageNumberPagination',
+    'PAGE_SIZE': 100,
     'DEFAULT_THROTTLE_CLASSES': (
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle'
