@@ -172,3 +172,10 @@ input:checked + .slider:before {
 @keyframes blinker {
   50% { opacity: 0; }
 }
+
+/*******/
+/* btn */
+/*******/
+.btn-primary {
+    background-color: black !important;
+}

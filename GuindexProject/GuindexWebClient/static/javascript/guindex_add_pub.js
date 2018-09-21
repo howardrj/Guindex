@@ -1,6 +1,12 @@
+// Global objects
 var g_addPubMap          = null;
 var g_addPubMapContainer = document.getElementById('add_pub_map');
 var g_pubLocationMarker  = null;
+
+// Global constants
+var G_MAP_ICON_BASE = location.protocol + '//' + location.hostname + ':' + location.port + '/static/images/';
+var G_ZOOM          = 17;
+var G_DUBLIN_CENTER = {lat: 53.345280, lng: -6.272161};
 
 $('#add_pub_submit_button').on('click', function () {
 
@@ -55,13 +61,6 @@ $('#add_pub_submit_button').on('click', function () {
 
                 // Clear form
                 document.getElementById('add_pub_name').value = "";
-    
-                // Reload relevant tables
-                getPubInfo();
-                initMap();
-                getStats();
-                getContributorInfo();
-                getPendingContributionsInfo();
             }
             else
             {
@@ -90,6 +89,25 @@ $('#add_pub_submit_button').on('click', function () {
         }   
     }
 });
+
+function initAddPubMap ()
+{
+    navigator.geolocation.getCurrentPosition(onSuccess, onError);
+
+    function onSuccess (position)
+    {
+        // Set map center to user's location
+        var map_center = {lat: position.coords.latitude, lng: position.coords.longitude};
+        createAddPubMap(map_center);
+    }
+
+    function onError (error)
+    {
+        // Set map center to center of Dublin
+        var map_center = G_DUBLIN_CENTER;
+        createAddPubMap(map_center);
+    }
+}
 
 function createAddPubMap (mapCenter) 
 {

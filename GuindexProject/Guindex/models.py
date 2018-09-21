@@ -63,6 +63,14 @@ class Pub(PubBase):
         Table that stores list of all approved pubs
     """
 
+    lastPrice = models.DecimalField(decimal_places = GuindexParameters.GUINNESS_PRICE_DECIMAL_PLACES,
+                                    max_digits = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
+                                    null = True,
+                                    default = None)
+
+    lastSubmissionTime = models.DateTimeField(null = True,
+                                              default = None)
+
     averageRating = models.DecimalField(help_text = 'Average star rating of pints submitted for this pub',
                                         decimal_places = GuindexParameters.STAR_RATING_DECIMAL_PLACES,
                                         max_digits = 3,
@@ -185,6 +193,10 @@ class Guinness(GuinnessBase):
                 logger.debug("Creator is not a staff member. Creating GuinnessPendingCreate object instead")
                 self.createPendingCreate()
                 return
+
+            self.pub.lastPrice = self.price
+            self.pub.lastSubmissionTime = self.creationDate
+            self.pub.save()
 
         super(Guinness, self).save(*args, **kwargs)
 

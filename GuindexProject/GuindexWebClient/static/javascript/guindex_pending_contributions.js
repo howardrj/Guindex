@@ -516,14 +516,6 @@ $(document).on('click', '.pending_contribution_button', function () {
                 displayMessage("Info", "Successfully rejected pending contribution.");
                 buttons[0].parentNode.innerHTML = "Rejected";
             }
-
-            // Reload tables
-            getPubInfo();
-            initMap();
-            getStats();
-            getContributorInfo();
-            getDetailedContributorInfo();
-            getPendingContributionsInfo();
         }
         else
         {

@@ -14,6 +14,15 @@ from Guindex.GuindexParameters import GuindexParameters
 
 logger = logging.getLogger(__name__.split('.')[-1])
 
+class GuindexGoogleMapPlotter(gmplot.GoogleMapPlotter):
+
+    def setMarkerPath(self):
+        """
+            Hack so generated map will request marker
+            images via static url.
+        """
+        self.coloricon = '/static/images/%s.png'
+
 
 class Command(BaseCommand):
 
@@ -25,17 +34,18 @@ class Command(BaseCommand):
         file_dir  = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../GuindexWebClient/templates/')
         file_name = 'guindex_map.html' 
 
+        gmap = GuindexGoogleMapPlotter(GuindexParameters.DUBLIN_CENTER_LATITUDE,
+                                       GuindexParameters.DUBLIN_CENTER_LONGITUDE,
+                                       GuindexParameters.MAP_ZOOM_LEVEL,
+                                       settings.GOOGLE_MAPS_API_KEY)
+
+        gmap.setMarkerPath()
+
         while True:
 
             logger.info("***** Generating Guindex Map Template *****")
 
             logger.info("Sleeping for %s seconds", GuindexParameters.MAP_GENERATION_PERIOD)
-
-            gmap = gmplot.GoogleMapPlotter(GuindexParameters.DUBLIN_CENTER_LATITUDE,
-                                           GuindexParameters.DUBLIN_CENTER_LONGITUDE,
-                                           GuindexParameters.MAP_ZOOM_LEVEL,
-                                           settings.GOOGLE_MAPS_API_KEY,
-                                           True) # Utilise hack I added to gmplot
 
             for pub in Pub.objects.all():
 

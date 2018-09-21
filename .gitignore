@@ -25,3 +25,4 @@ rpmbuild/RPMS/
 rpmbuild/SRPMS/
 guindex_*.min.js
 guindex_map.html
+*.bk

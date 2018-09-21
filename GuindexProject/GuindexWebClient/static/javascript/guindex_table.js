@@ -72,6 +72,7 @@ function populateGuindexDataTable()
             orderable: false,
             searchable: false,
             className: "text-center",
+            visible: "false",
             render: function (data, type, row) {
 
                 var input_field = '<input class="price_input" type="number" step="0.01" min="0" max="10"/> <br>';
@@ -102,6 +103,7 @@ function populateGuindexDataTable()
             orderable: false,
             searchable: false,
             className: "text-center",
+            visible: "false",
             render: function (data, type, row) {
 
                 var edit_pub_button = '<i class="fa fa-edit edit_pub_button hoverable" title="Edit pub (only available when logged in)" data-pub_id="' + row['id'] + 
@@ -157,10 +159,17 @@ function populateGuindexDataTable()
                              "columns": data_columns,
                          });
 
-    if (!g_loggedIn)
+    if (!g_guindexDataTable.onLogin)
     {
-        g_guindexDataTable.column(5).visible(false);
-        g_guindexDataTable.column(6).visible(false);
+        g_guindexDataTable.onLogin = function () {
+            g_guindexDataTable.column(5).visible(true);
+            g_guindexDataTable.column(6).visible(true);
+        }
+    }
+
+    if (g_loggedIn && g_guindexDataTable.onLogin)
+    {
+        g_guindexDataTable.onLogin();
     }
 }
 
@@ -179,7 +188,7 @@ $(document).on('click', '.submit_price_button', function () {
 
         // POST price to the guindex
         var request = new XMLHttpRequest();
-        request.open('POST', G_API_BASE + 'guinness/', true); 
+        request.open('POST', G_API_BASE + 'pubs/' + pub_id + '/prices/', true); 
 
         request.setRequestHeader('Content-Type', 'application/json');
         request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -199,7 +208,6 @@ $(document).on('click', '.submit_price_button', function () {
         }
 
         request.send(JSON.stringify({
-            'pub': pub_id,
             'price': price,
             'starRating': star_rating,
         }));

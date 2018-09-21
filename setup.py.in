@@ -35,5 +35,7 @@ setup(name='Guindex',
         'simplejson',
         'python-memcached',
         'djangorestframework-datatables',
+        'gmplot',
+        'drf-nested-routers',
       ],
     )

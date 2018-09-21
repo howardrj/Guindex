@@ -302,10 +302,9 @@ function onLoginWithPasswordSuccess ()
     getDetailedContributorInfo();
     getPendingContributionsInfo();
 
-    if (g_guindexDataTable)
+    if (g_guindexDataTable && g_guindexDataTable.onLogin)
     {
-        g_guindexDataTable.column(5).visible(true);
-        g_guindexDataTable.column(6).visible(true);
+        g_guindexDataTable.onLogin();
     }
 
     // Set login status link to display username
@@ -339,10 +338,9 @@ function onLoginWithFacebookSuccess ()
     getDetailedContributorInfo();
     getPendingContributionsInfo();
 
-    if (g_guindexDataTable)
+    if (g_guindexDataTable && g_guindexDataTable.onLogin)
     {
-        g_guindexDataTable.column(5).visible(true);
-        g_guindexDataTable.column(6).visible(true);
+        g_guindexDataTable.onLogin();
     }
 
     // Set login status link to display username

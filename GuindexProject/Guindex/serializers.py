@@ -134,7 +134,8 @@ class PubSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pub
         fields = '__all__'
-        read_only_fields = ('id', 'creator', 'creationDate', 'mapLink', 'averageRating')
+        read_only_fields = ('id', 'creator', 'creationDate', 'mapLink', 'averageRating', 
+                            'lastPrice', 'lastSubmissionTime')
 
     def validate(self, data):
         """
