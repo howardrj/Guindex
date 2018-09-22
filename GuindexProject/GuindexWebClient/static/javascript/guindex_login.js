@@ -99,9 +99,10 @@ var loginToGuindexViaFacebook = function ()
                 // We have successfully logged in
                 // Get token from response JSON object
 
-                g_loggedIn    = true;
-                g_accessToken = response['key'];
-                g_userId      = response['user'];
+                g_loggedIn      = true;
+                g_accessToken   = response['key'];
+                g_userId        = response['user'];
+                g_isStaffMember = response['isStaff'];
 
                 onLoginWithFacebookSuccess();
             }    
@@ -298,7 +299,6 @@ function onLoginWithPasswordSuccess ()
 {
     g_facebookAccessToken = null;
 
-    populatePendingContributionTables();
     populateUserSettingsTable();
     populateUserContributionsTable();
 
@@ -334,7 +334,6 @@ function onLoginWithFacebookSuccess ()
     localStorage.removeItem('guindexAccessToken');
     localStorage.removeItem('guindexUserId');
 
-    populatePendingContributionTables();
     populateUserSettingsTable();
     populateUserContributionsTable();
 
