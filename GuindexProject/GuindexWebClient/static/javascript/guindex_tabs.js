@@ -81,7 +81,7 @@
     // Call it once at startup
     onUrlChange();
 
-    // Callback invoked each timr we step through history
+    // Callback invoked each time we step through history
     window.onpopstate = function(evt) {
 
         var page_content_id = evt.state; // First parameter to history.pushState

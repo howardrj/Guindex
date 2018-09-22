@@ -298,9 +298,9 @@ function onLoginWithPasswordSuccess ()
 {
     g_facebookAccessToken = null;
 
-    getContributorInfo();
-    getDetailedContributorInfo();
-    getPendingContributionsInfo();
+    populatePendingContributionTables();
+    populateUserSettingsTable();
+    populateUserContributionsTable();
 
     if (g_guindexDataTable && g_guindexDataTable.onLogin)
     {
@@ -334,9 +334,9 @@ function onLoginWithFacebookSuccess ()
     localStorage.removeItem('guindexAccessToken');
     localStorage.removeItem('guindexUserId');
 
-    getContributorInfo();
-    getDetailedContributorInfo();
-    getPendingContributionsInfo();
+    populatePendingContributionTables();
+    populateUserSettingsTable();
+    populateUserContributionsTable();
 
     if (g_guindexDataTable && g_guindexDataTable.onLogin)
     {

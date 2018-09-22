@@ -1,30 +1,39 @@
 var g_stats = null;
 var g_guindexStatsTable = null;
+var g_retrievingStats = false;
 
 function populateGuindexStatsTable ()
 {
     function getStats ()
     {
+        if (g_retrievingStats)
+            return;
+
         g_stats = null;
 
         // Function to get detailed info about this user using REST API
         var request = new XMLHttpRequest();
 
-        request.open('GET', G_API_BASE + 'statistics/', true);
+        request.open('GET', G_API_BASE + 'statistics/1/', true);
 
         request.setRequestHeader('Content-Type', 'application/json');
         request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
         request.send(null);
 
+        g_retrievingStats = true;
+
         request.onreadystatechange = function processRequest()
         {
             if (request.readyState == 4 && request.status == 200)
             {
-                g_stats = JSON.parse(request.responseText)[0];
+                g_stats = JSON.parse(request.responseText);
+                g_retrievingStats = false;
             }
         }
     }
+
+    getStats();
 
     if (g_stats == null)
     {
@@ -56,11 +65,13 @@ function populateGuindexStatsTable ()
         ]
 
         g_guindexStatsTable = $('#GuindexStatisticsTable').DataTable({
-                                    responsive: true,
-                                    data: table_data,
-                                    columns: data_columns,
-                                    paging: false,
-                                });
+                                  responsive: true,
+                                  data: table_data,
+                                  columns: data_columns,
+                                  "paging": false,
+                                  "ordering": false,
+                                  "searching": false,
+                              });
     }
     else
     {

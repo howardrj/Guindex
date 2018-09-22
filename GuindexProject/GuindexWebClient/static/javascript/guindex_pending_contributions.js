@@ -1,3 +1,7 @@
+function populatePendingContributionTables ()
+{
+}
+
 var getPendingContributionsInfo = function ()
 {
     if (g_isStaffMember == null) // Has not been set yet

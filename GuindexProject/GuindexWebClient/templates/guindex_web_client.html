@@ -46,7 +46,7 @@
 
   <script>
     particlesJS.load('particles_js_container', '/static/javascript/particles.json', function() {
-    console.log('callback - particles.js config loaded');
+        return;
     });
   </script>
 
@@ -527,9 +527,9 @@
   {% if not debug %}
     <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_login.min.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_contributors.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_pending_contributions.min.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_detailed_contributor_info.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_user_settings.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_user_contributions.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_table.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_add_pub.min.js" %}"></script>
@@ -539,9 +539,9 @@
   {% else %}
     <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_login.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_contributors.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_pending_contributions.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_detailed_contributor_info.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_user_settings.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_user_contributions.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>

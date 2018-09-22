@@ -1,10 +1,6 @@
 import logging
-from twisted.internet import reactor
 
 from django.core.management.base import BaseCommand
-
-from Guindex.GuindexParameters import GuindexParameters
-from Guindex.GuindexAlertsServer import GuindexAlertsServerFactory
 
 logger = logging.getLogger(__name__.split('.')[-1])
 

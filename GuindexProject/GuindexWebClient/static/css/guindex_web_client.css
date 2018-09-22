@@ -173,9 +173,20 @@ input:checked + .slider:before {
   50% { opacity: 0; }
 }
 
-/*******/
-/* btn */
-/*******/
+/***********************/
+/* Bootstrap overrides */
+/***********************/
 .btn-primary {
+    background-color: black !important;
+}
+
+a.page-link {
+    color: black !important;
+    text-decoration: none;
+}
+
+.paginate_button.active a.page-link {
+    color: white !important;
+    text-decoration: none;
     background-color: black !important;
 }

@@ -10,12 +10,8 @@ var g_email               = null;
 var g_facebookAccessToken = null;
 
 // Global object lists
-var g_pubsList                = [];
-var g_contributorsList        = [];
-var g_detailedContributorInfo = {};
 
 // Global DataTable objects
-var g_userContributionsTable  = null;
 var g_userSettingsTable       = null;
 var g_pendingPriceCreateTable = null;
 var g_pendingPubCreateTable   = null;

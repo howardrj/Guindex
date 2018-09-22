@@ -2,7 +2,7 @@ var g_guindexDataTable = null;
 
 function populateGuindexDataTable()
 {
-    // No need to redraw table
+    // No need to redraw table since it's already dynamic
     if (g_guindexDataTable)
         return;
 
@@ -39,11 +39,11 @@ function populateGuindexDataTable()
                 {
                     if (i < star_rating)
                     {
-                        html_string += '<i class="fa fa-star" aria-hidden="true"></i>';
+                        html_string += '<i class="fa fa-star" aria-hidden="true" stle="color:black"></i>';
                     }
                     else
                     {
-                        html_string += '<i class="fa fa-star" aria-hidden="true" style="color:white"></i>';
+                        html_string += '<i class="fa fa-star" aria-hidden="true" style="color:lightgrey"></i>';
                     }
                 } 
                 return html_string;
@@ -87,7 +87,7 @@ function populateGuindexDataTable()
                     }
                     else
                     {
-                        stars += '<i class="fa fa-star guindex_price_star" data-guindex_price_star_id="' + i + '" aria-hidden="true" style="color:white"></i>';
+                        stars += '<i class="fa fa-star guindex_price_star" data-guindex_price_star_id="' + i + '" aria-hidden="true" style="color:lightgrey"></i>';
                     }
                 }
 
@@ -386,7 +386,7 @@ $(document).on('click', '.guindex_price_star', function () {
         }
         else
         {
-            stars[i].style.color = "white";
+            stars[i].style.color = "lightgrey";
         }
     }
 });
