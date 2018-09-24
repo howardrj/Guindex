@@ -14,6 +14,7 @@ from Guindex.GuindexParameters import GuindexParameters
 
 logger = logging.getLogger(__name__.split('.')[-1])
 
+
 class GuindexGoogleMapPlotter(gmplot.GoogleMapPlotter):
 
     def setMarkerPath(self):
@@ -24,7 +25,10 @@ class GuindexGoogleMapPlotter(gmplot.GoogleMapPlotter):
         self.coloricon = '/static/images/%s.png'
 
     def write_point(self, f, lat, lon, color, title):
-    
+        """
+            Overrride write_point function so we can include
+            click event listener when adding markers to the map.
+        """
         f.write('\t\tvar latlng = new google.maps.LatLng(%f, %f);\n' %
                 (lat, lon))
         f.write('\t\tvar img = new google.maps.MarkerImage(\'%s\');\n' %
@@ -38,7 +42,20 @@ class GuindexGoogleMapPlotter(gmplot.GoogleMapPlotter):
         f.write('\t\tmarker.setMap(map);\n')
         f.write('\n')
 
-        # TODO Add click event listener here
+        # Add click event listener to marker
+        f.write('\t\tvar content = "<p> %s <p>";\n\n' % title)
+
+        f.write('\t\tvar info_window = new google.maps.InfoWindow({\n')
+        f.write('\t\t\tdisableAutoPan: true,\n')
+        f.write('\t\t\tmaxWidth: 200\n')
+        f.write('\t\t});\n\n')
+
+        f.write("\t\tgoogle.maps.event.addListener(marker, 'click', (function (marker, content, info_window) {\n")
+        f.write("\t\t\treturn function() {\n")
+        f.write("\t\t\t\tinfo_window.setContent(content);\n")
+        f.write("\t\t\t\tinfo_window.open(map, marker);\n")
+        f.write("\t\t\t};\n")
+        f.write("\t\t}) (marker, content, info_window));\n\n")
 
     def write_map(self,  f):
         """
@@ -57,6 +74,7 @@ class GuindexGoogleMapPlotter(gmplot.GoogleMapPlotter):
             '\t\tvar map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);\n')
         f.write('\n')
 
+
 class Command(BaseCommand):
 
     def add_arguments(self, parser):
@@ -65,7 +83,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         file_dir  = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../GuindexWebClient/templates/')
-        file_name = 'guindex_map.html' 
+        file_name = 'guindex_map.html'
 
         gmap = GuindexGoogleMapPlotter(GuindexParameters.DUBLIN_CENTER_LATITUDE,
                                        GuindexParameters.DUBLIN_CENTER_LONGITUDE,
@@ -94,8 +112,8 @@ class Command(BaseCommand):
                     marker_title = '%s - €%.2f' % (pub.name.encode('utf-8'), price)
                 else:
                     colour = 'darkgray'
-                    marker_title = '%s - Not Yet Visited' % pub.name.encode('utf-8') 
-                 
+                    marker_title = '%s - Not Yet Visited' % pub.name.encode('utf-8')
+
                 gmap.marker(pub.latitude, pub.longitude, colour, title = marker_title)
 
             gmap.draw(file_dir + file_name)
