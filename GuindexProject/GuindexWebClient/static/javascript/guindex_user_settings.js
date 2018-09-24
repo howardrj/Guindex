@@ -5,10 +5,10 @@ var g_retrievingUserSettings = false;
 // Can only be called if user is logged in
 function populateUserSettingsTable ()
 {
-    function getUserSettings ()
+    function getUserSettings (callback)
     {
         if (g_retrievingUserSettings)
-            return;
+           return;
         
         g_userSettings = null;
 
@@ -31,16 +31,16 @@ function populateUserSettingsTable ()
             {
                 g_userSettings = JSON.parse(request.responseText);
                 g_retrievingUserSettings = false;
+
+                if (callback)
+                    callback();
             }
         }
     }
 
-    getUserSettings();
-
     if (g_userSettings == null)
     {
-        getUserSettings();
-        setTimeout(populateUserSettingsTable, 1000);
+        getUserSettings(populateUserSettingsTable);
         return;
     }
 

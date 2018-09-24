@@ -5,7 +5,7 @@ var g_retrievingUserContributions = false;
 // Can only be called if user is logged in
 function populateUserContributionsTable ()
 {
-    function getUserContributions ()
+    function getUserContributions (callback)
     {
         if (g_retrievingUserContributions)
             return;
@@ -31,16 +31,16 @@ function populateUserContributionsTable ()
             {
                 g_userContributions = JSON.parse(request.responseText);
                 g_retrievingUserContributions = false;
+
+                if (callback)
+                    callback();
             }
         }
     }
 
-    getUserContributions();
-
     if (g_userContributions == null)
     {
-        getUserContributions();
-        setTimeout(populateUserContributionsTable, 1000);
+        getUserContributions(populateUserContributionsTable);
         return;
     }
 

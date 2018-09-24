@@ -4,7 +4,7 @@ var g_retrievingStats = false;
 
 function populateGuindexStatsTable ()
 {
-    function getStats ()
+    function getStats (callback)
     {
         if (g_retrievingStats)
             return;
@@ -29,16 +29,16 @@ function populateGuindexStatsTable ()
             {
                 g_stats = JSON.parse(request.responseText);
                 g_retrievingStats = false;
+
+                if (callback)
+                    callback();
             }
         }
     }
 
-    getStats();
-
     if (g_stats == null)
     {
-        getStats();
-        setTimeout(populateGuindexStatsTable, 1000);
+        getStats(populateGuindexStatsTable);
         return;
     }
 
