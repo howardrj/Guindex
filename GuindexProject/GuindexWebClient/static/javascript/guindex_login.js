@@ -29,6 +29,8 @@ function statusChangeCallback(response) {
 
             // Carry on as normal ...
         }
+        
+        clearLoader();
     }
     else if (response.status === 'connected')
     {
@@ -57,6 +59,13 @@ function statusChangeCallback(response) {
                 loginToGuindexViaFacebook();
             }
         );
+
+        clearLoader();
+    }
+
+    function clearLoader ()
+    {
+        $('#particles_js_container').delay(1000).fadeOut('slow');
     }
 }
 
@@ -90,9 +99,10 @@ var loginToGuindexViaFacebook = function ()
                 // We have successfully logged in
                 // Get token from response JSON object
 
-                g_loggedIn    = true;
-                g_accessToken = response['key'];
-                g_userId      = response['user'];
+                g_loggedIn      = true;
+                g_accessToken   = response['key'];
+                g_userId        = response['user'];
+                g_isStaffMember = response['isStaff'];
 
                 onLoginWithFacebookSuccess();
             }    
@@ -289,20 +299,13 @@ function onLoginWithPasswordSuccess ()
 {
     g_facebookAccessToken = null;
 
-    getContributorInfo();
-    getDetailedContributorInfo();
-    getPendingContributionsInfo();
+    populateUserSettingsTable();
+    populateUserContributionsTable();
 
-    if (g_guindexDataTable)
+    if (g_guindexDataTable && g_guindexDataTable.onLogin)
     {
-        g_guindexDataTable.column(5).visible(true);
-        g_guindexDataTable.column(6).visible(true);
+        g_guindexDataTable.onLogin();
     }
-
-    // Call these in a loop
-    setInterval(getContributorInfo, G_GUI_REFRESH_INTERVAL);
-    setInterval(getDetailedContributorInfo, G_GUI_REFRESH_INTERVAL);
-    setInterval(getPendingContributionsInfo, G_GUI_REFRESH_INTERVAL);
 
     // Set login status link to display username
     var login_link = document.getElementById('login_link');
@@ -331,20 +334,13 @@ function onLoginWithFacebookSuccess ()
     localStorage.removeItem('guindexAccessToken');
     localStorage.removeItem('guindexUserId');
 
-    getContributorInfo();
-    getDetailedContributorInfo();
-    getPendingContributionsInfo();
+    populateUserSettingsTable();
+    populateUserContributionsTable();
 
-    if (g_guindexDataTable)
+    if (g_guindexDataTable && g_guindexDataTable.onLogin)
     {
-        g_guindexDataTable.column(5).visible(true);
-        g_guindexDataTable.column(6).visible(true);
+        g_guindexDataTable.onLogin();
     }
-
-    // Call these in a loop
-    setInterval(getContributorInfo, G_GUI_REFRESH_INTERVAL);
-    setInterval(getDetailedContributorInfo, G_GUI_REFRESH_INTERVAL);
-    setInterval(getPendingContributionsInfo, G_GUI_REFRESH_INTERVAL);
 
     // Set login status link to display username
     var login_link = document.getElementById('login_link');

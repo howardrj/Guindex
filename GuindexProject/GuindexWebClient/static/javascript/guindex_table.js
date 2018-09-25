@@ -1,189 +1,175 @@
-var getPubInfo = function ()
+var g_guindexDataTable = null;
+
+function populateGuindexDataTable()
 {
-    // Clear pubs list
-    g_pubsList = [];
+    // No need to redraw table since it's already dynamic
+    if (g_guindexDataTable)
+        return;
 
-    var request = new XMLHttpRequest();
-    request.open('GET', G_API_BASE + 'pubs/', true); 
-
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-    request.send(null);
-
-    request.onreadystatechange = processRequest;
-
-    function processRequest()
-    {
-        if (request.readyState == 4 && request.status == 200)
+    var data_columns = [
         {
-            g_pubsList = JSON.parse(request.responseText);
-            populateGuindexTable();
+            title: "Name",
+            data: "name",
+            render: function (data, type, row) {
+
+                return '<a target="_blank" href="' + row['mapLink'] + '">' + data + '</a>';
+            }
+        },
+        {
+            title: "County",
+            data: "county",
+        },
+        {
+            title: "Price",
+            data: "lastPrice",
+            defaultContent: "N.A.",
+        },
+        {
+            title: "Average Star Rating",
+            data: "averageRating",
+            render: function (data, type, row) {
+
+                if (!data)
+                    return "N.A.";
+
+                var star_rating = Math.round(parseFloat(data));
+                var html_string = "";
+
+                for (var i = 0; i < 5; i++)
+                {
+                    if (i < star_rating)
+                    {
+                        html_string += '<i class="fa fa-star" aria-hidden="true" stle="color:black"></i>';
+                    }
+                    else
+                    {
+                        html_string += '<i class="fa fa-star" aria-hidden="true" style="color:lightgrey"></i>';
+                    }
+                } 
+                return html_string;
+            },
+            defaultContent: "N.A."
+        },
+        {
+            title: "Last Submitted Date",
+            data: "lastSubmissionTime",
+            render: function (data, type, row) {
+
+                if (!data)
+                    return "N.A.";
+
+                var date_as_list = new Date(data).toString().split(' ');
+
+                var date_pretty_format = date_as_list[0] + ' ' + date_as_list[2] + ' ' + date_as_list[1] + ' ' + date_as_list[3];
+
+                return date_pretty_format;
+            },
+            defaultContent: "N.A.",
+        },
+        {
+            title: "Submit Price (with Star Rating)",
+            data: null,
+            orderable: false,
+            searchable: false,
+            className: "text-center",
+            visible: "false",
+            render: function (data, type, row) {
+
+                var input_field = '<input class="price_input" type="number" step="0.01" min="0" max="10"/> <br>';
+
+                var stars = "";
+
+                for (var i = 0; i < 5; i++)
+                {
+                    if (i < 3)
+                    {
+                        stars += '<i class="fa fa-star guindex_price_star" data-guindex_price_star_id="' + i + '" aria-hidden="true" style="color:black"></i>';
+                    }
+                    else
+                    {
+                        stars += '<i class="fa fa-star guindex_price_star" data-guindex_price_star_id="' + i + '" aria-hidden="true" style="color:lightgrey"></i>';
+                    }
+                }
+
+                var submit_button = '<i class="fa fa-paper-plane submit_price_button" title="Submit Price (only available when logged in)" data-pub_id="' + row['id'] + '"></i>';
+                var loader        = '<i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>';
+
+                return input_field + stars + submit_button + loader;
+            },
+        },
+        {
+            title: "Edit Pub",
+            data: null,
+            orderable: false,
+            searchable: false,
+            className: "text-center",
+            visible: "false",
+            render: function (data, type, row) {
+
+                var edit_pub_button = '<i class="fa fa-edit edit_pub_button hoverable" title="Edit pub (only available when logged in)" data-pub_id="' + row['id'] + 
+                                      '" data-name="'            +  row['name'] +
+                                      '" data-latitude="'        +  row['latitude'] +
+                                      '" data-longitude="'       +  row['longitude'] +
+                                      '" data-county="'          +  row['county'] +
+                                      '" data-closed="'          + (row['closed'] ? '1' : '0') +
+                                      '" data-servingGuinness="' + (row['servingGuinness'] ? '1' : '0') +
+                                      '"></i>';
+                
+                return edit_pub_button
+            },
+        },
+        {
+            title: "ID",
+            data: "id",
+            visible: false,
+        },
+        {
+            title: "Latitude",
+            data: "latitude",
+            visible: false,
+        },
+        {
+            title: "Longitude",
+            data: "longitude",
+            visible: false,
+        },
+        {
+            title: "Map Link",
+            data: "mapLink",
+            visible: false,
+        },
+        {
+            title: "Seving Guinness",
+            data: "servingGuinness",
+            visible: false,
+        },
+        {
+            title: "Closed",
+            data: "closed",
+            visible: false,
+        },
+    ]
+
+    g_guindexDataTable = $('#GuindexDataTable').DataTable({
+                             "serverSide": true,
+                             "ajax": "/api/pubs/?format=datatables",
+                             "search": {
+                                 "caseInsensitive": true,
+                             },
+                             "columns": data_columns,
+                         });
+
+    if (!g_guindexDataTable.onLogin)
+    {
+        g_guindexDataTable.onLogin = function () {
+            g_guindexDataTable.column(5).visible(true);
+            g_guindexDataTable.column(6).visible(true);
         }
     }
-} 
 
-var populateGuindexTable = function ()
-{
-    // Check if table is being drawn from scratch or refreshed
-    if (!g_guindexDataTable)
+    if (g_loggedIn && g_guindexDataTable.onLogin)
     {
-        var data_columns = [
-            {
-                title: "Name",
-                data: "name",
-                render: function (data, type, row) {
-
-                    return '<a target="_blank" href="' + row['mapLink'] + '">' + data + '</a>';
-                }
-            },
-            {
-                title: "County",
-                data: "county",
-            },
-            {
-                title: "Price",
-                data: "lastPrice",
-                defaultContent: "N.A.",
-            },
-            {
-                title: "Average Star Rating",
-                data: "averageRating",
-                render: function (data, type, row) {
-
-                    if (!data)
-                        return "N.A.";
-
-                    var star_rating = Math.round(parseFloat(data));
-                    var html_string = "";
-
-                    for (var i = 0; i < 5; i++)
-                    {
-                        if (i < star_rating)
-                        {
-                            html_string += '<i class="fa fa-star" aria-hidden="true"></i>';
-                        }
-                        else
-                        {
-                            html_string += '<i class="fa fa-star" aria-hidden="true" style="color:white"></i>';
-                        }
-                    } 
-                    return html_string;
-                },
-                defaultContent: "N.A."
-            },
-            {
-                title: "Last Submitted Date",
-                data: "lastSubmissionTime",
-                render: function (data, type, row) {
-
-                    if (!data)
-                        return "N.A.";
-
-                    var date_as_list = new Date(data).toString().split(' ');
-
-                    var date_pretty_format = date_as_list[0] + ' ' + date_as_list[2] + ' ' + date_as_list[1] + ' ' + date_as_list[3];
-
-                    return date_pretty_format;
-                },
-                defaultContent: "N.A.",
-            },
-            {
-                title: "Submit Price (with Star Rating)",
-                data: null,
-                orderable: false,
-                searchable: false,
-                className: "text-center",
-                render: function (data, type, row) {
-
-                    var input_field = '<input class="price_input" type="number" step="0.01" min="0" max="10"/> <br>';
-
-                    var stars = "";
-
-                    for (var i = 0; i < 5; i++)
-                    {
-                        if (i < 3)
-                        {
-                            stars += '<i class="fa fa-star guindex_price_star" data-guindex_price_star_id="' + i + '" aria-hidden="true" style="color:black"></i>';
-                        }
-                        else
-                        {
-                            stars += '<i class="fa fa-star guindex_price_star" data-guindex_price_star_id="' + i + '" aria-hidden="true" style="color:white"></i>';
-                        }
-                    }
-
-                    var submit_button = '<i class="fa fa-paper-plane submit_price_button" title="Submit Price (only available when logged in)" data-pub_id="' + row['id'] + '"></i>';
-                    var loader        = '<i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>';
-
-                    return input_field + stars + submit_button + loader;
-                },
-            },
-            {
-                title: "Edit Pub",
-                data: null,
-                orderable: false,
-                searchable: false,
-                className: "text-center",
-                render: function (data, type, row) {
-
-                    var edit_pub_button = '<i class="fa fa-edit edit_pub_button hoverable" title="Edit pub (only available when logged in)" data-pub_id="' + row['id'] + 
-                                          '" data-name="'            +  row['name'] +
-                                          '" data-latitude="'        +  row['latitude'] +
-                                          '" data-longitude="'       +  row['longitude'] +
-                                          '" data-county="'          +  row['county'] +
-                                          '" data-closed="'          + (row['closed'] ? '1' : '0') +
-                                          '" data-servingGuinness="' + (row['servingGuinness'] ? '1' : '0') +
-                                          '"></i>';
-                    
-                    return edit_pub_button
-                },
-            },
-            {
-                title: "ID",
-                data: "id",
-                visible: false,
-            },
-            {
-                title: "Latitude",
-                data: "latitude",
-                visible: false,
-            },
-            {
-                title: "Longitude",
-                data: "longitude",
-                visible: false,
-            },
-            {
-                title: "Map Link",
-                data: "mapLink",
-                visible: false,
-            },
-            {
-                title: "Seving Guinness",
-                data: "servingGuinness",
-                visible: false,
-            },
-            {
-                title: "Closed",
-                data: "closed",
-                visible: false,
-            },
-        ]
-
-        g_guindexDataTable = $('#GuindexDataTable').DataTable({
-                                "serverSide": true,
-                                "ajax": "/api/pubs/?format=datatables",
-                                "search": {
-                                    "caseInsensitive": true,
-                                },
-                                "columns": data_columns,
-                            });
-
-        if (!g_loggedIn)
-        {
-            g_guindexDataTable.column(5).visible(false);
-            g_guindexDataTable.column(6).visible(false);
-        }
+        g_guindexDataTable.onLogin();
     }
 }
 
@@ -202,7 +188,7 @@ $(document).on('click', '.submit_price_button', function () {
 
         // POST price to the guindex
         var request = new XMLHttpRequest();
-        request.open('POST', G_API_BASE + 'guinness/', true); 
+        request.open('POST', G_API_BASE + 'pubs/' + pub_id + '/prices/', true); 
 
         request.setRequestHeader('Content-Type', 'application/json');
         request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -222,7 +208,6 @@ $(document).on('click', '.submit_price_button', function () {
         }
 
         request.send(JSON.stringify({
-            'pub': pub_id,
             'price': price,
             'starRating': star_rating,
         }));
@@ -245,14 +230,10 @@ $(document).on('click', '.submit_price_button', function () {
                     {
                         displayMessage("Info", "Thank you. A member of staff will verify your submission shortly.");
                     }
-                       
-                    // Reload relevant tables
-                    getPubInfo();
-                    initMap();
-                    getStats();
-                    getContributorInfo();
-                    getDetailedContributorInfo();
-                    getPendingContributionsInfo();
+
+                    // Reload table
+                    if (g_guindexDataTable)
+                        g_guindexDataTable.ajax.reload();
                 }
                 else
                 {
@@ -292,14 +273,12 @@ $(document).on('click', '.edit_pub_button', function () {
         // Set form values
         var pub_id = parseInt(this.getAttribute('data-pub_id'));
 
-        var pub = $.grep(g_pubsList, function(obj) { return obj['id'] === pub_id;})[0];
-
-        document.getElementById('edit_pub_name').value               = pub['name'];
-        document.getElementById('edit_pub_latitude').value           = pub['latitude'];
-        document.getElementById('edit_pub_longitude').value          = pub['longitude'];
-        document.getElementById('edit_pub_county').value             = pub['county'];
-        document.getElementById('edit_pub_closed').checked           = pub['closed'];
-        document.getElementById('edit_pub_serving_guinness').checked = pub['servingGuinness'];
+        document.getElementById('edit_pub_name').value               = this.getAttribute('data-name');
+        document.getElementById('edit_pub_latitude').value           = parseFloat(this.getAttribute('data-latitude'));
+        document.getElementById('edit_pub_longitude').value          = parseFloat(this.getAttribute('data-longitude'));
+        document.getElementById('edit_pub_county').value             = this.getAttribute('data-county');
+        document.getElementById('edit_pub_closed').checked           = this.getAttribute('data-closed') == '1';
+        document.getElementById('edit_pub_serving_guinness').checked = this.getAttribute('data-servingGuinness') == '1';
 
         document.getElementById('edit_pub_submit_button').setAttribute('data-pub_id', pub_id);
 
@@ -364,14 +343,10 @@ $('#edit_pub_submit_button').on('click', function () {
                 {
                     displayMessage("Info", "Thank you. A member of staff will verify your submission shortly.");
                 }
-    
-                // Reload relevant tables
-                getPubInfo();
-                initMap();
-                getStats();
-                getContributorInfo();
-                getDetailedContributorInfo();
-                getPendingContributionsInfo();
+            
+                // Reload table
+                if (g_guindexDataTable)
+                    g_guindexDataTable.ajax.reload();
             }
             else
             {
@@ -417,7 +392,7 @@ $(document).on('click', '.guindex_price_star', function () {
         }
         else
         {
-            stars[i].style.color = "white";
+            stars[i].style.color = "lightgrey";
         }
     }
 });

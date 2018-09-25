@@ -43,9 +43,7 @@
                     There are three exceptions: Lucan (west county Dublin), Blackrock (south county Dublin) and Glenageary (south county Dublin).
                 </p>
 
-                <p align="center">
-                    <img class="article_image" style="width:75%" src="{% static "images/PCAAs.png" %}">
-                </p>
+                <img src="{% static "images/PCAAs.png" %}">
 
                 <p>
                     Note in the image above that the Donabate/Portrane area of county Dublin belongs to the Malahide post routing
@@ -54,10 +52,8 @@
                     The result of which looks like this:
                 </p>
 
-                <p align="center">
-                    <img class="article_image" style="width:44.5%; left:0" src="{% static "images/pubpcsdistr.png" %}";>
-                    <img class="article_image" style="width:44.5%; right:0" src="{% static "images/pubdubgeo.png" %}";>
-                </p>
+                <img src="{% static "images/pubpcsdistr.png" %}";>
+                <img src="{% static "images/pubdubgeo.png" %}";>
 
                 <p>
                     As you will have expected the most pubs are in the four city centre postcodes, Dublin 1, 2, 7 and 8.
@@ -80,9 +76,7 @@
                     Let's now look at the data taken from pubs within these postcodes up to this point:
                 </p>
 
-                <p align="center">
-                    <img class="article_image" style="width:75%" src="{% static "images/fracvis.png" %}";>
-                </p>
+                <img src="{% static "images/fracvis.png" %}";>
 
                 <p>
              	    Above we plot the fraction of the pubs visited within each postal area.
@@ -92,10 +86,8 @@
                     This data can be visualised below:
                 </p>
 
-                <p align="center">
-                    <img class="article_image" style="width:44.5%; left:0" src="{% static "images/guinpostprices.png" %}";>
-                    <img class="article_image" style="width:44.5%; right:0" src="{% static "images/avgpcsgeo.png" %}";>
-                </p>
+                <img src="{% static "images/guinpostprices.png" %}";>
+                <img src="{% static "images/avgpcsgeo.png" %}";>
 
                 <p>
              	    In the figure above we have taken all the collected data in each post routing adminastrative area and averaged the prices.
@@ -106,9 +98,7 @@
                     As well as looking at between postal area variation we can also look at the variation within each postal region: 
                 </p>
 
-                <p align="center">
-                    <img class="article_image" style="width:75%" src="{% static "images/Price By Postcode.png" %}";>
-                </p>
+                <img src="{% static "images/Price By Postcode.png" %}";>
 
                 <p>
              	    The plot above shows the distribution of pricing within each postal region.
@@ -146,10 +136,8 @@
                     Let's now examine how the Dublin pubs are distributed over the EDs
                 </p>
 
-                <p align="center">
-                    <img class="article_image" style="width:44.5%; left:0" src="{% static "images/coleds2.png" %}";>
-                    <img class="article_image" style="width:44.5%; right:0" src="{% static "images/pubedsgeo.png" %}";>
-                </p>
+                <img src="{% static "images/coleds2.png" %}";>
+                <img src="{% static "images/pudedsgeo.png" %}";>
 
                 <p>
              	    The image above shows the number of pubs in each ED by colour.
@@ -161,10 +149,8 @@
                     We can now move on to assess the average price in each ED containing at least one pub.
                 </p>
 
-                <p align="center">
-                    <img class="article_image" style="width:44.5%; left:0" src="{% static "images/AVGEDS.png" %}";>
-                    <img class="article_image" style="width:44.5%; right:0" src="{% static "images/avgedsgeo.png" %}";>
-                </p>
+                <img src="{% static "images/AVGEDS.png" %}";>
+                <img src="{% static "images/avgedsgeo.png" %}";>
 
                 <p>
              	    The figure above looks at the price of a pint of Guinness in each ED from the data collected,

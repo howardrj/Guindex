@@ -1,22 +1,26 @@
 import logging
 
 from django.contrib.auth.models import User
+from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import generics
 from rest_framework import permissions
+from rest_framework import viewsets
+from rest_framework.filters import SearchFilter
 
-from Guindex.serializers import PubGetSerializer, PubPostSerializer, PubPatchSerializer
-from Guindex.serializers import PubPendingCreateGetSerializer, PubPendingCreatePatchSerializer
-from Guindex.serializers import PubPendingPatchGetSerializer, PubPendingPatchPatchSerializer
-from Guindex.serializers import GuinnessGetSerializer, GuinnessPostSerializer, GuinnessPatchSerializer
-from Guindex.serializers import GuinnessPendingCreateGetSerializer, GuinnessPendingCreatePatchSerializer
-from Guindex.serializers import GuinnessPendingPatchGetSerializer, GuinnessPendingPatchPatchSerializer
+from rest_framework_datatables.filters import DatatablesFilterBackend
+
+from Guindex.serializers import GuinnessSerializer
+from Guindex.serializers import GuinnessPendingCreateSerializer
+from Guindex.serializers import PubSerializer
+from Guindex.serializers import PubPendingCreateSerializer
+from Guindex.serializers import PubPendingPatchSerializer
 from Guindex.serializers import StatisticsSerializer
-from Guindex.serializers import ContributorGetSerializer, ContributorDetailedGetSerializer, ContributorPatchSerializer
+from Guindex.serializers import ContributorSerializer
 from Guindex.serializers import ContactSerializer
 
+from Guindex.models import Guinness, GuinnessPendingCreate
 from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
-from Guindex.models import Guinness, GuinnessPendingCreate, GuinnessPendingPatch
 from Guindex.models import StatisticsSingleton
 
 logger = logging.getLogger(__name__)
@@ -37,368 +41,118 @@ class IsAdminOrReadOnly(permissions.IsAdminUser):
         return request.method in ['GET'] or request.user.is_staff
 
 
-class IsContributor(permissions.IsAdminUser):
+class IsContributorOrAdminUser(permissions.IsAdminUser):
     """
         Custom permissions class that only allows a contributor
-        to update it's own fields and read sensitive data
+        (or admin user) to access its own user object
     """
 
     def has_permission(self, request, view):
 
-        # Get primary key used in request
+        # Get primary key used in request (assumes trailing '/' in url)
         try:
             pk = int(request.path.split('/')[::-1][1])
         except:
-            return False
+            pk = -1
 
-        return request.user.id == pk
-
-
-#################
-# Pub API Views #
-#################
-
-class PubList(generics.ListCreateAPIView):
-
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
-    search_fields = ('name',)
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received PubList request")
-
-        # Access base class constructor
-        super(PubList, self).__init__(*args, **kwargs)
-
-    def perform_create(self, serializer):
-
-        logger.info("Creating new Pub")
-
-        # Sets creator field in Pub object
-        # prior to calling object's save method
-        serializer.save(creator = self.request.user)
-
-    def get_serializer_class(self):
-
-        if self.request.method == 'POST':
-            return PubPostSerializer
-        return PubGetSerializer
-
-    def get_queryset(self):
-        return Pub.objects.all()
-
-
-class PubDetail(generics.RetrieveUpdateAPIView):
-
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
-    http_method_names  = ['get', 'patch'] # Disallow PUTS
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received PubDetail request")
-
-        # Access base class constructor
-        super(PubDetail, self).__init__(*args, **kwargs)
-
-    def perform_update(self, serializer):
-
-        logger.info("Updating Pub object")
-
-        serializer.save(user = self.request.user)
-
-    def get_serializer_class(self):
-
-        if self.request.method == 'PATCH':
-            return PubPatchSerializer
-        return PubGetSerializer
-
-    def get_queryset(self):
-        return Pub.objects.all()
-
-
-class PubPendingCreateList(generics.ListAPIView):
-
-    serializer_class   = PubPendingCreateGetSerializer
-    permission_classes = (IsAdminOrReadOnly, )
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received PubPendingCreateList request")
-
-        # Access base class constructor
-        super(PubPendingCreateList, self).__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        return PubPendingCreate.objects.all()
-
-
-class PubPendingCreateDetail(generics.RetrieveUpdateAPIView):
-
-    permission_classes = (IsAdminOrReadOnly, )
-    http_method_names  = ['get', 'patch'] # Disallow PUTS
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received PubPendingCreateDetail request")
-
-        # Access base class constructor
-        super(PubPendingCreateDetail, self).__init__(*args, **kwargs)
-
-    def get_serializer_class(self):
-
-        if self.request.method == 'PATCH':
-            return PubPendingCreatePatchSerializer
-        return PubPendingCreateGetSerializer
-
-    def get_queryset(self):
-        return PubPendingCreate.objects.all()
-
-
-class PubPendingPatchList(generics.ListAPIView):
-
-    serializer_class = PubPendingPatchGetSerializer
-    permission_classes = (IsAdminOrReadOnly, )
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received PubPendingPatchList request")
-
-        # Access base class constructor
-        super(PubPendingPatchList, self).__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        return PubPendingPatch.objects.all()
-
-
-class PubPendingPatchDetail(generics.RetrieveUpdateAPIView):
-
-    permission_classes = (IsAdminOrReadOnly, )
-    http_method_names  = ['get', 'patch'] # Disallow PUTS
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received PubPendingPatchDetail request")
-
-        # Access base class constructor
-        super(PubPendingPatchDetail, self).__init__(*args, **kwargs)
-
-    def get_serializer_class(self):
-
-        if self.request.method == 'PATCH':
-            return PubPendingPatchPatchSerializer
-        return PubPendingPatchGetSerializer
-
-    def get_queryset(self):
-        return PubPendingPatch.objects.all()
+        return request.user.id == pk or request.user.is_staff
 
 
 ######################
 # Guinness API Views #
 ######################
 
-class GuinnessList(generics.ListCreateAPIView):
+class GuinnessViewSet(viewsets.ModelViewSet):
 
+    serializer_class   = GuinnessSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received GuinnessList request")
-
-        # Access base class constructor
-        super(GuinnessList, self).__init__(*args, **kwargs)
-
-    def perform_create(self, serializer):
-
-        logger.info("Creating new Guinness")
-
-        # Sets creator field in Guinness object
-        # prior to calling object's save method
-        serializer.save(creator = self.request.user)
-
-    def get_serializer_class(self):
-
-        if self.request.method == 'POST':
-            return GuinnessPostSerializer
-        return GuinnessGetSerializer
+    http_method_names  = ['get', 'post']
 
     def get_queryset(self):
-        return Guinness.objects.all()
+        return Guinness.objects.filter(pub = self.kwargs['pub_pk'])
 
 
-class GuinnessDetail(generics.RetrieveUpdateAPIView):
+###################################
+# GuinnessPendingCreate API Views #
+###################################
 
+class GuinnessPendingCreateViewSet(viewsets.ModelViewSet):
+
+    serializer_class   = GuinnessPendingCreateSerializer
+    queryset           = GuinnessPendingCreate.objects.all()
+    permission_classes = (IsAdminOrReadOnly, )
+    http_method_names  = ['get', 'patch']  # Disallow PUTS
+
+
+#################
+# Pub API Views #
+#################
+
+class PubViewSet(viewsets.ModelViewSet):
+
+    serializer_class   = PubSerializer
+    queryset           = Pub.objects.all()
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
-    http_method_names  = ['get', 'patch'] # Disallow PUTS
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received GuinnesDetail request")
-
-        # Access base class constructor
-        super(GuinnessDetail, self).__init__(*args, **kwargs)
-
-    def perform_update(self, serializer):
-
-        logger.info("Updating Guinness object")
-
-        serializer.save(user = self.request.user)
-
-    def get_serializer_class(self):
-        if self.request.method == 'PATCH':
-            return GuinnessPatchSerializer
-        return GuinnessGetSerializer
-
-    def get_queryset(self):
-        return Guinness.objects.all()
+    http_method_names  = ['get', 'post', 'patch']
+    filter_backends    = (DjangoFilterBackend, SearchFilter, DatatablesFilterBackend,)
+    filter_fields      = ('name', 'closed', 'servingGuinness', 'county', 'creator', )
+    search_fields      = ('name',)
 
 
-class GuinnessPendingCreateList(generics.ListAPIView):
+##############################
+# PubPendingCreate API Views #
+##############################
 
-    serializer_class   = GuinnessPendingCreateGetSerializer
+class PubPendingCreateViewSet(viewsets.ModelViewSet):
+
+    serializer_class   = PubPendingCreateSerializer
+    queryset           = PubPendingCreate.objects.all()
     permission_classes = (IsAdminOrReadOnly, )
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received GuinnessPendingCreateList request")
-
-        # Access base class constructor
-        super(GuinnessPendingCreateList, self).__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        return GuinnessPendingCreate.objects.all()
+    http_method_names  = ['get', 'patch']  # Disallow PUTS
 
 
-class GuinnessPendingCreateDetail(generics.RetrieveUpdateAPIView):
+#############################
+# PubPendingPatch API Views #
+#############################
 
+class PubPendingPatchViewSet(viewsets.ModelViewSet):
+
+    serializer_class   = PubPendingPatchSerializer
+    queryset           = PubPendingPatch.objects.all()
     permission_classes = (IsAdminOrReadOnly, )
-    http_method_names  = ['get', 'patch'] # Disallow PUTS
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received GuinnessPendingCreateDetail request")
-
-        # Access base class constructor
-        super(GuinnessPendingCreateDetail, self).__init__(*args, **kwargs)
-
-    def get_serializer_class(self):
-
-        if self.request.method == 'PATCH':
-            return GuinnessPendingCreatePatchSerializer
-        return GuinnessPendingCreateGetSerializer
-
-    def get_queryset(self):
-        return GuinnessPendingCreate.objects.all()
-
-
-class GuinnessPendingPatchList(generics.ListAPIView):
-
-    serializer_class   = GuinnessPendingPatchGetSerializer
-    permission_classes = (IsAdminOrReadOnly, )
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received GuinnessPendingPatchList request")
-
-        # Access base class constructor
-        super(GuinnessPendingPatchList, self).__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        return GuinnessPendingPatch.objects.all()
-
-
-class GuinnessPendingPatchDetail(generics.RetrieveUpdateAPIView):
-
-    permission_classes = (IsAdminOrReadOnly, )
-    http_method_names  = ['get', 'patch'] # Disallow PUTS
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received GuinnessPendingPatchDetail request")
-
-        # Access base class constructor
-        super(GuinnessPendingPatchDetail, self).__init__(*args, **kwargs)
-
-    def get_serializer_class(self):
-
-        if self.request.method == 'PATCH':
-            return GuinnessPendingPatchPatchSerializer
-        return GuinnessPendingPatchGetSerializer
-
-    def get_queryset(self):
-        return GuinnessPendingPatch.objects.all()
+    http_method_names  = ['get', 'patch']  # Disallow PUTS
 
 
 ########################
 # Statistics API Views #
 ########################
 
-class StatisticsList(generics.ListAPIView):
+class StatisticsViewSet(viewsets.ModelViewSet):
 
     serializer_class   = StatisticsSerializer
+    queryset           = StatisticsSingleton.objects.filter(id = 1)
     permission_classes = (permissions.AllowAny, )
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received StatisticsList request")
-
-        # Access base class constructor
-        super(StatisticsList, self).__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        return StatisticsSingleton.objects.filter(id = 1)
+    http_method_names  = ['get']
 
 
 #########################
 # Contributor API Views #
 #########################
 
-class ContributorList(generics.ListAPIView):
+class ContributorViewSet(viewsets.ModelViewSet):
 
-    serializer_class   = ContributorGetSerializer
-    permission_classes = (permissions.IsAdminUser, )
+    serializer_class   = ContributorSerializer
+    queryset           = User.objects.all()
+    http_method_names  = ['get', 'patch']
 
-    def __init__(self, *args, **kwargs):
+    def get_permission(self):
 
-        logger.debug("Received ContributorList request")
+        if self.action == 'list':
+            permission_classes = (permissions.IsAdminUser, )
+        else:
+            permission_classes = (IsContributorOrAdminUser, )
 
-        # Access base class constructor
-        super(ContributorList, self).__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        # Returns null on guindexuser/telegramuser related fields if either
-        # does not exist for a User
-        # No need for exclude filter
-        return User.objects.all()
-
-
-class ContributorDetail(generics.RetrieveUpdateAPIView):
-    """
-        A contributor can only patch its own User model.
-        The alert settings are the only editable fields.
-        A contributor can access detailed serializer for
-        its own User model.
-    """
-
-    permission_classes = (IsContributor, )
-    http_method_names  = ['get', 'patch'] # Disallow PUTS
-
-    def __init__(self, *args, **kwargs):
-
-        logger.debug("Received ContributorDetail request")
-
-        # Access base class constructor
-        super(ContributorDetail, self).__init__(*args, **kwargs)
-
-    def get_serializer_class(self):
-        if self.request.method == 'PATCH':
-            return ContributorPatchSerializer
-        return ContributorDetailedGetSerializer
-
-    def get_queryset(self):
-        # Returns null on guindexuser/telegramuser related fields if either
-        # does not exist for a User
-        # No need for exclude filter
-        return User.objects.all()
+        return [permission() for permission in permission_classes]
 
 
 #####################
@@ -407,7 +161,8 @@ class ContributorDetail(generics.RetrieveUpdateAPIView):
 
 class Contact(generics.CreateAPIView):
 
-    serializer_class = ContactSerializer
+    serializer_class   = ContactSerializer
+    permission_classes = (permissions.AllowAny, )
 
     def __init__(self, *args, **kwargs):
 

@@ -20,6 +20,12 @@ class GuindexParameters:
     DB_BACKUP_PERIOD         = 86400
     STATS_CALCULATION_PERIOD = 86400
 
+    # Map generation parameters
+    MAP_GENERATION_PERIOD   = 86400
+    DUBLIN_CENTER_LATITUDE  = 53.345280 
+    DUBLIN_CENTER_LONGITUDE = -6.272161
+    MAP_ZOOM_LEVEL          = 17
+
     # Alerts Server Parameters
     ALERTS_LISTEN_IP   = '127.0.0.1'
     ALERTS_LISTEN_PORT = 8088
@@ -169,9 +175,6 @@ class GuindexParameters:
     MAX_CONTACT_FORM_EMAIL_LEN   = 50
     MAX_CONTACT_FORM_SUBJECT_LEN = 30
     MAX_CONTACT_FORM_MESSAGE_LEN = 500
-
-    # Caching
-    CACHE_TIMEOUT = 60 * 60
 
     def getParameters():
 
