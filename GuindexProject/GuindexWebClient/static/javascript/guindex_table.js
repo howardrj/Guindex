@@ -230,6 +230,10 @@ $(document).on('click', '.submit_price_button', function () {
                     {
                         displayMessage("Info", "Thank you. A member of staff will verify your submission shortly.");
                     }
+
+                    // Reload table
+                    if (g_guindexDataTable)
+                        g_guindexDataTable.ajax.reload();
                 }
                 else
                 {
@@ -269,14 +273,12 @@ $(document).on('click', '.edit_pub_button', function () {
         // Set form values
         var pub_id = parseInt(this.getAttribute('data-pub_id'));
 
-        var pub = $.grep(g_pubsList, function(obj) { return obj['id'] === pub_id;})[0];
-
-        document.getElementById('edit_pub_name').value               = pub['name'];
-        document.getElementById('edit_pub_latitude').value           = pub['latitude'];
-        document.getElementById('edit_pub_longitude').value          = pub['longitude'];
-        document.getElementById('edit_pub_county').value             = pub['county'];
-        document.getElementById('edit_pub_closed').checked           = pub['closed'];
-        document.getElementById('edit_pub_serving_guinness').checked = pub['servingGuinness'];
+        document.getElementById('edit_pub_name').value               = this.getAttribute('data-name');
+        document.getElementById('edit_pub_latitude').value           = parseFloat(this.getAttribute('data-latitude'));
+        document.getElementById('edit_pub_longitude').value          = parseFloat(this.getAttribute('data-longitude'));
+        document.getElementById('edit_pub_county').value             = this.getAttribute('data-county');
+        document.getElementById('edit_pub_closed').checked           = this.getAttribute('data-closed') == '1';
+        document.getElementById('edit_pub_serving_guinness').checked = this.getAttribute('data-servingGuinness') == '1';
 
         document.getElementById('edit_pub_submit_button').setAttribute('data-pub_id', pub_id);
 
@@ -341,6 +343,10 @@ $('#edit_pub_submit_button').on('click', function () {
                 {
                     displayMessage("Info", "Thank you. A member of staff will verify your submission shortly.");
                 }
+            
+                // Reload table
+                if (g_guindexDataTable)
+                    g_guindexDataTable.ajax.reload();
             }
             else
             {

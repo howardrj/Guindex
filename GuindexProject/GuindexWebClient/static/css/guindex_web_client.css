@@ -190,3 +190,36 @@ a.page-link {
     text-decoration: none;
     background-color: black !important;
 }
+
+.card-register {
+    margin-bottom: 30px;
+}
+
+/********************/
+/* Overview buttons */
+/********************/
+.overview_button {
+    width: 250px;
+    background-color: black !important;
+}
+
+.contact_social_media_button {
+    width: 100px;
+    background-color: black !important;
+}
+
+/*******************/
+/* Contact buttons */
+/*******************/
+.contact_social_media_button:hover {
+    cursor:hand;
+    cursor:pointer;
+    opacity:0.4;
+}
+
+/*******************/
+/* Article styling */
+/*******************/
+.article_image {
+    margin: 20px 5px;
+}

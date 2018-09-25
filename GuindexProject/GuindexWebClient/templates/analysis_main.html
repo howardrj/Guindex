@@ -1,50 +1,88 @@
-<div id="analysis_main_page" class="page_content content-wrapper" style="display:none">
+{% load static %}
 
+<div id="analysis_main_page" class="page_content content-wrapper" style="display:none">
     <div class="container-fluid">
-	<div class="bigshiftedcontainer">
-    <P ALIGN=CENTER><b>Analysis</b></P><HR style="height:0.2vw;background-color:white";/>
-    <P ALIGN=LEFT><b> Most Recent </b></P><HR style="height:0.15vw;background-color:white";/>
-    <P Align=LEFT><table color=black style="width:100%; float:left; margin-bottom:3vw">	
-    <tr>
-    <th>Article</th>
-    <th>Date Published</th>
-    </tr>
-    <tr>
-    <td><a class="page_content_link class2" data-content_page_id="analysis_travelling_drunkard_page" style="color:deepskyblue"><b>The Travelling Drunkard</b></a></td>
-    <td>Coming Soon</td></tr>
-    <tr>
-    <td><a class="page_content_link class2" data-content_page_id="analysis_social_page" style="color:deepskyblue"><b>Correlation of Socioeconomic Factors and Guinness Pricing</b></a></td>
-    <td>Coming Soon</td></tr>
-    <tr>
-    <td><a class="page_content_link class2" data-content_page_id="analysis_geo_page" style="color:deepskyblue"><b>Geographic Variation of Guinness Pricing</b></a></td>
-    <td>January 2018</td></tr>
-    <tr>
-    <td><a class="page_content_link class2" data-content_page_id="analysis_pubdist_page" style="color:deepskyblue"><b>Furthest Distance to a Pub in County Dublin</b></a></td>
-    <td>January 2018</td></tr>
-    </table></P>
-    <P ALIGN=LEFT><b> Introduction </b></P><HR style="height:0.15vw;background-color:white";/>
-    <P ALIGN=LEFT><b> The principal aim of the project is to exaimine whether and if so how geographical and social factors affect the price of a pint of Guinness around Ireland. As the project began as a solely Dublin focused project all of the analysis conducted so far has looked at aspects of Dublin's pubs and the Guinness offered at those pubs. </b></P>
-    <P ALIGN=LEFT><b> Before looking at these questions we should first try and understand the distribution of the data itself. The statistics dashboard provides figures of merit relating to the data collected so far. These figures of merit show the extremes of the pricing distribution as well as overall quantitative descriptors of the data. </b></P>
-    <P Align=Left><b>The Snug Bar on upper Stephen street is the cheapest pint thus far! It along with Eleanora's in Drimnagh are the bastions of sub four euro Guinness in Dublin. Unsurprisingly four of the top five most expensive pubs collected thus far have come from Temple Bar. Temple Bar is the scourge of all our pockets and is best avoided. </b></P>
-    <P ALIGN=LEFT> <b>We can also look at the overall Guinness price distribution of the data collected so far, it'd be neat if the data followed the Student's t-distribution (essentially indistinguishable from a normal distribution for this number of samples) because of the historical connection between Guniness and that distribution. We look at this distribution below: </b></P>
-    <P Align=Center> <img src="../static/images/distribution.png" style="width:50%";></P>
-    <P ALIGN=LEFT><b> The Guinness price distribution is shown as a stacked pint histogram of the prices collected so far, the corresponding Student's t-distribution (same average, same standard deviation, degrees of freedom = number of prices collected -1 and scaled to match maximum of histogram) is displayed also in blue. We can see that, unfortunately, the Guinness distribution is quite non-normal. The Guinness distribution is considerably more centrally peaked between €5.00-€5.30 than the corresponding t-distribution.</b> </P>
-    <P ALIGN=LEFT><b> We can now look at problems concerning how this distribution is allocated geographically. The geographical regions we have considered are:</b></P>
-    <ul>
-    	<P Align=Left ><b> 1) Dublin post routing administrative areas </b></P> 
-    	<P Align=Left ><b>2) Electoral divisions within county Dublin. </b></P>
-    </ul>
-    <P ALIGN=LEFT><b>This analysis is found <a class="page_content_link class2" data-content_page_id="analysis_geo_page" style="color:deepskyblue"><b>here</b></a></b></P>
-    <div class="illustration">
-    <P ALIGN=CENTER> <p style="float:left; width:35%; margin-left:10%;margin-bottom:0.5em text-align:center;font-size:2.5vw;"> <img src="../static/images/rsz_1dublinpostcodes.png" style="width:100%;">Dublin post routing administrative areas </p> <p style="float:right; width:35%; margin-right:10%;margin-bottom:0.5em text-align:center;font-size:2.5vw;"> <img src="../static/images/rsz_eds.png" style="width:100%;">Dublin electoral divisions</p><p style="clear:both;"></P>
-    </div>  
-    <P ALIGN=LEFT><b> The examination of the effect of social factors on Guinness pricing will be carried out once a more complete price distribution has been collected. This analysis will be <a class="page_content_link class2" data-content_page_id="analysis_social_page" style="color:deepskyblue"><b>here</b></a> in the future. </b></P>
-     <P ALIGN=LEFT><b> A secondary theme of the project relates to the distribution of the pubs themselves. Interesting problems related to this theme are: </b></P>
-     <ul>
-     	<P Align=Left><b> 1) What is the furthest you can be from a pub in County Dublin? The solution of which can be found <a class="page_content_link class2" data-content_page_id="analysis_pubdist_page" style="color:deepskyblue"><b>here</b></a></b></P>
-     	<P Align=Left><b> 2) The travelling drunkard problem; what is the route that minimises travel distance and visits every pub within the two circular roads bounding Dublin city centre? The solution of this problem can be found <a class="page_content_link class2" data-content_page_id="analysis_travelling_drunkard_page" style="color:deepskyblue"><b>here</b></a>.  </b></P>
-     </ul>
-     <P ALIGN=LEFT><b> We also aim to look at other interesting mathematical problems concerning Guinness, pubs and Dublin. The next thing we plan to do is to analyse Dublin's electoral divisions as an N-colour map problem. If you have any suggestions as to what might be an interesting problem please get in contact. </b></P>
+        <div class="card card-register mx-auto mt-5">
+            <div class="card-header">
+                Analysis Overview
+            </div>
+            <div class="card-body">
+                <p>
+                    The principal aim of the project is to exaimine whether and if so how geographical and social factors affect the price of a pint of Guinness around Ireland.
+                    As the project began as a solely Dublin focused project all of the analysis conducted so far has looked at aspects of Dublin's pubs and the Guinness offered at those pubs.
+                </p>
+                <p>
+                    Before looking at these questions we should first try and understand the distribution of the data itself.
+                    The statistics dashboard provides figures of merit relating to the data collected so far.
+                    These figures of merit show the extremes of the pricing distribution as well as overall quantitative descriptors of the data.
+                </p>
+                <p>
+                    The Snug Bar on upper Stephen street is the cheapest pint thus far!
+                    It along with Eleanora's in Drimnagh are the bastions of sub four euro Guinness in Dublin.
+                    Unsurprisingly four of the top five most expensive pubs collected thus far have come from Temple Bar.
+                    Temple Bar is the scourge of all our pockets and is best avoided.
+                </p>
+                <p>
+                    We can also look at the overall Guinness price distribution of the data collected so far, 
+                    it'd be neat if the data followed the Student's t-distribution (essentially indistinguishable from a normal distribution for this number of samples) 
+                    because of the historical connection between Guniness and that distribution.
+                    We look at this distribution below:
+                </p> 
+
+                <p align="center">
+                    <img class="article_image" style="width:50%; margin: 20px auto" src="{% static "images/distribution.png" %}">
+                </p>
+
+                <p>
+                    The Guinness price distribution is shown as a stacked pint histogram of the prices collected so far,
+                    the corresponding Student's t-distribution
+                    (same average, same standard deviation, degrees of freedom = number of prices collected -1 and scaled to match maximum of histogram) is displayed also in blue.
+                    We can see that, unfortunately, the Guinness distribution is quite non-normal.
+                    The Guinness distribution is considerably more centrally peaked between €5.00-€5.30 than the corresponding t-distribution.
+                </p>
+
+                <p>
+                    We can now look at problems concerning how this distribution is allocated geographically.
+                    The geographical regions we have considered are:
+                    <ol>
+                        <li>Dublin post routing administrative areas</li>
+                        <li>Electoral divisions within county Dublin</li>
+                    </ol>
+                    This analysis is found <a class="page_content_link" data-content_page_id="analysis_geo_page" style="color:deepskyblue"><b>here</b></a>
+                </p>
+
+                <p align="center">
+                    <img class="article_image" style="width:44.5%; left:0" src="{% static "images/rsz_1dublinpostcodes.png" %}">
+                    <img class="article_image" style="width:44.5%; right:0" src="{% static "images/rsz_eds.png" %}">
+                </p>
+                
+                <p>
+                    The examination of the effect of social factors on Guinness pricing will be carried out once a more complete price distribution has been collected.
+                    This analysis will be <a class="page_content_link" data-content_page_id="analysis_social_page"><b>here</b></a> in the future.
+                </p>
+
+                <p>
+                    A secondary theme of the project relates to the distribution of the pubs themselves.
+                    Interesting problems related to this theme are: 
+
+                    <ol>
+                        <li>
+                            What is the furthest you can be from a pub in County Dublin?
+                            The solution of which can be found <a class="page_content_link" data-content_page_id="analysis_pubdist_page"><b>here</b></a>.
+                        </li>
+                        <li>
+                            The travelling drunkard problem; what is the route that minimises travel distance and visits every pub within the two circular roads bounding Dublin city centre?
+                            The solution of this problem can be found <a class="page_content_link" data-content_page_id="analysis_travelling_drunkard_page"><b>here</b></a>
+                        </li>
+                    </ol>
+                </p>
+                <p>
+                    We also aim to look at other interesting mathematical problems concerning Guinness, pubs and Dublin.
+                    The next thing we plan to do is to analyse Dublin's electoral divisions as an N-colour map problem.
+                    If you have any suggestions as to what might be an interesting problem please get in contact.
+                </p>
+            </div>
 		</div>
     </div>
 </div>
+
