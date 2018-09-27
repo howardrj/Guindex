@@ -1,1 +1,1 @@
-SUBDIRS = Guindex GuindexWebClient
+SUBDIRS = GuindexWebClient

@@ -9,6 +9,7 @@ from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 
 from rest_framework_datatables.filters import DatatablesFilterBackend
+from Guindex.filters import GuindexDatatablesFilterBackend
 
 from Guindex.serializers import GuinnessSerializer
 from Guindex.serializers import GuinnessPendingCreateSerializer
@@ -94,7 +95,7 @@ class PubViewSet(viewsets.ModelViewSet):
     queryset           = Pub.objects.all()
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     http_method_names  = ['get', 'post', 'patch']
-    filter_backends    = (DjangoFilterBackend, SearchFilter, DatatablesFilterBackend,)
+    filter_backends    = (DjangoFilterBackend, SearchFilter, GuindexDatatablesFilterBackend,)
     filter_fields      = ('name', 'closed', 'servingGuinness', 'county', 'creator', )
     search_fields      = ('name',)
 

@@ -17,7 +17,6 @@ AM_INIT_AUTOMAKE([foreign])
 
 AC_OUTPUT([Makefile
            GuindexProject/Makefile
-           GuindexProject/Guindex/Makefile
            GuindexProject/GuindexWebClient/Makefile
            GuindexProject/GuindexWebClient/static/Makefile
            GuindexProject/GuindexWebClient/static/javascript/Makefile
