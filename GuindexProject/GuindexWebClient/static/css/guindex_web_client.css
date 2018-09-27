@@ -55,7 +55,7 @@
 /* Spinning Loader */
 /*******************/
 .guindex_web_client_loader {
-    color: black;
+    color: white;
     display: none;
 }
 
@@ -138,7 +138,7 @@ input:checked + .slider:before {
     height: 100%;
     z-index: 9999;
     position: fixed;
-    background-color:white;
+    background-color:black;
     top: 0;
     left: 0;
     padding: 0;
@@ -150,6 +150,7 @@ input:checked + .slider:before {
     margin: 0 auto;
     top: 45%;
     width: 100%;
+    color:white;
 }
 
 #main_loader_spinner {
