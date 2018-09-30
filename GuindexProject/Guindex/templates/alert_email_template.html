@@ -6,9 +6,7 @@
     <head>
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Oswald">
     </head>
-
     <body>
-
         <style>
 
             h1 {
@@ -28,34 +26,219 @@
                 font-size: 16.5px;
                 text-align: center;
             }
-
         </style>
 
         <h1> Guindex </h1>
 
         <div class="content_div">
 
-            <p> Hello {{ username }}, </p>
+            <p> Hello {{ user.username }}, </p>
 
-            <p> {{ summary }} </p>
+            <p> Here is your weekly Guindex activity update. </p>
 
-            {% autoescape off %}
-                {% for key, value in data.items %}
-                    <p> {{ key }}: {{ value }} </p>
+            {% if new_prices|length %}
+                {% autoescape off %}
+
+                <h3> New Price Submissions </h3>
+
+                {% for price in new_prices %}
+                    <table border="1">
+                        <tr>
+                            <td> <b> Pub </b> </td>
+                            <td> {{ price.pubName }} </td>
+                        </tr>
+                        <tr>
+                            <td> <b> County </b> </td>
+                            <td> {{ price.pubCounty }} </td>
+                        </tr>
+                        <tr>
+                            <td> <b> Price </b> </td>
+                            <td> €{{ price.price }} </td>
+                        </tr>
+                        <tr>
+                            <td> <b> Rating </b> </td>
+                            <td> {{ price.starRating }}/5 </td>
+                        </tr>
+                        <tr>
+                            <td> <b> Time </b> </td>
+                            <td> {{ price.creationDate|date:'Y-m-d' }} {{ price.creationDate|time:'H:i:s' }} </td> 
+                        </tr>
+                    </table>
+                    </br>
                 {% endfor %}
-            {% endautoescape %}
 
-            {% if add_text %}
-                <p> {{ add_text }} </p>
+                {% endautoescape %}
             {% endif %}
-            
 
-            <p> Regards, </p>
-            <p> Guindex Team </p>
+            {% if new_pubs|length %}
+                {% autoescape off %}
+
+                <h3> New Pub Submissions </h3>
+
+                {% for pubs in new_pubs %}
+                    <table border="1">
+                        <tr>
+                            <td> <b> Pub </b> </td>
+                            <td> {{ pub.name }} </td>
+                        </tr>
+                        <tr>
+                            <td> <b> County </b> </td>
+                            <td> {{ pub.county }} </td>
+                        </tr>
+                        <tr>
+                            <td> <b> Time </b> </td>
+                            <td> {{ pub.creationDate|date:'Y-m-d' }} {{ pub.creationDate|time:'H:i:s' }} </td> 
+                        </tr>
+                    </table>
+                   </br>
+                {% endfor %}
+
+                {% endautoescape %}
+            {% endif %}
+
+            {% if user.is_staff %}
+
+                {% if new_pending_price_creates|length %}
+                    {% autoescape off %}
+
+                    <h3> New Pending Price Submissions </h3>
+
+                    {% for price in new_pending_price_creates %}
+                        <table border="1">
+                            <tr>
+                                <td> <b> ID </b> </td>
+                                <td> {{ price.id }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Pub </b> </td>
+                                <td> {{ price.pubName }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> County </b> </td>
+                                <td> {{ price.pubCounty }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Price </b> </td>
+                                <td> €{{ price.price }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Rating </b> </td>
+                                <td> {{ price.starRating }}/5 </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Contributor </b> </td>
+                                <td> {{ price.contributorName }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Time </b> </td>
+                                <td> {{ price.creationDate|date:'Y-m-d' }} {{ price.creationDate|time:'H:i:s' }} </td> 
+                            </tr>
+                        </table>
+                        <br>
+                    {% endfor %}
+
+                    {% endautoescape %}
+                {% endif %}
+
+                {% if new_pending_pub_creates|length %}
+                    {% autoescape off %}
+
+                    <h3> New Pending Pub Submissions </h3>
+
+                    {% for pub in new_pending_pub_creates %}
+                        <table border="1">
+                            <tr>
+                                <td> <b> ID </b> </td>
+                                <td> {{ pub.id }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Pub </b> </td>
+                                <td> {{ pub.name }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> County </b> </td>
+                                <td> {{ pub.county }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Latitude </b> </td>
+                                <td> {{ pub.latitude }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Longitude </b> </td>
+                                <td> {{ pub.longitude }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Contributor </b> </td>
+                                <td> {{ pub.contributorName }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Time </b> </td>
+                                <td> {{ pub.creationDate|date:'Y-m-d' }} {{ pub.creationDate|time:'H:i:s' }} </td> 
+                            </tr>
+                        </table>
+                        <br>
+                    {% endfor %}
+
+                    {% endautoescape %}
+                {% endif %}
+
+                {% if new_pending_pub_patches|length %}
+                    {% autoescape off %}
+
+                    <h3> New Pending Pub Changes </h3>
+
+                    {% for pub in new_pending_pub_patches %}
+                        <table border="1">
+                            <tr>
+                                <td> <b> ID </b> </td>
+                                <td> {{ pub.id }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Pub </b> </td>
+                                <td> {{ pub.nameOrig }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> County </b> </td>
+                                <td> {{ pub.countyOrig }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Contributor </b> </td>
+                                <td> {{ pub.contributorName }} </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Time </b> </td>
+                                <td> {{ pub.creationDate|date:'Y-m-d' }} {{ pub.creationDate|time:'H:i:s' }} </td> 
+                            </tr>
+                            <tr>
+                                <td> <b> Proposed changes </b> </td>
+                                <td>
+                                    <ul>
+                                    {% for changed_field in pub.changedFields %}
+                                        <li>
+                                            <b> {{ changed_field.0 }} </b>: {{ changed_field.1.0}} &xrarr; {{ changed_field.1.1 }}  
+                                        </li>
+                                    {% endfor %}     
+                                    </ul>
+                                </td>
+                            </tr>
+                        </table>
+                        <br>
+                    {% endfor %}
+
+                    {% endautoescape %}
+                {% endif %}
+
+            {% endif %}
+
+            <p>
+                Please note that you can adjust your notification settings by visiting
+                <a href="https://guindex.ie/settings/"> this link </a>.
+            </p>
+
+            <p> Kind regards, </p>
+            <p> The Guindex Team </p>
 
         </div>
-
     </body>
-
 </html>
 

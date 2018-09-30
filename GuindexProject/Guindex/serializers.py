@@ -111,7 +111,9 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
             for field in self.instance._meta.fields:
                 setattr(guinness, field.name, getattr(self.instance, field.name))
 
-            # Update relevant fields
+            # Overwrite creation date so alerts will register change
+            guinness.creationDate = timezone.now() 
+
             guinness.pk = None
             guinness.save(createPendingCreate = False)
 
@@ -277,6 +279,9 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
             for field in self.instance._meta.fields:
                 setattr(pub, field.name, getattr(self.instance, field.name))
 
+            # Overwrite creation date so alerts will register change
+            pub.creationDate = timezone.now() 
+
             # Update relevant fields
             pub.pk = None
             pub.save(createPendingCreate = False)
@@ -341,7 +346,7 @@ class PubPendingPatchSerializer(serializers.ModelSerializer):
             for field in self.instance._meta.fields:
 
                 # Don't merge these fields
-                if field.name in ['id', 'clonedFrom', 'creator', 'creationDate']:
+                if field.name in ['id', 'clonedFrom', 'creator', 'creationDate', 'mapLink']:
                     continue
 
                 # Merge new fields

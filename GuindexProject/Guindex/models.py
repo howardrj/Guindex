@@ -87,9 +87,6 @@ class Pub(PubBase):
 
             logger.debug("First save of Pub object")
 
-            # Set map link
-            self.mapLink = GuindexParameters.MAP_LINK_STRING % (self.latitude, self.longitude)
-
             create_pending_create = True
 
             try:
@@ -103,6 +100,9 @@ class Pub(PubBase):
                 logger.debug("Creator is not a staff member. Creating PubPendingCreate object instead")
                 self.createPendingCreate()
                 return
+
+        # Set map link
+        self.mapLink = GuindexParameters.MAP_LINK_STRING % (self.latitude, self.longitude)
 
         super(Pub, self).save(*args, **kwargs)
 
@@ -305,3 +305,31 @@ class GuindexUser(models.Model):
 
     isDeveloper = models.BooleanField(help_text = 'Is this contributor a developer of the Guindex website?',
                                       default = False)
+
+
+#################
+# Alerts Models #
+#################
+
+class AlertsSingleton(models.Model):
+    """
+        This is a singleton class to store values
+        related to processing of alerts.
+    """
+    lastCheckTime = models.DateTimeField(help_text = 'Last time alerts were checked',
+                                         auto_now = True)
+
+    def __unicode__(self):
+        return "'AlerstSingleton'"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(AlertsSingleton, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk = 1)
+        return obj
