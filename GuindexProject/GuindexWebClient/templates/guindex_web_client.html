@@ -550,8 +550,15 @@
 
   <script>
 
-        populateGuindexDataTable();
-        populateGuindexStatsTable();
+    populateGuindexDataTable();
+    populateGuindexStatsTable();
+
+    function clearLoader ()
+    {
+        $('#particles_js_container').delay(1000).fadeOut('slow');
+    }
+
+    setTimeout(clearLoader, 3000);
 
    </script>
 

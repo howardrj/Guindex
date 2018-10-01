@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.validators import validate_email as validateEmail
 from django.core.mail import send_mail as sendMail
+from django.utils import timezone
 
 from rest_framework import serializers
 
@@ -81,7 +82,7 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = GuinnessPendingCreate
         fields = '__all__'
-        read_only_fields = ('id', 'creationDate', 'price', 'pub', 'starRating')
+        read_only_fields = ('id', 'creationDate', 'creator', 'price', 'pub', 'starRating')
 
     def validate(self, data):
         """
@@ -122,6 +123,8 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
 
         logger.info("Deleting pending contribution")
         self.instance.delete()
+
+        # TODO Notify user of decision
 
 
 ###################
@@ -292,6 +295,8 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
         logger.info("Deleting pending contribution")
         self.instance.delete()
 
+        # TODO Notify user of decision
+
 
 ###############################
 # PubPendingPatch Serializers #
@@ -359,6 +364,8 @@ class PubPendingPatchSerializer(serializers.ModelSerializer):
 
         logger.info("Deleting pending contribution")
         self.instance.delete()
+    
+        # TODO Notify user of decision
 
 
 ##########################

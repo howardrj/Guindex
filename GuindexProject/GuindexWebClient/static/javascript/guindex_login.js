@@ -29,8 +29,6 @@ function statusChangeCallback(response) {
 
             // Carry on as normal ...
         }
-        
-        clearLoader();
     }
     else if (response.status === 'connected')
     {
@@ -59,13 +57,10 @@ function statusChangeCallback(response) {
                 loginToGuindexViaFacebook();
             }
         );
-
-        clearLoader();
     }
-
-    function clearLoader ()
+    else
     {
-        $('#particles_js_container').delay(1000).fadeOut('slow');
+        console.log("Unknown status: " + response.status);
     }
 }
 
@@ -102,7 +97,7 @@ var loginToGuindexViaFacebook = function ()
                 g_loggedIn      = true;
                 g_accessToken   = response['key'];
                 g_userId        = response['user'];
-                g_isStaffMember = response['isStaff'];
+                g_isStaffMember = response['isStaff'] == "True" ? true : false;
 
                 onLoginWithFacebookSuccess();
             }    

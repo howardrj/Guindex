@@ -79,12 +79,12 @@ class Command(BaseCommand):
 
                     # Add extra fields to objects needed in alert message
                     for price in alerts_context['new_prices']:
-                        pub = Pub.objects.get(id = price.pub)
+                        pub = price.pub
                         setattr(price, 'pubName', pub.name)
                         setattr(price, 'pubCounty', pub.county)
 
                     for price in alerts_context['new_pending_price_creates']:
-                        pub = Pub.objects.get(id = price.pub)
+                        pub = price.pub
                         setattr(price, 'pubName', pub.name)
                         setattr(price, 'pubCounty', pub.county)
                         setattr(price, 'contributorName', price.creator.username)
@@ -93,7 +93,7 @@ class Command(BaseCommand):
                         setattr(pub, 'contributorName', pub.creator.username)
 
                     for pub in alerts_context['new_pending_pub_patches']:
-                        cloned_from = Pub.objects.get(id = pub.clonedFrom)
+                        cloned_from = pub.clonedFrom
                         setattr(pub, 'nameOrig', cloned_from.name)
                         setattr(pub, 'countyOrig', cloned_from.county)
                         setattr(pub, 'contributorName', pub.creator.username)
@@ -101,8 +101,8 @@ class Command(BaseCommand):
 
                         # Set changed fields
                         for key in ['name', 'county', 'latitude', 'longitude', 'closed', 'servingGuinness']:
-                            if pub[key] != cloned_from[key]:
-                                pub['changedFields'].append((key, (cloned_from[key], pub[key])))
+                            if getattr(pub, key) != getattr(cloned_from, key):
+                                getattr(pub, 'changedFields').append((key, (getattr(cloned_from, key), getattr(pub, key))))
 
                     for user in User.objects.all():
 
@@ -125,14 +125,14 @@ class Command(BaseCommand):
                             try:
                                 html_content = render_to_string('alert_email_template.html', alerts_context)
                             except:
-                                self.logger.error("Failed to render email to string")
+                                logger.error("Failed to render email to string")
                                 continue
 
-                        try:
-                            user.email_user('Guindex Alert', html_content, None, html_message = html_content)
-                        except:
-                            self.logger.error("Failed to send email to user %d", user.id)
-                            continue
+                            try:
+                                user.email_user('Guindex Alert', html_content, None, html_message = html_content)
+                            except:
+                                logger.error("Failed to send email to user %d", user.id)
+                                continue
 
                         if getattr(user, 'telegramuser') and user.telegramuser.usingTelegramAlerts:
 
@@ -154,105 +154,107 @@ class Command(BaseCommand):
 
             time.sleep(sleep_time)
 
-        def sendTelegramAlert(self, context):
+    def sendTelegramAlert(self, context):
 
-            message = "Hello %s,\n\n" % (context['user'].username)
+        message = "Hello %s,\n\n" % (context['user'].username)
 
-            message += "Here is your weekly Guindex activity update\n\n"
+        message += "Here is your weekly Guindex activity update:\n\n"
 
-            if len(context['new_prices']):
+        if len(context['new_prices']):
 
-                message += "*** New Price Submissions ***\n\n"
+            message += "*** New Price Submissions ***\n\n"
 
-                for price in context['new_prices']:
-                    message += "Pub: %s\n" % price['pubName']
-                    message += "County: %s\n" % price['pubCounty']
-                    message += "Price: %f\n" % price['price']
-                    message += "Rating: %d/5\n" % price['starRating']
-                    message += "Time: %s\n" % price['creationDate'].strftime('%Y-%b-%d %H:%M:%S')
-                    message += "\n"
+            for price in context['new_prices']:
+                message += "Pub: %s\n" % getattr(price, 'pubName')
+                message += "County: %s\n" % getattr(price, 'pubCounty')
+                message += "Price: %.2f\n" % getattr(price, 'price')
+                message += "Rating: %d/5\n" % getattr(price, 'starRating')
+                message += "Time: %s\n" % getattr(price, 'creationDate').strftime('%Y-%b-%d %H:%M:%S')
+                message += "\n"
 
-            if len(context['new_pubs']):
+        if len(context['new_pubs']):
 
-                message += "*** New Pub Submissions ***\n\n"
+            message += "*** New Pub Submissions ***\n\n"
 
-                for pub in context['new_pubs']:
-                    message += "Pub: %s\n" % pub['name']
-                    message += "County: %s\n" % pub['county']
-                    message += "Time: %s\n" % pub['creationDate'].strftime('%Y-%b-%d %H:%M:%S')
-                    message += "\n"
+            for pub in context['new_pubs']:
+                message += "Pub Name: %s\n" % getattr(pub, 'name')
+                message += "County: %s\n" % getattr(pub, 'county')
+                message += "Latitude: %f\n" % getattr(pub, 'latitude')
+                message += "Longitude: %f\n" % getattr(pub, 'longitude')
+                message += "Time: %s\n" % getattr(pub, 'creationDate').strftime('%Y-%b-%d %H:%M:%S')
+                message += "\n"
 
-            if context['user'].is_staff and len(context['new_pending_price_creates']):
+        if context['user'].is_staff and len(context['new_pending_price_creates']):
 
-                message += "*** New Pending Price Submissions ***\n\n"
+            message += "*** New Pending Price Submissions ***\n\n"
 
-                for price in context['new_pending_price_creates']:
-                    message += "ID: %d\n" % price['id']
-                    message += "Pub: %s\n" % price['pubName']
-                    message += "County: %s\n" % price['pubCounty']
-                    message += "Price: %f\n" % price['price']
-                    message += "Rating: %d/5\n" % price['starRating']
-                    message += "Contributor: %s\n" % price['contributorName']
-                    message += "Time: %s\n" % price['creationDate'].strftime('%Y-%b-%d %H:%M:%S')
-                    message += "\n"
+            for price in context['new_pending_price_creates']:
+                message += "ID: %d\n" % getattr(price, 'id')
+                message += "Pub: %s\n" % getattr(price, 'pubName')
+                message += "County: %s\n" % getattr(price, 'pubCounty')
+                message += "Price: %.2f\n" % getattr(price, 'price')
+                message += "Rating: %d/5\n" % getattr(price, 'starRating')
+                message += "Contributor: %s\n" % getattr(price, 'contributorName')
+                message += "Time: %s\n" % getattr(price, 'creationDate').strftime('%Y-%b-%d %H:%M:%S')
+                message += "\n"
 
-            if context['user'].is_staff and len(context['new_pending_pub_creates']):
+        if context['user'].is_staff and len(context['new_pending_pub_creates']):
 
-                message += "*** New Pending Pub Submissions ***\n\n"
+            message += "*** New Pending Pub Submissions ***\n\n"
 
-                for pub in context['new_pending_pub_creates']:
-                    message += "ID: %d\n" % pub['id']
-                    message += "Pub: %s\n" % pub['name']
-                    message += "County: %s\n" % pub['county']
-                    message += "Latitude: %f\n" % pub['latitude']
-                    message += "Longitude: %f\n" % pub['longitude']
-                    message += "Contributor: %s\n" % pub['contributorName']
-                    message += "Time: %s\n" % pub['creationDate'].strftime('%Y-%b-%d %H:%M:%S')
-                    message += "\n"
+            for pub in context['new_pending_pub_creates']:
+                message += "ID: %d\n" % getattr(pub, 'id')
+                message += "Pub: %s\n" % getattr(pub, 'name')
+                message += "County: %s\n" % getattr(pub, 'county')
+                message += "Latitude: %f\n" % getattr(pub, 'latitude')
+                message += "Longitude: %f\n" % getattr(pub, 'longitude')
+                message += "Contributor: %s\n" % getattr(pub, 'contributorName')
+                message += "Time: %s\n" % getattr(pub, 'creationDate').strftime('%Y-%b-%d %H:%M:%S')
+                message += "\n"
 
-            if context['user'].is_staff and len(context['new_pending_pub_patches']):
+        if context['user'].is_staff and len(context['new_pending_pub_patches']):
 
-                message += "*** New Pending Pub Changes ***\n\n"
+            message += "*** New Pending Pub Changes ***\n\n"
 
-                for pub in context['new_pending_pub_patches']:
-                    message += "ID: %d\n" % pub['id']
-                    message += "Pub: %s\n" % pub['name']
-                    message += "County: %s\n" % pub['county']
-                    message += "Contributor: %s\n" % pub['contributorName']
-                    message += "Time: %s\n" % pub['creationDate'].strftime('%Y-%b-%d %H:%M:%S')
+            for pub in context['new_pending_pub_patches']:
+                message += "ID: %d\n" % getattr(pub, 'id')
+                message += "Pub: %s\n" % getattr(pub, 'name')
+                message += "County: %s\n" % getattr(pub, 'county')
+                message += "Contributor: %s\n" % getattr(pub, 'contributorName')
+                message += "Time: %s\n" % getattr(pub, 'creationDate').strftime('%Y-%b-%d %H:%M:%S')
 
-                    changes = ""
+                changes = ""
 
-                    for changed_field in pub['changedFields']:
-                        changes += "    " + changed_field[0] + ": " + str(changed_field[1][0]) + " --> " + \
-                                   str(changed_field[1][1]) + "\n"
+                for changed_field in getattr(pub, 'changedFields'):
+                    changes += "    " + changed_field[0] + ": " + str(changed_field[1][0]) + " --> " + \
+                               str(changed_field[1][1]) + "\n"
 
-                    message += "Updates: %s" % changes
-                    message += "\n"
+                message += "Updates:\n %s" % changes
+                message += "\n"
 
-            message += "Kind regards,\n"
-            message += "The Guindex Team"
+        message += "Kind regards,\n"
+        message += "The Guindex Team"
 
-            try:
-                GuindexBot.sendMessage(message, user.telegramuser.chatId)
-            except:
-                logger.error("Failed to send Telegram to user %d", context['user'].id)
+        try:
+            GuindexBot.sendMessage(message, context['user'].telegramuser.chatId)
+        except:
+            logger.error("Failed to send Telegram to user %d", context['user'].id)
 
-        def validateAlertsSettings(self, user):
+    def validateAlertsSettings(self, user):
 
-            logger.debug("Validating alerts settings for user %d", user.id)
+        logger.debug("Validating alerts settings for user %d", user.id)
 
-            if not hasattr(user, 'guindexuser'):
+        if not hasattr(user, 'guindexuser'):
 
-                logger.info("User %d does not have a GuindexUser. Creating one", user.id)
+            logger.info("User %d does not have a GuindexUser. Creating one", user.id)
 
-                guindexuser = GuindexUser()
+            guindexuser = GuindexUser()
 
-                guindexuser.user = user
-                guindexuser.save()
+            guindexuser.user = user
+            guindexuser.save()
 
-            if not hasattr(user, 'telegramuser'):
+        if not hasattr(user, 'telegramuser'):
 
-                logger.info("User %d does not have a TelegramUser. Creating one", user.id)
+            logger.info("User %d does not have a TelegramUser. Creating one", user.id)
 
-                TelegramUserUtils.createNewTelegramUser(user)
+            TelegramUserUtils.createNewTelegramUser(user)

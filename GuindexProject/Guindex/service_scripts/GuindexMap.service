@@ -1,0 +1,16 @@
+[Unit]
+Description=Periodically generate Guindex map
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/Guindex/GuindexProject
+ExecStart=/usr/bin/python /var/www/Guindex/GuindexProject/manage.py GuindexMap
+User=root
+Group=root
+Restart=always
+RestartSec=1
+StartLimitBurst=0
+
+[Install]
+WantedBy=multi-user.target

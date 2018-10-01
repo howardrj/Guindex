@@ -2,9 +2,9 @@ import logging
 from decimal import Decimal
 
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.utils import timezone
 
 from Guindex.GuindexParameters import GuindexParameters
 
@@ -331,5 +331,4 @@ class AlertsSingleton(models.Model):
 
     @classmethod
     def load(cls):
-        obj, created = cls.objects.get_or_create(pk = 1)
-        return obj
+        return cls.objects.get_or_create(pk = 1)

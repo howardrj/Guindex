@@ -34,7 +34,7 @@
 
             <p> Hello {{ user.username }}, </p>
 
-            <p> Here is your weekly Guindex activity update. </p>
+            <p> Here is your weekly Guindex activity update: </p>
 
             {% if new_prices|length %}
                 {% autoescape off %}
@@ -64,7 +64,7 @@
                             <td> {{ price.creationDate|date:'Y-m-d' }} {{ price.creationDate|time:'H:i:s' }} </td> 
                         </tr>
                     </table>
-                    </br>
+                    <br>
                 {% endfor %}
 
                 {% endautoescape %}
@@ -75,10 +75,10 @@
 
                 <h3> New Pub Submissions </h3>
 
-                {% for pubs in new_pubs %}
+                {% for pub in new_pubs %}
                     <table border="1">
                         <tr>
-                            <td> <b> Pub </b> </td>
+                            <td> <b> Pub Name </b> </td>
                             <td> {{ pub.name }} </td>
                         </tr>
                         <tr>
@@ -86,11 +86,19 @@
                             <td> {{ pub.county }} </td>
                         </tr>
                         <tr>
+                            <td> <b> Latitude </b> </td>
+                            <td> {{ pub.latitude }} </td>
+                        </tr>
+                        <tr>
+                            <td> <b> Longitude </b> </td>
+                            <td> {{ pub.longitude }} </td>
+                        </tr>
+                        <tr>
                             <td> <b> Time </b> </td>
                             <td> {{ pub.creationDate|date:'Y-m-d' }} {{ pub.creationDate|time:'H:i:s' }} </td> 
                         </tr>
                     </table>
-                   </br>
+                   <br>
                 {% endfor %}
 
                 {% endautoescape %}
@@ -152,7 +160,7 @@
                                 <td> {{ pub.id }} </td>
                             </tr>
                             <tr>
-                                <td> <b> Pub </b> </td>
+                                <td> <b> Pub Name </b> </td>
                                 <td> {{ pub.name }} </td>
                             </tr>
                             <tr>
@@ -215,7 +223,7 @@
                                     <ul>
                                     {% for changed_field in pub.changedFields %}
                                         <li>
-                                            <b> {{ changed_field.0 }} </b>: {{ changed_field.1.0}} &xrarr; {{ changed_field.1.1 }}  
+                                            <b> {{ changed_field.0 }} </b>: {{ changed_field.1.0}} --> {{ changed_field.1.1 }}  
                                         </li>
                                     {% endfor %}     
                                     </ul>

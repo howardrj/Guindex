@@ -19,6 +19,7 @@ class GuindexParameters:
     # Background script run periods (in seconds)
     DB_BACKUP_PERIOD         = 86400
     STATS_CALCULATION_PERIOD = 86400
+    ALERTS_CHECK_PERIOD      = 86400 * 7
 
     # Map generation parameters
     MAP_GENERATION_PERIOD   = 86400
