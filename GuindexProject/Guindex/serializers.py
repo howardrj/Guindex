@@ -113,7 +113,7 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
                 setattr(guinness, field.name, getattr(self.instance, field.name))
 
             # Overwrite creation date so alerts will register change
-            guinness.creationDate = timezone.now() 
+            guinness.creationDate = timezone.now()
 
             guinness.pk = None
             guinness.save(createPendingCreate = False)
@@ -122,9 +122,11 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
             logger.info("GuinnessPendingCreate object was not approved")
 
         logger.info("Deleting pending contribution")
-        self.instance.delete()
 
-        # TODO Notify user of decision
+        reject_reason = getattr(self._validated_data, 'rejectReason', "")
+
+        self.instance.delete(approved = approved,
+                             rejectReason = reject_reason)
 
 
 ###################
@@ -139,7 +141,7 @@ class PubSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pub
         fields = '__all__'
-        read_only_fields = ('id', 'creator', 'creationDate', 'mapLink', 'averageRating', 
+        read_only_fields = ('id', 'creator', 'creationDate', 'mapLink', 'averageRating',
                             'lastPrice', 'lastSubmissionTime')
 
     def validate(self, data):
@@ -283,7 +285,7 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
                 setattr(pub, field.name, getattr(self.instance, field.name))
 
             # Overwrite creation date so alerts will register change
-            pub.creationDate = timezone.now() 
+            pub.creationDate = timezone.now()
 
             # Update relevant fields
             pub.pk = None
@@ -295,7 +297,10 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
         logger.info("Deleting pending contribution")
         self.instance.delete()
 
-        # TODO Notify user of decision
+        reject_reason = getattr(self._validated_data, 'rejectReason', "")
+
+        self.instance.delete(approved = approved,
+                             rejectReason = reject_reason)
 
 
 ###############################
@@ -363,9 +368,11 @@ class PubPendingPatchSerializer(serializers.ModelSerializer):
             logger.info("PubPendingPatch object was not approved")
 
         logger.info("Deleting pending contribution")
-        self.instance.delete()
-    
-        # TODO Notify user of decision
+
+        reject_reason = getattr(self._validated_data, 'rejectReason', "")
+
+        self.instance.delete(approved = approved,
+                             rejectReason = reject_reason)
 
 
 ##########################

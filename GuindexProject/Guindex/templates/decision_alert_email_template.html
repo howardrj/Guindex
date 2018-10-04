@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Oswald">
+    </head>
+    <body>
+        <style>
+
+            h1 {
+                font-family: "Oswald";
+                font-size: 90px;
+                color: black;
+                position: relative;
+                white-space: nowrap;
+                margin-top: 40px;
+                text-align: center;
+            }
+
+            .content_div {
+                margin-top: 0px;
+                margin-bottom: 30px;
+                font-family: "Oswald";
+                font-size: 16.5px;
+                text-align: center;
+            }
+        </style>
+
+        <h1> Guindex </h1>
+
+        <div class="content_div">
+
+            <p> Hello {{ user.username }}, </p>
+
+            <p> {{ message }} </p>
+
+            {% if reject_reason and reject_reason != "" %}
+                {% autoescape off %}
+
+                <p> Reason: {{ reject_reason }} </p>
+        
+                {% endautoescape %}
+            {% endif %}
+
+            <p>
+                Please note that you can adjust your notification settings by visiting
+                <a href="https://guindex.ie/settings/"> this link </a>.
+            </p>
+
+            <p> Kind regards, </p>
+            <p> The Guindex Team </p>
+
+        </div>
+    </body>
+</html>
+

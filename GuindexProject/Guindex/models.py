@@ -5,8 +5,10 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.template.loader import render_to_string
 
 from Guindex.GuindexParameters import GuindexParameters
+from Guindex.GuindexBot import GuindexBot
 
 logger = logging.getLogger(__name__)
 
@@ -121,6 +123,61 @@ class PubPendingCreate(PubBase):
     """
         Table that stores list of pending pub creations
     """
+    def delete(self, *args, **kwargs):
+
+        approved = getattr(kwargs, 'approved', False)
+        reject_reason = getattr(kwargs, 'rejectReason', "")
+
+        try:
+            self.sendDeletionAlert(approved, reject_reason)
+        except:
+            pass
+
+        super(PubPendingCreate, self).delete()
+
+    def sendDeletionAlert(self, approved, rejectReason):
+        """
+            Let contributor know that a decision has been made
+            regarding their pending contribution.
+        """
+        if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.usingEmailAlerts:
+
+            alerts_context = {}
+
+            alerts_context['user'] = self.creator
+
+            alerts_context['message'] = "Your new pub submission (%s) has been %s" % (self.name,
+                                                                                      "approved" if approved else "rejected")
+
+            if not approved and rejectReason:
+                alerts_context['reject_reason'] = rejectReason
+            else:
+                alerts_context['reject_reason'] = ""
+
+            try:
+                html_content = render_to_string('decision_alert_email_template.html', alerts_context)
+                self.creator.email_user('Guindex New Pub Submission Decision', html_content, None, html_message = html_content)
+            except:
+                logger.error("Failed to send email to user %d", self.creator.id)
+
+        if getattr(self.creator, 'telegramuser') and self.creator.telegramuser.usingTelegramAlerts:
+
+            message = "Hello %s,\n\n" % (self.creator.username)
+
+            message += "Your new pub submission (%s) has been %s.\n" % (self.name,
+                                                                        "approved" if approved else "rejected")
+
+            if not approved and rejectReason:
+                message += "Reason: %s\n" % rejectReason
+
+            message += "\n"
+            message += "Kind regards,\n"
+            message += "The Guindex Team"
+
+            try:
+                GuindexBot.sendMessage(message, self.creator.telegramuser.chatId)
+            except:
+                logger.error("Failed to send Telegram to user %d", self.creator.id)
 
 
 class PubPendingPatch(PubBase):
@@ -130,6 +187,62 @@ class PubPendingPatch(PubBase):
 
     clonedFrom = models.ForeignKey(Pub,
                                    help_text = 'Pub this patch was applied to')
+
+    def delete(self, *args, **kwargs):
+
+        approved = getattr(kwargs, 'approved', False)
+        reject_reason = getattr(kwargs, 'rejectReason', "")
+
+        try:
+            self.sendDeletionAlert(approved, reject_reason)
+        except:
+            pass
+
+        super(PubPendingPatch, self).delete()
+
+    def sendDeletionAlert(self, approved, rejectReason):
+        """
+            Let contributor know that a decision has been made
+            regarding their pending contribution.
+        """
+        if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.usingEmailAlerts:
+
+            alerts_context = {}
+
+            alerts_context['user'] = self.creator
+
+            alerts_context['message'] = "Your suggested updates for %s have been %s" % (self.name,
+                                                                                        "approved" if approved else "rejected")
+
+            if not approved and rejectReason:
+                alerts_context['reject_reason'] = rejectReason
+            else:
+                alerts_context['reject_reason'] = ""
+
+            try:
+                html_content = render_to_string('decision_alert_email_template.html', alerts_context)
+                self.creator.email_user('Guindex Pub Update Decision', html_content, None, html_message = html_content)
+            except:
+                logger.error("Failed to send email to user %d", self.creator.id)
+
+        if getattr(self.creator, 'telegramuser') and self.creator.telegramuser.usingTelegramAlerts:
+
+            message = "Hello %s,\n\n" % (self.creator.username)
+
+            message += "Your suggested updates for %s have been %s.\n" % (self.name,
+                                                                          "approved" if approved else "rejected")
+
+            if not approved and rejectReason:
+                message += "Reason: %s\n" % rejectReason
+
+            message += "\n"
+            message += "Kind regards,\n"
+            message += "The Guindex Team"
+
+            try:
+                GuindexBot.sendMessage(message, self.creator.telegramuser.chatId)
+            except:
+                logger.error("Failed to send Telegram to user %d", self.creator.id)
 
 
 ###################
@@ -215,6 +328,63 @@ class GuinnessPendingCreate(GuinnessBase):
     """
         Table that stores list of pending Guinness creations
     """
+
+    def delete(self, *args, **kwargs):
+
+        approved = getattr(kwargs, 'approved', False)
+        reject_reason = getattr(kwargs, 'rejectReason', "")
+
+        try:
+            self.sendDeletionAlert(approved, reject_reason)
+        except:
+            pass
+
+        super(GuinnessPendingCreate, self).delete()
+
+    def sendDeletionAlert(self, approved, rejectReason):
+        """
+            Let contributor know that a decision has been made
+            regarding their pending contribution.
+        """
+
+        if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.usingEmailAlerts:
+
+            alerts_context = {}
+
+            alerts_context['user'] = self.creator
+
+            alerts_context['message'] = "Your price submission for %s have been %s" % (self.name,
+                                                                                       "approved" if approved else "rejected")
+
+            if not approved and rejectReason:
+                alerts_context['reject_reason'] = rejectReason
+            else:
+                alerts_context['reject_reason'] = ""
+
+            try:
+                html_content = render_to_string('decision_alert_email_template.html', alerts_context)
+                self.creator.email_user('Guindex Price Submission Decision', html_content, None, html_message = html_content)
+            except:
+                logger.error("Failed to send email to user %d", self.creator.id)
+
+        if getattr(self.creator, 'telegramuser') and self.creator.telegramuser.usingTelegramAlerts:
+
+            message = "Hello %s,\n\n" % (self.creator.username)
+
+            message += "Your price submission for %s has been %s.\n" % (self.pub.name,
+                                                                        "approved" if approved else "rejected")
+
+            if not approved and rejectReason:
+                message += "Reason: %s\n" % rejectReason
+
+            message += "\n"
+            message += "Kind regards,\n"
+            message += "The Guindex Team"
+
+            try:
+                GuindexBot.sendMessage(message, self.creator.telegramuser.chatId)
+            except:
+                logger.error("Failed to send Telegram to user %d", self.creator.id)
 
 
 #####################
