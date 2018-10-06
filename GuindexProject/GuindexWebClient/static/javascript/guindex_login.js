@@ -242,7 +242,7 @@ $(document).on('click', '#password_login_button', function () {
                 localStorage.setItem('guindexUsername',     response['username']);
                 localStorage.setItem('guindexAccessToken',  response['key']);
                 localStorage.setItem('guindexUserId',       response['user']);
-                localStorage.setItem('guindexIsStaffMember, response['isStaff'] == "True" ? true : false);
+                localStorage.setItem('guindexIsStaffMember', response['isStaff'] == "True" ? true : false);
 
                 // Do login stuff
                 g_loggedIn      = true;
