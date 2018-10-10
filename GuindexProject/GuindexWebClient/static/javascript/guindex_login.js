@@ -8,15 +8,17 @@ function statusChangeCallback(response) {
     {
         // The person is not logged into facebook or authorized your app 
 
-        // Need all three parameters
+        // Need all four parameters
         if (localStorage.getItem('guindexUsername') &&
             localStorage.getItem('guindexAccessToken') &&
-            localStorage.getItem('guindexUserId'))
+            localStorage.getItem('guindexUserId') &&
+            localStorage.getItem('guindexIsStaffMember'))
         {
-            g_loggedIn    = true;
-            g_username    = localStorage.getItem('guindexUsername');
-            g_accessToken = localStorage.getItem('guindexAccessToken');
-            g_userId      = localStorage.getItem('guindexUserId');
+            g_loggedIn      = true;
+            g_username      = localStorage.getItem('guindexUsername');
+            g_accessToken   = localStorage.getItem('guindexAccessToken');
+            g_userId        = localStorage.getItem('guindexUserId');
+            g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
 
             onLoginWithPasswordSuccess();
         }
@@ -26,6 +28,7 @@ function statusChangeCallback(response) {
             localStorage.removeItem('guindexUsername');
             localStorage.removeItem('guindexAccessToken');
             localStorage.removeItem('guindexUserId');
+            localStorage.removeItem('guindexIsStaffMember');
 
             // Carry on as normal ...
         }
@@ -236,15 +239,17 @@ $(document).on('click', '#password_login_button', function () {
 
             if (request.status == 200)
             {
-                localStorage.setItem('guindexUsername',    response['username']);
-                localStorage.setItem('guindexAccessToken', response['key']);
-                localStorage.setItem('guindexUserId',      response['user']);
+                localStorage.setItem('guindexUsername',     response['username']);
+                localStorage.setItem('guindexAccessToken',  response['key']);
+                localStorage.setItem('guindexUserId',       response['user']);
+                localStorage.setItem('guindexIsStaffMember', response['isStaff'] == "True" ? true : false);
 
                 // Do login stuff
-                g_loggedIn    = true;
-                g_username    = localStorage.getItem('guindexUsername');
-                g_accessToken = localStorage.getItem('guindexAccessToken');
-                g_userId      = localStorage.getItem('guindexUserId');
+                g_loggedIn      = true;
+                g_username      = localStorage.getItem('guindexUsername');
+                g_accessToken   = localStorage.getItem('guindexAccessToken');
+                g_userId        = localStorage.getItem('guindexUserId');
+                g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
 
                 onLoginWithPasswordSuccess();
             }
@@ -285,6 +290,7 @@ $(document).on('click', '#logout_button', function () {
     localStorage.removeItem('guindexUsername');
     localStorage.removeItem('guindexAccessToken');
     localStorage.removeItem('guindexUserId');
+    localStorage.removeItem('guindexIsStaffMember');
 
     // Reload page (easiest thing to do here)
     location.reload();
@@ -331,6 +337,7 @@ function onLoginWithFacebookSuccess ()
     localStorage.removeItem('guindexUsername');
     localStorage.removeItem('guindexAccessToken');
     localStorage.removeItem('guindexUserId');
+    localStorage.removeItem('guindexIsStaffMember');
 
     // TODO Should not be doing this
     // Instead dispatch 'login' event
