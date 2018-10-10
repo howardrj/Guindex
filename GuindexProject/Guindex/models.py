@@ -116,6 +116,7 @@ class Pub(PubBase):
             setattr(pub_pending_create, field.name, getattr(self, field.name))
 
         pub_pending_create.pk = None
+        pub_pending_create.mapLink = GuindexParameters.MAP_LINK_STRING % (self.latitude, self.longitude)
         pub_pending_create.save()
 
 
@@ -187,6 +188,21 @@ class PubPendingPatch(PubBase):
 
     clonedFrom = models.ForeignKey(Pub,
                                    help_text = 'Pub this patch was applied to')
+
+    def getProposedPatches(self):
+        """
+            Returns proposed changes in serializable format.
+        """
+        
+        changed_fields = {}
+
+        for field in ['name', 'county', 'latitude', 'longitude', 'servingGuinness', 'closed']:
+
+            if getattr(self.clonedFrom, field) != getattr(self, field):
+
+                changed_fields[field] = (getattr(self.clonedFrom, field), getattr(self, field))
+
+        return changed_fields
 
     def delete(self, *args, **kwargs):
 

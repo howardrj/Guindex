@@ -81,7 +81,7 @@ class GuinnessPendingCreateViewSet(viewsets.ModelViewSet):
 
     serializer_class   = GuinnessPendingCreateSerializer
     queryset           = GuinnessPendingCreate.objects.all()
-    permission_classes = (IsAdminOrReadOnly, )
+    permission_classes = (permissions.IsAdminUser, )
     http_method_names  = ['get', 'patch']  # Disallow PUTS
 
 
@@ -108,7 +108,7 @@ class PubPendingCreateViewSet(viewsets.ModelViewSet):
 
     serializer_class   = PubPendingCreateSerializer
     queryset           = PubPendingCreate.objects.all()
-    permission_classes = (IsAdminOrReadOnly, )
+    permission_classes = (permissions.IsAdminUser, )
     http_method_names  = ['get', 'patch']  # Disallow PUTS
 
 
@@ -120,7 +120,7 @@ class PubPendingPatchViewSet(viewsets.ModelViewSet):
 
     serializer_class   = PubPendingPatchSerializer
     queryset           = PubPendingPatch.objects.all()
-    permission_classes = (IsAdminOrReadOnly, )
+    permission_classes = (permissions.IsAdminUser, )
     http_method_names  = ['get', 'patch']  # Disallow PUTS
 
 
@@ -146,7 +146,7 @@ class ContributorViewSet(viewsets.ModelViewSet):
     queryset           = User.objects.all()
     http_method_names  = ['get', 'patch']
 
-    def get_permission(self):
+    def get_permissions(self):
 
         if self.action == 'list':
             permission_classes = (permissions.IsAdminUser, )

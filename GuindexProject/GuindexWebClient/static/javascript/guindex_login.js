@@ -294,8 +294,11 @@ function onLoginWithPasswordSuccess ()
 {
     g_facebookAccessToken = null;
 
+    // TODO Should not be doing this
+    // Instead dispatch 'login' event
     populateUserSettingsTable();
     populateUserContributionsTable();
+    populatePendingContributionsTables();
 
     if (g_guindexDataTable && g_guindexDataTable.onLogin)
     {
@@ -329,8 +332,11 @@ function onLoginWithFacebookSuccess ()
     localStorage.removeItem('guindexAccessToken');
     localStorage.removeItem('guindexUserId');
 
+    // TODO Should not be doing this
+    // Instead dispatch 'login' event
     populateUserSettingsTable();
     populateUserContributionsTable();
+    populatePendingContributionsTables();
 
     if (g_guindexDataTable && g_guindexDataTable.onLogin)
     {

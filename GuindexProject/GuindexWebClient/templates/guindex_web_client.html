@@ -156,6 +156,12 @@
             <span class="nav-link-text">Contributions</span>
           </a>
         </li>
+        <li id="pending_contributions_li" class="nav-item" data-toggle="tooltip" data-placement="right" title="Pending Contributions" style="display:none">
+          <a class="nav-link page_content_link" data-content_page_id="pending_contributions_page">
+            <i class="fa fa-fw fa-clock-o"></i>
+            <span class="nav-link-text">Pending Contributions</span>
+          </a>
+        </li>
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Links">
           <a class="nav-link page_content_link" data-content_page_id="links_page">
             <i class="fa fa-fw fa-link"></i>
@@ -236,6 +242,7 @@
   {% include "data_table.html" %}
   {% include "data_add_pub.html" %}
   {% include "contributions.html" %}
+  {% include "pending_contributions.html" %}
   {% include "settings.html" %}
   {% include "links.html" %}
   {% include "info_introduction.html" %}
@@ -405,6 +412,33 @@
     </div>
   </div>
 
+  <!-- Pending Contribution Reject Reason Modal (with hidden button to open it)-->
+  <a class="nav-link" data-toggle="modal" id="reject_reason_link" data-target="#reject_reason_modal" style="display:none"></a>
+
+  <div class="modal fade" id="reject_reason_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:9999">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="message_severity"> Reject Reason </h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            Include an (optional) reason for rejecting this pending contribution:
+            <textarea id="reject_reason_text_area" style="margin: 10px auto; display:block; position:relative">
+
+            </textarea>
+        </div>
+        <div class="modal-footer">
+          <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <button id="final_reject_submit_button" class="pending_contribution_button btn btn-primary" type="button" data-dismiss="modal">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Edit Pub Modal (with hidden button to open it)-->
   <!-- TODO Need to clean this up to look more like the otehr forms (using form-groups etc.) -->
   <a class="nav-link" data-toggle="modal" id="edit_pub_link" data-target="#edit_pub_modal" style="display:none"></a>
@@ -495,6 +529,7 @@
     <script type="text/javascript" src="{% static "javascript/guindex_login.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_user_settings.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_user_contributions.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_pending_contributions.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_table.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_add_pub.min.js" %}"></script>
@@ -506,6 +541,7 @@
     <script type="text/javascript" src="{% static "javascript/guindex_login.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_user_settings.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_user_contributions.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_pending_contributions.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>

@@ -79,10 +79,26 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
                                          write_only = True,
                                          allow_blank = True)
 
+    creatorName = serializers.CharField(help_text = 'Username of creator',
+                                        source = 'creator.username',
+                                        read_only = True,
+                                        max_length = 100)
+
+    pubName = serializers.CharField(help_text = 'Name of the pub this price belongs to',
+                                    source = 'pub.name',
+                                    read_only = True,
+                                    max_length = GuindexParameters.MAX_PUB_NAME_LEN)
+
+    pubCounty = serializers.CharField(help_text = 'County of the pub this price belongs to',
+                                      source = 'pub.county',
+                                      read_only = True,
+                                      max_length = 50)
+
     class Meta:
         model = GuinnessPendingCreate
         fields = '__all__'
-        read_only_fields = ('id', 'creationDate', 'creator', 'price', 'pub', 'starRating')
+        read_only_fields = ('id', 'creationDate', 'creator', 'creatorName', 
+                            'price', 'pub', 'pubName', 'pubCounty', 'starRating')
 
     def validate(self, data):
         """
@@ -249,11 +265,16 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
                                          write_only = True,
                                          allow_blank = True)
 
+    creatorName = serializers.CharField(help_text = 'Username of creator',
+                                        source = 'creator.username',
+                                        read_only = True,
+                                        max_length = 100)
+
     class Meta:
         model = PubPendingCreate
         fields = '__all__'
-        read_only_fields = ('id', 'creator', 'creationDate', 'name', 'county',
-                            'longitude', 'latitude', 'mapLink', 'closed',
+        read_only_fields = ('id', 'creator', 'creatorName', 'creationDate', 'name', 'county',
+                            'longitude', 'latitude', 'mapLink', 'closed', 'averageRating',
                             'servingGuinness')
 
     def validate(self, data):
@@ -320,12 +341,32 @@ class PubPendingPatchSerializer(serializers.ModelSerializer):
                                          write_only = True,
                                          allow_blank = True)
 
+    creatorName = serializers.CharField(help_text = 'Username of patch contributor',
+                                        source = 'creator.username',
+                                        read_only = True,
+                                        max_length = 100)
+
+    pubNameOrig = serializers.CharField(help_text = 'Name of the pub this patch applies to',
+                                        source = 'clonedFrom.name',
+                                        read_only = True,
+                                        max_length = GuindexParameters.MAX_PUB_NAME_LEN)
+
+    pubCountyOrig = serializers.CharField(help_text = 'County of the pub this patch applies to',
+                                          source = 'clonedFrom.county',
+                                          read_only = True,
+                                          max_length = 50)
+
+    proposedPatches = serializers.JSONField(help_text = 'List of proposed changes (original value first)',
+                                            read_only = True,
+                                            source = 'getProposedPatches')
+    
+
     class Meta:
         model = PubPendingPatch
         fields = '__all__'
-        read_only_fields = ('id', 'creator', 'creationDate', 'name', 'county',
-                            'longitude', 'latitude', 'mapLink', 'closed',
-                            'servingGuinness', 'clonedFrom')
+        read_only_fields = ('id', 'name', 'latitude', 'longitude', 'creator', 'creationDate',
+                            'servingGuinness', 'closed', 'averageRating', 'county', 'mapLink', 
+                            'clonedFrom', 'creatorName', 'pubNameOrig', 'pubCountyOrig', 'proposedPatches')
 
     def validate(self, data):
         """
@@ -394,15 +435,19 @@ class StatisticsSerializer(serializers.ModelSerializer):
 class ContributorSerializer(serializers.ModelSerializer):
 
     pubsVisited = serializers.IntegerField(help_text = 'Number of pubs visited by this contributor',
+                                           read_only = True,
                                            source = 'guindexuser.pubsVisited')
 
     originalPrices = serializers.IntegerField(help_text = 'Number of first prices for a pub submitted by this contributor',
+                                              read_only = True,
                                               source = 'guindexuser.originalPrices')
 
     currentVerifications = serializers.IntegerField(help_text = 'Number of current verifactions for this contributor',
+                                                    read_only = True,
                                                     source = 'guindexuser.currentVerifications')
 
     isDeveloper = serializers.IntegerField(help_text = 'Is this contributor a developer of the Guindex website?',
+                                           read_only = True,
                                            source = 'guindexuser.isDeveloper')
 
     usingEmailAlerts = serializers.BooleanField(help_text = 'Does this contributor have email alerts enabled?',
@@ -412,9 +457,11 @@ class ContributorSerializer(serializers.ModelSerializer):
                                                    source = 'telegramuser.usingTelegramAlerts')
 
     telegramActivated = serializers.BooleanField(help_text = 'Does this contributor have their Telegram account activated?',
+                                                 read_only = True,
                                                  source = 'telegramuser.activated')
 
     telegramActivationKey = serializers.CharField(help_text = 'Telegram activation key for this contributor.',
+                                                  read_only = True,
                                                   source = 'telegramuser.activationKey')
 
     class Meta:
