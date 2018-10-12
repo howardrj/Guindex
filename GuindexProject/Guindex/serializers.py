@@ -139,7 +139,7 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
 
         logger.info("Deleting pending contribution")
 
-        reject_reason = getattr(self._validated_data, 'rejectReason', "")
+        reject_reason = self._validated_data.get('rejectReason', "")
 
         self.instance.delete(approved = approved,
                              rejectReason = reject_reason)
@@ -316,9 +316,8 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
             logger.info("PubPendingCreate object was not approved")
 
         logger.info("Deleting pending contribution")
-        self.instance.delete()
 
-        reject_reason = getattr(self._validated_data, 'rejectReason', "")
+        reject_reason = self._validated_data.get('rejectReason', "")
 
         self.instance.delete(approved = approved,
                              rejectReason = reject_reason)
@@ -410,7 +409,7 @@ class PubPendingPatchSerializer(serializers.ModelSerializer):
 
         logger.info("Deleting pending contribution")
 
-        reject_reason = getattr(self._validated_data, 'rejectReason', "")
+        reject_reason = self._validated_data.get('rejectReason', "")
 
         self.instance.delete(approved = approved,
                              rejectReason = reject_reason)

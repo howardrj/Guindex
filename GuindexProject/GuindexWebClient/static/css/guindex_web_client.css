@@ -55,8 +55,12 @@
 /* Spinning Loader */
 /*******************/
 .guindex_web_client_loader {
-    color: white;
+    color: black;
     display: none;
+}
+
+#main_loader_spinner {
+    color: white;
 }
 
 /***********/

@@ -126,8 +126,10 @@ class PubPendingCreate(PubBase):
     """
     def delete(self, *args, **kwargs):
 
-        approved = getattr(kwargs, 'approved', False)
-        reject_reason = getattr(kwargs, 'rejectReason', "")
+        logger.debug("Deleting PubPendingCreate %d", self.id)
+
+        approved = kwargs.get('approved', False)
+        reject_reason = kwargs.get('rejectReason', "")
 
         try:
             self.sendDeletionAlert(approved, reject_reason)
@@ -143,12 +145,14 @@ class PubPendingCreate(PubBase):
         """
         if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.usingEmailAlerts:
 
+            logger.debug("Sending PubPendingCreate delete alert email to user %d", self.creator.id)
+
             alerts_context = {}
 
             alerts_context['user'] = self.creator
 
-            alerts_context['message'] = "Your new pub submission (%s) has been %s" % (self.name,
-                                                                                      "approved" if approved else "rejected")
+            alerts_context['message'] = "Your new pub submission (%s) has been %s." % (self.name,
+                                                                                       "approved" if approved else "rejected")
 
             if not approved and rejectReason:
                 alerts_context['reject_reason'] = rejectReason
@@ -163,12 +167,15 @@ class PubPendingCreate(PubBase):
 
         if getattr(self.creator, 'telegramuser') and self.creator.telegramuser.usingTelegramAlerts:
 
+            logger.debug("Sending PubPendingCreate delete alert telegram to user %d", self.creator.id)
+
             message = "Hello %s,\n\n" % (self.creator.username)
 
             message += "Your new pub submission (%s) has been %s.\n" % (self.name,
                                                                         "approved" if approved else "rejected")
 
             if not approved and rejectReason:
+                message += "\n"
                 message += "Reason: %s\n" % rejectReason
 
             message += "\n"
@@ -206,8 +213,10 @@ class PubPendingPatch(PubBase):
 
     def delete(self, *args, **kwargs):
 
-        approved = getattr(kwargs, 'approved', False)
-        reject_reason = getattr(kwargs, 'rejectReason', "")
+        logger.debug("Deleting PubPendingPatch %d", self.id)
+
+        approved = kwargs.get('approved', False)
+        reject_reason = kwargs.get('rejectReason', "")
 
         try:
             self.sendDeletionAlert(approved, reject_reason)
@@ -223,11 +232,13 @@ class PubPendingPatch(PubBase):
         """
         if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.usingEmailAlerts:
 
+            logger.debug("Sending PubPendingPatch delete alert email to user %d", self.creator.id)
+
             alerts_context = {}
 
             alerts_context['user'] = self.creator
 
-            alerts_context['message'] = "Your suggested updates for %s have been %s" % (self.name,
+            alerts_context['message'] = "Your suggested updates for %s have been %s." % (self.name,
                                                                                         "approved" if approved else "rejected")
 
             if not approved and rejectReason:
@@ -243,12 +254,15 @@ class PubPendingPatch(PubBase):
 
         if getattr(self.creator, 'telegramuser') and self.creator.telegramuser.usingTelegramAlerts:
 
+            logger.debug("Sending PubPendingPatch delete alert telegram to user %d", self.creator.id)
+
             message = "Hello %s,\n\n" % (self.creator.username)
 
             message += "Your suggested updates for %s have been %s.\n" % (self.name,
                                                                           "approved" if approved else "rejected")
 
             if not approved and rejectReason:
+                message += "\n"
                 message += "Reason: %s\n" % rejectReason
 
             message += "\n"
@@ -347,8 +361,10 @@ class GuinnessPendingCreate(GuinnessBase):
 
     def delete(self, *args, **kwargs):
 
-        approved = getattr(kwargs, 'approved', False)
-        reject_reason = getattr(kwargs, 'rejectReason', "")
+        logger.debug("Deleting GuinnessPendingCreate %d", self.id)
+
+        approved = kwargs.get('approved', False)
+        reject_reason = kwargs.get('rejectReason', "")
 
         try:
             self.sendDeletionAlert(approved, reject_reason)
@@ -365,11 +381,13 @@ class GuinnessPendingCreate(GuinnessBase):
 
         if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.usingEmailAlerts:
 
+            logger.debug("Sending GuinnessPendingCreate delete alert email to user %d", self.creator.id)
+
             alerts_context = {}
 
             alerts_context['user'] = self.creator
 
-            alerts_context['message'] = "Your price submission for %s have been %s" % (self.name,
+            alerts_context['message'] = "Your price submission for %s has been %s." % (self.pub.name,
                                                                                        "approved" if approved else "rejected")
 
             if not approved and rejectReason:
@@ -385,12 +403,15 @@ class GuinnessPendingCreate(GuinnessBase):
 
         if getattr(self.creator, 'telegramuser') and self.creator.telegramuser.usingTelegramAlerts:
 
+            logger.debug("Sending GuinnessPendingCreate delete alert telegram to user %d", self.creator.id)
+
             message = "Hello %s,\n\n" % (self.creator.username)
 
             message += "Your price submission for %s has been %s.\n" % (self.pub.name,
                                                                         "approved" if approved else "rejected")
 
             if not approved and rejectReason:
+                message += "\n"
                 message += "Reason: %s\n" % rejectReason
 
             message += "\n"
