@@ -1,3 +1,10 @@
+{% load static %}
+
+{% if async_template_loading %}
+<div id="map_page" class="page_content content-wrapper" style="display:none">
+</div>
+{% else %}
 <div id="map_page" class="page_content content-wrapper" style="display:none">
     <iframe src="/guindex_map" id="guindex_map_iframe"></iframe> 
 </div>
+{% endif %}

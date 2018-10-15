@@ -1,4 +1,17 @@
+{% load static %}
+
+{% if async_template_loading %}
 <div id="data_table_page" class="page_content content-wrapper" style="display:none">
+</div>
+{% else %}
+<div id="data_table_page" class="page_content content-wrapper" style="display:none">
+
+    {% if not debug %}
+    <script type="text/javascript" src="{% static "javascript/guindex_table.min.js" %}"></script>
+    {% else %}
+    <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
+    {% endif %}
+
     <div class="container-fluid">
         <div class="card mb-3">
             <div class="card-header">
@@ -13,4 +26,17 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('data_table_page').addEventListener('tab_display', populateGuindexDataTable); 
+        document.getElementById('data_table_page').addEventListener('on_login', function() {
+
+            console.log("ON LOGIN EVENT");
+            if (g_loggedIn && g_guindexDataTable.onLogin)
+            {
+                g_guindexDataTable.onLogin();
+            }
+        }); 
+    </script>
 </div>
+{% endif %}

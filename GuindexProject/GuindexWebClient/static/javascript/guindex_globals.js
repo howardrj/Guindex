@@ -1,4 +1,5 @@
-var G_API_BASE = location.protocol + '//' + location.hostname + ':' + location.port + '/api/';
+var G_URL_BASE = location.protocol + '//' + location.hostname + ':' + location.port;
+var G_API_BASE = G_URL_BASE + '/api/';
 
 // Global variables to keep track of user state
 // TODO Add these to object

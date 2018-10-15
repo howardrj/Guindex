@@ -1,54 +1,90 @@
 (function () {
 
+    console.log("Here");
+
+    var page_content_divs = document.getElementsByClassName('page_content');
     var g_firstPage = true;
 
-    var page_content_links = document.getElementsByClassName('page_content_link'); 
-    var page_content_divs  = document.getElementsByClassName('page_content');
+    $(document).on('click', '.page_content_link', function () {
 
-    for (var i = 0; i < page_content_links.length; i++)
-    {
-        page_content_links[i].addEventListener('click', function (evt) {
+        // Hide all page content
+        for (var i = 0; i < page_content_divs.length; i++)
+        {
+            page_content_divs[i].style.display = 'none';    
+        }
 
-            // Hide all page content
-            for (var i = 0; i < page_content_divs.length; i++)
-            {
-                page_content_divs[i].style.display = 'none';    
-            }
+        // Get anchor node (evt.target may be child node)
+        var anchor_node = this;
 
-            // Get anchor node (evt.target may be child node)
-            var anchor_node = evt.target;
+        while (!anchor_node.classList.contains('page_content_link'))
+        {
+            anchor_node = anchor_node.parentNode;
+        }
 
-            while (!anchor_node.classList.contains('page_content_link'))
-            {
-                anchor_node = anchor_node.parentNode;
-            }
+        var page_content_id = anchor_node.getAttribute('data-content_page_id');
 
-            var page_content_id = anchor_node.getAttribute('data-content_page_id');
+        var page_content = document.getElementById(page_content_id);
 
-            // Display corresponding page content
-            document.getElementById(page_content_id).style.display = 'block';
+        // Update URL
+        if (g_firstPage)
+        {
+            // Overwrite history if first page
+            g_firstPage = false;
 
-            // Update URL
-            if (g_firstPage)
-            {
-                // Overwrite history if first page
-                g_firstPage = false;
-
-                history.replaceState(page_content_id,
-                                     'Guindex', 
-                                     location.protocol + '//' + location.hostname + ':' + location.port + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
-            }
-            else
-            {
-                history.pushState(page_content_id,
-                                  'Guindex', 
-                                  location.protocol + '//' + location.hostname + ':' + location.port + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
-            }
+            history.replaceState(page_content_id,
+                                 'Guindex', 
+                                 location.protocol + '//' + location.hostname + ':' + location.port + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
+        }
+        else
+        {
+            history.pushState(page_content_id,
+                              'Guindex', 
+                              location.protocol + '//' + location.hostname + ':' + location.port + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
+        }
     
-            // Send analytics page view
-            if (!g_debug)
-                ga('send', 'pageview', page_content_id);
-        });
+        // Send analytics page view
+        if (!g_debug)
+            ga('send', 'pageview', page_content_id);
+        
+        if (page_content.hasAttribute('data-content_loaded') && page_content.getAttribute('data-content_loaded') == '1')
+        {
+            page_content.style.display = 'block'; 
+            page_content.dispatchEvent(new Event('tab_display'));
+            return;
+        }
+
+        // TODO Start loader
+        page_content.style.display = 'block'; 
+        
+        var request = new XMLHttpRequest();
+
+        request.open('GET', G_URL_BASE + '/async_load/' + page_content_id.slice(0, -5), true);
+
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        request.send(null);
+
+        request.onreadystatechange = function processRequest()
+        {
+            if (request.readyState == 4 && request.status == 200)
+            {
+                var html = new DOMParser().parseFromString(request.responseText, 'text/html').body.firstChild;
+
+                // Update page content
+                page_content.innerHTML = "";
+
+                $('#' + page_content_id).append(html.innerHTML);
+
+                onTabLoad(page_content);
+            }
+        }
+    });
+
+    function onTabLoad(tabContent)
+    {
+        tabContent.setAttribute('data-content_loaded', '1');
+        tabContent.dispatchEvent(new Event('tab_display'));
     }
 
     function onUrlChange()

@@ -1,4 +1,17 @@
+{% load static %}
+
+{% if async_template_loading %}
 <div id="statistics_page" class="page_content content-wrapper" style="display:none">
+</div>
+{% else %}
+<div id="statistics_page" class="page_content content-wrapper" style="display:none">
+
+    {% if not debug %}
+    <script type="text/javascript" src="{% static "javascript/guindex_stats.min.js" %}"></script>
+    {% else %}
+    <script type="text/javascript" src="{% static "javascript/guindex_stats.js" %}"></script>
+    {% endif %}
+
     <div class="container-fluid">
         <div class="card mb-3">
             <div class="card-header">
@@ -14,4 +27,9 @@
         </div>
 
 	</div>
+
+    <script>
+        document.getElementById('statistics_page').addEventListener('tab_display', populateGuindexStatsTable); 
+    </script>
 </div>
+{% endif %}

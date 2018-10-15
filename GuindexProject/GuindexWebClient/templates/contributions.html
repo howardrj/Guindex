@@ -1,4 +1,17 @@
+{% load static %}
+
+{% if async_template_loading %}
 <div id="contributions_page" class="page_content content-wrapper" style="display:none">
+</div>
+{% else %}
+<div id="contributions_page" class="page_content content-wrapper" style="display:none">
+
+    {% if not debug %}
+    <script type="text/javascript" src="{% static "javascript/guindex_user_contributions.min.js" %}"></script>
+    {% else %}
+    <script type="text/javascript" src="{% static "javascript/guindex_user_contributions.js" %}"></script>
+    {% endif %}
+
     <div class="container-fluid">
         <!-- Breadcrumbs-->
         <div class="on_logged_out" style="display:block">
@@ -27,4 +40,10 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('contributions_page').addEventListener('tab_display', populateUserContributionsTable);
+        document.getElementById('contributions_page').addEventListener('on_login', populateUserContributionsTable); 
+    </script>
 </div>
+{% endif %}

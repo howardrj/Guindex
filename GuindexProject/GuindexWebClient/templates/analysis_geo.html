@@ -1,5 +1,9 @@
 {% load static %}
 
+{% if async_template_loading %}
+<div id="analysis_geo_page" class="page_content content-wrapper" style="display:none">
+</div>
+{% else %}
 <div id="analysis_geo_page" class="page_content content-wrapper" style="display:none">
     <div class="container-fluid">
         <div class="card card-register mx-auto mt-5">
@@ -183,3 +187,4 @@
         </div>
     </div>
 </div>
+{% endif %}

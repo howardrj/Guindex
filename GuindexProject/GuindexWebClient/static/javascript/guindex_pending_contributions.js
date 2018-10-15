@@ -1,22 +1,33 @@
+var g_pendingContributionsTablesRendered = false;
+
 function populatePendingContributionsTables ()
 {
     if (g_isStaffMember == false)
+        return;
+
+    if (g_loggedIn)
+    {
+        // Clear log in warning
+        // Note we have mutliple tables so it's a bit easier to do it here instead of just 
+        // before drawing the table.
+        var pending_contributions_page = document.getElementById('pending_contributions_page');
+
+        pending_contributions_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
+        pending_contributions_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
+    }
+    else
+    {
+        return;
+    }
+
+    if (g_pendingContributionsTablesRendered)
         return;
 
     populatePendingPriceCreatesTable();
     populatePendingPubCreatesTable();
     populatePendingPubPatchesTable();
 
-    // Clear log in warning
-    // Note we have mutliple tables so it's a bit easier to do it here instead of just 
-    // before drawing the table.
-    var pending_contributions_page = document.getElementById('pending_contributions_page');
-
-    pending_contributions_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
-    pending_contributions_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
-
-    // Show pending contributions tab 
-    document.getElementById('pending_contributions_li').style.display = 'list-item';
+    g_pendingContributionsTablesRendered = true;
 }
 
 var g_guindexPendingPriceCreatesTable = null;

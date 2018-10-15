@@ -1,10 +1,27 @@
 var g_userSettings = null;
 var g_userSettingsTable = null;
 var g_retrievingUserSettings = false;
+var g_userSettingsTableRendered = false;
 
 // Can only be called if user is logged in
 function populateUserSettingsTable ()
 {
+    if (g_loggedIn)
+    {
+        // Clear log in warning
+        var settings_page = document.getElementById('settings_page');
+
+        settings_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
+        settings_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
+    }
+    else
+    {
+        return;
+    }
+
+    if (g_userSettingsTableRendered)
+        return;
+
     function getUserSettings (callback)
     {
         if (g_retrievingUserSettings)
@@ -78,12 +95,6 @@ function populateUserSettingsTable ()
     // Check if table is being drawn from scratch or refreshed
     if (!g_userSettingsTable)
     {
-        // Clear log in warning
-        var settings_page = document.getElementById('settings_page');
-
-        settings_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
-        settings_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
-
         g_userSettingsTable = $('#GuindexUserSettingsTable').DataTable({
                                   responsive: true,
                                   "paging": false,
@@ -112,6 +123,8 @@ function populateUserSettingsTable ()
 
     if (g_userSettings['usingTelegramAlerts'])
         document.getElementById('telegram_alerts_toggler').checked = true;
+
+    g_userSettingsTableRendered = true;
 }
 
 $(document).on('click', '.toggler', function () {

@@ -1,9 +1,14 @@
 var g_stats = null;
 var g_guindexStatsTable = null;
 var g_retrievingStats = false;
+var g_statsTableRendered = false;
 
 function populateGuindexStatsTable ()
 {
+    // Hack to avoid fetching stats each time tab is opened
+    if (g_statsTableRendered)
+        return;
+
     function getStats (callback)
     {
         if (g_retrievingStats)
@@ -81,4 +86,6 @@ function populateGuindexStatsTable ()
         g_guindexStatsTable.rows.add(table_data);
         g_guindexStatsTable.columns.adjust().draw();
     }
+
+    g_statsTableRendered = true;
 }

@@ -9,10 +9,10 @@ function statusChangeCallback(response) {
         // The person is not logged into facebook or authorized your app 
 
         // Need all four parameters
-        if (localStorage.getItem('guindexUsername') &&
-            localStorage.getItem('guindexAccessToken') &&
-            localStorage.getItem('guindexUserId') &&
-            localStorage.getItem('guindexIsStaffMember'))
+        if (localStorage.hasOwnProperty('guindexUsername') &&
+            localStorage.hasOwnProperty('guindexAccessToken') &&
+            localStorage.hasOwnProperty('guindexUserId') &&
+            localStorage.hasOwnProperty('guindexIsStaffMember'))
         {
             g_loggedIn      = true;
             g_username      = localStorage.getItem('guindexUsername');
@@ -239,9 +239,9 @@ $(document).on('click', '#password_login_button', function () {
 
             if (request.status == 200)
             {
-                localStorage.setItem('guindexUsername',     response['username']);
-                localStorage.setItem('guindexAccessToken',  response['key']);
-                localStorage.setItem('guindexUserId',       response['user']);
+                localStorage.setItem('guindexUsername',      response['username']);
+                localStorage.setItem('guindexAccessToken',   response['key']);
+                localStorage.setItem('guindexUserId',        response['user']);
                 localStorage.setItem('guindexIsStaffMember', response['isStaff'] == "True" ? true : false);
 
                 // Do login stuff
@@ -300,15 +300,15 @@ function onLoginWithPasswordSuccess ()
 {
     g_facebookAccessToken = null;
 
-    // TODO Should not be doing this
-    // Instead dispatch 'login' event
-    populateUserSettingsTable();
-    populateUserContributionsTable();
-    populatePendingContributionsTables();
+    // Show pending contributions tab 
+    if (g_isStaffMember)
+        document.getElementById('pending_contributions_li').style.display = 'list-item';
 
-    if (g_guindexDataTable && g_guindexDataTable.onLogin)
+    var page_contents = document.getElementsByClassName('page_content');
+
+    for (var i = 0; i < page_contents.length; i++)
     {
-        g_guindexDataTable.onLogin();
+        page_contents[i].dispatchEvent(new Event('on_login'));
     }
 
     // Set login status link to display username
@@ -339,15 +339,15 @@ function onLoginWithFacebookSuccess ()
     localStorage.removeItem('guindexUserId');
     localStorage.removeItem('guindexIsStaffMember');
 
-    // TODO Should not be doing this
-    // Instead dispatch 'login' event
-    populateUserSettingsTable();
-    populateUserContributionsTable();
-    populatePendingContributionsTables();
+    // Show pending contributions tab 
+    if (g_isStaffMember)
+        document.getElementById('pending_contributions_li').style.display = 'list-item';
 
-    if (g_guindexDataTable && g_guindexDataTable.onLogin)
+    var page_contents = document.getElementsByClassName('page_content');
+
+    for (var i = 0; i < page_contents.length; i++)
     {
-        g_guindexDataTable.onLogin();
+        page_contents[i].dispatchEvent(new Event('on_login'));
     }
 
     // Set login status link to display username

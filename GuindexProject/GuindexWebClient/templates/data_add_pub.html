@@ -1,4 +1,19 @@
+{% load static %}
+
+{% if async_template_loading %}
 <div id="data_add_pub_page" class="page_content content-wrapper" style="display:none">
+</div>
+{% else %}
+<div id="data_add_pub_page" class="page_content content-wrapper" style="display:none">
+
+    {% if not debug %}
+    <script type="text/javascript" src="{% static "javascript/guindex_add_pub.min.js" %}"></script>
+    {% else %}
+    <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>
+    {% endif %}
+
+    <script src="https://maps.googleapis.com/maps/api/js?key={{google_maps_api_key}}&callback=initAddPubMap"></script>
+
     <div class="container-fluid">
         <div class="card card-register mx-auto mt-5">
             <div class="card-header">
@@ -38,3 +53,4 @@
         </div>
     </div>
 </div>
+{% endif %}

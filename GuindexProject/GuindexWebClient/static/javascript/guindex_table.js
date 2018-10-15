@@ -72,7 +72,7 @@ function populateGuindexDataTable()
             orderable: false,
             searchable: false,
             className: "text-center",
-            visible: "false",
+            visible: false,
             render: function (data, type, row) {
 
                 var input_field = '<input class="price_input" type="number" step="0.01" min="0" max="10"/> <br>';
@@ -103,7 +103,7 @@ function populateGuindexDataTable()
             orderable: false,
             searchable: false,
             className: "text-center",
-            visible: "false",
+            visible: false,
             render: function (data, type, row) {
 
                 var edit_pub_button = '<i class="fa fa-edit edit_pub_button hoverable" title="Edit pub (only available when logged in)" data-pub_id="' + row['id'] + 

@@ -1,4 +1,17 @@
+{% load static %}
+
+{% if async_template_loading %}
 <div id="help_contact_page" class="page_content content-wrapper" style="display:none">
+</div>
+{% else %}
+<div id="help_contact_page" class="page_content content-wrapper" style="display:none">
+
+    {% if not debug %}
+    <script type="text/javascript" src="{% static "javascript/guindex_contact.min.js" %}"></script>
+    {% else %}
+    <script type="text/javascript" src="{% static "javascript/guindex_contact.js" %}"></script>
+    {% endif %}
+
     <div class="container-fluid">
         <div class="card card-register mx-auto mt-5">
             <div class="card-header">
@@ -63,3 +76,4 @@
         </div>
     </div>
 </div>
+{% endif %}

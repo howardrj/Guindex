@@ -1,10 +1,26 @@
 var g_userContributions = null;
 var g_userContributionsTable = null;
 var g_retrievingUserContributions = false;
+var g_userContributionsTableRendered = false;
 
 // Can only be called if user is logged in
 function populateUserContributionsTable ()
 {
+    if (g_loggedIn)
+    {
+        var contributions_page = document.getElementById('contributions_page');
+
+        contributions_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
+        contributions_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
+    }
+    else
+    {
+        return;
+    }
+
+    if (g_userContributionsTableRendered)
+        return;
+
     function getUserContributions (callback)
     {
         if (g_retrievingUserContributions)
@@ -53,12 +69,6 @@ function populateUserContributionsTable ()
     // Check if table is being drawn from scratch or refreshed
     if (!g_userContributionsTable)
     {
-
-        var contributions_page = document.getElementById('contributions_page');
-
-        contributions_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
-        contributions_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
-
         data_columns = [
             {title: "Statistic", "orderable": false},
             {title: "Value",     "orderable": false},
@@ -81,4 +91,6 @@ function populateUserContributionsTable ()
         g_userContributionsTable.rows.add(table_data);
         g_userContributionsTable.columns.adjust().draw();
     }
+
+    g_userContributionsTableRendered = true;
 }
