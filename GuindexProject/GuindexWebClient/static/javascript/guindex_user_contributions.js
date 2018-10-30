@@ -65,6 +65,22 @@ function populateUserContributionsTable ()
     table_data.push(["Pubs Visited",          g_userContributions['pubsVisited']]);
     table_data.push(["Current Verifications", g_userContributions['currentVerifications']]);
     table_data.push(["Original Prices",       g_userContributions['originalPrices']]);
+    table_data.push(["Trophies",       	      if (parseFloat(g_userContributions['originalPrices'])==0)
+							{trophy="None";}
+				       	      else if (parseFloat(g_userContributions['originalPrices'])<4.5)
+							{trophy="1PubTrophy";}
+			 		      else if (4.5<parseFloat(g_userContributions['originalPrices'])<9.5)
+							{trophy="5PubTrophy";}
+					      else if (9.5<parseFloat(g_userContributions['originalPrices'])<24.5)
+							{trophy="10PubTrophy";}
+					      else if (24.5<parseFloat(g_userContributions['originalPrices'])<49.5)
+							{trophy="25PubTrophy";}
+					      else if (49.5<parseFloat(g_userContributions['originalPrices'])<99.5)
+							{trophy="50PubTrophy";}
+					      else (parseFloat(g_userContributions['originalPrices'])>99.5)
+							{trophy="100PubTrophy";}
+						
+					      trophy]);     
 
     // Check if table is being drawn from scratch or refreshed
     if (!g_userContributionsTable)

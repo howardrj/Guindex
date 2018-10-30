@@ -42,6 +42,10 @@ function populatePendingPriceCreatesTable ()
         {
             title: "ID",
             data: 'id',
+            render: function (data, type, row) {
+
+                return '<a target="_blank" href="' + row['mapLink'] + '">' + data + '</a>';
+            }
         },
         {
             title: "Pub",
@@ -123,6 +127,10 @@ function populatePendingPubCreatesTable ()
         {
             title: "Name",
             data: "name",
+	    render: function (data, type, row) {
+
+                return '<a target="_blank" href="' + row['mapLink'] + '">' + data + '</a>';
+            }
         },
         {   
             title: "County",
@@ -208,6 +216,10 @@ function populatePendingPubPatchesTable ()
         {
             title: "Original Pub Name",
             data: "pubNameOrig",
+	    render: function (data, type, row) {
+
+                return '<a target="_blank" href="' + row['mapLink'] + '">' + data + '</a>';
+            },
             orderable: false,
             searchable: false,
         },
