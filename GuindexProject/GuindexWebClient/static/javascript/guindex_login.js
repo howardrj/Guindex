@@ -20,7 +20,7 @@ function statusChangeCallback(response) {
             g_userId        = localStorage.getItem('guindexUserId');
             g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
 
-            onLoginWithPasswordSuccess();
+            onLoginSuccess('password');
         }
         else
         {
@@ -102,7 +102,7 @@ var loginToGuindexViaFacebook = function ()
                 g_userId        = response['user'];
                 g_isStaffMember = response['isStaff'] == "True" ? true : false;
 
-                onLoginWithFacebookSuccess();
+                onLoginSuccess('facebook');
             }    
             else if (request.status == 400 && response['non_field_errors'][0] === "User is already registered with this e-mail address.")
             {
@@ -199,7 +199,7 @@ $(document).on('click', '#facebook_connect_button', function () {
                     document.getElementById('facebook_connect_nav_item').style.display = 'none';
                     document.getElementById('facebook_connect_cancel_button').click();
 
-                    onLoginWithFacebookSuccess();
+                    onLoginSuccess('facebook');
                 }
                 else
                 {
@@ -251,7 +251,7 @@ $(document).on('click', '#password_login_button', function () {
                 g_userId        = localStorage.getItem('guindexUserId');
                 g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
 
-                onLoginWithPasswordSuccess();
+                onLoginSuccess('password');
             }
             else
             {
@@ -281,25 +281,47 @@ $(document).on('click', '#password_login_button', function () {
     }
 });
 
-// Add event listeners for logout button
+// Add event listener for logout button
 $(document).on('click', '#logout_button', function () {
-    
+
     toggleLoader(this);
 
-    // Remove login paremeters from local storage
-    localStorage.removeItem('guindexUsername');
-    localStorage.removeItem('guindexAccessToken');
-    localStorage.removeItem('guindexUserId');
-    localStorage.removeItem('guindexIsStaffMember');
+    if (getAttribute(this, 'login_method') == 'password')
+    {
+        // Remove login paremeters from local storage
+        localStorage.removeItem('guindexUsername');
+        localStorage.removeItem('guindexAccessToken');
+        localStorage.removeItem('guindexUserId');
+        localStorage.removeItem('guindexIsStaffMember');
 
-    // Reload page (easiest thing to do here)
-    location.reload();
+        // Reload page (easiest thing to do here)
+        location.reload();
+    }
+    else if (getAttribute(this, 'login_method') == 'facebook')
+    {
+        FB.logout(function (response) {
+            // Reload page (easiest thing to do here)
+            location.reload();
+        });
+    }
+    else if (getAttribute(this, 'login_method') == 'google')
+    {
+        var auth2 = gapi.auth2.getAuthInstance();
+
+        auth2.signOut().then(function () {
+            // Reload page (easiest thing to do here)
+            location.reload();
+        });
+    }
+    else
+    {
+        // ERROR
+        toggleLoader(this);
+    }
 });
 
-function onLoginWithPasswordSuccess ()
+function onLoginSuccess (method)
 {
-    g_facebookAccessToken = null;
-
     // Show pending contributions tab 
     if (g_isStaffMember)
         document.getElementById('pending_contributions_li').style.display = 'list-item';
@@ -315,57 +337,24 @@ function onLoginWithPasswordSuccess ()
     var login_link = document.getElementById('login_link');
     login_link.innerHTML = g_username;
 
-    // Update Facebook login modal inner HTML
-    document.getElementById('login_with_facebook_button').style.display = 'none';
-    document.getElementById('facebook_login_modal_body_default').style.display             = 'none';
-    document.getElementById('facebook_login_modal_body_logged_in_this_way').style.display  = 'none';
-    document.getElementById('facebook_login_modal_body_logged_in_other_way').style.display = 'inline';
-
-    // Update login with password modal inner HTML
-    document.getElementById('password_login_button').style.display = 'none';
+    // Display logout button
     document.getElementById('logout_button').style.display = 'inline';
-    document.getElementById('password_login_modal_body_default').style.display             = 'none';
-    document.getElementById('password_login_modal_body_logged_in_this_way').style.display  = 'inline';
-    document.getElementById('password_login_modal_body_logged_in_other_way').style.display = 'none';
+    document.getElementById('logout_button').setAttribute('login_method', method);
 
-    document.getElementById('password_login_username').innerHTML = g_username;
+    hideLoginCards();
+
+    // Toggle log in message
+    document.getElementById('logged_out_message').style.display = 'none';
+    document.getElementById('logged_in_message').style.display = 'block';
+    document.getElementById('logged_in_message').innerHTML = 'Logged in as <b>' + g_username + '</b>.';
 }
 
-function onLoginWithFacebookSuccess ()
+function hideLoginCards ()
 {
-    // Remove login paremeters from local storage to be safe
-    localStorage.removeItem('guindexUsername');
-    localStorage.removeItem('guindexAccessToken');
-    localStorage.removeItem('guindexUserId');
-    localStorage.removeItem('guindexIsStaffMember');
+    var login_cards = document.getElementsByClassName('login_card');
 
-    // Show pending contributions tab 
-    if (g_isStaffMember)
-        document.getElementById('pending_contributions_li').style.display = 'list-item';
-
-    var page_contents = document.getElementsByClassName('page_content');
-
-    for (var i = 0; i < page_contents.length; i++)
+    for (var i = 0; i < login_cards.length; i++)
     {
-        page_contents[i].dispatchEvent(new Event('on_login'));
+        login_cards[i].style.display = 'none';
     }
-
-    // Set login status link to display username
-    var login_link = document.getElementById('login_link');
-    login_link.innerHTML = g_username;
-
-    // Update Facebook login modal inner HTML
-    document.getElementById('login_with_facebook_button').style.display = 'none';
-    document.getElementById('facebook_login_modal_body_default').style.display             = 'none';
-    document.getElementById('facebook_login_modal_body_logged_in_this_way').style.display  = 'inline';
-    document.getElementById('facebook_login_modal_body_logged_in_other_way').style.display = 'none';
-
-    // Update login with password modal inner HTML
-    document.getElementById('password_login_button').style.display = 'none';
-    document.getElementById('logout_button').style.display = 'none';
-    document.getElementById('password_login_modal_body_default').style.display             = 'none';
-    document.getElementById('password_login_modal_body_logged_in_this_way').style.display  = 'none';
-    document.getElementById('password_login_modal_body_logged_in_other_way').style.display = 'inline';
-
-    document.getElementById('facebook_login_username').innerHTML = g_username;
 }

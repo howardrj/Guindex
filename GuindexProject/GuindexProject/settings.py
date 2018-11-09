@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.twitter',
+    'allauth.socialaccount.providers.google',
     'corsheaders',
     'UserProfile',
     'Guindex',
@@ -331,6 +332,9 @@ GOOGLE_ANALYTICS_KEY = secrets.GOOGLE_ANALYTICS_KEY
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True   
 ACCOUNT_USERNAME_REQUIRED = False
+
+# Google Auth API
+GOOGLE_AUTH_CLIENT_ID = secrets.GOOGLE_AUTH_CLIENT_ID
 
 AUTHENTICATION_BACKENDS = (
  # Needed to login by username in Django admin, regardless of `allauth`

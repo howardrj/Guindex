@@ -83,8 +83,6 @@ class Pub(PubBase):
 
     def save(self, *args, **kwargs):
 
-        logger.debug("Saving Pub")
-
         if self.pk is None:
 
             logger.debug("First save of Pub object")
@@ -102,6 +100,8 @@ class Pub(PubBase):
                 logger.debug("Creator is not a staff member. Creating PubPendingCreate object instead")
                 self.createPendingCreate()
                 return
+
+        logger.debug("Saving Pub %s", self)
 
         # Set map link
         self.mapLink = GuindexParameters.MAP_LINK_STRING % (self.latitude, self.longitude)

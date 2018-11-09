@@ -9,4 +9,3 @@ var g_userId              = null;
 var g_username            = null;
 var g_isStaffMember       = null;
 var g_email               = null; 
-var g_facebookAccessToken = null;

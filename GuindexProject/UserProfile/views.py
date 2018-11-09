@@ -1,9 +1,6 @@
-import logging
-
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView, SocialConnectView
-
-logger = logging.getLogger(__name__)
 
 
 class FacebookLogin(SocialLoginView):
@@ -12,3 +9,11 @@ class FacebookLogin(SocialLoginView):
 
 class FacebookConnect(SocialConnectView):
     adapter_class = FacebookOAuth2Adapter
+
+
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+
+
+class GoogleConnect(SocialConnectView):
+    adapter_class = GoogleOAuth2Adapter

@@ -21,6 +21,7 @@ def guindexWebClient(request):
         'guindex_counties'      : GuindexParameters.SUPPORTED_COUNTIES,
         'debug'                 : settings.DEBUG,
         'async_template_loading': True,
+        'google_auth_client_id' : settings.GOOGLE_AUTH_CLIENT_ID,
     }
     
     return render(request, 'guindex_web_client.html', context_dict)
@@ -47,6 +48,7 @@ def guindexWebClientWithTemplate(request, template):
         'guindex_counties'      : GuindexParameters.SUPPORTED_COUNTIES,
         'debug'                 : settings.DEBUG,
         'async_template_loading': True,
+        'google_auth_client_id' : settings.GOOGLE_AUTH_CLIENT_ID,
     }
     
     return render(request, 'guindex_web_client.html', context_dict)
