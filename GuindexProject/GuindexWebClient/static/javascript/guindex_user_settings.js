@@ -68,14 +68,14 @@ function populateUserSettingsTable ()
 
     // Email alerts setting
     var email_alerts_list = ['Email Alerts', 
-                             "Receive email alerts when new prices and pubs are added to the Guindex.",
+                             "Receive weekly email alerts about new prices and pubs added to the Guindex.",
                              prefix + '<input type="checkbox" id="email_alerts_toggler" class="toggler hoverable">' + suffix
                             ];
 
     table_data.push(email_alerts_list);
 
     // Telgram alerts setting
-    var telegram_description = "Receive Telegram alerts when new prices and pubs are added to the Guindex.";
+    var telegram_description = "Receive weekly Telegram alerts about new prices and pubs added to the Guindex.";
 
     if (!g_userSettings['telegramActivated'])
     {

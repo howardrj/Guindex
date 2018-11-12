@@ -1,54 +1,28 @@
-// Below code is borrowed from the Facbook javascript SDK
-// SDK is loaded in login_with_facebook.html
+/******************/
+/* Facebook Login */
+/******************/
+// Callback provided to Facebook login button
+function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+    });
+}
 
 // This is called with the results from from FB.getLoginStatus().
 function statusChangeCallback(response) {
 
     if (response.status === 'unknown' || response.status === 'not_authorized')
     {
-        // The person is not logged into facebook or authorized your app 
-
-        // Need all four parameters
-        if (localStorage.hasOwnProperty('guindexUsername') &&
-            localStorage.hasOwnProperty('guindexAccessToken') &&
-            localStorage.hasOwnProperty('guindexUserId') &&
-            localStorage.hasOwnProperty('guindexIsStaffMember'))
-        {
-            g_loggedIn      = true;
-            g_username      = localStorage.getItem('guindexUsername');
-            g_accessToken   = localStorage.getItem('guindexAccessToken');
-            g_userId        = localStorage.getItem('guindexUserId');
-            g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
-
-            onLoginSuccess('password');
-        }
-        else
-        {
-            // Remove login paremeters from local storage to be safe
-            localStorage.removeItem('guindexUsername');
-            localStorage.removeItem('guindexAccessToken');
-            localStorage.removeItem('guindexUserId');
-            localStorage.removeItem('guindexIsStaffMember');
-
-            // Carry on as normal ...
-        }
+        // The person is not logged into facebook or has not authorized your app 
+        // Carry on as normal ...
     }
     else if (response.status === 'connected')
     {
-        // N.B: Facebook takes precedence
-        // If user is connected, log them in using Facebook credentials
-        // Only give user the option of logging in with password if
-        // not connected via Facebook
-        // If this an inconvenience for some users we can change the logic accordingly.
-
-        // Logged into Facebook and user has authorised app.
+        // User has logged into Facebook and has authorised app.
         var access_token = response['authResponse']['accessToken'];
         var user_id      = response['authResponse']['userID'];
 
-        // Assign access token to global variable 
-        g_facebookAccessToken = access_token;
-
-        // Retrieve user name through facebook API
+        // Retrieve username and email through Facebook API
         FB.api(
             '/' + user_id,
             'GET',
@@ -57,7 +31,7 @@ function statusChangeCallback(response) {
                 g_username = response.name;
                 g_email    = response.email;
 
-                loginToGuindexViaFacebook();
+                loginToGuindexViaFacebook(access_token);
             }
         );
     }
@@ -67,14 +41,7 @@ function statusChangeCallback(response) {
     }
 }
 
-// This function is called when someone finishes with the Login Button
-function checkLoginState() {
-    FB.getLoginStatus(function(response) {
-        statusChangeCallback(response);
-    });
-}
-
-var loginToGuindexViaFacebook = function ()
+function loginToGuindexViaFacebook (accessToken)
 {
     // Use REST API to login to guindex.ie
     var request = new XMLHttpRequest();
@@ -84,7 +51,7 @@ var loginToGuindexViaFacebook = function ()
     request.setRequestHeader('Content-Type', 'application/json');
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-    request.send(JSON.stringify({'access_token': g_facebookAccessToken}));
+    request.send(JSON.stringify({'access_token': accessToken}));
 
     request.onreadystatechange = function processRequest()
     {
@@ -106,9 +73,7 @@ var loginToGuindexViaFacebook = function ()
             }    
             else if (request.status == 400 && response['non_field_errors'][0] === "User is already registered with this e-mail address.")
             {
-                document.getElementById('facebook_connect_email').innerHTML = g_email;
-                document.getElementById('facebook_connect_nav_item').style.display = 'block';
-                document.getElementById('facebook_connect_modal_link').click();
+                // TODO How do we connect accounts?
             }
             else
             {
@@ -118,27 +83,36 @@ var loginToGuindexViaFacebook = function ()
     } 
 }
 
-// Add event listener for facebook connect button
-$(document).on('click', '#facebook_connect_button', function () {
 
-    var password = document.getElementById('facebook_connect_password_input').value;
+/****************/
+/* Google Login */
+/****************/
+// This function is called by Google login button after successful access token retrieval
+function onGoogleSignIn (response)
+{
+    console.log(response);
 
-    // Don't post empty password
-    if (!password)
-        return;
+    // access_token used by our backend for authenticating the user with Google
+    var access_token = response['Zi']['access_token'];
 
-    var connect_button = this;
-    toggleLoader(connect_button);
+    // TODO Are we guaranteed to have these?
+    g_email = response['w3']['U3'];
+    g_username = g_email.split('@')[0];
 
-    // Use REST API to check password is correct
+    loginToGuindexViaGoogle(access_token);
+}
+
+function loginToGuindexViaGoogle (accessToken)
+{
+    // Use REST API to login to guindex.ie
     var request = new XMLHttpRequest();
 
-    request.open('POST', G_API_BASE + 'rest-auth/login/', true);
+    request.open('POST', G_API_BASE + 'rest-auth/google/', true);
 
     request.setRequestHeader('Content-Type', 'application/json');
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-    request.send(JSON.stringify({'email': g_email, 'password': password}));
+    request.send(JSON.stringify({'access_token': accessToken}));
 
     request.onreadystatechange = function processRequest()
     {
@@ -148,69 +122,32 @@ $(document).on('click', '#facebook_connect_button', function () {
 
             if (request.status == 200)
             {
-                g_accessToken = response['key'];
+                // We have successfully logged in
+                // Get token from response JSON object
 
-                connectAccounts(connect_button);
-            }
-            else if (request.status == 400 && response['non_field_errors'][0] === "Unable to log in with provided credentials.")
+                g_loggedIn      = true;
+                g_accessToken   = response['key'];
+                g_userId        = response['user'];
+                g_isStaffMember = response['isStaff'] == "True" ? true : false;
+
+                onLoginSuccess('google');
+            }    
+            else if (request.status == 400 && response['non_field_errors'][0] === "User is already registered with this e-mail address.")
             {
-                // Incorrect password
-                toggleLoader(connect_button);
-
-                displayMessage("Error", "Incorrect password. Try again.");
+                // TODO How do we connect accounts?
             }
             else
             {
                 // TODO How do we handle this?
-            } 
-        }
-    }
-
-    function connectAccounts (connectButton)
-    {
-        // Use REST API to connect accounts
-        var request = new XMLHttpRequest();
-
-        request.open('POST', G_API_BASE + 'rest-auth/facebook/connect/', true);
-
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        request.setRequestHeader('Authorization', 'Token ' + g_accessToken);
-
-        request.send(JSON.stringify({'access_token': g_facebookAccessToken}));
-
-        request.onreadystatechange = function processRequest()
-        {
-            if (request.readyState == 4)
-            {
-                toggleLoader(connectButton);
-
-                if (request.status == 200)
-                {
-                    var response = JSON.parse(request.responseText);
-
-                    g_loggedIn    = true;
-                    g_accessToken = response['key'];
-                    g_userId      = response['user'];
-
-                    displayMessage("Info", "Succesfully connected accounts. You are now logged in as " + g_username + ".");
-
-                    // Hide connect button and close modal
-                    document.getElementById('facebook_connect_nav_item').style.display = 'none';
-                    document.getElementById('facebook_connect_cancel_button').click();
-
-                    onLoginSuccess('facebook');
-                }
-                else
-                {
-                    displayMessage("Error", "Failed to connect accounts.");
-                }
             }
         }
-    }
-});
+    } 
+}
 
-// Add event listeners for login via password button
+/******************/
+/* Password Login */
+/******************/
+
 $(document).on('click', '#password_login_button', function () {
     
     var email    = document.getElementById('password_login_email').value;
@@ -281,44 +218,9 @@ $(document).on('click', '#password_login_button', function () {
     }
 });
 
-// Add event listener for logout button
-$(document).on('click', '#logout_button', function () {
-
-    toggleLoader(this);
-
-    if (getAttribute(this, 'login_method') == 'password')
-    {
-        // Remove login paremeters from local storage
-        localStorage.removeItem('guindexUsername');
-        localStorage.removeItem('guindexAccessToken');
-        localStorage.removeItem('guindexUserId');
-        localStorage.removeItem('guindexIsStaffMember');
-
-        // Reload page (easiest thing to do here)
-        location.reload();
-    }
-    else if (getAttribute(this, 'login_method') == 'facebook')
-    {
-        FB.logout(function (response) {
-            // Reload page (easiest thing to do here)
-            location.reload();
-        });
-    }
-    else if (getAttribute(this, 'login_method') == 'google')
-    {
-        var auth2 = gapi.auth2.getAuthInstance();
-
-        auth2.signOut().then(function () {
-            // Reload page (easiest thing to do here)
-            location.reload();
-        });
-    }
-    else
-    {
-        // ERROR
-        toggleLoader(this);
-    }
-});
+/*****************/
+/* Login Success */
+/*****************/
 
 function onLoginSuccess (method)
 {
@@ -358,3 +260,55 @@ function hideLoginCards ()
         login_cards[i].style.display = 'none';
     }
 }
+
+/**********/
+/* Logout */
+/**********/
+
+$(document).on('click', '#logout_button', function () {
+
+    toggleLoader(this);
+
+    if (getAttribute(this, 'login_method') == 'facebook')
+    {
+        FB.logout(function (response) {
+            // Reload page (easiest thing to do here)
+            location.reload();
+        });
+    }
+    else if (getAttribute(this, 'login_method') == 'google')
+    {
+        var auth2 = gapi.auth2.getAuthInstance();
+
+        auth2.signOut().then(function () {
+            // Reload page (easiest thing to do here)
+            location.reload();
+        });
+    }
+    else if (getAttribute(this, 'login_method') == 'password')
+    {
+        clearLocalStorage();
+
+        // Reload page (easiest thing to do here)
+        location.reload();
+    }
+    else
+    {
+        // ERROR
+        toggleLoader(this);
+    }
+});
+
+function clearLocalStorage ()
+{
+    // Remove login paremeters from local storage
+    localStorage.removeItem('guindexUsername');
+    localStorage.removeItem('guindexAccessToken');
+    localStorage.removeItem('guindexUserId');
+    localStorage.removeItem('guindexIsStaffMember');
+}
+
+/********************/
+/* Connect Accounts */
+/********************/
+// TODO
