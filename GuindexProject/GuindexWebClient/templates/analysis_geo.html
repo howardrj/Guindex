@@ -44,11 +44,11 @@
 
              	<p>
                     The Dublin county postcodes are mainly from north county Dublin.
-                    There are three exceptions: Lucan (west county Dublin), Blackrock (south county Dublin) and Glenageary (south county Dublin).
+                    There are three exceptions: Lucan (west county Dublin), Blackrock (south county Dublin) and Glenageary (south county Dublin). These postcodes are shown in the image below.
                 </p>
 
                 <p align="center">
-                    <img class="article_image" style="width:75%" src="{% static "images/PCAAs.png" %}">
+                    <img class="article_image" style="width:85%" src="{% static "images/PCAAs.png" %}">
                 </p>
 
                 <p>
@@ -57,10 +57,13 @@
                     To begin the analysis we will sort the pubs into their respective postal region.
                     The result of which looks like this:
                 </p>
+		
+		 <p align="center">
+                    <img class="article_image" style="width:85%" src="{% static "images/pubpcsdistr.png" %}">
+                </p>
 
                 <p align="center">
-                    <img class="article_image" style="width:44.5%; left:0" src="{% static "images/pubpcsdistr.png" %}";>
-                    <img class="article_image" style="width:44.5%; right:0" src="{% static "images/pubdubgeo.png" %}";>
+                    <img class="article_image" style="width:85%" src="{% static "images/pubdubgeo.png" %}";>
                 </p>
 
                 <p>
@@ -74,61 +77,66 @@
                 </p>
 
                 <p>
-		            These pictures are produced from incomplete data, 
-                    I know for instance that Skerries has more than 2 pubs even though there are currently only two in our database.
+		    These pictures are produced from incomplete data.
                     In order for these pictures to better describe reality we need your help.
-                    If there are pubs missing in an area that you are familiar with please add them to the database by signing up to the website through the Data tab in the sidebar.
-                    On the right above we see the same image superposed on a map of Dublin.
+                    If there are pubs missing in an area that you are familiar with please add them to the database by signing up to the website through the Login link in the header.
+                    Below the image showing the number of pubs in each postal area we see the same image superposed on a map of Dublin.
                     We can see the quality of the shape file describing the post routing adminastrative areas from this image.
                     The only clear discrepancy between the shape file and the actual geographic picture is the Portmarnock spit.
                     Let's now look at the data taken from pubs within these postcodes up to this point:
                 </p>
 
                 <p align="center">
-                    <img class="article_image" style="width:75%" src="{% static "images/fracvis.png" %}";>
+                    <img class="article_image" style="width:85%" src="{% static "images/fracvis.png" %}";>
                 </p>
 
                 <p>
              	    Above we plot the fraction of the pubs visited within each postal area.
                     We can see that we have visited the highest fraction of Dublin 6s pubs - all but one of them in fact.
-                    Dublin 6 is folllowed by Dublin 2 and Dublin 4. All the other areas have quite low coverage, less than 50%.
+                    Dublin 6 is folllowed by Dublin 2, Dublin 4 and Malahide. All the other areas have quite low coverage, less than 50%.
                     We have also been tracking the prices in the pubs visited within each postal region.
                     This data can be visualised below:
                 </p>
+		
+		 <p align="center">
+                    <img class="article_image" style="width:85%" src="{% static  "images/guinpostprices.png" %}">
+                </p>
 
                 <p align="center">
-                    <img class="article_image" style="width:44.5%; left:0" src="{% static "images/guinpostprices.png" %}";>
-                    <img class="article_image" style="width:44.5%; right:0" src="{% static "images/avgpcsgeo.png" %}";>
+                    <img class="article_image" style="width:85%" src="{% static "images/avgpcsgeo.png" %}";>
                 </p>
+
 
                 <p>
              	    In the figure above we have taken all the collected data in each post routing adminastrative area and averaged the prices.
                     Some of these averages should be considered very reliable, having been calculated from many pubs within that area.
                     Some, however, have only data from a single pub and should be taken less seriously.
-                    Unsurprisingly the most expensive area is Dublin 2 with an average of €5.37 of the data collected so far.
-                    The cheapest area is Dublin 12, this is perhaps not that definitive as there have only 4 submissions from that postcode so far.
+                    Unsurprisingly the most expensive area is Dublin 2 with an average of €5.41 of the data collected so far.
+                    The cheapest area is Dublin 12, with an average of €4.48 although this is perhaps not that definitive as there have only 4 submissions from that postcode so far.
                     As well as looking at between postal area variation we can also look at the variation within each postal region: 
                 </p>
 
                 <p align="center">
-                    <img class="article_image" style="width:75%" src="{% static "images/Price By Postcode.png" %}";>
+                    <img class="article_image" style="width:85%" src="{% static "images/Price By Postcode.png" %}";>
                 </p>
 
                 <p>
              	    The plot above shows the distribution of pricing within each postal region.
                     Of particular note is the "Temple Bar" tail of the right skewed Dublin 2 distribution.
-                    The irregularity of the Dublin 1, Dublin 7 and Dublin 8 distributions is also very interesting
+                    The large standard deviation of the Dublin 1, Dublin 7 and Dublin 8 distributions is interesting
                     and I'd contend that it is reflective of the social and cultural diversity and inhomogeneity of these postcodes.
-                    Although some of the other distributions (D6W, D9 and D12) are quite irregular this is probably due to the
-                    low level of data collected in these postcodes thus far.
-                    The Dublin 4 and Dublin 6 distributions both look reasonably normal with a slight left skew.
+		    The irregularity of the Dublin 12 distribution is likely partly attributable to the low number of samples in that postcode. 
+                    The majority of the other distributions look reasonably normal-like.
+		</p>
+
+		<p> 
                     We have conducted ANOVA analysis of the pricing over these regions.
                     This analysis tests whether there is a statistically significant difference in the pricing across different postal regions or
                     whether the spread seen above is the product of random variation around some overall Dublin mean.
-                    The p-value of the F-test (~1*^-12) indicates that there is at least one mean statistically distinct from the others.
+                    The p-value of the F-test (~2*^-18) indicates that there is at least one mean statistically distinct from the others.
                     To assess which means are statistically different we have carried out a Tukey analysis on the data.
                     The results of this test indicate that the following pairs of postcodes have statistically different average prices of Guinness: 
-                    (1,8), (2,1), (2,6), (2,7), (2,8). 
+                    (1,8), (2,1), (2,6), (2,7), (2,8), (2,9), (2,12), (2,Glenageary) and (4,8). 
                     As expected this test concludes that the pricing of Guinness in the city centre, particularly in Dublin 2, is more than other parts of Dublin. 
                     We expect that this dichotomy of Guinness pricing between city centre and outside will be  more fully borne out as more data is collected.
                 </p>
@@ -150,11 +158,15 @@
                     Let's now examine how the Dublin pubs are distributed over the EDs
                 </p>
 
-                <p align="center">
-                    <img class="article_image" style="width:44.5%; left:0" src="{% static "images/coleds2.png" %}";>
-                    <img class="article_image" style="width:44.5%; right:0" src="{% static "images/pubedsgeo.png" %}";>
+		 <p align="center">
+                    <img class="article_image" style="width:85%" src="{% static  "images/coleds2.png" %}">
                 </p>
 
+                <p align="center">
+                    <img class="article_image" style="width:85%" src="{% static "images/pubedsgeo.png" %}";>
+                </p>
+
+                
                 <p>
              	    The image above shows the number of pubs in each ED by colour.
                     There are a surprising number of electoral divisions which don't have a pub at all (indicated in black in the image).
@@ -165,9 +177,12 @@
                     We can now move on to assess the average price in each ED containing at least one pub.
                 </p>
 
+		<p align="center">
+                    <img class="article_image" style="width:85%" src="{% static  "images/AVGEDS.png" %}">
+                </p>
+
                 <p align="center">
-                    <img class="article_image" style="width:44.5%; left:0" src="{% static "images/AVGEDS.png" %}";>
-                    <img class="article_image" style="width:44.5%; right:0" src="{% static "images/avgedsgeo.png" %}";>
+                    <img class="article_image" style="width:85%" src="{% static "images/avgedsgeo.png" %}";>
                 </p>
 
                 <p>
@@ -180,7 +195,7 @@
                 </p>
 
                 <p>
-                    The figure on the right hand side shows the left hand figure overlaid on a road map of county Dublin in order to
+                    The second figure above shows the first figure overlaid on a road map of county Dublin in order to
                     better appreciate where the value is and what EDs need to hang their head in shame.
                 </p>
             </div>
