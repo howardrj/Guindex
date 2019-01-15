@@ -3,11 +3,18 @@ import logging
 
 from django.shortcuts import render
 from django.conf import settings
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponseRedirect
 
 from Guindex.GuindexParameters import GuindexParameters
 
 logger = logging.getLogger(__name__)
+
+
+def faq(request):
+
+    logger.info("Redirecting to FAQ")
+
+    return HttpResponseRedirect('/info_faq/')
 
 
 def guindexWebClient(request):
@@ -22,8 +29,9 @@ def guindexWebClient(request):
         'debug'                 : settings.DEBUG,
         'async_template_loading': True,
     }
-    
+
     return render(request, 'guindex_web_client.html', context_dict)
+
 
 def guindexWebClientWithTemplate(request, template):
 
@@ -48,8 +56,9 @@ def guindexWebClientWithTemplate(request, template):
         'debug'                 : settings.DEBUG,
         'async_template_loading': True,
     }
-    
+
     return render(request, 'guindex_web_client.html', context_dict)
+
 
 def asyncLoadTemplate(request, template):
 
