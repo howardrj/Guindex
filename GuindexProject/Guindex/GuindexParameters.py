@@ -14,7 +14,7 @@ class GuindexParameters:
     STAR_RATING_DECIMAL_PLACES    = 2
 
     # Pending Contribution Accept/Reject Parameters
-    REJECT_REASON_MAX_LEN = 100
+    REJECT_REASON_MAX_LEN = 500
 
     # Background script run periods (in seconds)
     DB_BACKUP_PERIOD         = 86400
