@@ -3,11 +3,18 @@ import logging
 
 from django.shortcuts import render
 from django.conf import settings
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponseRedirect
 
 from Guindex.GuindexParameters import GuindexParameters
 
 logger = logging.getLogger(__name__)
+
+
+def faq(request):
+
+    logger.info("Redirecting to FAQ")
+
+    return HttpResponseRedirect('/info_faq/')
 
 
 def guindexWebClient(request):
@@ -23,8 +30,9 @@ def guindexWebClient(request):
         'async_template_loading': True,
         'google_auth_client_id' : settings.GOOGLE_AUTH_CLIENT_ID,
     }
-    
+
     return render(request, 'guindex_web_client.html', context_dict)
+
 
 def guindexWebClientWithTemplate(request, template):
 
@@ -50,8 +58,9 @@ def guindexWebClientWithTemplate(request, template):
         'async_template_loading': True,
         'google_auth_client_id' : settings.GOOGLE_AUTH_CLIENT_ID,
     }
-    
+
     return render(request, 'guindex_web_client.html', context_dict)
+
 
 def asyncLoadTemplate(request, template):
 
