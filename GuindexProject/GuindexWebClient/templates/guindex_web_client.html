@@ -224,8 +224,8 @@
           <a class="nav-link" data-toggle="modal" id="login_link" data-target="#exampleModal">
             <i class="fa fa-fw fa-sign-in"></i>Login</a>
         </li>
-        <li class="nav-item" id="facebook_connect_nav_item" style="display:none">
-          <a class="nav-link" data-toggle="modal" id="facebook_connect_modal_link" data-target="#facebook_connect_modal">
+        <li class="nav-item" id="account_connect_nav_item" style="display:none">
+          <a class="nav-link" data-toggle="modal" id="account_connect_modal_link" data-target="#account_connect_modal">
             <i class="fa fa-fw fa-plug"></i>Connect
           </a>
         </li>
@@ -303,7 +303,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Google</h5>
                         <h6 class="card-subtitle mb-2 text-muted">Log in via Google</h6>
-                        <p class="card-text">Click the Google log in button below if you would like to log in via Facebook.</p>
+                        <p class="card-text">Click the Google log in button below if you would like to log in via Google.</p>
                         <div class="g-signin2" data-onsuccess="onGoogleSignIn"></div>
                     </div>
                 </div>
@@ -349,8 +349,8 @@
    </div>
  </div>
 
-  <!-- Facebook Connect Accounts Modal -->
-  <div class="modal fade" id="facebook_connect_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <!-- Connect Accounts Modal -->
+  <div class="modal fade" id="account_connect_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -361,19 +361,55 @@
         </div>
         <div class="modal-body">
 
-            We have detected that an account was previously created with the email <span id="facebook_connect_email"></span>.
-            We assume this is you but to be sure, please enter the password of your previously created account below to 
-            connect your Guindex and Facebook accounts.    
+            We have detected that an account was previously created with the email <span id="account_connect_email" style="font-weight:bold"></span>
+            via the method(s) listed below.
+            We assume this is you but to be sure, please log in via one of the methods below to connect your accounts so you can log in using
+            the new and old method in the future.
 
-            <div class="form-group" style="margin-top:10px">
-                <input class="form-control" id="facebook_connect_password_input" type="password" placeholder="Enter password">
+            <div class="card login_card" style="margin-top:10px;" id="connect_with_facebook_card">
+                <div class="card-body">
+                    <h5 class="card-title">Facebook</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Connect via Facebook</h6>
+                    <p class="card-text">Click the Facebook log in button below if you would like to log in via Facebook to connect accounts.</p>
+                    <fb:login-button id="connect_with_facebook_button" scope="public_profile,email" onlogin="checkLoginStateForConnect();">
+                    </fb:login-button>
+                </div>
+            </div>
+
+            <div class="card login_card" style="margin-top:10px;" id="connect_with_google_card">
+                <div class="card-body">
+                    <h5 class="card-title">Google</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Connect via Google</h6>
+                    <p class="card-text">Click the Google log in button below if you would like to log in via Google to connect accounts.</p>
+                    <div class="g-signin2" data-onsuccess="onGoogleSignInForConnect"></div>
+                </div>
+            </div>
+
+            <div class="card login_card" style="margin-top:10px;" id="connect_with_password_card">
+                <div class="card-body">
+                    <h5 class="card-title">Password</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Connect via Email/Password combination</h6>
+                    <p class="card-text">
+                        Complete and submit the form below to log in with previously created account credentials to connect accounts.
+                    </p>
+                    <form>
+                        <div class="form-group">
+                            <div class="form-row">
+                                <label for="password_connect_password">Password</label>
+                                <input class="form-control" id="password_connect_password" type="password" placeholder="Enter password">
+                            </div>
+                        </div>
+                        <div class="card_footer" style="text-align:center">
+                            <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+                            <a class="btn btn-primary" id="connect_with_password_button" style="color:white; display:block">Submit</a>
+                        </div>
+                    </form>
+                </div>
             </div>
 
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" id="facebook_connect_cancel_button" type="button" data-dismiss="modal">Cancel</button>
-          <a class="btn btn-primary" id="facebook_connect_button">Connect</a>
-          <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
         </div>
       </div>
     </div>

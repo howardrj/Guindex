@@ -9,7 +9,7 @@ function checkLoginState() {
 }
 
 // This is called with the results from from FB.getLoginStatus().
-function statusChangeCallback(response) {
+function statusChangeCallback(response, connectProcedureCallback = null) {
 
     if (response.status === 'unknown' || response.status === 'not_authorized')
     {
@@ -31,7 +31,7 @@ function statusChangeCallback(response) {
                 g_username = response.name;
                 g_email    = response.email;
 
-                loginToGuindexViaFacebook(access_token);
+                loginToGuindexViaFacebook(access_token, connectProcedureCallback);
             }
         );
     }
@@ -41,7 +41,7 @@ function statusChangeCallback(response) {
     }
 }
 
-function loginToGuindexViaFacebook (accessToken)
+function loginToGuindexViaFacebook (accessToken, connectProcedureCallback = null)
 {
     // Use REST API to login to guindex.ie
     var request = new XMLHttpRequest();
@@ -61,28 +61,42 @@ function loginToGuindexViaFacebook (accessToken)
 
             if (request.status == 200)
             {
-                // We have successfully logged in
-                // Get token from response JSON object
+                if (!connectProcedureCallback)
+                {
+                    // We have successfully logged in
+                    // Get token from response JSON object
 
-                g_loggedIn      = true;
-                g_accessToken   = response['key'];
-                g_userId        = response['user'];
-                g_isStaffMember = response['isStaff'] == "True" ? true : false;
+                    g_loggedIn      = true;
+                    g_accessToken   = response['key'];
+                    g_userId        = response['user'];
+                    g_isStaffMember = response['isStaff'] == "True" ? true : false;
 
-                onLoginSuccess('facebook');
+                    onLoginSuccess('facebook');
+                }
+                else
+                {
+                    connectProcedureCallback(1, response['key']);
+                }
+                
             }    
-            else if (request.status == 400 && response['non_field_errors'][0] === "User is already registered with this e-mail address.")
+            else if (request.status == 400 && response['non_field_errors'][0].startsWith("User is already registered with this e-mail address."))
             {
-                // TODO How do we connect accounts?
+                error_message = response['non_field_errors'][0];
+                
+                login_account_info = JSON.parse(error_message.split('-')[2].trim())
+                login_account_info['account_to_connect'] = 'facebook';
+                onAccountConnectRequired(login_account_info);
             }
             else
             {
-                // TODO How do we handle this?
+                if (connectProcedureCallback)
+                {
+                    connectProcedureCallback(0, '');
+                }
             }
         }
     } 
 }
-
 
 /****************/
 /* Google Login */
@@ -90,8 +104,6 @@ function loginToGuindexViaFacebook (accessToken)
 // This function is called by Google login button after successful access token retrieval
 function onGoogleSignIn (response)
 {
-    console.log(response);
-
     // access_token used by our backend for authenticating the user with Google
     var access_token = response['Zi']['access_token'];
 
@@ -102,7 +114,7 @@ function onGoogleSignIn (response)
     loginToGuindexViaGoogle(access_token);
 }
 
-function loginToGuindexViaGoogle (accessToken)
+function loginToGuindexViaGoogle (accessToken, connectProcedureCallback = null)
 {
     // Use REST API to login to guindex.ie
     var request = new XMLHttpRequest();
@@ -122,23 +134,37 @@ function loginToGuindexViaGoogle (accessToken)
 
             if (request.status == 200)
             {
-                // We have successfully logged in
-                // Get token from response JSON object
+                if (!connectProcedureCallback)
+                {
+                    // We have successfully logged in
+                    // Get token from response JSON object
 
-                g_loggedIn      = true;
-                g_accessToken   = response['key'];
-                g_userId        = response['user'];
-                g_isStaffMember = response['isStaff'] == "True" ? true : false;
+                    g_loggedIn      = true;
+                    g_accessToken   = response['key'];
+                    g_userId        = response['user'];
+                    g_isStaffMember = response['isStaff'] == "True" ? true : false;
 
-                onLoginSuccess('google');
+                    onLoginSuccess('google');
+                }
+                else
+                {
+                    connectProcedureCallback(1, response['key']);
+                }
             }    
-            else if (request.status == 400 && response['non_field_errors'][0] === "User is already registered with this e-mail address.")
+            else if (request.status == 400 && response['non_field_errors'][0].startsWith("User is already registered with this e-mail address."))
             {
-                // TODO How do we connect accounts?
+                error_message = response['non_field_errors'][0];
+
+                login_account_info = JSON.parse(error_message.split('-')[2].trim())
+                login_account_info['account_to_connect'] = 'google';
+                onAccountConnectRequired(login_account_info);
             }
             else
             {
-                // TODO How do we handle this?
+                if (connectProcedureCallback)
+                {
+                    connectProcedureCallback(0, '');
+                }
             }
         }
     } 
@@ -245,6 +271,9 @@ function onLoginSuccess (method)
 
     hideLoginCards();
 
+    // Hide connect button
+    document.getElementById('account_connect_nav_item').style.display = 'none';
+
     // Toggle log in message
     document.getElementById('logged_out_message').style.display = 'none';
     document.getElementById('logged_in_message').style.display = 'block';
@@ -269,14 +298,14 @@ $(document).on('click', '#logout_button', function () {
 
     toggleLoader(this);
 
-    if (getAttribute(this, 'login_method') == 'facebook')
+    if (this.getAttribute('login_method') == 'facebook')
     {
         FB.logout(function (response) {
             // Reload page (easiest thing to do here)
             location.reload();
         });
     }
-    else if (getAttribute(this, 'login_method') == 'google')
+    else if (this.getAttribute('login_method') == 'google')
     {
         var auth2 = gapi.auth2.getAuthInstance();
 
@@ -285,7 +314,7 @@ $(document).on('click', '#logout_button', function () {
             location.reload();
         });
     }
-    else if (getAttribute(this, 'login_method') == 'password')
+    else if (this.getAttribute('login_method') == 'password')
     {
         clearLocalStorage();
 
@@ -311,4 +340,134 @@ function clearLocalStorage ()
 /********************/
 /* Connect Accounts */
 /********************/
-// TODO
+function onAccountConnectRequired(loginAccountInfo)
+{
+    g_loginAccountInfo = loginAccountInfo;
+
+    document.getElementById('account_connect_email').innerHTML = loginAccountInfo['email'];
+    document.getElementById('account_connect_nav_item').style.display = 'block';
+
+    document.getElementById('connect_with_facebook_card').style.display = loginAccountInfo['has_fb_login'] ? 'block' : 'none'; 
+    document.getElementById('connect_with_google_card').style.display   = loginAccountInfo['has_google_login'] ? 'block' : 'none';
+    document.getElementById('connect_with_password_card').style.display = loginAccountInfo['has_password_login'] ? 'block' : 'none';
+
+    document.getElementById('account_connect_modal_link').click();
+}
+
+// Connecting with Facebook
+function checkLoginStateForConnect ()
+{
+    FB.getLoginStatus(function(response) {
+        statusChangeCallback(response, previousMethodLoginResultCallback);
+    });
+}
+
+// Connecting with Google
+function onGoogleSignInForConnect (response)
+{
+}
+
+// Connecting with password
+$(document).on('click', '#connect_with_password_button', function () {
+
+    var email = g_loginAccountInfo['email']; 
+    var password = document.getElementById('password_connect_password').value;
+
+    // Use REST API to login to guindex.ie
+    var request = new XMLHttpRequest();
+
+    request.open('POST', G_API_BASE + 'rest-auth/login/', true);
+
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+    request.send(JSON.stringify({'email': email, 'password': password}));
+
+    var button = this;
+    toggleLoader(button);
+
+    request.onreadystatechange = function processRequest()
+    {
+        if (request.readyState == 4)
+        {
+            toggleLoader(button);
+
+            var response = JSON.parse(request.responseText);
+
+            if (request.status == 200)
+            {
+                previousMethodLoginResultCallback(1, response['key']);
+            }
+            else
+            {
+                previousMethodLoginResultCallback(0, '');
+            }
+        }
+    }
+
+});
+
+function previousMethodLoginResultCallback(result, accessToken)
+{
+    if (result != 1)
+    {
+        displayMessage("Error", "Connecting accounts procedure failed");
+        return;
+    }
+
+    connectAccounts(g_loginAccountInfo['account_to_connect'], accessToken);
+}
+
+function connectAccounts (accountType, accessToken) 
+{
+    var request = new XMLHttpRequest();
+
+    // Use REST API to connect accounts
+    if (accountType == 'facebook')
+    {
+        request.open('POST', G_API_BASE + 'rest-auth/facebook/connect/', true);
+
+    }
+    else if (accountType == 'google')
+    {
+        request.open('POST', G_API_BASE + 'rest-auth/google/connect/', true);
+    }
+    else
+    {
+        // TODO How should we handle this?
+        return;
+    }
+
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    request.setRequestHeader('Authorization', 'Token ' + accessToken);
+
+    request.send(JSON.stringify({'access_token': g_loginAccountInfo['account_to_connect_access_token']}));
+
+    request.onreadystatechange = function processRequest()
+    {
+        if (request.readyState == 4)
+        {
+            if (request.status == 200)
+            {
+                var response = JSON.parse(request.responseText);
+
+                g_loggedIn      = true;
+                g_accessToken   = response['key'];
+                g_userId        = response['user'];
+                g_isStaffMember = response['isStaff'] == "True" ? true : false;
+
+                displayMessage("Info", "Succesfully connected accounts. You are now logged in as " + g_username + ".");
+
+                // Hide connect modal
+                document.getElementById('account_connect_modal_link').click();
+
+                onLoginSuccess(accountType);
+            }
+            else
+            {
+                displayMessage("Error", "Failed to connect accounts.");
+            }
+        }
+    }
+}
