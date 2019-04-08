@@ -3,6 +3,34 @@ var g_userContributionsTable = null;
 var g_retrievingUserContributions = false;
 var g_userContributionsTableRendered = false;
 
+function originalbadges(A) {
+	A=parseInt(A);
+   var image_tag = '<img src="'
+  if (A<0.5) {
+     image_tag += G_URL_BASE + "/static/images/Trophy0.jpeg";
+  } 
+  else if (A<4.5) {
+   image_tag +=G_URL_BASE + "/static/images/Trophy1.jpeg";
+  }
+  else if (A<9.5) {
+    image_tag +=G_URL_BASE + "/static/images/Trophy5.jpeg";
+  }
+  else if (A<24.5) {
+    image_tag +=G_URL_BASE + "/static/images/Trophy10.jpeg";
+  }
+  else if (A<49.5) {
+   image_tag +=G_URL_BASE + "/static/images/Trophy25.jpeg";
+  }
+  else if (A<99.5) {
+   image_tag +=G_URL_BASE + "/static/images/Trophy50.jpeg";
+  }
+  else {
+	image_tag +=G_URL_BASE + "/static/images/Trophy100.jpeg";;}
+  image_tag +='" width=35%>';
+  return image_tag;
+  console.log(image_tag);
+}
+
 // Can only be called if user is logged in
 function populateUserContributionsTable ()
 {
@@ -65,6 +93,7 @@ function populateUserContributionsTable ()
     table_data.push(["Pubs Visited",          g_userContributions['pubsVisited']]);
     table_data.push(["Current Verifications", g_userContributions['currentVerifications']]);
     table_data.push(["Original Prices",       g_userContributions['originalPrices']]);
+    table_data.push(["Badges",       	      originalbadges(g_userContributions['originalPrices'])]);
 
     // Check if table is being drawn from scratch or refreshed
     if (!g_userContributionsTable)
