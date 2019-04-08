@@ -172,7 +172,32 @@ function loginToGuindexViaGoogle (accessToken, connectProcedureCallback = null)
 
 /******************/
 /* Password Login */
+(function () {
 /******************/
+        if (localStorage.hasOwnProperty('guindexUsername') &&
+            localStorage.hasOwnProperty('guindexAccessToken') &&
+            localStorage.hasOwnProperty('guindexUserId') &&
+            localStorage.hasOwnProperty('guindexIsStaffMember'))
+        {
+            g_loggedIn      = true;
+            g_username      = localStorage.getItem('guindexUsername');
+            g_accessToken   = localStorage.getItem('guindexAccessToken');
+            g_userId        = localStorage.getItem('guindexUserId');
+            g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
+
+            onLoginSuccess('password');
+        }
+        else
+        {
+            // Remove login paremeters from local storage to be safe
+            localStorage.removeItem('guindexUsername');
+            localStorage.removeItem('guindexAccessToken');
+            localStorage.removeItem('guindexUserId');
+            localStorage.removeItem('guindexIsStaffMember');
+
+            // Carry on as normal ...
+        }
+})();
 
 $(document).on('click', '#password_login_button', function () {
     
