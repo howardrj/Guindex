@@ -18,23 +18,21 @@ def newUserInit(sender, **kwargs):
         for newly created Users.
     """
 
-    if kwargs.get('created', False):
+    user = kwargs.get('instance')
 
-        user = kwargs.get('instance')
+    logger.info("New User %d was created", user.id)
 
-        logger.info("New User %d was created", user.id)
+    if not hasattr(user, 'telegramuser'):
 
-        if not hasattr(user, 'telegramuser'):
+        logger.info("User %d does not have a TelegramUser. Creating one", user.id)
 
-            logger.info("User %d does not have a TelegramUser. Creating one", user.id)
+        TelegramUserUtils.createNewTelegramUser(user)
 
-            TelegramUserUtils.createNewTelegramUser(user)
+    if not hasattr(user, 'guindexuser'):
 
-        if not hasattr(user, 'guindexuser'):
+        logger.info("User %d does not have a GuindexUser. Creating one", user.id)
 
-            logger.info("User %d does not have a GuindexUser. Creating one", user.id)
+        guindexuser = GuindexUser()
 
-            guindexuser = GuindexUser()
-
-            guindexuser.user = user
-            guindexuser.save()
+        guindexuser.user = user
+        guindexuser.save()
