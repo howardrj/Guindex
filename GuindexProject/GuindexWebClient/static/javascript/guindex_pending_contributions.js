@@ -52,6 +52,11 @@ function populatePendingPriceCreatesTable ()
                 return '<a target="_blank" href="' + row['pubMapLink'] + '">' + data + '</a>';
             }
         },
+        {
+            title: "Map Link",
+            data: "pubMapLink",
+            visible: false,
+        },
         {   
             title: "County",
             data: "pubCounty",
@@ -129,6 +134,11 @@ function populatePendingPubCreatesTable ()
             render: function (data, type, row) {
                 return '<a target="_blank" href="' + row['mapLink'] + '">' + data + '</a>';
             }
+        },
+        {
+            title: "Map Link",
+            data: "mapLink",
+            visible: false,
         },
         {   
             title: "County",
@@ -219,6 +229,11 @@ function populatePendingPubPatchesTable ()
             render: function (data, type, row) {
                 return '<a target="_blank" href="' + row['mapLink'] + '">' + data + '</a>';
             }
+        },
+        {
+            title: "Map Link",
+            data: "mapLink",
+            visible: false,
         },
         {   
             title: "Original County",
