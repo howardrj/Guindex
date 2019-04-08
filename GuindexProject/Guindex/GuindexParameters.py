@@ -22,10 +22,10 @@ class GuindexParameters:
     ALERTS_CHECK_PERIOD      = 86400 * 7
 
     # Map generation parameters
-    MAP_GENERATION_PERIOD   = 86400
-    DUBLIN_CENTER_LATITUDE  = 53.345280 
-    DUBLIN_CENTER_LONGITUDE = -6.272161
-    MAP_ZOOM_LEVEL          = 17
+    MAP_GENERATION_PERIOD   = 30
+    DUBLIN_CENTER_LATITUDE  = 53.489969 
+    DUBLIN_CENTER_LONGITUDE = -7.565688
+    MAP_ZOOM_LEVEL          = 7
     MAX_MAP_LINK_LEN        = 2000
 
     # Alerts Server Parameters
