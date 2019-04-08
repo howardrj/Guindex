@@ -89,6 +89,11 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
                                     read_only = True,
                                     max_length = GuindexParameters.MAX_PUB_NAME_LEN)
 
+    pubMapLink = serializers.CharField(help_text = 'Map link of the pub this price belongs to',
+                                       source = 'pub.mapLink',
+                                       read_only = True,
+                                       max_length = GuindexParameters.MAX_MAP_LINK_LEN)
+
     pubCounty = serializers.CharField(help_text = 'County of the pub this price belongs to',
                                       source = 'pub.county',
                                       read_only = True,

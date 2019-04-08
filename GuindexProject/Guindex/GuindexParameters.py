@@ -26,6 +26,7 @@ class GuindexParameters:
     DUBLIN_CENTER_LATITUDE  = 53.345280 
     DUBLIN_CENTER_LONGITUDE = -6.272161
     MAP_ZOOM_LEVEL          = 17
+    MAX_MAP_LINK_LEN        = 2000
 
     # Alerts Server Parameters
     ALERTS_LISTEN_IP   = '127.0.0.1'

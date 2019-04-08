@@ -37,5 +37,8 @@ setup(name='Guindex',
         'djangorestframework-datatables',
         'gmplot',
         'drf-nested-routers',
+        'django-extensions',
+        'Werkzeug',
+        'pyOpenSSL',
       ],
     )
