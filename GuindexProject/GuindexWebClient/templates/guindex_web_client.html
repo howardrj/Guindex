@@ -103,13 +103,39 @@
             <span class="nav-link-text">Map</span>
           </a>
         </li>
-	    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Statistics">
+	<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Data">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseData" data-parent="#exampleAccordion">
+            <i class="fa fa-fw fa-table"></i>
+            <span class="nav-link-text">Pubs & Prices</span>
+          </a>
+          <ul class="sidenav-second-level collapse" id="collapseData" style="background-color:black">
+            <li>
+              <a class="nav-link page_content_link" data-content_page_id="data_table_page"> Current Database </a>
+            </li>
+            <li>
+              <a class="nav-link page_content_link" data-content_page_id="data_add_pub_page"> Add a Pub </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Contributions">
+          <a class="nav-link page_content_link" data-content_page_id="contributions_page">
+            <i class="fa fa-fw fa-user"></i>
+            <span class="nav-link-text">Contributions</span>
+          </a>
+        </li>
+        <li id="pending_contributions_li" class="nav-item" data-toggle="tooltip" data-placement="right" title="Pending Contributions" style="display:none">
+          <a class="nav-link page_content_link" data-content_page_id="pending_contributions_page">
+            <i class="fa fa-fw fa-clock-o"></i>
+            <span class="nav-link-text">Pending Contributions</span>
+          </a>
+        </li>
+	<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Statistics">
           <a class="nav-link page_content_link" data-content_page_id="statistics_page">
             <i class="fa fa-fw fa-dashboard"></i>
             <span class="nav-link-text">Statistics</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Analysis">
+	<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Analysis">
           <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseAnalysis" data-parent="#exampleAccordion">
             <i class="fa fa-fw fa-area-chart"></i>
             <span class="nav-link-text">Analysis</span>
@@ -132,37 +158,10 @@
             </li>
           </ul>
         </li>
-
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Data">
-          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseData" data-parent="#exampleAccordion">
-            <i class="fa fa-fw fa-table"></i>
-            <span class="nav-link-text">Data</span>
-          </a>
-          <ul class="sidenav-second-level collapse" id="collapseData" style="background-color:black">
-            <li>
-              <a class="nav-link page_content_link" data-content_page_id="data_table_page"> Table </a>
-            </li>
-            <li>
-              <a class="nav-link page_content_link" data-content_page_id="data_add_pub_page"> Add a Pub </a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
+	 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
           <a class="nav-link page_content_link" data-content_page_id="settings_page">
             <i class="fa fa-fw fa-wrench"></i>
             <span class="nav-link-text">Settings</span>
-          </a>
-        </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Contributions">
-          <a class="nav-link page_content_link" data-content_page_id="contributions_page">
-            <i class="fa fa-fw fa-user"></i>
-            <span class="nav-link-text">Contributions</span>
-          </a>
-        </li>
-        <li id="pending_contributions_li" class="nav-item" data-toggle="tooltip" data-placement="right" title="Pending Contributions" style="display:none">
-          <a class="nav-link page_content_link" data-content_page_id="pending_contributions_page">
-            <i class="fa fa-fw fa-clock-o"></i>
-            <span class="nav-link-text">Pending Contributions</span>
           </a>
         </li>
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Links">
