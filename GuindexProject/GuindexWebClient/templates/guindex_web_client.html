@@ -21,6 +21,15 @@
 
   </script>
   <script async src='https://www.google-analytics.com/analytics.js'></script>
+  <script type="text/javascript" src="{% static "javascript/jquery.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/bootstrap.bundle.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/jquery.easing.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/Chart.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/jquery.dataTables.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/dataTables.bootstrap4.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/sb-admin.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/sb-admin-datatables.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_login.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/particles.js" %}"></script>
   <script src="https://apis.google.com/js/platform.js" async defer></script>
   <meta name="google-signin-client_id" content="{{google_auth_client_id}}.apps.googleusercontent.com">
@@ -224,7 +233,7 @@
             <i class="fa fa-fw fa-sign-in"></i>Login</a>
         </li>
         <li class="nav-item" id="account_connect_nav_item" style="display:none">
-          <a class="nav-link" data-toggle="modal" id="account_connect_modal_link" data-target="#account_connect_modal">
+          <a class="nav-link" data-toggle="modal" id="account_connect_modal_link" data-target="#account_connect_modal" style="color:white; font-weight:bold; font-size:150%">
             <i class="fa fa-fw fa-plug"></i>Connect
           </a>
         </li>
@@ -389,7 +398,7 @@
                     <h5 class="card-title">Password</h5>
                     <h6 class="card-subtitle mb-2 text-muted">Connect via Email/Password combination</h6>
                     <p class="card-text">
-                        Complete and submit the form below to log in with previously created account credentials to connect accounts.
+                        Complete and submit the form below to log in with previously created Guindex account credentials to connect accounts.
                     </p>
                     <form>
                         <div class="form-group">
@@ -539,23 +548,13 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript" src="{% static "javascript/jquery.min.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/bootstrap.bundle.min.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/jquery.easing.min.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/Chart.min.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/jquery.dataTables.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/dataTables.bootstrap4.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/sb-admin.min.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/sb-admin-datatables.min.js" %}"></script>
 
   {% if not debug %}
     <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.min.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_login.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_main.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.min.js" %}"></script>
   {% else %}
     <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_login.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_main.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
   {% endif %}

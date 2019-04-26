@@ -72,7 +72,7 @@ class GuindexSocialLoginSerializer(SocialLoginSerializer):
                         'account_to_connect_access_token': attr['access_token'],
                     }
 
-                    new_error_message = "User is already registered with this e-mail address.";
+                    new_error_message = "User is already registered with this email address.";
                     new_error_message += " - ";
                     new_error_message += json.dumps(login_account_state);
 

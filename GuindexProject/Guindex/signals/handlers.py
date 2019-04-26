@@ -20,8 +20,6 @@ def newUserInit(sender, **kwargs):
 
     user = kwargs.get('instance')
 
-    logger.info("New User %d was created", user.id)
-
     if not hasattr(user, 'telegramuser'):
 
         logger.info("User %d does not have a TelegramUser. Creating one", user.id)

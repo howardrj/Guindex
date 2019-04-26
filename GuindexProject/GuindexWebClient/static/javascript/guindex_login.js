@@ -1,3 +1,5 @@
+g_loginAccountInfo = null;
+
 /******************/
 /* Facebook Login */
 /******************/
@@ -28,6 +30,14 @@ function statusChangeCallback(response, connectProcedureCallback = null) {
             'GET',
             {fields: 'name, email'},
             function(response) {
+
+                // Make sure connection doesn't work with any facebook account
+                if (g_email != response.email & connectProcedureCallback != null)
+                {
+                    displayMessage("Error", "Account emails do not match. Cannot complete connection procedure.");
+                    return;
+                }
+
                 g_username = response.name;
                 g_email    = response.email;
 
@@ -79,11 +89,13 @@ function loginToGuindexViaFacebook (accessToken, connectProcedureCallback = null
                 }
                 
             }    
-            else if (request.status == 400 && response['non_field_errors'][0].startsWith("User is already registered with this e-mail address."))
+            else if (request.status == 400 && response['non_field_errors'][0].startsWith("User is already registered with this email address."))
             {
-                error_message = response['non_field_errors'][0];
-                
-                login_account_info = JSON.parse(error_message.split('-')[2].trim())
+                var error_message = response['non_field_errors'][0];
+                var split_location = error_message.indexOf('-');
+                var account_info_json_string = error_message.slice(split_location + 1).trim();
+
+                var login_account_info = JSON.parse(account_info_json_string);
                 login_account_info['account_to_connect'] = 'facebook';
                 onAccountConnectRequired(login_account_info);
             }
@@ -151,11 +163,13 @@ function loginToGuindexViaGoogle (accessToken, connectProcedureCallback = null)
                     connectProcedureCallback(1, response['key']);
                 }
             }    
-            else if (request.status == 400 && response['non_field_errors'][0].startsWith("User is already registered with this e-mail address."))
+            else if (request.status == 400 && response['non_field_errors'][0].startsWith("User is already registered with this email address."))
             {
-                error_message = response['non_field_errors'][0];
+                var error_message = response['non_field_errors'][0];
+                var split_location = error_message.indexOf('-');
+                var account_info_json_string = error_message.slice(split_location + 1).trim();
 
-                login_account_info = JSON.parse(error_message.split('-')[2].trim())
+                var login_account_info = JSON.parse(account_info_json_string);
                 login_account_info['account_to_connect'] = 'google';
                 onAccountConnectRequired(login_account_info);
             }
@@ -172,31 +186,32 @@ function loginToGuindexViaGoogle (accessToken, connectProcedureCallback = null)
 
 /******************/
 /* Password Login */
-(function () {
 /******************/
-        if (localStorage.hasOwnProperty('guindexUsername') &&
-            localStorage.hasOwnProperty('guindexAccessToken') &&
-            localStorage.hasOwnProperty('guindexUserId') &&
-            localStorage.hasOwnProperty('guindexIsStaffMember'))
-        {
-            g_loggedIn      = true;
-            g_username      = localStorage.getItem('guindexUsername');
-            g_accessToken   = localStorage.getItem('guindexAccessToken');
-            g_userId        = localStorage.getItem('guindexUserId');
-            g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
+(function () {
 
-            onLoginSuccess('password');
-        }
-        else
-        {
-            // Remove login paremeters from local storage to be safe
-            localStorage.removeItem('guindexUsername');
-            localStorage.removeItem('guindexAccessToken');
-            localStorage.removeItem('guindexUserId');
-            localStorage.removeItem('guindexIsStaffMember');
+    if (localStorage.hasOwnProperty('guindexUsername') &&
+        localStorage.hasOwnProperty('guindexAccessToken') &&
+        localStorage.hasOwnProperty('guindexUserId') &&
+        localStorage.hasOwnProperty('guindexIsStaffMember'))
+    {
+        g_loggedIn      = true;
+        g_username      = localStorage.getItem('guindexUsername');
+        g_accessToken   = localStorage.getItem('guindexAccessToken');
+        g_userId        = localStorage.getItem('guindexUserId');
+        g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
 
-            // Carry on as normal ...
-        }
+        onLoginSuccess('password');
+    }
+    else
+    {
+        // Remove login paremeters from local storage to be safe
+        localStorage.removeItem('guindexUsername');
+        localStorage.removeItem('guindexAccessToken');
+        localStorage.removeItem('guindexUserId');
+        localStorage.removeItem('guindexIsStaffMember');
+
+        // Carry on as normal ...
+    }
 })();
 
 $(document).on('click', '#password_login_button', function () {
@@ -275,9 +290,22 @@ $(document).on('click', '#password_login_button', function () {
 
 function onLoginSuccess (method)
 {
+    if (document.readyState != "complete")
+    {
+        var timeout = 1;
+
+        setTimeout(function () {
+            onLoginSuccess(method);
+        }, timeout * 1000);
+
+        return;
+    }
+
     // Show pending contributions tab 
     if (g_isStaffMember)
+    {
         document.getElementById('pending_contributions_li').style.display = 'list-item';
+    }
 
     var page_contents = document.getElementsByClassName('page_content');
 
@@ -303,6 +331,26 @@ function onLoginSuccess (method)
     document.getElementById('logged_out_message').style.display = 'none';
     document.getElementById('logged_in_message').style.display = 'block';
     document.getElementById('logged_in_message').innerHTML = 'Logged in as <b>' + g_username + '</b>.';
+
+    // Clean up remnants of other log in methods
+    if (method != 'google')
+    {
+        var auth2 = gapi.auth2.getAuthInstance();
+
+        auth2.signOut().then(function () {
+        });
+    }
+
+    if (method != 'facebook')
+    {
+        FB.logout(function (response) {
+        });
+    }
+
+    if (method != 'password')
+    {
+        clearLocalStorage();
+    }
 }
 
 function hideLoginCards ()
@@ -390,6 +438,28 @@ function checkLoginStateForConnect ()
 // Connecting with Google
 function onGoogleSignInForConnect (response)
 {
+    // Avoid this callback triggering automatically
+    // g_loginAccountInfo only set when account connection is required
+    if (!g_loginAccountInfo)
+    {
+        return;
+    }
+
+    // access_token used by our backend for authenticating the user with Google
+    var access_token = response['Zi']['access_token'];
+
+    // Make sure connection doesn't work with any google account
+    if (g_email != response['w3']['U3'])
+    {
+        displayMessage("Error", "Account emails do not match. Cannot complete connection procedure.");
+        return;
+    }
+
+    // TODO Are we guaranteed to have these?
+    g_email = response['w3']['U3'];
+    g_username = g_email.split('@')[0];
+
+    loginToGuindexViaGoogle(access_token, previousMethodLoginResultCallback);
 }
 
 // Connecting with password
