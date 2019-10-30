@@ -1,0 +1,59 @@
+{% load static %}
+
+{% if async_template_loading %}
+<div id="analysis_risingseas_page" class="page_content content-wrapper" style="display:none">
+</div>
+{% else %}
+<div id="analysis_risingseas_page" class="page_content content-wrapper" style="display:none">
+    <div class="container-fluid">
+        <div class="card card-register mx-auto mt-5">
+            <div class="card-header">
+               Dublin Pintscape in a Warmer World 
+            </div>
+            <div class="card-body">
+
+                <p>
+		   Over the coming years we will see worsening global disruptions due to the escalating climate crisis. These disruptions consist of, among others, wildfires, droughts, deluges and emergent, fast-amplifying hurricanes.                  
+                </p>
+
+                <p>
+              	    Along with these extreme weather events we will also see continuing insistent sea-level rise as the environment responds to our noxious effluvia. Just this week (I'm writing this on 30/10/2019) a research study suggested that by 2050 300 million peoples homes will flood at least once a year due to rising sea-levels and storm surges.
+                </p>
+
+                <p>
+             	    Sea-level rise poses an existential threat, especially for inhabitants of coral atoll nations and other low-lying populations. In Dublin, barring significant global mitigation efforts or suitable local adaptation measures, sea-level rise will also re-shape our terrain. In this article we examine what these changes will mean for the pinting ladscape of central Dublin.  
+                </p>
+
+                <p>
+                    <b> Emissions Scenarios </b>
+                </p>
+
+                <p>
+             	    We will consider two separate scenarios of different amounts of total greenhouse gas pollution. The first scenario, which worryingly looks increasingly fanciful, is that we collectively manage to abide with the Paris agreement and keep global temperature rise to 1.5&#8451; above pre-industrial levels. The second scenario considers the effect of continuing on the current emissions trajectory which will bring us 4&#8451; of temperature rise.
+                </p>
+
+             	<p>
+                    As the rate at which we are emitting greenhouse gases is so high we are collectively forcing the ecological systems to such a degree that they cannot instantaneously respond. Instead they will require a certain time to elapse before the full effect of our cumulative emissions to date is observed. As such the analysis considers Dublin following the long-term relaxation of the environment following the last emissions to lock-in each of the scenarios considered (and no more emissions beyond that point). It is likely that this relaxation will take several hundred years.   
+                </p>
+
+                <p align="center">
+                    <img class="article_image" style="width:85%" src="{% static "images/1point5pubs.png" %}">
+                </p>
+		 
+                <p>
+		   Dublin's pintscape under the first emissions scenario, where we collectively limit global heating to 1.5&#8451;, is displayed in the above figure. We see that, even in this scenario, there are large swathes of Poolbeg, Ringsend, Irishtown, Sandymount, East Wall and the Docklands under water. Some of these areas are reclaimed land so it is not terribly surprising that these areas will be some of the first affected by rising sea-levels.                     
+                </p>
+		
+		<p>
+		</p>
+		 <p align="center">
+                    <img class="article_image" style="width:85%" src="{% static "images/4pubs.png" %}">
+                </p>
+		<p>
+
+		</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
