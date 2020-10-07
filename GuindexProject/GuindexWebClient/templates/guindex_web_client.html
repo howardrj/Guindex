@@ -5,8 +5,6 @@
 
 <head>
   <script>
-    var G_FACEBOOK_APP_ID = '{{facebook_app_id}}';
-    var G_GOOGLE_AUTH_CLIENT_ID = '{{google_auth_client_id}}';
     var g_debug = ('{{debug}}' == 'True')
   </script>
   {% if not debug %}
@@ -32,7 +30,6 @@
   <script type="text/javascript" src="{% static "javascript/guindex_login.js" %}"></script>
   <script type="text/javascript" src="{% static "javascript/particles.js" %}"></script>
   <script src="https://apis.google.com/js/platform.js" async defer></script>
-  <meta name="google-signin-client_id" content="{{google_auth_client_id}}.apps.googleusercontent.com">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
@@ -61,34 +58,6 @@
         return;
     });
   </script>
-
-  <script>
-
-      window.fbAsyncInit = function() {
-
-          FB.init({
-              appId      : G_FACEBOOK_APP_ID,
-              cookie     : true,  // enable cookies to allow the server to access 
-                                // the session
-              xfbml      : true,  // parse social plugins on this page
-              version    : 'v2.8' // use graph api version 2.8
-          });
-
-          FB.getLoginStatus(function(response) {
-              statusChangeCallback(response);
-          });
-      };
-
-      // Load the Facebook SDK asynchronously
-      (function(d, s, id) {
-          var js, fjs = d.getElementsByTagName(s)[0];
-          if (d.getElementById(id)) return;
-          js = d.createElement(s); js.id = id;
-          js.src = "https://connect.facebook.net/en_US/sdk.js";
-          fjs.parentNode.insertBefore(js, fjs);
-      }(document, 'script', 'facebook-jssdk'));
-
-  </script>   
 
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color:black;" id="mainNav">
@@ -233,12 +202,7 @@
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
           <a class="nav-link" data-toggle="modal" id="login_link" data-target="#exampleModal" style="color:white; font-weight:bold; font-size:150%" >
-            <i class="fa fa-fw fa-sign-in"></i>Login</a>
-        </li>
-        <li class="nav-item" id="account_connect_nav_item" style="display:none">
-          <a class="nav-link" data-toggle="modal" id="account_connect_modal_link" data-target="#account_connect_modal" style="color:white; font-weight:bold; font-size:150%">
-            <i class="fa fa-fw fa-plug"></i>Connect
-          </a>
+            <i class="fa fa-fw fa-sign-in"></i> Account</a>
         </li>
       </ul>
     </div>
@@ -285,147 +249,98 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel"><b>Log In</b></h5>
+          <ul class="nav nav-tabs" roles="tablist">
+            <li class="nav-item login_state_link">
+                <a class="nav-link active login_state_link" href="#password_signup" data-toggle="tab">Signup</a>
+            </li>
+            <li class="nav-item login_state_link">
+                <a class="nav-link login_state_link" href="#password_login" data-toggle="tab">Login</a>
+            </li>
+          </ul>
+
           <button class="close" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
-        <div class="modal-body" id="login_modal_body">
-            <div class="container-fluid">
-                <p id="logged_out_message"> 
-                    Login via one of the methods listed below if you would like to start contributing to the Guindex.
-                </p>
 
-                <p id="logged_in_message" style="display:none">
-                </p>
+        <div class="tab-content">
+            <div class="tab-pane active" role="tabpanel" id="password_signup">
+                <div class="modal-body" id="password_signup_modal_body">
+                    
+                   <p>
+                       Signup if you would like to start contributing to the Guindex.
+                   </p>
 
-                <br> 
+                   <br>
 
-                <div class="card login_card">
-                    <div class="card-body">
-                        <h5 class="card-title">Facebook</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Log in via Facebook</h6>
-                        <p class="card-text">Click the Facebook log in button below if you would like to log in via Facebook.</p>
-                        <fb:login-button id="login_with_facebook_button" scope="public_profile,email" onlogin="checkLoginState();">
-                        </fb:login-button>
-                    </div>
+                    <form>
+                       <div class="form-group">
+                           <div class="form-row">
+                               <label for="password_signup_username">Username</label>
+                               <input class="form-control" id="password_signup_username" type="text" placeholder="Enter username">
+                           </div>
+                       </div>
+                       <div class="form-group">
+                           <div class="form-row">
+                               <label for="password_signup_email">Email</label>
+                               <input class="form-control" id="password_signup_email" type="text" placeholder="Enter email">
+                           </div>
+                       </div>
+                       <div class="form-group">
+                           <div class="form-row">
+                               <label for="password_signup_password1">Password</label>
+                               <input class="form-control" id="password_signup_password1" type="password" placeholder="Enter password">
+                           </div>
+                       </div>
+                       <div class="form-group">
+                           <div class="form-row">
+                               <label for="password_signup_password2">Password</label>
+                               <input class="form-control" id="password_signup_password2" type="password" placeholder="Renter password">
+                           </div>
+                       </div>
+                    </form>
                 </div>
-
-                <div class="card login_card" style="margin-top:10px;">
-                    <div class="card-body">
-                        <h5 class="card-title">Google</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Log in via Google</h6>
-                        <p class="card-text">Click the Google log in button below if you would like to log in via Google.</p>
-                        <div class="g-signin2" data-onsuccess="onGoogleSignIn"></div>
-                    </div>
-                </div>
-
-                <div class="card login_card" style="margin-top:10px;">
-                    <div class="card-body">
-                        <h5 class="card-title">Password</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Log in via Email/Password combination</h6>
-                        <p class="card-text">
-                            Complete and submit the form below to log in with previously created account credentials.
-                            Please note that logging in with this method is only available to users who signed up for the first version of the Guindex.
-                            As a security measure, the Guindex now only offers sign up via Facebook and Google.
-                            Support for authentication via other social apps will be added in due course.
-                        </p>
-                        <form>
-                            <div class="form-group">
-                                <div class="form-row">
-                                    <label for="password_login_email">Email</label>
-                                    <input class="form-control" id="password_login_email" type="text" placeholder="Enter email">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="form-row">
-                                    <label for="password_login_password">Password</label>
-                                    <input class="form-control" id="password_login_password" type="password" placeholder="Enter password">
-                                </div>
-                            </div>
-                            <div class="card_footer" style="text-align:center">
-                                <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
-                                <a class="btn btn-primary" id="password_login_button" style="color:white; display:block">Submit</a>
-                            </div>
-                        </form>
-                    </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" id="password_signup_button">Submit</a>
+                    <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
                 </div>
             </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-            <a class="btn btn-primary" id="logout_button" style="display:none; color:white">Logout</a>
-            <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
-        </div>
+
+            <div class="tab-pane" role="tabpanel" id="password_login">
+                <div class="modal-body" id="password_login_modal_body">
+                    
+                   <p>
+                       Login with your previously created account credentials if you would like to start contributing to the Guindex.
+                   </p>
+
+                   <br>
+
+                    <form>
+                       <div class="form-group">
+                           <div class="form-row">
+                               <label for="password_login_email">Email</label>
+                               <input class="form-control" id="password_login_email" type="text" placeholder="Enter email">
+                           </div>
+                       </div>
+                       <div class="form-group">
+                           <div class="form-row">
+                               <label for="password_login_password">Password</label>
+                               <input class="form-control" id="password_login_password" type="password" placeholder="Enter password">
+                           </div>
+                       </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" id="password_login_button">Submit</a>
+                    <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+                </div>
+            </div> 
+        </div> 
      </div>
    </div>
  </div>
-
-  <!-- Connect Accounts Modal -->
-  <div class="modal fade" id="account_connect_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Connect Accounts</h5>
-          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <div class="modal-body">
-
-            We have detected that an account was previously created with the email <span id="account_connect_email" style="font-weight:bold"></span>
-            via the method(s) listed below.
-            We assume this is you but to be sure, please log in via one of the methods below to connect your accounts so you can log in using
-            the new and old method in the future.
-
-            <div class="card login_card" style="margin-top:10px;" id="connect_with_facebook_card">
-                <div class="card-body">
-                    <h5 class="card-title">Facebook</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">Connect via Facebook</h6>
-                    <p class="card-text">Click the Facebook log in button below if you would like to log in via Facebook to connect accounts.</p>
-                    <fb:login-button id="connect_with_facebook_button" scope="public_profile,email" onlogin="checkLoginStateForConnect();">
-                    </fb:login-button>
-                </div>
-            </div>
-
-            <div class="card login_card" style="margin-top:10px;" id="connect_with_google_card">
-                <div class="card-body">
-                    <h5 class="card-title">Google</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">Connect via Google</h6>
-                    <p class="card-text">Click the Google log in button below if you would like to log in via Google to connect accounts.</p>
-                    <div class="g-signin2" data-onsuccess="onGoogleSignInForConnect"></div>
-                </div>
-            </div>
-
-            <div class="card login_card" style="margin-top:10px;" id="connect_with_password_card">
-                <div class="card-body">
-                    <h5 class="card-title">Password</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">Connect via Email/Password combination</h6>
-                    <p class="card-text">
-                        Complete and submit the form below to log in with previously created Guindex account credentials to connect accounts.
-                    </p>
-                    <form>
-                        <div class="form-group">
-                            <div class="form-row">
-                                <label for="password_connect_password">Password</label>
-                                <input class="form-control" id="password_connect_password" type="password" placeholder="Enter password">
-                            </div>
-                        </div>
-                        <div class="card_footer" style="text-align:center">
-                            <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
-                            <a class="btn btn-primary" id="connect_with_password_button" style="color:white; display:block">Submit</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Generic Message Modal (with hidden button to open it)-->
   <a class="nav-link" data-toggle="modal" id="message_link" data-target="#message_modal" style="display:none"></a>
