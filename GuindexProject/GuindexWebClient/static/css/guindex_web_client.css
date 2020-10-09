@@ -228,3 +228,16 @@ a.page-link {
 .article_image {
     margin: 20px 5px;
 }
+
+/*********/
+/* Cards */
+/*********/
+
+.card {
+    border-width: 3px;
+    border-color: lightgrey !important;
+}
+
+.card-header {
+    background-color: lightgrey !important;
+}

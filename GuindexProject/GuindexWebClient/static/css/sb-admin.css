@@ -282,8 +282,7 @@ body.sidenav-toggled #mainNav.static-top #sidenavToggler i {
 
 .content-wrapper {
   overflow-x: hidden;
-  background-image: url("../images/bg4_refl_big-min_recol.jpg");
-  background-size:contain;
+  background: white;
 }
 
 @media (min-width: 992px) {

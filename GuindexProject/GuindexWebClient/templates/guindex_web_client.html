@@ -201,8 +201,12 @@
       </ul>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <a class="nav-link" data-toggle="modal" id="login_link" data-target="#exampleModal" style="color:white; font-weight:bold; font-size:150%" >
-            <i class="fa fa-fw fa-sign-in"></i> Account</a>
+          <a class="nav-link" data-toggle="modal" id="login_link" data-target="#login_modal" >
+            <i class="fa fa-fw fa-sign-in"></i>
+              Account
+           </a>
+          <a class="nav-link" data-toggle="modal" id="logout_link" data-target="#logout_modal" style="display:none" >
+           </a>
         </li>
       </ul>
     </div>
@@ -245,7 +249,7 @@
   </a>
 
   <!-- Login Modal-->
-  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="login_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -258,7 +262,7 @@
             </li>
           </ul>
 
-          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <button class="close" id="login_close_button" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
@@ -273,7 +277,7 @@
 
                    <br>
 
-                    <form>
+                   <form>
                        <div class="form-group">
                            <div class="form-row">
                                <label for="password_signup_username">Username</label>
@@ -302,7 +306,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" id="password_signup_button">Submit</a>
+                    <a class="btn btn-primary" id="password_signup_button" style="color:white">Submit</a>
                     <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
                 </div>
             </div>
@@ -333,7 +337,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" id="password_login_button">Submit</a>
+                    <a class="btn btn-primary" id="password_login_button" style="color:white">Submit</a>
                     <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
                 </div>
             </div> 
@@ -341,6 +345,28 @@
      </div>
    </div>
  </div>
+
+  <div class="modal fade" id="logout_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:9999">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Logout</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+		You are currently logged in as <span style="font-weight:bold;" id="logout_modal_username"></span>.
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" id="logout_button" style="color:white">Logout</a>
+          <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Generic Message Modal (with hidden button to open it)-->
   <a class="nav-link" data-toggle="modal" id="message_link" data-target="#message_modal" style="display:none"></a>

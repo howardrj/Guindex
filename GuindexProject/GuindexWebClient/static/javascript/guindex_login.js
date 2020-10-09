@@ -1,8 +1,8 @@
 g_loginAccountInfo = null;
 
-/******************/
-/* Password Login */
-/******************/
+/*********/
+/* Login */
+/*********/
 (function () {
 
     if (localStorage.hasOwnProperty('guindexUsername') &&
@@ -16,7 +16,7 @@ g_loginAccountInfo = null;
         g_userId        = localStorage.getItem('guindexUserId');
         g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
 
-        onLoginSuccess('password');
+        onLoginSuccess();
     }
     else
     {
@@ -100,10 +100,6 @@ $(document).on('click', '#password_login_button', function () {
     }
 });
 
-/*****************/
-/* Login Success */
-/*****************/
-
 function onLoginSuccess ()
 {
     if (document.readyState != "complete")
@@ -132,30 +128,94 @@ function onLoginSuccess ()
 
     // Set login status link to display username
     var login_link = document.getElementById('login_link');
-    login_link.innerHTML = g_username;
+    var logout_link = document.getElementById('logout_link');
+    var logout_modal_username = document.getElementById('logout_modal_username');
 
-    // Display logout button
-    document.getElementById('logout_button').style.display = 'inline';
+    login_link.style.display = 'none';
+    logout_link.innerHTML = g_username;
+    logout_link.style.display = 'inline';
+    logout_modal_username.innerHTML = g_username;
 
-    hideLoginCards();
-
-    // Hide connect button
-    document.getElementById('account_connect_nav_item').style.display = 'none';
-
-    // Toggle log in message
-    document.getElementById('logged_out_message').style.display = 'none';
-    document.getElementById('logged_in_message').style.display = 'block';
-    document.getElementById('logged_in_message').innerHTML = 'Logged in as <b>' + g_username + '</b>.';
+    document.getElementById('login_close_button').click();
 }
 
-function hideLoginCards ()
-{
-    var login_cards = document.getElementsByClassName('login_card');
+/**********/
+/* Signup */
+/**********/
 
-    for (var i = 0; i < login_cards.length; i++)
-    {
-        login_cards[i].style.display = 'none';
+$(document).on('click', '#password_signup_button', function () {
+    
+    var username  = document.getElementById('password_signup_username').value;
+    var email     = document.getElementById('password_signup_email').value;
+    var password1 = document.getElementById('password_signup_password1').value;
+    var password2 = document.getElementById('password_signup_password2').value;
+
+    // Use REST API to login to guindex.ie
+    var request = new XMLHttpRequest();
+
+    request.open('POST', G_API_BASE + 'rest-auth/registration/', true);
+
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+    var signup_data = {
+        'username': username,
+        'email': email,
+        'password1': password1,
+        'password2': password2,
     }
+
+    request.send(JSON.stringify(signup_data));
+
+    var button = this;
+    toggleLoader(button);
+
+    request.onreadystatechange = function processRequest()
+    {
+        if (request.readyState == 4)
+        {
+            toggleLoader(button);
+
+            var response = JSON.parse(request.responseText);
+
+            if (request.status == 201)
+            {
+                onSignupSuccess();
+            }
+            else
+            {
+                // Display errors
+                var error_message = '<p>Please fix the following error(s): </p>'
+
+                var error_table = '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
+
+                error_table += '<tr> <th> Field </th> <th> Error </th> </tr>';
+
+                Object.keys(response).forEach(function(key) {
+
+                    error_table += '<tr>';
+
+                    error_table += '<td>' + key + '</td>';
+
+                    error_table += '<td>' + response[key] + '</td>';
+
+                    error_table += '</tr>';
+                });
+
+                error_table += '</tbody></table>';
+
+                displayMessage("Error", error_message + error_table);
+            }
+        }
+    }
+});
+
+function onSignupSuccess ()
+{
+    document.getElementById('login_close_button').click();
+
+    displayMessage('Account Verificatiom Email Sent', 
+                   "Please check your email and verify your account before logging in");
 }
 
 /**********/
