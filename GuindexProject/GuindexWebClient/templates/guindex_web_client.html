@@ -260,6 +260,9 @@
             <li class="nav-item login_state_link">
                 <a class="nav-link login_state_link" href="#password_login" data-toggle="tab">Login</a>
             </li>
+            <li class="nav-item login_state_link">
+                <a class="nav-link login_state_link" href="#forgot_password" data-toggle="tab">Forgot Password?</a>
+            </li>
           </ul>
 
           <button class="close" id="login_close_button" type="button" data-dismiss="modal" aria-label="Close">
@@ -306,7 +309,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" id="password_signup_button" style="color:white">Submit</a>
+                    <a class="btn btn-primary" id="password_signup_button" style="color:white; text-align:center">Submit</a>
                     <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
                 </div>
             </div>
@@ -338,6 +341,30 @@
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                     <a class="btn btn-primary" id="password_login_button" style="color:white">Submit</a>
+                    <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+                </div>
+            </div> 
+            <div class="tab-pane" role="tabpanel" id="forgot_password">
+                <div class="modal-body" id="forgot_password_modal_body">
+                    
+                   <p>
+                        Please enter your email address to reset your account password.
+                   </p>
+
+                   <br>
+
+                    <form>
+                       <div class="form-group">
+                           <div class="form-row">
+                               <label for="forgot_password_email">Email</label>
+                               <input class="form-control" id="forgot_password_email" type="text" placeholder="Enter email">
+                           </div>
+                       </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" id="forgot_password_button" style="color:white">Submit</a>
                     <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
                 </div>
             </div> 

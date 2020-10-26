@@ -30,7 +30,7 @@ DEBUG = True
 # Enable timezone support
 USE_TZ = True
 
-ALLOWED_HOSTS = ['45.79.148.4', 'guindex.ie', 'www.guindex.ie', '127.0.0.1', '172.28.5.22', '172.28.4.152']
+ALLOWED_HOSTS = ['45.79.148.4', 'guindex.ie', 'www.guindex.ie', '127.0.0.1', '172.28.5.22', '172.28.4.152', '10.0.3.148']
 
 # Application definition
 
@@ -47,18 +47,14 @@ INSTALLED_APPS = (
     'rest_framework_datatables',
     'rest_auth',
     'django.contrib.sites',
-    'allauth',
-    'allauth.account',
     'rest_auth.registration',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.facebook',
-    'allauth.socialaccount.providers.twitter',
-    'allauth.socialaccount.providers.google',
     'corsheaders',
     'UserProfile',
     'Guindex',
     'GuindexWebClient',
     'TelegramUser',
+    'allauth',
+    'allauth.account',
 )
 
 SITE_ID = 1 # Need for rest_auth stuff
@@ -104,7 +100,7 @@ WSGI_APPLICATION = 'GuindexProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/var/www/Testing/Guindex/Guindex.db',
+        'NAME': secrets.GUINDEX_DB_LOCATION
     }
 }
 
@@ -309,9 +305,6 @@ REST_FRAMEWORK = {
     }
 }
 
-# Allauth settings
-ACCOUNT_EMAIL_VERIFICATION = 'none'
-
 # Telegram API
 BOT_HTTP_API_TOKEN = secrets.BOT_HTTP_API_TOKEN
 
@@ -333,6 +326,7 @@ GOOGLE_ANALYTICS_KEY = secrets.GOOGLE_ANALYTICS_KEY
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True   
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 # Google Auth API
 GOOGLE_AUTH_CLIENT_ID = secrets.GOOGLE_AUTH_CLIENT_ID

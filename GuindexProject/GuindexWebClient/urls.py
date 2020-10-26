@@ -9,5 +9,3 @@ urlpatterns = [
     url(r'^(?P<template>.+)$', views.guindexWebClientWithTemplate),
     url(r'^social_sigup/$', views.guindexWebClient, name = 'socialaccount_signup'),
 ]
-
-# Note the second is just a dummy url to detect email collisions

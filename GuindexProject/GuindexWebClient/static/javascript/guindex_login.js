@@ -56,7 +56,7 @@ $(document).on('click', '#password_login_button', function () {
 
             var response = JSON.parse(request.responseText);
 
-            if (request.status == 200)
+            if (request.status >= 200 && request.status < 300)
             {
                 localStorage.setItem('guindexUsername',      response['username']);
                 localStorage.setItem('guindexAccessToken',   response['key']);
@@ -178,7 +178,7 @@ $(document).on('click', '#password_signup_button', function () {
 
             var response = JSON.parse(request.responseText);
 
-            if (request.status == 201)
+            if (request.status >= 200 && request.status < 300)
             {
                 onSignupSuccess();
             }
@@ -216,6 +216,79 @@ function onSignupSuccess ()
 
     displayMessage('Account Verificatiom Email Sent', 
                    "Please check your email and verify your account before logging in");
+}
+
+/*******************/
+/* Forgot Password */
+/*******************/
+
+$(document).on('click', '#forgot_password_button', function () {
+    
+    var email = document.getElementById('forgot_password_email').value;
+
+    // Use REST API to login to guindex.ie
+    var request = new XMLHttpRequest();
+
+    request.open('POST', G_API_BASE + 'rest-auth/password/reset/', true);
+
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+    var forgot_password_data = {
+        'email': email,
+    }
+
+    request.send(JSON.stringify(forgot_password_data));
+
+    var button = this;
+    toggleLoader(button);
+
+    request.onreadystatechange = function processRequest()
+    {
+        if (request.readyState == 4)
+        {
+            toggleLoader(button);
+
+            var response = JSON.parse(request.responseText);
+
+            if (request.status >= 200 && request.status < 300)
+            {
+                onForgotPasswordSubmitSuccess();
+            }
+            else
+            {
+                // Display errors
+                var error_message = '<p>Please fix the following error(s): </p>'
+
+                var error_table = '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
+
+                error_table += '<tr> <th> Field </th> <th> Error </th> </tr>';
+
+                Object.keys(response).forEach(function(key) {
+
+                    error_table += '<tr>';
+
+                    error_table += '<td>' + key + '</td>';
+
+                    error_table += '<td>' + response[key] + '</td>';
+
+                    error_table += '</tr>';
+                });
+
+                error_table += '</tbody></table>';
+
+                displayMessage("Error", error_message + error_table);
+            }
+        }
+    }
+});
+
+function onForgotPasswordSubmitSuccess ()
+{
+    document.getElementById('login_close_button').click();
+
+    displayMessage('Password Reset Sent', 
+                   "Please check your email to reset your password");
 }
 
 /**********/
