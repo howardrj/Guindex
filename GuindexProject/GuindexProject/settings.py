@@ -30,7 +30,7 @@ DEBUG = True
 # Enable timezone support
 USE_TZ = True
 
-ALLOWED_HOSTS = ['45.79.148.4', 'guindex.ie', 'www.guindex.ie', '127.0.0.1', '172.28.5.22', '172.28.4.152', '10.0.3.148']
+ALLOWED_HOSTS = ['45.79.148.4', 'guindex.ie', 'www.guindex.ie', '127.0.0.1', 'rhoward-guindex-ubuntu-test.com']
 
 # Application definition
 
