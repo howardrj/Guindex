@@ -1,315 +1,84 @@
-g_loginAccountInfo = null;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.3/firebase-app.js";
 
-/*********/
-/* Login */
-/*********/
+function guindex_login_init_firebase ()
+{
+    const firebase_config = {
+        apiKey: "AIzaSyDdzY9rNnZTpA_EenAfn9Vs7SRvAZtCh2g",
+        authDomain: "guindex-fd679.firebaseapp.com",
+        projectId: "guindex-fd679",
+        storageBucket: "guindex-fd679.appspot.com",
+        messagingSenderId: "895081803981",
+        appId: "1:895081803981:web:d897aed7427b4c79c8f984",
+        measurementId: "G-K9V19D9DWE"
+    };
+
+    const app = firebase.initializeApp(firebase_config);
+
+    var ui_config = {
+        signInSuccessUrl: window.location.href,
+        signInOptions: [
+            // Leave the lines as is for the providers you want to offer your users.
+            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        ],
+    };
+
+    var ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+    ui.start('#firebaseui-auth-container', ui_config);
+}
+
+const GuindexUserStates = {
+    LOGGED_OUT: 0,
+    AUTHENTICATED_BY_PROVIDER: 1,
+    LOGGED_IN_TO_GUINDEX: 2
+}
+
+const GuindexUserAuthProviders = {
+    UNKNOWN: 0,
+    GOOGLE: 1
+}
+
+class GuindexUser
+{
+    static singleton = null;
+
+    constructor ()
+    {
+        if (GuindexUser.singleton)
+            throw new Error("Cannot have more than one GuindexUser instance");
+
+        GuindexUser.singleton = this;
+        this.state = GuindexUserStates.LOGGED_OUT;
+        this.auth_provider = GuindexUserAuthProviders.UNKNOWN;
+
+        firebase.auth().onAuthStateChanged(this._on_firebase_user_auth_state_changed);
+    }
+
+    _change_state (state_name)
+    {
+        if (state_name == this.state)
+            return;
+
+    }
+
+    _on_firebase_user_auth_state_changed (user)
+    {
+        let guindex_user = GuindexUser.singleton;
+
+        if (!user)
+        {
+            console.log("User has not been authenticated by any provider");
+            guindex_user._change_state(GuindexUserStates.LOGGED_OUT);
+            return;
+        }
+
+        console.log(guindex_user);
+    }
+}
+
 (function () {
 
-    if (localStorage.hasOwnProperty('guindexUsername') &&
-        localStorage.hasOwnProperty('guindexAccessToken') &&
-        localStorage.hasOwnProperty('guindexUserId') &&
-        localStorage.hasOwnProperty('guindexIsStaffMember'))
-    {
-        g_loggedIn      = true;
-        g_username      = localStorage.getItem('guindexUsername');
-        g_accessToken   = localStorage.getItem('guindexAccessToken');
-        g_userId        = localStorage.getItem('guindexUserId');
-        g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
+    guindex_login_init_firebase();
 
-        onLoginSuccess();
-    }
-    else
-    {
-        // Remove login paremeters from local storage to be safe
-        localStorage.removeItem('guindexUsername');
-        localStorage.removeItem('guindexAccessToken');
-        localStorage.removeItem('guindexUserId');
-        localStorage.removeItem('guindexIsStaffMember');
-
-        // Carry on as normal ...
-    }
+    let guindex_user = new GuindexUser();
 })();
-
-$(document).on('click', '#password_login_button', function () {
-    
-    var email    = document.getElementById('password_login_email').value;
-    var password = document.getElementById('password_login_password').value;
-
-    // Use REST API to login to guindex.ie
-    var request = new XMLHttpRequest();
-
-    request.open('POST', G_API_BASE + 'rest-auth/login/', true);
-
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-    request.send(JSON.stringify({'email': email, 'password': password}));
-
-    var button = this;
-    toggleLoader(button);
-
-    request.onreadystatechange = function processRequest()
-    {
-        if (request.readyState == 4)
-        {
-            toggleLoader(button);
-
-            var response = JSON.parse(request.responseText);
-
-            if (request.status >= 200 && request.status < 300)
-            {
-                localStorage.setItem('guindexUsername',      response['username']);
-                localStorage.setItem('guindexAccessToken',   response['key']);
-                localStorage.setItem('guindexUserId',        response['user']);
-                localStorage.setItem('guindexIsStaffMember', response['isStaff'] == "True" ? true : false);
-
-                // Do login stuff
-                g_loggedIn      = true;
-                g_username      = localStorage.getItem('guindexUsername');
-                g_accessToken   = localStorage.getItem('guindexAccessToken');
-                g_userId        = localStorage.getItem('guindexUserId');
-                g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
-
-                onLoginSuccess();
-            }
-            else
-            {
-                // Display errors
-                var error_message = '<p>Please fix the following error(s): </p>'
-
-                var error_table = '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
-
-                error_table += '<tr> <th> Field </th> <th> Error </th> </tr>';
-
-                Object.keys(response).forEach(function(key) {
-
-                    error_table += '<tr>';
-
-                    error_table += '<td>' + key + '</td>';
-
-                    error_table += '<td>' + response[key] + '</td>';
-
-                    error_table += '</tr>';
-                });
-
-                error_table += '</tbody></table>';
-
-                displayMessage("Error", error_message + error_table);
-            }
-        }
-    }
-});
-
-function onLoginSuccess ()
-{
-    if (document.readyState != "complete")
-    {
-        var timeout = 1;
-
-        setTimeout(function () {
-            onLoginSuccess();
-        }, timeout * 1000);
-
-        return;
-    }
-
-    // Show pending contributions tab 
-    if (g_isStaffMember)
-    {
-        document.getElementById('pending_contributions_li').style.display = 'list-item';
-    }
-
-    var page_contents = document.getElementsByClassName('page_content');
-
-    for (var i = 0; i < page_contents.length; i++)
-    {
-        page_contents[i].dispatchEvent(new Event('on_login'));
-    }
-
-    // Set login status link to display username
-    var login_link = document.getElementById('login_link');
-    var logout_link = document.getElementById('logout_link');
-    var logout_modal_username = document.getElementById('logout_modal_username');
-
-    login_link.style.display = 'none';
-    logout_link.innerHTML = g_username;
-    logout_link.style.display = 'inline';
-    logout_modal_username.innerHTML = g_username;
-
-    document.getElementById('login_close_button').click();
-}
-
-/**********/
-/* Signup */
-/**********/
-
-$(document).on('click', '#password_signup_button', function () {
-    
-    var username  = document.getElementById('password_signup_username').value;
-    var email     = document.getElementById('password_signup_email').value;
-    var password1 = document.getElementById('password_signup_password1').value;
-    var password2 = document.getElementById('password_signup_password2').value;
-
-    // Use REST API to login to guindex.ie
-    var request = new XMLHttpRequest();
-
-    request.open('POST', G_API_BASE + 'rest-auth/registration/', true);
-
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-    var signup_data = {
-        'username': username,
-        'email': email,
-        'password1': password1,
-        'password2': password2,
-    }
-
-    request.send(JSON.stringify(signup_data));
-
-    var button = this;
-    toggleLoader(button);
-
-    request.onreadystatechange = function processRequest()
-    {
-        if (request.readyState == 4)
-        {
-            toggleLoader(button);
-
-            var response = JSON.parse(request.responseText);
-
-            if (request.status >= 200 && request.status < 300)
-            {
-                onSignupSuccess();
-            }
-            else
-            {
-                // Display errors
-                var error_message = '<p>Please fix the following error(s): </p>'
-
-                var error_table = '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
-
-                error_table += '<tr> <th> Field </th> <th> Error </th> </tr>';
-
-                Object.keys(response).forEach(function(key) {
-
-                    error_table += '<tr>';
-
-                    error_table += '<td>' + key + '</td>';
-
-                    error_table += '<td>' + response[key] + '</td>';
-
-                    error_table += '</tr>';
-                });
-
-                error_table += '</tbody></table>';
-
-                displayMessage("Error", error_message + error_table);
-            }
-        }
-    }
-});
-
-function onSignupSuccess ()
-{
-    document.getElementById('login_close_button').click();
-
-    displayMessage('Account Verificatiom Email Sent', 
-                   "Please check your email and verify your account before logging in");
-}
-
-/*******************/
-/* Forgot Password */
-/*******************/
-
-$(document).on('click', '#forgot_password_button', function () {
-    
-    var email = document.getElementById('forgot_password_email').value;
-
-    // Use REST API to login to guindex.ie
-    var request = new XMLHttpRequest();
-
-    request.open('POST', G_API_BASE + 'rest-auth/password/reset/', true);
-
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-    var forgot_password_data = {
-        'email': email,
-    }
-
-    request.send(JSON.stringify(forgot_password_data));
-
-    var button = this;
-    toggleLoader(button);
-
-    request.onreadystatechange = function processRequest()
-    {
-        if (request.readyState == 4)
-        {
-            toggleLoader(button);
-
-            var response = JSON.parse(request.responseText);
-
-            if (request.status >= 200 && request.status < 300)
-            {
-                onForgotPasswordSubmitSuccess();
-            }
-            else
-            {
-                // Display errors
-                var error_message = '<p>Please fix the following error(s): </p>'
-
-                var error_table = '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
-
-                error_table += '<tr> <th> Field </th> <th> Error </th> </tr>';
-
-                Object.keys(response).forEach(function(key) {
-
-                    error_table += '<tr>';
-
-                    error_table += '<td>' + key + '</td>';
-
-                    error_table += '<td>' + response[key] + '</td>';
-
-                    error_table += '</tr>';
-                });
-
-                error_table += '</tbody></table>';
-
-                displayMessage("Error", error_message + error_table);
-            }
-        }
-    }
-});
-
-function onForgotPasswordSubmitSuccess ()
-{
-    document.getElementById('login_close_button').click();
-
-    displayMessage('Password Reset Sent', 
-                   "Please check your email to reset your password");
-}
-
-/**********/
-/* Logout */
-/**********/
-
-$(document).on('click', '#logout_button', function () {
-
-    toggleLoader(this);
-
-    clearLocalStorage();
-
-    // Reload page (easiest thing to do here)
-    location.reload();
-});
-
-function clearLocalStorage ()
-{
-    // Remove login paremeters from local storage
-    localStorage.removeItem('guindexUsername');
-    localStorage.removeItem('guindexAccessToken');
-    localStorage.removeItem('guindexUserId');
-    localStorage.removeItem('guindexIsStaffMember');
-}
