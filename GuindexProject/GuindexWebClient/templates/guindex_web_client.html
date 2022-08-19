@@ -7,11 +7,6 @@
   <script>
     var g_debug = ('{{debug}}' == 'True')
   </script>
-  {% if not debug %}
-    <script type="text/javascript" src="{% static "javascript/guindex_globals.min.js" %}"> </script>
-  {% else %}
-    <script type="text/javascript" src="{% static "javascript/guindex_globals.js" %}"> </script>
-  {% endif %}
   <script>
     window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 

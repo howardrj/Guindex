@@ -8,7 +8,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('UserProfile', '0002_auto_20180112_2059'),
         ('Guindex', '0011_auto_20180129_1031'),
     ]
 

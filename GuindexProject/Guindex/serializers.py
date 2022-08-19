@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.validators import validate_email as validateEmail
 from django.core.mail import send_mail as sendMail
 from django.utils import timezone
+from rest_framework.authtoken.models import Token
 
 from rest_framework import serializers
 
@@ -69,35 +70,41 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
         Serializer for updating and retrieving GuinnessPendingCreate objects.
     """
 
-    approved = serializers.BooleanField(help_text = 'Is contribution approved?',
-                                        required = True,
-                                        write_only = True)
+    approved = serializers.BooleanField(
+        help_text = 'Is contribution approved?',
+        required = True,
+        write_only = True)
 
-    rejectReason = serializers.CharField(help_text = 'Reason for rejecting contribution',
-                                         max_length = GuindexParameters.REJECT_REASON_MAX_LEN,
-                                         required = False,
-                                         write_only = True,
-                                         allow_blank = True)
+    rejectReason = serializers.CharField(
+        help_text = 'Reason for rejecting contribution',
+        max_length = GuindexParameters.REJECT_REASON_MAX_LEN,
+        required = False,
+        write_only = True,
+        allow_blank = True)
 
-    creatorName = serializers.CharField(help_text = 'Username of creator',
-                                        source = 'creator.username',
-                                        read_only = True,
-                                        max_length = 100)
+    creatorName = serializers.CharField(
+        help_text = 'Username of creator',
+        source = 'creator.username',
+        read_only = True,
+        max_length = 100)
 
-    pubName = serializers.CharField(help_text = 'Name of the pub this price belongs to',
-                                    source = 'pub.name',
-                                    read_only = True,
-                                    max_length = GuindexParameters.MAX_PUB_NAME_LEN)
+    pubName = serializers.CharField(
+        help_text = 'Name of the pub this price belongs to',
+        source = 'pub.name',
+        read_only = True,
+        max_length = GuindexParameters.MAX_PUB_NAME_LEN)
 
-    pubMapLink = serializers.CharField(help_text = 'Map link of the pub this price belongs to',
-                                       source = 'pub.mapLink',
-                                       read_only = True,
-                                       max_length = GuindexParameters.MAX_MAP_LINK_LEN)
+    pubMapLink = serializers.CharField(
+        help_text = 'Map link of the pub this price belongs to',
+        source = 'pub.mapLink',
+        read_only = True,
+        max_length = GuindexParameters.MAX_MAP_LINK_LEN)
 
-    pubCounty = serializers.CharField(help_text = 'County of the pub this price belongs to',
-                                      source = 'pub.county',
-                                      read_only = True,
-                                      max_length = 50)
+    pubCounty = serializers.CharField(
+        help_text = 'County of the pub this price belongs to',
+        source = 'pub.county',
+        read_only = True,
+        max_length = 50)
 
     class Meta:
         model = GuinnessPendingCreate
@@ -260,20 +267,23 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
         Serializer for updating and retrieving PubPendingCreate objects.
     """
 
-    approved = serializers.BooleanField(help_text = 'Is contribution approved?',
-                                        required = True,
-                                        write_only = True)
+    approved = serializers.BooleanField(
+        help_text = 'Is contribution approved?',
+        required = True,
+        write_only = True)
 
-    rejectReason = serializers.CharField(help_text = 'Reason for rejecting contribution',
-                                         max_length = GuindexParameters.REJECT_REASON_MAX_LEN,
-                                         required = False,
-                                         write_only = True,
-                                         allow_blank = True)
+    rejectReason = serializers.CharField(
+        help_text = 'Reason for rejecting contribution',
+        max_length = GuindexParameters.REJECT_REASON_MAX_LEN,
+        required = False,
+        write_only = True,
+        allow_blank = True)
 
-    creatorName = serializers.CharField(help_text = 'Username of creator',
-                                        source = 'creator.username',
-                                        read_only = True,
-                                        max_length = 100)
+    creatorName = serializers.CharField(
+        help_text = 'Username of creator',
+        source = 'creator.username',
+        read_only = True,
+        max_length = 100)
 
     class Meta:
         model = PubPendingCreate
@@ -335,35 +345,40 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
 
 class PubPendingPatchSerializer(serializers.ModelSerializer):
 
-    approved = serializers.BooleanField(help_text = 'Is contribution approved?',
-                                        required = True,
-                                        write_only = True)
+    approved = serializers.BooleanField(
+        help_text = 'Is contribution approved?',
+        required = True,
+        write_only = True)
 
-    rejectReason = serializers.CharField(help_text = 'Reason for rejecting contribution',
-                                         max_length = GuindexParameters.REJECT_REASON_MAX_LEN,
-                                         required = False,
-                                         write_only = True,
-                                         allow_blank = True)
+    rejectReason = serializers.CharField(
+        help_text = 'Reason for rejecting contribution',
+        max_length = GuindexParameters.REJECT_REASON_MAX_LEN,
+        required = False,
+        write_only = True,
+        allow_blank = True)
 
-    creatorName = serializers.CharField(help_text = 'Username of patch contributor',
-                                        source = 'creator.username',
-                                        read_only = True,
-                                        max_length = 100)
+    creatorName = serializers.CharField(
+        help_text = 'Username of patch contributor',
+        source = 'creator.username',
+        read_only = True,
+        max_length = 100)
 
-    pubNameOrig = serializers.CharField(help_text = 'Name of the pub this patch applies to',
-                                        source = 'clonedFrom.name',
-                                        read_only = True,
-                                        max_length = GuindexParameters.MAX_PUB_NAME_LEN)
+    pubNameOrig = serializers.CharField(
+        help_text = 'Name of the pub this patch applies to',
+        source = 'clonedFrom.name',
+        read_only = True,
+        max_length = GuindexParameters.MAX_PUB_NAME_LEN)
 
-    pubCountyOrig = serializers.CharField(help_text = 'County of the pub this patch applies to',
-                                          source = 'clonedFrom.county',
-                                          read_only = True,
-                                          max_length = 50)
+    pubCountyOrig = serializers.CharField(
+        help_text = 'County of the pub this patch applies to',
+        source = 'clonedFrom.county',
+        read_only = True,
+        max_length = 50)
 
-    proposedPatches = serializers.JSONField(help_text = 'List of proposed changes (original value first)',
-                                            read_only = True,
-                                            source = 'getProposedPatches')
-    
+    proposedPatches = serializers.JSONField(
+        help_text = 'List of proposed changes (original value first)',
+        read_only = True,
+        source = 'getProposedPatches')
 
     class Meta:
         model = PubPendingPatch
@@ -438,44 +453,37 @@ class StatisticsSerializer(serializers.ModelSerializer):
 
 class ContributorSerializer(serializers.ModelSerializer):
 
-    pubsVisited = serializers.IntegerField(help_text = 'Number of pubs visited by this contributor',
-                                           read_only = True,
-                                           source = 'guindexuser.pubsVisited')
+    pubsVisited = serializers.IntegerField(
+        help_text = 'Number of pubs visited by this contributor',
+        read_only = True,
+        source = 'guindexuser.pubsVisited')
 
-    originalPrices = serializers.IntegerField(help_text = 'Number of first prices for a pub submitted by this contributor',
-                                              read_only = True,
-                                              source = 'guindexuser.originalPrices')
+    originalPrices = serializers.IntegerField(
+        help_text = 'Number of first prices for a pub submitted by this contributor',
+        read_only = True,
+        source = 'guindexuser.originalPrices')
 
-    currentVerifications = serializers.IntegerField(help_text = 'Number of current verifactions for this contributor',
-                                                    read_only = True,
-                                                    source = 'guindexuser.currentVerifications')
+    currentVerifications = serializers.IntegerField(
+        help_text = 'Number of current verifactions for this contributor',
+        read_only = True,
+        source = 'guindexuser.currentVerifications')
 
-    isDeveloper = serializers.IntegerField(help_text = 'Is this contributor a developer of the Guindex website?',
-                                           read_only = True,
-                                           source = 'guindexuser.isDeveloper')
+    isDeveloper = serializers.IntegerField(
+        help_text = 'Is this contributor a developer of the Guindex website?',
+        read_only = True,
+        source = 'guindexuser.isDeveloper')
 
-    usingEmailAlerts = serializers.BooleanField(help_text = 'Does this contributor have email alerts enabled?',
-                                                source = 'guindexuser.usingEmailAlerts')
-
-    usingTelegramAlerts = serializers.BooleanField(help_text = 'Does this contributor have Telegram alerts enabled?',
-                                                   source = 'telegramuser.usingTelegramAlerts')
-
-    telegramActivated = serializers.BooleanField(help_text = 'Does this contributor have their Telegram account activated?',
-                                                 read_only = True,
-                                                 source = 'telegramuser.activated')
-
-    telegramActivationKey = serializers.CharField(help_text = 'Telegram activation key for this contributor.',
-                                                  read_only = True,
-                                                  source = 'telegramuser.activationKey')
+    usingEmailAlerts = serializers.BooleanField(
+        help_text = 'Does this contributor have email alerts enabled?',
+        source = 'guindexuser.usingEmailAlerts')
 
     class Meta:
         model = User
         fields = ('id', 'username', 'is_staff', 'pubsVisited', 'originalPrices',
-                  'currentVerifications', 'usingEmailAlerts', 'usingTelegramAlerts',
-                  'telegramActivated', 'telegramActivationKey', 'isDeveloper')
+                  'currentVerifications', 'usingEmailAlerts', 'isDeveloper')
         # Can only patch alert settings
         read_only_fields = ('id', 'username', 'is_staff', 'pubsVisited', 'originalPrices',
-                            'currentVerifications', 'telegramActivated', 'telegramActivationKey')
+                            'currentVerifications')
 
     def validate(self, data):
         """
@@ -488,28 +496,7 @@ class ContributorSerializer(serializers.ModelSerializer):
 
         return data
 
-    def validate_usingTelegramAlerts(self, usingTelegramAlerts):
-
-        if not self.instance.telegramuser.activated:
-            logger.error("User has not activated Telegram account yet")
-            raise ValidationError("You must activate your Telegram account before Telegram alerts can be enabled.")
-
-        return usingTelegramAlerts
-
     def save(self, **kwargs):
-
-        if 'telegramuser' in self.validated_data:
-
-            # This is a horrible but necessary hack
-            # Needed to update telegram alert settings via API
-            # since source field does not seem to work when deserializing
-
-            logger.debug("Attempting to update Telegram alerts setting")
-
-            # Update and save instance field here instead
-            self.instance.telegramuser.usingTelegramAlerts = self.validated_data['telegramuser']['usingTelegramAlerts']
-            self.instance.telegramuser.save()
-            del self.validated_data['telegramuser']
 
         if 'guindexuser' in self.validated_data:
 
@@ -533,29 +520,33 @@ class ContributorSerializer(serializers.ModelSerializer):
 
 class ContactSerializer(serializers.Serializer):
 
-    name = serializers.CharField(help_text = 'Name of message poster',
-                                 max_length = GuindexParameters.MAX_CONTACT_FORM_NAME_LEN,
-                                 required = True,
-                                 write_only = True,
-                                 allow_blank = False)
+    name = serializers.CharField(
+        help_text = 'Name of message poster',
+        max_length = GuindexParameters.MAX_CONTACT_FORM_NAME_LEN,
+        required = True,
+        write_only = True,
+        allow_blank = False)
 
-    email = serializers.CharField(help_text = 'Email of message poster (for sending replies)',
-                                  max_length = GuindexParameters.MAX_CONTACT_FORM_EMAIL_LEN,
-                                  required = True,
-                                  write_only = True,
-                                  allow_blank = False)
+    email = serializers.CharField(
+        help_text = 'Email of message poster (for sending replies)',
+        max_length = GuindexParameters.MAX_CONTACT_FORM_EMAIL_LEN,
+        required = True,
+        write_only = True,
+        allow_blank = False)
 
-    subject = serializers.CharField(help_text = 'Subject of message',
-                                    max_length = GuindexParameters.MAX_CONTACT_FORM_SUBJECT_LEN,
-                                    required = True,
-                                    write_only = True,
-                                    allow_blank = False)
+    subject = serializers.CharField(
+        help_text = 'Subject of message',
+        max_length = GuindexParameters.MAX_CONTACT_FORM_SUBJECT_LEN,
+        required = True,
+        write_only = True,
+        allow_blank = False)
 
-    message = serializers.CharField(help_text = 'Message body',
-                                    max_length = GuindexParameters.MAX_CONTACT_FORM_MESSAGE_LEN,
-                                    required = True,
-                                    write_only = True,
-                                    allow_blank = False)
+    message = serializers.CharField(
+        help_text = 'Message body',
+        max_length = GuindexParameters.MAX_CONTACT_FORM_MESSAGE_LEN,
+        required = True,
+        write_only = True,
+        allow_blank = False)
 
     def validate_email(self, email):
 
@@ -587,3 +578,22 @@ class ContactSerializer(serializers.Serializer):
             logger.error("Failed to send contact email")
 
         return self
+
+
+#####################
+# Token Serializers #
+#####################
+
+class TokenSerializer(serializers.ModelSerializer):
+    
+    username = serializers.CharField(
+        source = 'user.username',
+        read_only = True)
+
+    isStaff = serializers.CharField(
+        source = 'user.is_staff',
+        read_only = True)
+
+    class Meta:
+        model = Token
+        fields = ('key', 'user', 'username', 'isStaff')

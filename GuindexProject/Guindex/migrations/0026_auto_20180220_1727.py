@@ -9,7 +9,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('UserProfile', '0003_auto_20180220_1727'),
         ('Guindex', '0025_guinnesspendingcreate_guinnesspendingpatch'),
     ]
 

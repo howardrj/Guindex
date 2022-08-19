@@ -7,11 +7,13 @@ from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
+from rest_framework.authtoken.models import Token
 
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from Guindex.filters import GuindexDatatablesFilterBackend
 
 from Guindex.serializers import GuinnessSerializer
+from Guindex.serializers import TokenSerializer
 from Guindex.serializers import GuinnessPendingCreateSerializer
 from Guindex.serializers import PubSerializer
 from Guindex.serializers import PubPendingCreateSerializer
@@ -19,6 +21,8 @@ from Guindex.serializers import PubPendingPatchSerializer
 from Guindex.serializers import StatisticsSerializer
 from Guindex.serializers import ContributorSerializer
 from Guindex.serializers import ContactSerializer
+
+from Guindex.authentication import FirebaseAuthentication
 
 from Guindex.models import Guinness, GuinnessPendingCreate
 from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
@@ -171,3 +175,16 @@ class Contact(generics.CreateAPIView):
 
         # Access base class constructor
         super(Contact, self).__init__(*args, **kwargs)
+
+
+##########################
+# Access Token API views #
+##########################
+
+class AccessToken(generics.ListAPIView):
+
+    authentication_classes = [FirebaseAuthentication]
+    serializer_class       = TokenSerializer
+
+    def get_queryset(self):
+        return Token.objects.filter(user = self.request.user) 

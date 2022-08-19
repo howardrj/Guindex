@@ -74,24 +74,6 @@ function populateUserSettingsTable ()
 
     table_data.push(email_alerts_list);
 
-    // Telgram alerts setting
-    var telegram_description = "Receive weekly Telegram alerts about new prices and pubs added to the Guindex.";
-
-    if (!g_userSettings['telegramActivated'])
-    {
-        telegram_description += " To activate your Telegram account, please add the GuindexBot as a contact using" +
-                                " the Telegram app and send: /activate " + g_userSettings['telegramActivationKey'] + '.';
-    }
-
-    suffix = '<div id="telegram_alerts_toggler_div" class="slider round"> </div></label>';
-
-    var telegram_alerts_list = ['Telegram Alerts',
-                                telegram_description,
-                                prefix + '<input type="checkbox" id="telegram_alerts_toggler" class="toggler hoverable">' + suffix
-                                ];
-
-    table_data.push(telegram_alerts_list);
-
     // Check if table is being drawn from scratch or refreshed
     if (!g_userSettingsTable)
     {
@@ -121,9 +103,6 @@ function populateUserSettingsTable ()
     if (g_userSettings['usingEmailAlerts'])
         document.getElementById('email_alerts_toggler').checked = true;
 
-    if (g_userSettings['usingTelegramAlerts'])
-        document.getElementById('telegram_alerts_toggler').checked = true;
-
     g_userSettingsTableRendered = true;
 }
 
@@ -141,10 +120,6 @@ $(document).on('click', '.toggler', function () {
     {
         var field = 'usingEmailAlerts';
     }
-    else if (this.id == "telegram_alerts_toggler")
-    {
-        var field = 'usingTelegramAlerts';
-    } 
     else
     {
         // Can't get field
@@ -174,7 +149,6 @@ $(document).on('click', '.toggler', function () {
             else
             {
                 // Error: Revert toggler to original state
-                displayMessage('Error', response['usingTelegramAlerts'])
                 toggler.checked = !toggler.checked;
             }
         }   

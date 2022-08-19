@@ -24,11 +24,9 @@ def guindexWebClient(request):
     context_dict = {
         'google_maps_api_key'   : settings.GOOGLE_MAPS_API_KEY,
         'google_analytics_key'  : settings.GOOGLE_ANALYTICS_KEY,
-        'facebook_app_id'       : settings.FACEBOOK_APP_ID,
         'guindex_counties'      : GuindexParameters.SUPPORTED_COUNTIES,
         'debug'                 : settings.DEBUG,
         'async_template_loading': True,
-        'google_auth_client_id' : settings.GOOGLE_AUTH_CLIENT_ID,
     }
 
     return render(request, 'guindex_web_client.html', context_dict)
@@ -52,11 +50,9 @@ def guindexWebClientWithTemplate(request, template):
     context_dict = {
         'google_maps_api_key'   : settings.GOOGLE_MAPS_API_KEY,
         'google_analytics_key'  : settings.GOOGLE_ANALYTICS_KEY,
-        'facebook_app_id'       : settings.FACEBOOK_APP_ID,
         'guindex_counties'      : GuindexParameters.SUPPORTED_COUNTIES,
         'debug'                 : settings.DEBUG,
         'async_template_loading': True,
-        'google_auth_client_id' : settings.GOOGLE_AUTH_CLIENT_ID,
     }
 
     return render(request, 'guindex_web_client.html', context_dict)

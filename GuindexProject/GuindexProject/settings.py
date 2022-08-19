@@ -45,19 +45,11 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_datatables',
-    'rest_auth',
     'django.contrib.sites',
-    'rest_auth.registration',
     'corsheaders',
-    'UserProfile',
     'Guindex',
     'GuindexWebClient',
-    'TelegramUser',
-    'allauth',
-    'allauth.account',
 )
-
-SITE_ID = 1 # Need for rest_auth stuff
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -101,14 +93,6 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': secrets.GUINDEX_DB_LOCATION
-    }
-}
-
-# Cache
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'guindex_cache',
     }
 }
 
@@ -172,14 +156,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'TelegramUserLogFile': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/TelegramUser.log"),
-            'maxBytes': 1024 * 1024 * 10,
-            'backupCount': 10,
-            'formatter': 'verbose'
-        },
         'GuindexLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -188,93 +164,10 @@ LOGGING = {
             'backupCount': 10,
             'formatter': 'verbose'
         },
-        'GuindexWebClientLogFile': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexWebClient.log"),
-            'maxBytes': 1024 * 1024 * 10,
-            'backupCount': 10,
-            'formatter': 'verbose'
-        },
-        'GuindexStatsLogFile': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexStats.log"),
-            'maxBytes': 1024 * 1024 * 10,
-            'backupCount': 10,
-            'formatter': 'verbose'
-        },
-        'GuindexAlertsLogFile': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexAlerts.log"),
-            'maxBytes': 1024 * 1024 * 10,
-            'backupCount': 10,
-            'formatter': 'verbose'
-        },
-        'GuindexDbBackupLogFile': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexDbBackup.log"),
-            'maxBytes': 1024 * 1024 * 10,
-            'backupCount': 10,
-            'formatter': 'verbose'
-        },
-        'GuindexBotLogFile': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexBot.log"),
-            'maxBytes': 1024 * 1024 * 10,
-            'backupCount': 10,
-            'formatter': 'verbose'
-        },
-        'GuindexMapLogFile': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexMap.log"),
-            'maxBytes': 1024 * 1024 * 10,
-            'backupCount': 10,
-            'formatter': 'verbose'
-        },
     },
     'loggers': {
-        'TelegramUser': {
-            'handlers': ['TelegramUserLogFile'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
-        'Guindex': {
+        '': { # i.e. default log file
             'handlers': ['GuindexLogFile'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
-        'GuindexWebClient': {
-            'handlers': ['GuindexWebClientLogFile'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
-        'GuindexStats': {
-            'handlers': ['GuindexStatsLogFile'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
-        'GuindexAlerts': {
-            'handlers': ['GuindexAlertsLogFile'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
-        'GuindexDbBackup': {
-            'handlers': ['GuindexDbBackupLogFile'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
-        'GuindexBot': {
-            'handlers': ['GuindexBotLogFile'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
-        'GuindexMap': {
-            'handlers': ['GuindexMapLogFile'],
             'propogate': True,
             'level': 'DEBUG',
         },
@@ -305,9 +198,6 @@ REST_FRAMEWORK = {
     }
 }
 
-# Telegram API
-BOT_HTTP_API_TOKEN = secrets.BOT_HTTP_API_TOKEN
-
 # Google Maps API
 GOOGLE_MAPS_API_KEY = secrets.GOOGLE_MAPS_API_KEY
 
@@ -315,9 +205,6 @@ GOOGLE_MAPS_API_KEY = secrets.GOOGLE_MAPS_API_KEY
 DROPBOX_API_KEY          = secrets.DROPBOX_API_KEY
 DROPBOX_API_SECRET       = secrets.DROPBOX_API_SECRET
 DROPBOX_API_ACCESS_TOKEN = secrets.DROPBOX_API_ACCESS_TOKEN
-
-# Facebook Login API
-FACEBOOK_APP_ID = secrets.FACEBOOK_APP_ID
 
 # Google Analytics API
 GOOGLE_ANALYTICS_KEY = secrets.GOOGLE_ANALYTICS_KEY
@@ -328,17 +215,15 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
-# Google Auth API
-GOOGLE_AUTH_CLIENT_ID = secrets.GOOGLE_AUTH_CLIENT_ID
+# Firebase Auth API 
+FIREBASE_PROJECT_ID = secrets.FIREBASE_PROJECT_ID
+FIREBASE_PRIVATE_KEY_ID = secrets.FIREBASE_PRIVATE_KEY_ID
+FIREBASE_PRIVATE_KEY = secrets.FIREBASE_PRIVATE_KEY
+FIREBASE_CLIENT_ID = secrets.FIREBASE_CLIENT_ID
+FIREBASE_CLIENT_CERT_URL = secrets.FIREBASE_CLIENT_CERT_URL
+FIREBASE_CLIENT_EMAIL = secrets.FIREBASE_CLIENT_EMAIL
 
 AUTHENTICATION_BACKENDS = (
- # Needed to login by username in Django admin, regardless of `allauth`
- "django.contrib.auth.backends.ModelBackend",
-
- # `allauth` specific authentication methods, such as login by e-mail
- "allauth.account.auth_backends.AuthenticationBackend",
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
 )
-
-REST_AUTH_SERIALIZERS = {
-    'TOKEN_SERIALIZER': 'UserProfile.serializers.TokenSerializer',
-}

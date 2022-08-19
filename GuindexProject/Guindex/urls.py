@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^', include(pubs_router.urls)),
     url(r'^api/contact/$', views.Contact.as_view()),
+    url(r'^api/access_token/$', views.AccessToken.as_view()),
 ]

@@ -11,11 +11,7 @@ from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
 from Guindex.models import AlertsSingleton
 from Guindex.models import GuindexUser
 
-from Guindex.GuindexBot import GuindexBot
-
 from Guindex.GuindexParameters import GuindexParameters
-
-from TelegramUser import TelegramUserUtils
 
 logger = logging.getLogger(__name__.split('.')[-1])
 
@@ -134,12 +130,6 @@ class Command(BaseCommand):
                                 logger.error("Failed to send email to user %d", user.id)
                                 continue
 
-                        if getattr(user, 'telegramuser') and user.telegramuser.usingTelegramAlerts:
-
-                            logger.debug("Sending telegram alert for user %d", user.id)
-
-                            self.sendTelegramAlert(alerts_context)
-
                 alerts.save()
 
                 sleep_time = GuindexParameters.ALERTS_CHECK_PERIOD
@@ -154,92 +144,6 @@ class Command(BaseCommand):
 
             time.sleep(sleep_time)
 
-    def sendTelegramAlert(self, context):
-
-        message = "Hello %s,\n\n" % (context['user'].username)
-
-        message += "Here is your weekly Guindex activity update:\n\n"
-
-        if len(context['new_prices']):
-
-            message += "*** New Price Submissions ***\n\n"
-
-            for price in context['new_prices']:
-                message += "Pub: %s\n" % getattr(price, 'pubName')
-                message += "County: %s\n" % getattr(price, 'pubCounty')
-                message += "Price: %.2f\n" % getattr(price, 'price')
-                message += "Rating: %d/5\n" % getattr(price, 'starRating')
-                message += "Time: %s\n" % getattr(price, 'creationDate').strftime('%Y-%b-%d %H:%M:%S')
-                message += "\n"
-
-        if len(context['new_pubs']):
-
-            message += "*** New Pub Submissions ***\n\n"
-
-            for pub in context['new_pubs']:
-                message += "Pub Name: %s\n" % getattr(pub, 'name')
-                message += "County: %s\n" % getattr(pub, 'county')
-                message += "Latitude: %f\n" % getattr(pub, 'latitude')
-                message += "Longitude: %f\n" % getattr(pub, 'longitude')
-                message += "Time: %s\n" % getattr(pub, 'creationDate').strftime('%Y-%b-%d %H:%M:%S')
-                message += "\n"
-
-        if context['user'].is_staff and len(context['new_pending_price_creates']):
-
-            message += "*** New Pending Price Submissions ***\n\n"
-
-            for price in context['new_pending_price_creates']:
-                message += "ID: %d\n" % getattr(price, 'id')
-                message += "Pub: %s\n" % getattr(price, 'pubName')
-                message += "County: %s\n" % getattr(price, 'pubCounty')
-                message += "Price: %.2f\n" % getattr(price, 'price')
-                message += "Rating: %d/5\n" % getattr(price, 'starRating')
-                message += "Contributor: %s\n" % getattr(price, 'contributorName')
-                message += "Time: %s\n" % getattr(price, 'creationDate').strftime('%Y-%b-%d %H:%M:%S')
-                message += "\n"
-
-        if context['user'].is_staff and len(context['new_pending_pub_creates']):
-
-            message += "*** New Pending Pub Submissions ***\n\n"
-
-            for pub in context['new_pending_pub_creates']:
-                message += "ID: %d\n" % getattr(pub, 'id')
-                message += "Pub: %s\n" % getattr(pub, 'name')
-                message += "County: %s\n" % getattr(pub, 'county')
-                message += "Latitude: %f\n" % getattr(pub, 'latitude')
-                message += "Longitude: %f\n" % getattr(pub, 'longitude')
-                message += "Contributor: %s\n" % getattr(pub, 'contributorName')
-                message += "Time: %s\n" % getattr(pub, 'creationDate').strftime('%Y-%b-%d %H:%M:%S')
-                message += "\n"
-
-        if context['user'].is_staff and len(context['new_pending_pub_patches']):
-
-            message += "*** New Pending Pub Changes ***\n\n"
-
-            for pub in context['new_pending_pub_patches']:
-                message += "ID: %d\n" % getattr(pub, 'id')
-                message += "Pub: %s\n" % getattr(pub, 'name')
-                message += "County: %s\n" % getattr(pub, 'county')
-                message += "Contributor: %s\n" % getattr(pub, 'contributorName')
-                message += "Time: %s\n" % getattr(pub, 'creationDate').strftime('%Y-%b-%d %H:%M:%S')
-
-                changes = ""
-
-                for changed_field in getattr(pub, 'changedFields'):
-                    changes += "    " + changed_field[0] + ": " + str(changed_field[1][0]) + " --> " + \
-                               str(changed_field[1][1]) + "\n"
-
-                message += "Updates:\n %s" % changes
-                message += "\n"
-
-        message += "Kind regards,\n"
-        message += "The Guindex Team"
-
-        try:
-            GuindexBot.sendMessage(message, context['user'].telegramuser.chatId)
-        except:
-            logger.error("Failed to send Telegram to user %d", context['user'].id)
-
     def validateAlertsSettings(self, user):
 
         logger.debug("Validating alerts settings for user %d", user.id)
@@ -252,9 +156,3 @@ class Command(BaseCommand):
 
             guindexuser.user = user
             guindexuser.save()
-
-        if not hasattr(user, 'telegramuser'):
-
-            logger.info("User %d does not have a TelegramUser. Creating one", user.id)
-
-            TelegramUserUtils.createNewTelegramUser(user)

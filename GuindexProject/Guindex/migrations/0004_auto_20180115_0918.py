@@ -10,7 +10,6 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('UserProfile', '0002_auto_20180112_2059'),
         ('Guindex', '0003_auto_20180114_1354'),
     ]
 

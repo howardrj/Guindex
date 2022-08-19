@@ -1,8 +1,6 @@
 from django.conf.urls import url
 from django.contrib import admin
 
-from UserProfile import urls as UserProfileUrls
-
 from Guindex import urls as GuindexUrls
 
 from GuindexWebClient import urls as GuindexWebClientUrls
@@ -15,9 +13,6 @@ urlpatterns = []
 
 # Append django admin url
 urlpatterns.append(url(r'^admin/', admin.site.urls))
-
-# Append UserProfile views
-urlpatterns.extend(UserProfileUrls.urlpatterns)
 
 # Append Guindex views
 urlpatterns.extend(GuindexUrls.urlpatterns)

@@ -12,10 +12,6 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('UserProfile', '0001_initial'),
-    ]
-
     operations = [
         migrations.CreateModel(
             name='Guinness',
