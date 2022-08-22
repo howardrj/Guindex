@@ -255,48 +255,42 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <ul class="nav nav-tabs" roles="tablist">
-            <li class="nav-item login_state_link">
-                <a class="nav-link login_state_link" href="#firebase_auth" data-toggle="tab">Firebase Auth</a>
-            </li>
-          </ul>
+            <div id="logged_out_modal_header">
+                Login
+            </div>
+            <div id="logged_in_modal_header" style="display:none">
+                Logout
+            </div>
 
           <button class="close" id="login_close_button" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
 
-        <div class="tab-content">
-            <div class="tab-pane active" role="tabpanel" id="firebase_auth">
-                <div class="modal-body" id="firebase_auth_modal_body">
-                    <div id="firebaseui-auth-container"></div>
-                </div>            
-        </div> 
+        <div class="modal-body" id="firebase_auth_modal_body">
+            <div id="logged_out_modal_body">
+                Choose your login method from the options available below.
+                You will need to login to submit new pint prices.
+                <div id="firebaseui-auth-container"></div>
+            </div>
+            <div id="logged_in_modal_body" style="display:none">
+                <div>
+                    Logged in as <span id="logged_in_modal_body_username" style="font-weight:bold"> </span>.
+                    Click the button below to log out.
+                </div>
+            </div>
+        </div>            
+        <div class="modal-footer">
+            <div id="logged_out_modal_footer">
+            </div>
+            <div id="logged_in_modal_footer" style="display:none">
+                <a class="btn btn-primary" id="logout_button" style="color:white">Logout</a>
+                <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+            </div>
+        </div>
      </div>
    </div>
  </div>
-
-  <div class="modal fade" id="logout_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:9999">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Logout</h5>
-          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <div class="modal-body">
-		You are currently logged in as <span style="font-weight:bold;" id="logout_modal_username"></span>.
-
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-          <a class="btn btn-primary" id="logout_button" style="color:white">Logout</a>
-          <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Generic Message Modal (with hidden button to open it)-->
   <a class="nav-link" data-toggle="modal" id="message_link" data-target="#message_modal" style="display:none"></a>
