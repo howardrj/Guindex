@@ -3,7 +3,8 @@ Once the Guindex source code has been cloned please follow the below steps to
 get the Guindex development web server up and running:
 
 Note 1: Guindex uses python 2.7.
-Note 2: THese steps have only been tested on Ubuntu 16.04.7 LTS.
+
+Note 2: These steps have only been tested on Ubuntu 16.04.7 LTS.
 
 0) pip version >= 20.3.4 is required:
    wget https://bootstrap.pypa.io/pip/2.7/get-pip.pywget https://bootstrap.pypa.io/pip/2.7/get-pip.pywget https://bootstrap.pypa.io/pip/2.7/get-pip.py && python get-pip.py
