@@ -2,7 +2,7 @@ django==1.11.7
 python-telegram-bot==10.0.1
 dropbox==8.7.1
 gunicorn==19.7.1
-djangorestframework==3.8.2
+djangorestframework==3.11.2
 django-filter==2.4.0
 coreapi==2.3.3
 django-cors-headers==2.2.0
