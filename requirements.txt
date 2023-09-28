@@ -1,4 +1,4 @@
-django==1.11.7
+django==2.2.28
 python-telegram-bot==10.0.1
 dropbox==8.7.1
 gunicorn==19.7.1
