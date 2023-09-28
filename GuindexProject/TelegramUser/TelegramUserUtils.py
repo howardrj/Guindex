@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
 from TelegramUser.models import TelegramUser
-from TelegramUserParameters import TelegramUserParameters
+from TelegramUser.TelegramUserParameters import TelegramUserParameters
 
 logger = logging.getLogger(__name__)
 
