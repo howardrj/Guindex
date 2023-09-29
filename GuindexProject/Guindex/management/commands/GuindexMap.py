@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import logging
 import time
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__.split('.')[-1])
 
 class GuindexGoogleMapPlotter(gmplot.GoogleMapPlotter):
 
-    def setMarkerPath(self):
+    def set_marker_path(self):
         """
             Hack so generated map will request marker
             images via static url.
@@ -90,7 +90,7 @@ class Command(BaseCommand):
                                        GuindexParameters.MAP_ZOOM_LEVEL,
                                        settings.GOOGLE_MAPS_API_KEY)
 
-        gmap.setMarkerPath()
+        gmap.set_marker_path()
 
         while True:
 
@@ -103,7 +103,7 @@ class Command(BaseCommand):
                 if pub.closed:
                     colour = 'red'
                     marker_title = '%s - Closed' % pub.name.encode('utf-8')
-                elif not pub.servingGuinness:
+                elif not pub.serving_guinness:
                     colour = 'black'
                     marker_title = '%s - Not Serving Guinness' % pub.name.encode('utf-8')
                 elif len(Guinness.objects.filter(pub = pub)):

@@ -34,7 +34,7 @@ class GuinnessSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
         # This is a nested resource so pub ID is taken from url
-        read_only_fields = ('id', 'creator', 'creationDate', 'pub')
+        read_only_fields = ('id', 'creator', 'creation_date', 'pub')
 
     def validate(self, data):
         """
@@ -75,32 +75,32 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
         required = True,
         write_only = True)
 
-    rejectReason = serializers.CharField(
+    reject_reason = serializers.CharField(
         help_text = 'Reason for rejecting contribution',
         max_length = GuindexParameters.REJECT_REASON_MAX_LEN,
         required = False,
         write_only = True,
         allow_blank = True)
 
-    creatorName = serializers.CharField(
+    creator_name = serializers.CharField(
         help_text = 'Username of creator',
         source = 'creator.username',
         read_only = True,
         max_length = 100)
 
-    pubName = serializers.CharField(
+    pub_name = serializers.CharField(
         help_text = 'Name of the pub this price belongs to',
         source = 'pub.name',
         read_only = True,
         max_length = GuindexParameters.MAX_PUB_NAME_LEN)
 
-    pubMapLink = serializers.CharField(
+    pub_map_link = serializers.CharField(
         help_text = 'Map link of the pub this price belongs to',
         source = 'pub.mapLink',
         read_only = True,
         max_length = GuindexParameters.MAX_MAP_LINK_LEN)
 
-    pubCounty = serializers.CharField(
+    pub_county = serializers.CharField(
         help_text = 'County of the pub this price belongs to',
         source = 'pub.county',
         read_only = True,
@@ -109,8 +109,8 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = GuinnessPendingCreate
         fields = '__all__'
-        read_only_fields = ('id', 'creationDate', 'creator', 'creatorName', 
-                            'price', 'pub', 'pubName', 'pubCounty', 'starRating')
+        read_only_fields = ('id', 'creation_date', 'creator', 'creator_name', 
+                            'price', 'pub', 'pub_name', 'pub_county', 'star_rating')
 
     def validate(self, data):
         """
@@ -141,7 +141,7 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
                 setattr(guinness, field.name, getattr(self.instance, field.name))
 
             # Overwrite creation date so alerts will register change
-            guinness.creationDate = timezone.now()
+            guinness.creation_date = timezone.now()
 
             guinness.pk = None
             guinness.save(createPendingCreate = False)
@@ -151,10 +151,10 @@ class GuinnessPendingCreateSerializer(serializers.ModelSerializer):
 
         logger.info("Deleting pending contribution")
 
-        reject_reason = self._validated_data.get('rejectReason', "")
+        reject_reason = self._validated_data.get('reject_reason', "")
 
         self.instance.delete(approved = approved,
-                             rejectReason = reject_reason)
+                             reject_reason = reject_reason)
 
 
 ###################
@@ -169,8 +169,8 @@ class PubSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pub
         fields = '__all__'
-        read_only_fields = ('id', 'creator', 'creationDate', 'mapLink', 'averageRating',
-                            'lastPrice', 'lastSubmissionTime')
+        read_only_fields = ('id', 'creator', 'creation_date', 'map_link', 'average_rating',
+                            'last_price', 'last_submission_time')
 
     def validate(self, data):
         """
@@ -186,7 +186,7 @@ class PubSerializer(serializers.ModelSerializer):
         if self.instance and self.instance.pk:  # If Pub already exists i.e. patch
 
             # Check there are no pending contributions for this Pub
-            if len(PubPendingPatch.objects.filter(clonedFrom = self.instance)):
+            if len(PubPendingPatch.objects.filter(cloned_from = self.instance)):
                 raise ValidationError('There are already pending patches for this Pub.')
 
             # Check fields have actually changed
@@ -234,7 +234,7 @@ class PubSerializer(serializers.ModelSerializer):
             # Update relevant fields
             pub_pending_patch.pk         = None
             pub_pending_patch.creator    = user
-            pub_pending_patch.clonedFrom = self.instance
+            pub_pending_patch.cloned_from = self.instance
             pub_pending_patch.save()
 
         else:  # If Pub does not already exist i.e. create
@@ -272,14 +272,14 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
         required = True,
         write_only = True)
 
-    rejectReason = serializers.CharField(
+    reject_reason = serializers.CharField(
         help_text = 'Reason for rejecting contribution',
         max_length = GuindexParameters.REJECT_REASON_MAX_LEN,
         required = False,
         write_only = True,
         allow_blank = True)
 
-    creatorName = serializers.CharField(
+    creator_name = serializers.CharField(
         help_text = 'Username of creator',
         source = 'creator.username',
         read_only = True,
@@ -288,9 +288,9 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PubPendingCreate
         fields = '__all__'
-        read_only_fields = ('id', 'creator', 'creatorName', 'creationDate', 'name', 'county',
-                            'longitude', 'latitude', 'mapLink', 'closed', 'averageRating',
-                            'servingGuinness')
+        read_only_fields = ('id', 'creator', 'creator_name', 'creation_date', 'name', 'county',
+                            'longitude', 'latitude', 'map_link', 'closed', 'average_rating',
+                            'serving_guinness')
 
     def validate(self, data):
         """
@@ -321,21 +321,21 @@ class PubPendingCreateSerializer(serializers.ModelSerializer):
                 setattr(pub, field.name, getattr(self.instance, field.name))
 
             # Overwrite creation date so alerts will register change
-            pub.creationDate = timezone.now()
+            pub.creation_date = timezone.now()
 
             # Update relevant fields
             pub.pk = None
-            pub.save(createPendingCreate = False)
+            pub.save(create_pending_create = False)
 
         else:
             logger.info("PubPendingCreate object was not approved")
 
         logger.info("Deleting pending contribution")
 
-        reject_reason = self._validated_data.get('rejectReason', "")
+        reject_reason = self._validated_data.get('reject_reason', "")
 
         self.instance.delete(approved = approved,
-                             rejectReason = reject_reason)
+                             reject_reason = reject_reason)
 
 
 ###############################
@@ -350,42 +350,42 @@ class PubPendingPatchSerializer(serializers.ModelSerializer):
         required = True,
         write_only = True)
 
-    rejectReason = serializers.CharField(
+    reject_reason = serializers.CharField(
         help_text = 'Reason for rejecting contribution',
         max_length = GuindexParameters.REJECT_REASON_MAX_LEN,
         required = False,
         write_only = True,
         allow_blank = True)
 
-    creatorName = serializers.CharField(
+    creator_name = serializers.CharField(
         help_text = 'Username of patch contributor',
         source = 'creator.username',
         read_only = True,
         max_length = 100)
 
-    pubNameOrig = serializers.CharField(
+    pub_name_orig = serializers.CharField(
         help_text = 'Name of the pub this patch applies to',
-        source = 'clonedFrom.name',
+        source = 'cloned_from.name',
         read_only = True,
         max_length = GuindexParameters.MAX_PUB_NAME_LEN)
 
-    pubCountyOrig = serializers.CharField(
+    pub_county_orig = serializers.CharField(
         help_text = 'County of the pub this patch applies to',
-        source = 'clonedFrom.county',
+        source = 'cloned_from.county',
         read_only = True,
         max_length = 50)
 
-    proposedPatches = serializers.JSONField(
+    proposed_patches = serializers.JSONField(
         help_text = 'List of proposed changes (original value first)',
         read_only = True,
-        source = 'getProposedPatches')
+        source = 'get_proposed_patches')
 
     class Meta:
         model = PubPendingPatch
         fields = '__all__'
-        read_only_fields = ('id', 'name', 'latitude', 'longitude', 'creator', 'creationDate',
-                            'servingGuinness', 'closed', 'averageRating', 'county', 'mapLink', 
-                            'clonedFrom', 'creatorName', 'pubNameOrig', 'pubCountyOrig', 'proposedPatches')
+        read_only_fields = ('id', 'name', 'latitude', 'longitude', 'creator', 'creation_date',
+                            'serving_guinness', 'closed', 'average_rating', 'county', 'map_link', 
+                            'cloned_from', 'creator_name', 'pub_name_orig', 'pub_county_orig', 'proposed_patches')
 
     def validate(self, data):
         """
@@ -406,7 +406,7 @@ class PubPendingPatchSerializer(serializers.ModelSerializer):
             logger.error("No approved value included in request")
             return
 
-        pub = self.instance.clonedFrom
+        pub = self.instance.cloned_from
 
         if approved:
 
@@ -416,7 +416,7 @@ class PubPendingPatchSerializer(serializers.ModelSerializer):
             for field in self.instance._meta.fields:
 
                 # Don't merge these fields
-                if field.name in ['id', 'clonedFrom', 'creator', 'creationDate', 'mapLink']:
+                if field.name in ['id', 'cloned_from', 'creator', 'creation_date', 'map_link']:
                     continue
 
                 # Merge new fields
@@ -429,10 +429,10 @@ class PubPendingPatchSerializer(serializers.ModelSerializer):
 
         logger.info("Deleting pending contribution")
 
-        reject_reason = self._validated_data.get('rejectReason', "")
+        reject_reason = self._validated_data.get('reject_reason', "")
 
         self.instance.delete(approved = approved,
-                             rejectReason = reject_reason)
+                             reject_reason = reject_reason)
 
 
 ##########################
@@ -453,37 +453,37 @@ class StatisticsSerializer(serializers.ModelSerializer):
 
 class ContributorSerializer(serializers.ModelSerializer):
 
-    pubsVisited = serializers.IntegerField(
+    pubs_visited = serializers.IntegerField(
         help_text = 'Number of pubs visited by this contributor',
         read_only = True,
-        source = 'guindexuser.pubsVisited')
+        source = 'guindexuser.pubs_visited')
 
-    originalPrices = serializers.IntegerField(
+    original_prices = serializers.IntegerField(
         help_text = 'Number of first prices for a pub submitted by this contributor',
         read_only = True,
-        source = 'guindexuser.originalPrices')
+        source = 'guindexuser.original_prices')
 
-    currentVerifications = serializers.IntegerField(
+    current_verifications = serializers.IntegerField(
         help_text = 'Number of current verifactions for this contributor',
         read_only = True,
-        source = 'guindexuser.currentVerifications')
+        source = 'guindexuser.current_verifications')
 
-    isDeveloper = serializers.IntegerField(
+    is_developer = serializers.IntegerField(
         help_text = 'Is this contributor a developer of the Guindex website?',
         read_only = True,
         source = 'guindexuser.isDeveloper')
 
-    usingEmailAlerts = serializers.BooleanField(
+    using_email_alerts = serializers.BooleanField(
         help_text = 'Does this contributor have email alerts enabled?',
-        source = 'guindexuser.usingEmailAlerts')
+        source = 'guindexuser.using_email_alerts')
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'is_staff', 'pubsVisited', 'originalPrices',
-                  'currentVerifications', 'usingEmailAlerts', 'isDeveloper')
+        fields = ('id', 'username', 'is_staff', 'pubs_visited', 'original_prices',
+                  'current_verifications', 'using_email_alerts', 'is_developer')
         # Can only patch alert settings
-        read_only_fields = ('id', 'username', 'is_staff', 'pubsVisited', 'originalPrices',
-                            'currentVerifications')
+        read_only_fields = ('id', 'username', 'is_staff', 'pubs_visited', 'original_prices',
+                            'current_verifications')
 
     def validate(self, data):
         """
@@ -507,7 +507,7 @@ class ContributorSerializer(serializers.ModelSerializer):
             logger.debug("Attempting to update Email alerts setting")
 
             # Update and save instance field here instead
-            self.instance.guindexuser.usingEmailAlerts = self.validated_data['guindexuser']['usingEmailAlerts']
+            self.instance.guindexuser.using_email_alerts = self.validated_data['guindexuser']['using_email_alerts']
             self.instance.guindexuser.save()
             del self.validated_data['guindexuser']
 
@@ -590,10 +590,10 @@ class TokenSerializer(serializers.ModelSerializer):
         source = 'user.username',
         read_only = True)
 
-    isStaff = serializers.CharField(
+    is_staff = serializers.CharField(
         source = 'user.is_staff',
         read_only = True)
 
     class Meta:
         model = Token
-        fields = ('key', 'user', 'username', 'isStaff')
+        fields = ('key', 'user', 'username', 'is_staff')

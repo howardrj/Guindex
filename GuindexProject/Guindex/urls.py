@@ -13,7 +13,7 @@ router.register(r'^api/statistics', views.StatisticsViewSet)
 router.register(r'^api/contributors', views.ContributorViewSet)
 
 pubs_router = routers.NestedSimpleRouter(router, r'^api/pubs', lookup = 'pub')
-pubs_router.register(r'prices', views.GuinnessViewSet, base_name = 'pub-prices')
+pubs_router.register(r'prices', views.GuinnessViewSet, basename = 'pub-prices')
 
 
 urlpatterns = [

@@ -11,3 +11,4 @@ gmplot==1.2.0
 drf-nested-routers==0.90.2
 django-extensions==2.1.6
 firebase-admin==3.2.1
+urllib3==1.26.6 # https://github.com/urllib3/urllib3/issues/2168 

@@ -3,6 +3,7 @@
 *.swp
 *pb2.py
 secrets.py*
+guin_secrets.py*
 *.db
 aclocal.m4
 autom4te.cache
@@ -26,3 +27,4 @@ rpmbuild/SRPMS/
 guindex_*.min.js
 guindex_map.html
 *.bk
+guindex-*.json

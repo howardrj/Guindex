@@ -28,43 +28,43 @@ class Command(BaseCommand):
 
             try:
                 logger.info("Calculating number of pubs")
-                stats.pubsInDb = self.calculateNumberOfPubs()
+                stats.pubs_in_db = self.calculate_number_of_pubs()
             except:
                 logger.error("Failed to calculate number of pubs")
 
             try:
                 logger.info("Calculating average price")
-                stats.averagePrice = self.calculateAveragePrice()
+                stats.average_price = self.calculate_average_price()
             except:
                 logger.error("Failed to calculate average price")
 
             try:
                 logger.info("Calculating standard deviation")
-                stats.standardDeviation = self.calculateStandardDeviation()
+                stats.standard_deviation = self.calculate_standard_deviation()
             except:
                 logger.error("Failed to calculate standard deviation")
 
             try:
                 logger.info("Calculating closed pubs")
-                stats.closedPubs = self.calculateClosedPubs()
+                stats.closed_pubs = self.calculate_closed_pubs()
             except:
                 logger.error("Failed to calculate closed pubs")
 
             try:
                 logger.info("Calculating pubs not serving Guinness")
-                stats.notServingGuinness = self.calculateNotServingGuinness()
+                stats.not_serving_guinness = self.calculate_not_serving_guinness()
             except:
                 logger.error("Failed to calculate not serving Guinness")
 
             try:
                 logger.info("Calculating percentage visited")
-                stats.percentageVisited = self.calculatePercentageVisited()
+                stats.percentage_visited = self.calculate_percentage_visited()
             except:
                 logger.error("Failed to calculate percentage visited")
 
             try:
                 logger.info("Calculating number of users")
-                stats.numUsers = self.calculateNumberOfUsers()
+                stats.num_users = self.calculate_number_of_users()
             except:
                 logger.error("Failed to calculate number of users")
 
@@ -76,19 +76,19 @@ class Command(BaseCommand):
 
             try:
                 logger.info("Calculate average star ratings")
-                self.calculateAverageStarRatings()
+                self.calculate_average_star_ratings()
             except:
                 logger.error("Failed to calculate average star ratings")
 
             try:
                 logger.info("Calculating latest pub prices")
-                self.calculateLatestPubPrices()
+                self.calculate_latest_pub_prices()
             except:
                 logger.error("Failed to calculate latest pub prices")
 
             try:
                 logger.info("Calculating user contributions")
-                self.calculateUserContributions()
+                self.calculate_user_contributions()
             except:
                 logger.error("Failed to calculate user contributions")
 
@@ -96,13 +96,13 @@ class Command(BaseCommand):
 
             time.sleep(GuindexParameters.STATS_CALCULATION_PERIOD)
 
-    def calculateNumberOfPubs(self):
+    def calculate_number_of_pubs(self):
         """
             Counts approved pubs.
         """
         return len(Pub.objects.all())
 
-    def calculateAveragePrice(self):
+    def calculate_average_price(self):
         """
             Calculate average price from pubs with prices.
             Uses most recent price for each pub/
@@ -112,7 +112,7 @@ class Command(BaseCommand):
 
         for pub in Pub.objects.all():
 
-            if pub.closed or not pub.servingGuinness:
+            if pub.closed or not pub.serving_guinness:
                 continue
 
             if not len(Guinness.objects.filter(pub = pub)):
@@ -125,12 +125,12 @@ class Command(BaseCommand):
 
         return average_price
 
-    def calculateStandardDeviation(self):
+    def calculate_standard_deviation(self):
         """
             Calculate standard deviation from pubs with prices.
             Uses most recent price for each pub.
         """
-        average_price = self.calculateAveragePrice()
+        average_price = self.calculate_average_price()
 
         if average_price == 0:
             return 0
@@ -157,21 +157,21 @@ class Command(BaseCommand):
 
         return standard_deviation
 
-    def calculateClosedPubs(self):
+    def calculate_closed_pubs(self):
 
         return len(Pub.objects.filter(closed = True))
 
-    def calculateNotServingGuinness(self):
+    def calculate_not_serving_guinness(self):
 
-        return len(Pub.objects.filter(servingGuinness = False))
+        return len(Pub.objects.filter(serving_guinness = False))
 
-    def calculatePercentageVisited(self):
+    def calculate_percentage_visited(self):
         """
             Includes pubs marked as not serving Guinness
             and closed pubs with registered prices.
         """
 
-        pubs_in_db = self.calculateNumberOfPubs()
+        pubs_in_db = self.calculate_number_of_pubs()
 
         if pubs_in_db == 0:
             return 0
@@ -180,18 +180,18 @@ class Command(BaseCommand):
 
         for pub in Pub.objects.all():
 
-            if len(Guinness.objects.filter(pub = pub)) or not pub.servingGuinness:
+            if len(Guinness.objects.filter(pub = pub)) or not pub.serving_guinness:
                 pubs_visited_count += 1
 
         percentage_visited = 100 * pubs_visited_count / Decimal(pubs_in_db)
 
         return percentage_visited
 
-    def calculateNumberOfUsers(self):
+    def calculate_number_of_users(self):
 
         return len(User.objects.all())
 
-    def calculateAverageStarRatings(self):
+    def calculate_average_star_ratings(self):
 
         for pub in Pub.objects.all():
 
@@ -204,20 +204,20 @@ class Command(BaseCommand):
             cumulative_rating = Decimal('0.00')
 
             for price in pub_prices:
-                if price.starRating:
+                if price.star_rating:
                     num_prices_with_rating += 1
-                    cumulative_rating += price.starRating
+                    cumulative_rating += price.star_rating
 
             if num_prices_with_rating:
-                pub.averageRating = cumulative_rating / num_prices_with_rating
+                pub.average_rating = cumulative_rating / num_prices_with_rating
             else:
-                pub.averageRating = None
+                pub.average_rating = None
 
             pub.save()
 
-    def calculateLatestPubPrices(self):
+    def calculate_latest_pub_prices(self):
         """
-            Fill in lastPrice and lastSubmissionTime
+            Fill in last_price and last_submission_time
             for each pub.
         """
         for pub in Pub.objects.all():
@@ -225,15 +225,15 @@ class Command(BaseCommand):
             pub_prices = Guinness.objects.filter(pub = pub).order_by('-id')
 
             if not len(pub_prices):
-                pub.lastPrice = None
-                pub.lastSubmissionTime = None
+                pub.last_price = None
+                pub.last_submission_time = None
             else:
-                pub.lastPrice = pub_prices[0].price
-                pub.lastSubmissionTime = pub_prices[0].creationDate
+                pub.last_price = pub_prices[0].price
+                pub.last_submission_time = pub_prices[0].creation_date
 
             pub.save()
 
-    def calculateUserContributions(self):
+    def calculate_user_contributions(self):
         """
             Populate all GuindexUser fields for each User
         """
@@ -274,13 +274,13 @@ class Command(BaseCommand):
                 if len(Guinness.objects.filter(pub = pub, creator = user)):
                     number_of_pubs_visited = number_of_pubs_visited + 1
 
-            user.guindexuser.originalPrices       = number_of_first_verifications
-            user.guindexuser.currentVerifications = number_of_current_verifications
-            user.guindexuser.pubsVisited          = number_of_pubs_visited
+            user.guindexuser.original_prices       = number_of_first_verifications
+            user.guindexuser.current_verifications = number_of_current_verifications
+            user.guindexuser.pubs_visited          = number_of_pubs_visited
 
             """
-                Note: pubsVisited may be a bad name. We count pubs marked as
-                not servingGuinness as visited, yet we have no way of knowing who registered
+                Note: pubs_visited may be a bad name. We count pubs marked as
+                not serving_guinness as visited, yet we have no way of knowing who registered
                 that mark. Maybe change name to pubsPriced?
             """
 

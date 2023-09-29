@@ -34,7 +34,7 @@ class Command(BaseCommand):
                 # for first run
                 alerts.save()
 
-            last_check_time = alerts.lastCheckTime
+            last_check_time = alerts.last_check_time
 
             # Only process alerts if sufficent time has passed
             if (timezone.now() - last_check_time).total_seconds() > GuindexParameters.ALERTS_CHECK_PERIOD:
@@ -42,23 +42,23 @@ class Command(BaseCommand):
                 alerts_context = {}
 
                 alerts_context['new_prices'] = Guinness.objects.filter(
-                                                   creationDate__range = (last_check_time, timezone.now())
+                                                   creation_date__range = (last_check_time, timezone.now())
                                                )
 
                 alerts_context['new_pubs'] = Pub.objects.filter(
-                                                 creationDate__range = (last_check_time, timezone.now())
+                                                 creation_date__range = (last_check_time, timezone.now())
                                              )
 
                 alerts_context['new_pending_price_creates'] = GuinnessPendingCreate.objects.filter(
-                                                                  creationDate__range = (last_check_time, timezone.now())
+                                                                  creation_date__range = (last_check_time, timezone.now())
                                                               )
 
                 alerts_context['new_pending_pub_creates'] = PubPendingCreate.objects.filter(
-                                                                creationDate__range = (last_check_time, timezone.now())
+                                                                creation_date__range = (last_check_time, timezone.now())
                                                             )
 
                 alerts_context['new_pending_pub_patches'] = PubPendingPatch.objects.filter(
-                                                                creationDate__range = (last_check_time, timezone.now())
+                                                                creation_date__range = (last_check_time, timezone.now())
                                                             )
 
                 normal_user_alerts_pending = len(alerts_context['new_prices']) or \
@@ -76,33 +76,33 @@ class Command(BaseCommand):
                     # Add extra fields to objects needed in alert message
                     for price in alerts_context['new_prices']:
                         pub = price.pub
-                        setattr(price, 'pubName', pub.name)
-                        setattr(price, 'pubCounty', pub.county)
+                        setattr(price, 'pub_name', pub.name)
+                        setattr(price, 'pub_county', pub.county)
 
                     for price in alerts_context['new_pending_price_creates']:
                         pub = price.pub
-                        setattr(price, 'pubName', pub.name)
-                        setattr(price, 'pubCounty', pub.county)
-                        setattr(price, 'contributorName', price.creator.username)
+                        setattr(price, 'pub_name', pub.name)
+                        setattr(price, 'pub_county', pub.county)
+                        setattr(price, 'contributor_name', price.creator.username)
 
                     for pub in alerts_context['new_pending_pub_creates']:
-                        setattr(pub, 'contributorName', pub.creator.username)
+                        setattr(pub, 'contributor_name', pub.creator.username)
 
                     for pub in alerts_context['new_pending_pub_patches']:
-                        cloned_from = pub.clonedFrom
-                        setattr(pub, 'nameOrig', cloned_from.name)
-                        setattr(pub, 'countyOrig', cloned_from.county)
-                        setattr(pub, 'contributorName', pub.creator.username)
-                        setattr(pub, 'changedFields', [])
+                        cloned_from = pub.cloned_from
+                        setattr(pub, 'name_orig', cloned_from.name)
+                        setattr(pub, 'county_orig', cloned_from.county)
+                        setattr(pub, 'contributor_name', pub.creator.username)
+                        setattr(pub, 'changed_fields', [])
 
                         # Set changed fields
-                        for key in ['name', 'county', 'latitude', 'longitude', 'closed', 'servingGuinness']:
+                        for key in ['name', 'county', 'latitude', 'longitude', 'closed', 'serving_guinness']:
                             if getattr(pub, key) != getattr(cloned_from, key):
-                                getattr(pub, 'changedFields').append((key, (getattr(cloned_from, key), getattr(pub, key))))
+                                getattr(pub, 'changed_fields').append((key, (getattr(cloned_from, key), getattr(pub, key))))
 
                     for user in User.objects.all():
 
-                        self.validateAlertsSettings(user)
+                        self.validate_alert_settings(user)
 
                         logger.debug("Checking alerts for user %d", user.id)
 
@@ -114,7 +114,7 @@ class Command(BaseCommand):
 
                         alerts_context['user'] = user
 
-                        if getattr(user, 'guindexuser') and user.guindexuser.usingEmailAlerts:
+                        if getattr(user, 'guindexuser') and user.guindexuser.using_email_alerts:
 
                             logger.debug("Sending email alert for user %d", user.id)
 
@@ -144,7 +144,7 @@ class Command(BaseCommand):
 
             time.sleep(sleep_time)
 
-    def validateAlertsSettings(self, user):
+    def validate_alert_settings(self, user):
 
         logger.debug("Validating alerts settings for user %d", user.id)
 

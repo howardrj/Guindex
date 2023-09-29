@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/var/www/Guindex/GuindexProject
-ExecStart=/usr/bin/python /var/www/Guindex/GuindexProject/manage.py GuindexMap
+ExecStart=/usr/bin/python3 /var/www/Guindex/GuindexProject/manage.py GuindexMap
 User=root
 Group=root
 Restart=always

@@ -23,9 +23,10 @@ class PubBase(models.Model):
         help_text = 'ID of user who created this pub',
         null = True,
         blank = True,
-        default = None)
+        default = None,
+        on_delete = models.CASCADE)
 
-    creationDate = models.DateTimeField(
+    creation_date = models.DateTimeField(
         help_text = 'UTC timestamp of when pub was created',
         default = timezone.now)
 
@@ -49,7 +50,7 @@ class PubBase(models.Model):
         decimal_places = GuindexParameters.GPS_COORD_DECIMAL_PLACES,
         max_digits = GuindexParameters.GPS_COORD_MAX_DIGITS)
 
-    mapLink = models.TextField(
+    map_link = models.TextField(
         help_text = 'Link to pub location in google maps',
         default = "")  # Set this in save method
 
@@ -57,7 +58,7 @@ class PubBase(models.Model):
         help_text = 'Is pub permanently closed?',
         default = False)
 
-    servingGuinness = models.BooleanField(
+    serving_guinness = models.BooleanField(
         help_text = 'Is pub serving Guinness?',
         default = True)
 
@@ -73,17 +74,17 @@ class Pub(PubBase):
         Table that stores list of all approved pubs
     """
 
-    lastPrice = models.DecimalField(
+    last_price = models.DecimalField(
         decimal_places = GuindexParameters.GUINNESS_PRICE_DECIMAL_PLACES,
         max_digits = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
         null = True,
         default = None)
 
-    lastSubmissionTime = models.DateTimeField(
+    last_submission_time = models.DateTimeField(
         null = True,
         default = None)
 
-    averageRating = models.DecimalField(
+    average_rating = models.DecimalField(
         help_text = 'Average star rating of pints submitted for this pub',
         decimal_places = GuindexParameters.STAR_RATING_DECIMAL_PLACES,
         max_digits = 3,
@@ -101,25 +102,25 @@ class Pub(PubBase):
             create_pending_create = True
 
             try:
-                create_pending_create = kwargs['createPendingCreate']
-                kwargs.pop('createPendingCreate')
+                create_pending_create = kwargs['create_pending_create']
+                kwargs.pop('create_pending_create')
             except:
-                logger.debug("createPendingCreate not in kwargs")
+                logger.debug("create_pending_create not in kwargs")
 
             # If not a staff member, save it to PubPendingCreates table instead
             if not self.creator.is_staff and create_pending_create:
                 logger.debug("Creator is not a staff member. Creating PubPendingCreate object instead")
-                self.createPendingCreate()
+                self.create_pending_create()
                 return
 
         logger.debug("Saving Pub %s", self)
 
         # Set map link
-        self.mapLink = GuindexParameters.MAP_LINK_STRING % (self.latitude, self.longitude)
+        self.map_link = GuindexParameters.MAP_LINK_STRING % (self.latitude, self.longitude)
 
         super(Pub, self).save(*args, **kwargs)
 
-    def createPendingCreate(self):
+    def create_pending_create(self):
 
         pub_pending_create = PubPendingCreate()
 
@@ -127,7 +128,7 @@ class Pub(PubBase):
             setattr(pub_pending_create, field.name, getattr(self, field.name))
 
         pub_pending_create.pk = None
-        pub_pending_create.mapLink = GuindexParameters.MAP_LINK_STRING % (self.latitude, self.longitude)
+        pub_pending_create.map_link = GuindexParameters.MAP_LINK_STRING % (self.latitude, self.longitude)
         pub_pending_create.save()
 
 
@@ -140,21 +141,21 @@ class PubPendingCreate(PubBase):
         logger.debug("Deleting PubPendingCreate %d", self.id)
 
         approved = kwargs.get('approved', False)
-        reject_reason = kwargs.get('rejectReason', "")
+        reject_reason = kwargs.get('reject_reason', "")
 
         try:
-            self.sendDeletionAlert(approved, reject_reason)
+            self.send_deletion_alert(approved, reject_reason)
         except:
             pass
 
         super(PubPendingCreate, self).delete()
 
-    def sendDeletionAlert(self, approved, rejectReason):
+    def send_deletion_alert(self, approved, reject_reason):
         """
             Let contributor know that a decision has been made
             regarding their pending contribution.
         """
-        if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.usingEmailAlerts:
+        if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.using_email_alerts:
 
             logger.debug("Sending PubPendingCreate delete alert email to user %d", self.creator.id)
 
@@ -165,8 +166,8 @@ class PubPendingCreate(PubBase):
             alerts_context['message'] = "Your new pub submission (%s) has been %s." % (self.name,
                                                                                        "approved" if approved else "rejected")
 
-            if not approved and rejectReason:
-                alerts_context['reject_reason'] = rejectReason
+            if not approved and reject_reason:
+                alerts_context['reject_reason'] = reject_reason
             else:
                 alerts_context['reject_reason'] = ""
 
@@ -182,22 +183,23 @@ class PubPendingPatch(PubBase):
         Table that stores list of pending pub patches
     """
 
-    clonedFrom = models.ForeignKey(
+    cloned_from = models.ForeignKey(
         Pub,
-        help_text = 'Pub this patch was applied to')
+        help_text = 'Pub this patch was applied to',
+        on_delete = models.CASCADE)
 
-    def getProposedPatches(self):
+    def get_proposed_patches(self):
         """
             Returns proposed changes in serializable format.
         """
         
         changed_fields = {}
 
-        for field in ['name', 'county', 'latitude', 'longitude', 'servingGuinness', 'closed']:
+        for field in ['name', 'county', 'latitude', 'longitude', 'serving_guinness', 'closed']:
 
-            if getattr(self.clonedFrom, field) != getattr(self, field):
+            if getattr(self.cloned_from, field) != getattr(self, field):
 
-                changed_fields[field] = (getattr(self.clonedFrom, field), getattr(self, field))
+                changed_fields[field] = (getattr(self.cloned_from, field), getattr(self, field))
 
         return changed_fields
 
@@ -206,21 +208,21 @@ class PubPendingPatch(PubBase):
         logger.debug("Deleting PubPendingPatch %d", self.id)
 
         approved = kwargs.get('approved', False)
-        reject_reason = kwargs.get('rejectReason', "")
+        reject_reason = kwargs.get('reject_reason', "")
 
         try:
-            self.sendDeletionAlert(approved, reject_reason)
+            self.send_deletion_alert(approved, reject_reason)
         except:
             pass
 
         super(PubPendingPatch, self).delete()
 
-    def sendDeletionAlert(self, approved, rejectReason):
+    def send_deletion_alert(self, approved, reject_reason):
         """
             Let contributor know that a decision has been made
             regarding their pending contribution.
         """
-        if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.usingEmailAlerts:
+        if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.using_email_alerts:
 
             logger.debug("Sending PubPendingPatch delete alert email to user %d", self.creator.id)
 
@@ -231,8 +233,8 @@ class PubPendingPatch(PubBase):
             alerts_context['message'] = "Your suggested updates for %s have been %s." % (self.name,
                                                                                         "approved" if approved else "rejected")
 
-            if not approved and rejectReason:
-                alerts_context['reject_reason'] = rejectReason
+            if not approved and reject_reason:
+                alerts_context['reject_reason'] = reject_reason
             else:
                 alerts_context['reject_reason'] = ""
 
@@ -254,9 +256,10 @@ class GuinnessBase(models.Model):
         help_text = 'ID of user who submitted this price',
         null = True,
         blank = True,
-        default = None)
+        default = None,
+        on_delete = models.CASCADE)
 
-    creationDate = models.DateTimeField(
+    creation_date = models.DateTimeField(
         help_text = 'UTC timestamp of when price was submitted',
         default = timezone.now)
 
@@ -268,9 +271,10 @@ class GuinnessBase(models.Model):
 
     pub = models.ForeignKey(
         Pub,
-        help_text = 'ID of pub this price belongs to')
+        help_text = 'ID of pub this price belongs to',
+        on_delete = models.CASCADE)
 
-    starRating = models.IntegerField(
+    star_rating = models.IntegerField(
         help_text = 'Star rating (i.e. quality of pint)',
         validators = [MinValueValidator(0), MaxValueValidator(5)],
         null = True,
@@ -299,19 +303,19 @@ class Guinness(GuinnessBase):
             create_pending_create = True
 
             try:
-                create_pending_create = kwargs['createPendingCreate']
-                kwargs.pop('createPendingCreate')
+                create_pending_create = kwargs['create_pending_create']
+                kwargs.pop('create_pending_create')
             except:
-                logger.debug("createPendingCreate not in kwargs")
+                logger.debug("create_pending_create not in kwargs")
 
             # If not a staff member, save it to GuinnessPendingCreates table instead
             if not self.creator.is_staff and create_pending_create:
                 logger.debug("Creator is not a staff member. Creating GuinnessPendingCreate object instead")
-                self.createPendingCreate()
+                self.create_pending_create()
                 return
 
-            self.pub.lastPrice = self.price
-            self.pub.lastSubmissionTime = self.creationDate
+            self.pub.last_price = self.price
+            self.pub.last_submission_time = self.creation_date
             self.pub.save()
 
         super(Guinness, self).save(*args, **kwargs)
@@ -337,22 +341,22 @@ class GuinnessPendingCreate(GuinnessBase):
         logger.debug("Deleting GuinnessPendingCreate %d", self.id)
 
         approved = kwargs.get('approved', False)
-        reject_reason = kwargs.get('rejectReason', "")
+        reject_reason = kwargs.get('reject_reason', "")
 
         try:
-            self.sendDeletionAlert(approved, reject_reason)
+            self.send_deletion_alert(approved, reject_reason)
         except:
             pass
 
         super(GuinnessPendingCreate, self).delete()
 
-    def sendDeletionAlert(self, approved, rejectReason):
+    def send_deletion_alert(self, approved, reject_reason):
         """
             Let contributor know that a decision has been made
             regarding their pending contribution.
         """
 
-        if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.usingEmailAlerts:
+        if getattr(self.creator, 'guindexuser') and self.creator.guindexuser.using_email_alerts:
 
             logger.debug("Sending GuinnessPendingCreate delete alert email to user %d", self.creator.id)
 
@@ -363,8 +367,8 @@ class GuinnessPendingCreate(GuinnessBase):
             alerts_context['message'] = "Your price submission for %s has been %s." % (self.pub.name,
                                                                                        "approved" if approved else "rejected")
 
-            if not approved and rejectReason:
-                alerts_context['reject_reason'] = rejectReason
+            if not approved and reject_reason:
+                alerts_context['reject_reason'] = reject_reason
             else:
                 alerts_context['reject_reason'] = ""
 
@@ -384,41 +388,41 @@ class StatisticsSingleton(models.Model):
         This is a singleton class to store statistics.
     """
 
-    pubsInDb = models.IntegerField(
+    pubs_in_db = models.IntegerField(
         help_text = 'Number of pubs in database',
         default = 0)
 
-    averagePrice = models.DecimalField(
+    average_price = models.DecimalField(
         help_text = 'Average price from all pubs with registered prices',
         decimal_places = GuindexParameters.GUINNESS_PRICE_DECIMAL_PLACES,
         max_digits = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
         default = Decimal('0.0'))
 
-    standardDeviation = models.DecimalField(
+    standard_deviation = models.DecimalField(
         help_text = 'Standard deviation',
         decimal_places = GuindexParameters.GUINNESS_PRICE_DECIMAL_PLACES + 1,
         max_digits = 12,
         default = Decimal('0.0'))
 
-    percentageVisited = models.DecimalField(
+    percentage_visited = models.DecimalField(
         help_text = 'Percentage of pubs in database visited by one or more users',
         decimal_places = 2,
         max_digits = 5,
         default = Decimal('0.0'))
 
-    closedPubs = models.IntegerField(
+    closed_pubs = models.IntegerField(
         help_text = 'Number of pubs marked as closed',
         default = 0)
 
-    notServingGuinness = models.IntegerField(
+    not_serving_guinness = models.IntegerField(
         help_text = 'Number of pubs marked as not serving Guinness',
         default = 0)
 
-    lastCalculated = models.DateTimeField(
+    last_calculated = models.DateTimeField(
         help_text = 'UTC timestamp of when statistics were last calculated',
         auto_now = True)
 
-    numUsers = models.IntegerField(
+    num_users = models.IntegerField(
         help_text = 'Number of user accounts',
         default = 0)
 
@@ -453,29 +457,30 @@ class GuindexUser(models.Model):
         null = True,
         blank = True,
         default = None,
-        related_name = 'guindexuser')
+        related_name = 'guindexuser',
+        on_delete = models.CASCADE)
 
-    pubsVisited = models.IntegerField(
+    pubs_visited = models.IntegerField(
         help_text = 'Number of pubs visited by this contributor',
         default = 0)
 
-    originalPrices = models.IntegerField(
+    original_prices = models.IntegerField(
         help_text = 'Number of first prices for a pub submitted by this contributor',
         default = 0)
 
-    currentVerifications = models.IntegerField(
+    current_verifications = models.IntegerField(
         help_text = 'Number of current verifactions for this contributor',
         default = 0)
 
-    lastCalculated = models.DateTimeField(
+    last_calculated = models.DateTimeField(
         help_text = 'UTC timestamp of when statistics were last calculated for this contributor',
         auto_now = True)
 
-    usingEmailAlerts = models.BooleanField(
+    using_email_alerts = models.BooleanField(
         help_text = 'Does this contributor have email alerts enabled?',
         default = False)
 
-    isDeveloper = models.BooleanField(
+    is_developer = models.BooleanField(
         help_text = 'Is this contributor a developer of the Guindex website?',
         default = False)
 
@@ -489,7 +494,7 @@ class AlertsSingleton(models.Model):
         This is a singleton class to store values
         related to processing of alerts.
     """
-    lastCheckTime = models.DateTimeField(
+    last_check_time = models.DateTimeField(
         help_text = 'Last time alerts were checked',
         auto_now = True)
 
