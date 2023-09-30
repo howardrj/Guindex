@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import django.db.models.deletion
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -21,7 +22,7 @@ class Migration(migrations.Migration):
                 ('originalPrices', models.IntegerField(default=0)),
                 ('currentVerifications', models.IntegerField(default=0)),
                 ('lastCalculated', models.DateTimeField(auto_now=True)),
-                ('userProfile', models.OneToOneField(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='guindexuser', to='UserProfile.UserProfile')),
+                ('userProfile', models.OneToOneField(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='guindexuser', to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.AlterField(

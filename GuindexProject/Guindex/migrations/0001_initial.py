@@ -6,6 +6,7 @@ from decimal import Decimal
 from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -20,7 +21,7 @@ class Migration(migrations.Migration):
                 ('creationDate', models.DateTimeField(default=django.utils.timezone.now)),
                 ('price', models.DecimalField(decimal_places=2, max_digits=6)),
                 ('approved', models.BooleanField(default=True)),
-                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='UserProfile.UserProfile')),
+                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
@@ -55,9 +56,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('lastCalculated', models.DateTimeField(auto_now=True)),
-                ('mostFirstVerified', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='most_first_verifications', to='UserProfile.UserProfile')),
-                ('mostLastVerified', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='most_last_verifications', to='UserProfile.UserProfile')),
-                ('mostVisited', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='most_visited', to='UserProfile.UserProfile')),
+                ('mostFirstVerified', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='most_first_verifications', to=settings.AUTH_USER_MODEL)),
+                ('mostLastVerified', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='most_last_verifications', to=settings.AUTH_USER_MODEL)),
+                ('mostVisited', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='most_visited', to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.AddField(

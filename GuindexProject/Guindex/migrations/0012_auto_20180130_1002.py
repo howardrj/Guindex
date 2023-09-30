@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -19,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='usercontributionssingleton',
             name='mostFirstVerified',
-            field=models.ManyToManyField(related_name='most_first_verifications', to='UserProfile.UserProfile'),
+            field=models.ManyToManyField(related_name='most_first_verifications', to=settings.AUTH_USER_MODEL),
         ),
         migrations.RemoveField(
             model_name='usercontributionssingleton',
@@ -28,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='usercontributionssingleton',
             name='mostLastVerified',
-            field=models.ManyToManyField(related_name='most_last_verifications', to='UserProfile.UserProfile'),
+            field=models.ManyToManyField(related_name='most_last_verifications', to=settings.AUTH_USER_MODEL),
         ),
         migrations.RemoveField(
             model_name='usercontributionssingleton',
@@ -37,6 +38,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='usercontributionssingleton',
             name='mostVisited',
-            field=models.ManyToManyField(related_name='most_visited', to='UserProfile.UserProfile'),
+            field=models.ManyToManyField(related_name='most_visited', to=settings.AUTH_USER_MODEL),
         ),
     ]

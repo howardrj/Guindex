@@ -6,6 +6,7 @@ from decimal import Decimal
 import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -21,7 +22,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('creationDate', models.DateTimeField(auto_now_add=True)),
                 ('price', models.DecimalField(decimal_places=2, max_digits=4, validators=[django.core.validators.MinValueValidator(Decimal('0.01'))])),
-                ('creator', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='UserProfile.UserProfile')),
+                ('creator', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('pub', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Guindex.Pub')),
             ],
             options={
@@ -35,7 +36,7 @@ class Migration(migrations.Migration):
                 ('creationDate', models.DateTimeField(auto_now_add=True)),
                 ('price', models.DecimalField(decimal_places=2, max_digits=4, validators=[django.core.validators.MinValueValidator(Decimal('0.01'))])),
                 ('clonedFrom', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Guindex.Guinness')),
-                ('creator', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='UserProfile.UserProfile')),
+                ('creator', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('pub', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Guindex.Pub')),
             ],
             options={

@@ -6,6 +6,7 @@ from decimal import Decimal
 import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -26,7 +27,7 @@ class Migration(migrations.Migration):
                 ('mapLink', models.TextField(default=b'')),
                 ('closed', models.BooleanField(default=False)),
                 ('servingGuinness', models.BooleanField(default=True)),
-                ('creator', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='UserProfile.UserProfile')),
+                ('creator', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'abstract': False,
@@ -104,6 +105,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='pubpendingpatch',
             name='creator',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='UserProfile.UserProfile'),
+            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
     ]
