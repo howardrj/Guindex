@@ -1,30 +1,4 @@
-
-function guindex_login_init_firebase ()
-{
-    const firebase_config = {
-        apiKey: "AIzaSyDdzY9rNnZTpA_EenAfn9Vs7SRvAZtCh2g",
-        authDomain: "guindex-fd679.firebaseapp.com",
-        projectId: "guindex-fd679",
-        storageBucket: "guindex-fd679.appspot.com",
-        messagingSenderId: "895081803981",
-        appId: "1:895081803981:web:d897aed7427b4c79c8f984",
-        measurementId: "G-K9V19D9DWE"
-    };
-
-    const app = firebase.initializeApp(firebase_config);
-
-    var ui_config = {
-        signInSuccessUrl: window.location.href,
-        signInOptions: [
-            // Leave the lines as is for the providers you want to offer your users.
-            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        ],
-    };
-
-    var ui = new firebaseui.auth.AuthUI(firebase.auth());
-
-    ui.start('#firebaseui-auth-container', ui_config);
-}
+var g_guindex_user = null;
 
 const GuindexUserStates = {
     LOGGED_OUT: 0,
@@ -132,7 +106,7 @@ class GuindexUserStateLoggedIntoGuindex extends GuindexUserState
         var login_link = document.getElementById('login_link');
         login_link.innerHTML = this.user.username;
 
-        // Toggle log ini/out display messages
+        // Toggle log in/out display messages
         document.getElementById('logged_out_modal_header').style.display = 'none';
         document.getElementById('logged_in_modal_header').style.display = 'block';
 
@@ -273,12 +247,8 @@ class GuindexUser
     }
 }
 
-(function () {
-
-    guindex_login_init_firebase();
-
-    let guindex_user = new GuindexUser();
-
-    guindex_user.check_firebase_auth_status();
+(function ()
+{
+    g_guindex_user = new GuindexUser();
 
 })();

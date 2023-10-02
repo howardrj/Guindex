@@ -5,7 +5,7 @@
 
 <head>
   <script>
-    var g_debug = ('{{debug}}' == 'True')
+    var G_GUINDEX_DEBUG = ('{{debug}}' == 'True')
   </script>
   <script>
     window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
@@ -13,17 +13,25 @@
     ga('create', '{{ google_analytics_key }}', 'auto'); 
 
   </script>
+
+  <!-- Firebase auth related tags -->
+  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/ui/6.0.0/firebase-ui-auth.js"></script>
+  <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.0/firebase-ui-auth.css" />
+
   <script async src='https://www.google-analytics.com/analytics.js'></script>
-  <script type="text/javascript" src="{% static "javascript/jquery.min.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/bootstrap.bundle.min.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/jquery.easing.min.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/Chart.min.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/jquery.dataTables.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/dataTables.bootstrap4.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/sb-admin.min.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/sb-admin-datatables.min.js" %}"></script>
-  <script type="module" src="{% static "javascript/guindex_login.js" %}"></script>
-  <script type="text/javascript" src="{% static "javascript/particles.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/jquery.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/bootstrap.bundle.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/jquery.easing.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/Chart.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/jquery.dataTables.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/dataTables.bootstrap4.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/sb-admin.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/sb-admin-datatables.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_user.js" %}"></script>
+  <script type="module" src="{% static "javascript/guindex_firebase_auth.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/lib/particles.js" %}"></script>
   <script src="https://apis.google.com/js/platform.js" async defer></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -31,19 +39,13 @@
   <meta name="author" content="">
   <title> Guindex </title>
   <link rel="icon" href="{% static "images/favicon.png" %}">
-  <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+  <link rel="stylesheet" href="{% static "css/lib/bootstrap.min.css" %}">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="{% static "css/dataTables.bootstrap4.css" %}">
-  <link rel="stylesheet" href="{% static "css/sb-admin.css" %}">
+  <link rel="stylesheet" href="{% static "css/lib/dataTables.bootstrap4.css" %}">
+  <link rel="stylesheet" href="{% static "css/lib/sb-admin.css" %}">
   <link rel="stylesheet" href="{% static "css/guindex_web_client.css" %}">
 	
-  <!-- Firebase auth related tags -->
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/ui/6.0.0/firebase-ui-auth.js"></script>
-  <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.0/firebase-ui-auth.css" />
-
 </head>
 
 <body class="fixed-nav sticky-footer" id="page-top">
@@ -56,7 +58,7 @@
   </div>
 
   <script>
-    particlesJS.load('particles_js_container', '/static/javascript/particles.json', function() {
+    particlesJS.load('particles_js_container', '/static/javascript/lib/particles.json', function() {
         return;
     });
   </script>
@@ -421,11 +423,11 @@
   {% if not debug %}
     <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_main.min.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_tabs.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_page_manager.min.js" %}"></script>
   {% else %}
     <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_main.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_page_manager.js" %}"></script>
   {% endif %}
 
   <script>

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd ..
+
 rm -f guindex_*.min.js
 
 for file in guindex_*.js; do
