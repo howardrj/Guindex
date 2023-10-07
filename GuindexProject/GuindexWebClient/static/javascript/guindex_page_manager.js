@@ -20,7 +20,9 @@ class GuindexPageManager
 
     _add_on_tab_click_cbs()
     {
-        $(document).on('click', '.page_content_link', this._on_tab_click_cb);
+        $(document).on('click',
+                       '.page_content_link',
+                       this._on_tab_click_cb);
     }
 
     _on_tab_click_cb ()
