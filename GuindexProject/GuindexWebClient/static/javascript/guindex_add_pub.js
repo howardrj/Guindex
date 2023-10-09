@@ -106,10 +106,9 @@ class GuindexAddPubMap
     async _post_new_pub_data (new_pub_data,
                               button)
     {
-
         toggleLoader(button);
 
-        let response = await fetch(this.user.api_base + 'access_token/', 
+        let response = await fetch(this.user.api_base + 'pubs/', 
                                    {
                                        method: 'POST',
                                        headers: {

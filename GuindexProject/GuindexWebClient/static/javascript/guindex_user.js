@@ -163,6 +163,11 @@ class GuindexUser
         this.login_method = 'google';
     }
 
+    logged_in ()
+    {
+        return this.access_token != null;
+    }
+
     async request_access_token ()
     {
         let response = await fetch(this.api_base + 'access_token/', 
