@@ -37,7 +37,6 @@ class GuindexUserSettingsTable
                                        },
                                    });
 
-
         if (response.status == 200)
         {
             this.user_settings = await response.json();
@@ -129,7 +128,7 @@ class GuindexUserSettingsTable
         
         if (this.id !== "email_alerts_toggler")
         {
-            field = 'using_email_alerts
+            field = 'using_email_alerts';
         }
         else
         {
@@ -169,3 +168,13 @@ class GuindexUserSettingsTable
          }
     }
 }
+
+// Add settings page event listeners
+(function ()
+{
+    document.getElementById('settings_page').addEventListener('tab_display',
+                                                              guindex_init_user_settings_table);
+
+    document.getElementById('settings_page').addEventListener('on_login',
+                                                              guindex_init_user_settings_table); 
+})();
