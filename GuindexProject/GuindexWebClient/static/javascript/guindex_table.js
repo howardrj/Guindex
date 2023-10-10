@@ -181,7 +181,7 @@ $(document).on('click', '.submit_price_button', function () {
     {
         var button = this;
 
-        toggleLoader(button);
+        guindex_toggle_loader(button);
 
         var price  = parseFloat(this.parentNode.getElementsByTagName('input')[0].value);
         var pub_id = parseInt(this.getAttribute('data-pub_id'));
@@ -220,15 +220,15 @@ $(document).on('click', '.submit_price_button', function () {
 
                 if (request.status == 201) // => Created
                 {
-                    toggleLoader(button);
+                    guindex_toggle_loader(button);
 
                     if (g_isStaffMember)
                     {
-                        displayMessage("Info", "Thank you. Your submission was successful.");
+                        guindex_display_message("Info", "Thank you. Your submission was successful.");
                     }
                     else
                     {
-                        displayMessage("Info", "Thank you. A member of staff will verify your submission shortly.");
+                        guindex_display_message("Info", "Thank you. A member of staff will verify your submission shortly.");
                     }
 
                     // Reload table
@@ -238,8 +238,8 @@ $(document).on('click', '.submit_price_button', function () {
                 else
                 {
                     var error_message = response['price'][0];
-                    toggleLoader(button);
-                    displayMessage("Error", error_message);
+                    guindex_toggle_loader(button);
+                    guindex_display_message("Error", error_message);
                 }
             }   
         }
@@ -266,7 +266,7 @@ $(document).on('click', '.edit_pub_button', function () {
 
     if (!g_loggedIn || !g_accessToken)
     {
-        displayMessage("Error", "You must be logged in to edit a pub.");
+        guindex_display_message("Error", "You must be logged in to edit a pub.");
     }
     else
     {
@@ -292,8 +292,8 @@ $('#edit_pub_submit_button').on('click', function () {
     var button1 = this.parentNode.getElementsByTagName('button')[0];
     var button2 = this.parentNode.getElementsByTagName('button')[1];
 
-    toggleLoader(button1);
-    toggleLoader(button2);
+    guindex_toggle_loader(button1);
+    guindex_toggle_loader(button2);
 
     // Send form values in PATCH REST API request
     var id               = this.getAttribute('data-pub_id');
@@ -328,8 +328,8 @@ $('#edit_pub_submit_button').on('click', function () {
     {
         if (request.readyState == 4) 
         {
-            toggleLoader(button1);
-            toggleLoader(button2);
+            guindex_toggle_loader(button1);
+            guindex_toggle_loader(button2);
 
             response = JSON.parse(request.responseText);    
 
@@ -337,11 +337,11 @@ $('#edit_pub_submit_button').on('click', function () {
             {
                 if (g_isStaffMember)
                 {
-                    displayMessage("Info", "Thank you. Your submission was successful.");
+                    guindex_display_message("Info", "Thank you. Your submission was successful.");
                 }
                 else
                 {
-                    displayMessage("Info", "Thank you. A member of staff will verify your submission shortly.");
+                    guindex_display_message("Info", "Thank you. A member of staff will verify your submission shortly.");
                 }
             
                 // Reload table
@@ -370,7 +370,7 @@ $('#edit_pub_submit_button').on('click', function () {
 
                 error_table += '</tbody></table>';
 
-                displayMessage("Error", error_message + error_table);
+                guindex_display_message("Error", error_message + error_table);
             }
         }
     }

@@ -1,9 +1,4 @@
-function guindex_init_user_contributions_table ()
-{
-    let guindex_user_contributions_table = new GuindexUserContributionsTable(g_guindex_user);
-}
-
-class GuindexUserContributionsTable ()
+class GuindexUserContributionsTable
 {
     constructor (user)
     {
@@ -16,8 +11,6 @@ class GuindexUserContributionsTable ()
         this.user_contributions_data_table = null;
         this.retrieving_user_contributions = false;
         this.rendered = false;
-
-        this._populate();
     }
 
     get_contribution_badges ()
@@ -104,7 +97,7 @@ class GuindexUserContributionsTable ()
             this.rendered = true;
     }
 
-    _populate ()
+    populate ()
     {
         var contributions_page = document.getElementById('contributions_page');
 
@@ -127,9 +120,11 @@ class GuindexUserContributionsTable ()
 
 (function ()
 {
+    let table = new GuindexUserContributionsTable(g_guindex_user);
+
     document.getElementById('contributions_page').addEventListener('tab_display',
-                                                                   guindex_init_user_contributions_table);
+                                                                   table.populate);
 
     document.getElementById('contributions_page').addEventListener('on_login',
-                                                                   guindex_init_user_contributions_table);
+                                                                   table.populate);
 })();

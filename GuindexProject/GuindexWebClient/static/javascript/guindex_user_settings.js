@@ -1,8 +1,3 @@
-function guindex_init_user_settings_table ()
-{
-    let guindex_user_settings_table = new GuindexUserSettingsTable(g_guindex_user);
-}
-
 class GuindexUserSettingsTable
 {
     static singleton = null;
@@ -19,7 +14,6 @@ class GuindexUserSettingsTable
         this.retrieving_user_settings = false;
         this.rendered = false;
 
-        this._populate();
         this._add_on_setting_toggler_click_cb();
     }
 
@@ -92,24 +86,26 @@ class GuindexUserSettingsTable
             this.rendered = true;
     }
 
-    _populate ()
+    populate ()
     {
-        var settings_page = document.getElementById('settings_page');
+        let settings_page = document.getElementById('settings_page');
+        let table = GuindexUserSettingsTable.singleton;
+        let user = table.user;
 
-        if (!this.user.logged_in())
+        if (!user.logged_in())
             return;
 
         // Clear log in warning if logged in
         settings_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
         settings_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
 
-        if (this.rendered)
+        if (table.rendered)
             return;
 
-        if (!this.user_settings)
-            this._retrieve_user_settings_and_render_table();
+        if (!table.user_settings)
+            table._retrieve_user_settings_and_render_table();
         else
-            this._render_table()
+            table._render_table()
     }
 
     _add_on_setting_toggler_click_cb ()
@@ -172,9 +168,11 @@ class GuindexUserSettingsTable
 // Add settings page event listeners
 (function ()
 {
+    let table = new GuindexUserSettingsTable(g_guindex_user);
+
     document.getElementById('settings_page').addEventListener('tab_display',
-                                                              guindex_init_user_settings_table);
+                                                              table.populate);
 
     document.getElementById('settings_page').addEventListener('on_login',
-                                                              guindex_init_user_settings_table); 
+                                                              table.populate); 
 })();

@@ -83,7 +83,7 @@ class GuindexAddPubMap
 
         if (!user.access_token)
         {
-            displayMessage("Error", "You must be logged in to add a pub.");
+            guindex_display_message("Error", "You must be logged in to add a pub.");
             return;
         }
 
@@ -106,7 +106,7 @@ class GuindexAddPubMap
     async _post_new_pub_data (new_pub_data,
                               button)
     {
-        toggleLoader(button);
+        guindex_toggle_loader(button);
 
         let response = await fetch(this.user.api_base + 'pubs/', 
                                    {
@@ -118,30 +118,22 @@ class GuindexAddPubMap
                                        body: JSON.stringify(new_pub_data),
                                    });
 
-        toggleLoader(button);
+        guindex_toggle_loader(button);
 
         let response_body = await response.json();
 
         if (response.status == 201)
-        {
             this._on_add_pub_success()
-        }
         else
-        {
             this._on_add_pub_failure()
-        }
     }
 
     _on_add_pub_success ()
     {
         if (this.user.is_staff_member)
-        {
-            displayMessage("Info", "Thank you. Your submission was successful.");
-        }
+            guindex_display_message("Info", "Thank you. Your submission was successful.");
         else
-        {
-            displayMessage("Info", "Thank you. A member of staff will verify your submission shortly.");
-        }
+            guindex_display_message("Info", "Thank you. A member of staff will verify your submission shortly.");
 
         // Clear form
         document.getElementById('add_pub_name').value = "";
@@ -169,7 +161,7 @@ class GuindexAddPubMap
 
         error_table += '</tbody></table>';
 
-        displayMessage("Error", error_message + error_table);
+        guindex_display_message("Error", error_message + error_table);
     }
 }
 

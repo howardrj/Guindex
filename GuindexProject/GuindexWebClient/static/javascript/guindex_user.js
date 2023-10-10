@@ -120,14 +120,14 @@ class GuindexUserStateLoggedIntoGuindex extends GuindexUserState
         // Add logout button event listener
         $(document).on('click', '#logout_button', function () {
 
-            toggleLoader(this);
+            guindex_toggle_loader(this);
 
             firebase.auth().signOut().then(function() {
                 // Sign-out successful.
                 location.reload();
             }).catch(function(error) {
                 // An error happened
-               toggleLoader(this);
+               guindex_toggle_loader(this);
            });    
         });
     }

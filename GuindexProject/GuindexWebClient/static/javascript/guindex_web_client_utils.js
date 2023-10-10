@@ -1,23 +1,23 @@
-var toggleLoader = function (buttonNode) {
+var guindex_toggle_loader = function (button_node) {
 
     // Function that takes in button node
     // switches currrent didaply with corresponding loader
 
-    var loader = buttonNode.parentNode.getElementsByClassName('guindex_web_client_loader')[0];
+    var loader = button_node.parentNode.getElementsByClassName('guindex_web_client_loader')[0];
 
-    if (buttonNode.style.display === "none")
+    if (button_node.style.display === "none")
     {
-        buttonNode.style.display = "block";
+        button_node.style.display = "block";
         loader.style.display     = "none";
     }
     else
     {
-        buttonNode.style.display = "none";
+        button_node.style.display = "none";
         loader.style.display     = "block";
     }
 }
 
-var displayMessage = function (severity, message) {
+var guindex_display_message = function (severity, message) {
     
     // Function that opens generic message modal,
     // sets severity in modal header and message in modal body
