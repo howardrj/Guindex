@@ -49,7 +49,7 @@ class GuindexUserContributionsTable ()
         if (this.retrieving_user_contributions)
             return;
 
-        this.retrieving_user_settings = true;
+        this.retrieving_user_contributions = true;
 
         let response = await fetch(this.user.api_base + 'contributors/' + this.user.id + '/', 
                                    {
@@ -118,7 +118,7 @@ class GuindexUserContributionsTable ()
         if (this.rendered)
             return;
 
-        if (!this.user_settings)
+        if (!this.user_contributions)
             this._retrieve_user_contributions_and_render_table();
         else
             this._render_table()
