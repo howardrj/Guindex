@@ -46,7 +46,8 @@ def guindexWebClientWithTemplate(request, template):
     except:
         return HttpResponseNotFound('<h1> Page not found </h1>')
 
-    if template == 'guindex_map':
+    if template == 'guindex_map' or template == "new_guindex_map":
+
         return rendered_template
 
     context_dict = {
