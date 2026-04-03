@@ -16,6 +16,6 @@ class Command(BaseCommand):
 
         guindex_bot = GuindexBot()
 
-        print("Polling for incoming messages ...")
+        self.stdout.write("Polling for incoming messages ...")
 
-        guindex_bot.start_polling()
+        guindex_bot.run_polling()

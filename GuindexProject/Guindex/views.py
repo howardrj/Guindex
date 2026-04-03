@@ -96,7 +96,7 @@ class PubViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     http_method_names  = ['get', 'post', 'patch']
     filter_backends    = (DjangoFilterBackend, SearchFilter, GuindexDatatablesFilterBackend,)
-    filter_fields      = ('name', 'closed', 'servingGuinness', 'county', 'creator', )
+    filterset_fields   = ('name', 'closed', 'servingGuinness', 'county', 'creator',)
     search_fields      = ('name',)
 
 

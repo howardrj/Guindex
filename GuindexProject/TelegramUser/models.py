@@ -10,11 +10,14 @@ logger = logging.getLogger(__name__)
 
 class TelegramUser(models.Model):
 
-    user                = models.OneToOneField(User,
-                                               null         = True,
-                                               blank        = True,
-                                               default      = None,
-                                               related_name = 'telegramuser')
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        default=None,
+        related_name="telegramuser",
+    )
     activated           = models.BooleanField(default = False)
     activationKey       = models.CharField(max_length = TelegramUserParameters.ACTIVATION_KEY_LENGTH,
                                            default    = "",

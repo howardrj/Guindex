@@ -19,11 +19,14 @@ logger = logging.getLogger(__name__)
 
 class PubBase(models.Model):
 
-    creator = models.ForeignKey(User,
-                                help_text = 'ID of user who created this pub',
-                                null = True,
-                                blank = True,
-                                default = None)
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        help_text="ID of user who created this pub",
+        null=True,
+        blank=True,
+        default=None,
+    )
 
     creationDate = models.DateTimeField(help_text = 'UTC timestamp of when pub was created',
                                         default = timezone.now)
@@ -56,7 +59,7 @@ class PubBase(models.Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return "'%s(%s)'" % (self.name, str(self.id) if self.id else "No DB ID")
 
 
@@ -106,7 +109,7 @@ class Pub(PubBase):
         # Set map link
         self.mapLink = GuindexParameters.MAP_LINK_STRING % (self.latitude, self.longitude)
 
-        super(Pub, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def createPendingCreate(self):
 
@@ -136,7 +139,7 @@ class PubPendingCreate(PubBase):
         except:
             pass
 
-        super(PubPendingCreate, self).delete()
+        super().delete()
 
     def sendDeletionAlert(self, approved, rejectReason):
         """
@@ -193,8 +196,11 @@ class PubPendingPatch(PubBase):
         Table that stores list of pending pub patches
     """
 
-    clonedFrom = models.ForeignKey(Pub,
-                                   help_text = 'Pub this patch was applied to')
+    clonedFrom = models.ForeignKey(
+        Pub,
+        on_delete=models.CASCADE,
+        help_text="Pub this patch was applied to",
+    )
 
     def getProposedPatches(self):
         """
@@ -223,7 +229,7 @@ class PubPendingPatch(PubBase):
         except:
             pass
 
-        super(PubPendingPatch, self).delete()
+        super().delete()
 
     def sendDeletionAlert(self, approved, rejectReason):
         """
@@ -281,11 +287,14 @@ class PubPendingPatch(PubBase):
 
 class GuinnessBase(models.Model):
 
-    creator = models.ForeignKey(User,
-                                help_text = 'ID of user who submitted this price',
-                                null = True,
-                                blank = True,
-                                default = None)
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        help_text="ID of user who submitted this price",
+        null=True,
+        blank=True,
+        default=None,
+    )
 
     creationDate = models.DateTimeField(help_text = 'UTC timestamp of when price was submitted',
                                         default = timezone.now)
@@ -295,8 +304,11 @@ class GuinnessBase(models.Model):
                                 max_digits = GuindexParameters.MAX_GUINNESS_PRICE_DIGITS,
                                 validators = [MinValueValidator(Decimal(GuindexParameters.MIN_GUINNESS_PRICE))])
 
-    pub = models.ForeignKey(Pub,
-                            help_text = 'ID of pub this price belongs to')
+    pub = models.ForeignKey(
+        Pub,
+        on_delete=models.CASCADE,
+        help_text="ID of pub this price belongs to",
+    )
 
     starRating   = models.IntegerField(help_text = 'Star rating (i.e. quality of pint)',
                                        validators = [MinValueValidator(0), MaxValueValidator(5)],
@@ -306,8 +318,12 @@ class GuinnessBase(models.Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
-        return "'%s(%s) - Price: %.2f'" % (self.pub, str(self.id) if self.id else "No DB ID", self.price)
+    def __str__(self):
+        return "'%s(%s) - Price: %.2f'" % (
+            self.pub,
+            str(self.id) if self.id else "No DB ID",
+            self.price,
+        )
 
 
 class Guinness(GuinnessBase):
@@ -341,7 +357,7 @@ class Guinness(GuinnessBase):
             self.pub.lastSubmissionTime = self.creationDate
             self.pub.save()
 
-        super(Guinness, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def createPendingCreate(self):
 
@@ -371,7 +387,7 @@ class GuinnessPendingCreate(GuinnessBase):
         except:
             pass
 
-        super(GuinnessPendingCreate, self).delete()
+        super().delete()
 
     def sendDeletionAlert(self, approved, rejectReason):
         """
@@ -463,12 +479,12 @@ class StatisticsSingleton(models.Model):
     numUsers = models.IntegerField(help_text = 'Number of user accounts',
                                    default = 0)
 
-    def __unicode__(self):
+    def __str__(self):
         return "'StatisticsSingleton'"
 
     def save(self, *args, **kwargs):
         self.pk = 1
-        super(StatisticsSingleton, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         pass
@@ -488,12 +504,15 @@ class GuindexUser(models.Model):
         Class to keep track of user contributions.
     """
 
-    user = models.OneToOneField(User,
-                                help_text = 'User ID associated with this contributor',
-                                null = True,
-                                blank = True,
-                                default = None,
-                                related_name = 'guindexuser')
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        help_text="User ID associated with this contributor",
+        null=True,
+        blank=True,
+        default=None,
+        related_name="guindexuser",
+    )
 
     pubsVisited = models.IntegerField(help_text = 'Number of pubs visited by this contributor',
                                       default = 0)
@@ -526,12 +545,12 @@ class AlertsSingleton(models.Model):
     lastCheckTime = models.DateTimeField(help_text = 'Last time alerts were checked',
                                          auto_now = True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "'AlerstSingleton'"
 
     def save(self, *args, **kwargs):
         self.pk = 1
-        super(AlertsSingleton, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         pass

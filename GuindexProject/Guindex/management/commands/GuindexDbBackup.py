@@ -41,11 +41,15 @@ class Command(BaseCommand):
 
             try:
                 with open(copied_db_name, 'rb') as f:
-                    dropbox_context.files_upload(f.read(), '/GuindexDbBackups/' + copied_db_leaf, mute = True) 
+                    dropbox_context.files_upload(
+                        f.read(),
+                        '/GuindexDbBackups/' + copied_db_leaf,
+                        mute=True,
+                    )
 
                 logger.info("Successfully uploaded %s to dropbox", copied_db_leaf)
-            except:
-                logger.error("Failed to upload %s to dropbox", copied_db_leaf)
+            except Exception:
+                logger.exception("Failed to upload %s to dropbox", copied_db_leaf)
                 # TODO Take action     
 
             logger.info("Sleeping for %d seconds", GuindexParameters.DB_BACKUP_PERIOD)

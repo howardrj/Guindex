@@ -188,7 +188,7 @@ class GuindexParameters:
         frame = inspect.currentframe()
         function_name = inspect.getframeinfo(frame).function
 
-        for key, attribute in class_attributes.iteritems():
+        for key, attribute in class_attributes.items():
 
             if not key.startswith("__") and key != function_name:
 

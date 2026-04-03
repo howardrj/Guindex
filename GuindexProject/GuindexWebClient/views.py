@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from django.shortcuts import render
 from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponseRedirect
+from django.shortcuts import render
+from django.template import TemplateDoesNotExist
 
 from Guindex.GuindexParameters import GuindexParameters
 
@@ -42,9 +43,9 @@ def guindexWebClientWithTemplate(request, template):
         template = template[:-1]
 
     try:
-        rendered_template = render(request, template + '.html', {})
-    except:
-        return HttpResponseNotFound('<h1> Page not found </h1>')
+        rendered_template = render(request, template + ".html", {})
+    except TemplateDoesNotExist:
+        return HttpResponseNotFound("<h1> Page not found </h1>")
 
     if template == 'guindex_map':
         return rendered_template
@@ -74,6 +75,6 @@ def asyncLoadTemplate(request, template):
     }
 
     try:
-        return render(request, template + '.html', context_dict)
-    except:
-        return HttpResponseNotFound('<h1> Page not found </h1>')
+        return render(request, template + ".html", context_dict)
+    except TemplateDoesNotExist:
+        return HttpResponseNotFound("<h1> Page not found </h1>")

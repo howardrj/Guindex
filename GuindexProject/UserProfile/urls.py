@@ -1,24 +1,20 @@
-from django.conf.urls import include, url
-from django.conf import settings
+from django.urls import include, path, re_path
+
 from UserProfile import views
 
-
 PASSWORD_RESET = (
-    r'^api/rest-auth/password/reset/confirm/'
-    r'(?P<uidb64>[0-9A-Za-z_\-]+)/'
-    r'(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$'
+    r"^api/rest-auth/password/reset/confirm/"
+    r"(?P<uidb64>[0-9A-Za-z_\-]+)/"
+    r"(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$"
 )
 
 urlpatterns = [
-    url(r'^api/rest-auth/', include('rest_auth.urls')),
-    url(r'^api/rest-auth/registration/', include('rest_auth.registration.urls')),
-    url(r'^account/', include('allauth.urls')) # Needed for account_email_verification_sent reverse
-]
-
-urlpatterns += [
-    url(
+    path("api/rest-auth/", include("dj_rest_auth.urls")),
+    path("api/rest-auth/registration/", include("dj_rest_auth.registration.urls")),
+    path("account/", include("allauth.urls")),
+    re_path(
         PASSWORD_RESET,
         views.GuindexPasswordResetConfirmView.as_view(),
-        name='password_reset_confirm',
+        name="password_reset_confirm",
     ),
 ]

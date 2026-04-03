@@ -15,6 +15,6 @@ class GuindexBot(TelegramBot):
         logger.info("Creating GuindexBot")
 
         # Initialise underlying Telegram class
-        super(GuindexBot, self).__init__(apiKey)
+        super().__init__(apiKey)
 
         # Add custom commands handlers

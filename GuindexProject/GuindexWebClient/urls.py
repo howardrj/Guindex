@@ -1,11 +1,11 @@
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from GuindexWebClient import views
 
 urlpatterns = [
-    url(r'^faq\/?$', views.faq),
-    url(r'^async_load/(?P<template>.+)$', views.asyncLoadTemplate),
-    url(r'^$', views.guindexWebClient),
-    url(r'^(?P<template>.+)$', views.guindexWebClientWithTemplate),
-    url(r'^social_sigup/$', views.guindexWebClient, name = 'socialaccount_signup'),
+    re_path(r"^faq/?$", views.faq),
+    re_path(r"^async_load/(?P<template>.+)$", views.asyncLoadTemplate),
+    path("", views.guindexWebClient),
+    path("social_sigup/", views.guindexWebClient, name="socialaccount_signup"),
+    re_path(r"^(?P<template>.+)$", views.guindexWebClientWithTemplate),
 ]
