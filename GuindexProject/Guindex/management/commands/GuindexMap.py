@@ -81,8 +81,9 @@ class Command(BaseCommand):
         parser.add_argument(
             "--once",
             action="store_true",
-            help="Generate guindex_map.html once and exit (for deploy/cron). "
-            "Default is to regenerate periodically in a loop.",
+            help="Generate legacy gmplot HTML (guindex_map_gmplot_legacy.html) once "
+            "and exit. The live site map uses Folium via guindex_map.html — do not "
+            "overwrite that template. Default: periodic loop.",
         )
 
     def _write_map_template(self, file_dir, file_name):
@@ -123,7 +124,8 @@ class Command(BaseCommand):
             os.path.dirname(os.path.realpath(__file__)),
             "../../../GuindexWebClient/templates/",
         )
-        file_name = "guindex_map.html"
+        # Legacy gmplot output only — guindex_map.html is the Folium/Django template.
+        file_name = "guindex_map_gmplot_legacy.html"
 
         if options["once"]:
             self._write_map_template(file_dir, file_name)

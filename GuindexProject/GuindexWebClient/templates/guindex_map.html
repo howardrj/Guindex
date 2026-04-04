@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="referrer" content="origin-when-cross-origin">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Guindex map</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0.75rem 1rem;
+            color: #333;
+            box-sizing: border-box;
+        }
+        .guindex-map-toolbar {
+            margin-bottom: 0.75rem;
+        }
+        .guindex-map-toolbar label {
+            margin-right: 0.5rem;
+        }
+        .guindex-map-toolbar select {
+            min-width: 10rem;
+            margin-right: 0.5rem;
+        }
+        .guindex-map-frame {
+            width: 100%;
+            min-height: calc(100vh - 5rem);
+        }
+    </style>
+</head>
+<body>
+    <div class="guindex-map-toolbar">
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Show pubs map</button>
+        </form>
+    </div>
+    {% if map %}
+    <div class="guindex-map-frame">
+        {{ map|safe }}
+    </div>
+    {% endif %}
+</body>
+</html>
