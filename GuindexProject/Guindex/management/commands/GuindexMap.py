@@ -78,44 +78,66 @@ class GuindexGoogleMapPlotter(gmplot.GoogleMapPlotter):
 class Command(BaseCommand):
 
     def add_arguments(self, parser):
-        pass
+        parser.add_argument(
+            "--once",
+            action="store_true",
+            help="Generate guindex_map.html once and exit (for deploy/cron). "
+            "Default is to regenerate periodically in a loop.",
+        )
+
+    def _write_map_template(self, file_dir, file_name):
+        gmap = GuindexGoogleMapPlotter(
+            GuindexParameters.DUBLIN_CENTER_LATITUDE,
+            GuindexParameters.DUBLIN_CENTER_LONGITUDE,
+            GuindexParameters.MAP_ZOOM_LEVEL,
+            settings.GOOGLE_MAPS_API_KEY,
+        )
+
+        gmap.setMarkerPath()
+
+        logger.info("***** Generating Guindex Map Template *****")
+
+        for pub in Pub.objects.all():
+
+            if pub.closed:
+                colour = "red"
+                marker_title = "%s - Closed" % pub.name.encode("utf-8")
+            elif not pub.servingGuinness:
+                colour = "black"
+                marker_title = "%s - Not Serving Guinness" % pub.name.encode("utf-8")
+            elif len(Guinness.objects.filter(pub=pub)):
+                price = Guinness.objects.filter(pub=pub).order_by("-id")[0].price
+                colour = "green"
+                marker_title = "%s - €%.2f" % (pub.name.encode("utf-8"), price)
+            else:
+                colour = "darkgray"
+                marker_title = "%s - Not Yet Visited" % pub.name.encode("utf-8")
+
+            gmap.marker(pub.latitude, pub.longitude, colour, title=marker_title)
+
+        gmap.draw(file_dir + file_name)
 
     def handle(self, *args, **options):
 
-        file_dir  = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../GuindexWebClient/templates/')
-        file_name = 'guindex_map.html'
+        file_dir = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            "../../../GuindexWebClient/templates/",
+        )
+        file_name = "guindex_map.html"
 
-        gmap = GuindexGoogleMapPlotter(GuindexParameters.DUBLIN_CENTER_LATITUDE,
-                                       GuindexParameters.DUBLIN_CENTER_LONGITUDE,
-                                       GuindexParameters.MAP_ZOOM_LEVEL,
-                                       settings.GOOGLE_MAPS_API_KEY)
-
-        gmap.setMarkerPath()
+        if options["once"]:
+            self._write_map_template(file_dir, file_name)
+            self.stdout.write(self.style.SUCCESS("Wrote %s" % (file_dir + file_name)))
+            return
 
         while True:
 
             logger.info("***** Generating Guindex Map Template *****")
 
-            logger.info("Sleeping for %s seconds", GuindexParameters.MAP_GENERATION_PERIOD)
+            logger.info(
+                "Sleeping for %s seconds", GuindexParameters.MAP_GENERATION_PERIOD
+            )
 
-            for pub in Pub.objects.all():
-
-                if pub.closed:
-                    colour = 'red'
-                    marker_title = '%s - Closed' % pub.name.encode('utf-8')
-                elif not pub.servingGuinness:
-                    colour = 'black'
-                    marker_title = '%s - Not Serving Guinness' % pub.name.encode('utf-8')
-                elif len(Guinness.objects.filter(pub = pub)):
-                    price = Guinness.objects.filter(pub = pub).order_by('-id')[0].price
-                    colour = 'green'
-                    marker_title = '%s - €%.2f' % (pub.name.encode('utf-8'), price)
-                else:
-                    colour = 'darkgray'
-                    marker_title = '%s - Not Yet Visited' % pub.name.encode('utf-8')
-
-                gmap.marker(pub.latitude, pub.longitude, colour, title = marker_title)
-
-            gmap.draw(file_dir + file_name)
+            self._write_map_template(file_dir, file_name)
 
             time.sleep(GuindexParameters.MAP_GENERATION_PERIOD)

@@ -37,10 +37,19 @@ ALLOWED_HOSTS = [
     "guindex.ie",
     "www.guindex.ie",
     "127.0.0.1",
+    "localhost",
+    "[::1]",
     "172.28.5.22",
     "172.28.4.152",
     "10.0.3.148",
 ]
+# Comma-separated extra hosts (e.g. test domain or IP until guindex.ie DNS is ready)
+_extra_hosts = os.environ.get("DJANGO_ALLOWED_HOSTS", "").strip()
+if _extra_hosts:
+    ALLOWED_HOSTS.extend(
+        h.strip() for h in _extra_hosts.split(",") if h.strip()
+    )
+    ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -113,12 +122,23 @@ DATABASES = {
     }
 }
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
-        "LOCATION": "guindex_cache",
+# Throttling (and anything using caches) needs a working backend.
+# Database cache: run once after migrate: python manage.py createcachetable
+# Or set DJANGO_CACHE_BACKEND=locmem for dev / single Gunicorn worker (no extra table).
+_cache_backend = os.environ.get("DJANGO_CACHE_BACKEND", "database").strip().lower()
+if _cache_backend == "locmem":
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
     }
-}
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+            "LOCATION": "guindex_cache",
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
