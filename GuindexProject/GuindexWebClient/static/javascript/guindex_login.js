@@ -1,5 +1,17 @@
 g_loginAccountInfo = null;
 
+function guindexParseJsonResponse(responseText) {
+    var raw = (responseText || "").trim();
+    if (!raw) {
+        return { ok: true, data: {} };
+    }
+    try {
+        return { ok: true, data: JSON.parse(raw) };
+    } catch (e) {
+        return { ok: false, data: null };
+    }
+}
+
 /*********/
 /* Login */
 /*********/
@@ -41,6 +53,7 @@ $(document).on('click', '#password_login_button', function () {
     request.open('POST', G_API_BASE + 'rest-auth/login/', true);
 
     request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('Accept', 'application/json');
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
     request.send(JSON.stringify({'email': email, 'password': password}));
@@ -54,7 +67,17 @@ $(document).on('click', '#password_login_button', function () {
         {
             toggleLoader(button);
 
-            var response = JSON.parse(request.responseText);
+            var parsed = guindexParseJsonResponse(request.responseText);
+            if (!parsed.ok) {
+                displayMessage(
+                    "Error",
+                    "<p>Login failed: the server did not return valid JSON (HTTP " +
+                        request.status +
+                        "). Check the network tab or try again later.</p>"
+                );
+                return;
+            }
+            var response = parsed.data;
 
             if (request.status >= 200 && request.status < 300)
             {
@@ -156,6 +179,7 @@ $(document).on('click', '#password_signup_button', function () {
     request.open('POST', G_API_BASE + 'rest-auth/registration/', true);
 
     request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('Accept', 'application/json');
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
     var signup_data = {
@@ -176,7 +200,17 @@ $(document).on('click', '#password_signup_button', function () {
         {
             toggleLoader(button);
 
-            var response = JSON.parse(request.responseText);
+            var parsed = guindexParseJsonResponse(request.responseText);
+            if (!parsed.ok) {
+                displayMessage(
+                    "Error",
+                    "<p>Signup failed: the server did not return valid JSON (HTTP " +
+                        request.status +
+                        ").</p>"
+                );
+                return;
+            }
+            var response = parsed.data;
 
             if (request.status >= 200 && request.status < 300)
             {
@@ -232,6 +266,7 @@ $(document).on('click', '#forgot_password_button', function () {
     request.open('POST', G_API_BASE + 'rest-auth/password/reset/', true);
 
     request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('Accept', 'application/json');
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
     var forgot_password_data = {
@@ -249,7 +284,17 @@ $(document).on('click', '#forgot_password_button', function () {
         {
             toggleLoader(button);
 
-            var response = JSON.parse(request.responseText);
+            var parsed = guindexParseJsonResponse(request.responseText);
+            if (!parsed.ok) {
+                displayMessage(
+                    "Error",
+                    "<p>Password reset request failed: the server did not return JSON (HTTP " +
+                        request.status +
+                        "). This often means a server error or proxy page — check server logs and email configuration.</p>"
+                );
+                return;
+            }
+            var response = parsed.data;
 
             if (request.status >= 200 && request.status < 300)
             {
