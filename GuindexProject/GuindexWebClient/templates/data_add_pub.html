@@ -1,5 +1,3 @@
-{% load static %}
-
 {% if async_template_loading %}
 <div id="data_add_pub_page" class="page_content content-wrapper" style="display:none">
 </div>
@@ -44,9 +42,6 @@
         </div>
     </div>
 
-    {# Leaflet + OSM: vendored under static/ (avoids unpkg + Referrer-Policy console noise). #}
-    <link rel="stylesheet" href="{% static "vendor/leaflet/leaflet.css" %}" />
-    <script src="{% static "vendor/leaflet/leaflet.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>
+    {# Leaflet + guindex_add_pub.js load in guindex_web_client.html so async tab injection has L defined. #}
 </div>
 {% endif %}
