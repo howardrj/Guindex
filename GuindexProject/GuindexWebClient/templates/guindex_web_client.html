@@ -7,11 +7,8 @@
   <script>
     var g_debug = ('{{debug}}' == 'True')
   </script>
-  {% if not debug %}
-    <script type="text/javascript" src="{% static "javascript/guindex_globals.min.js" %}"> </script>
-  {% else %}
-    <script type="text/javascript" src="{% static "javascript/guindex_globals.js" %}"> </script>
-  {% endif %}
+  {# guindex_*.min.js is gitignored — use .js in prod until min build is in deploy pipeline #}
+  <script type="text/javascript" src="{% static "javascript/guindex_globals.js" %}"> </script>
   <script>
     window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 
@@ -521,15 +518,9 @@
     </div>
   </div>
 
-  {% if not debug %}
-    <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.min.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_main.min.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_tabs.min.js" %}"></script>
-  {% else %}
-    <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_main.js" %}"></script>
-    <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
-  {% endif %}
+  <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_main.js" %}"></script>
+  <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
 
   <script>
     // Close dropdown when new page is opened
