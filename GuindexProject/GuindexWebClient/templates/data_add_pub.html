@@ -44,9 +44,9 @@
         </div>
     </div>
 
-    {# Leaflet + OSM: load after #add_pub_map exists. No Google Maps API key. #}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    {# Leaflet + OSM: vendored under static/ (avoids unpkg + Referrer-Policy console noise). #}
+    <link rel="stylesheet" href="{% static "vendor/leaflet/leaflet.css" %}" />
+    <script src="{% static "vendor/leaflet/leaflet.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>
 </div>
 {% endif %}
