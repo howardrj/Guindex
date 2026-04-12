@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.db.models import Count
 from django.core.validators import validate_email as validateEmail
 from django.core.mail import send_mail as sendMail
 from django.utils import timezone
@@ -450,6 +451,11 @@ class ContributorSerializer(serializers.ModelSerializer):
                                                     read_only = True,
                                                     source = 'guindexuser.currentVerifications')
 
+    countyBadges = serializers.SerializerMethodField(
+        help_text='Per-county badge image filenames (highest tier earned for distinct pubs with approved pints).',
+        read_only=True,
+    )
+
     isDeveloper = serializers.IntegerField(help_text = 'Is this contributor a developer of the Guindex website?',
                                            read_only = True,
                                            source = 'guindexuser.isDeveloper')
@@ -471,11 +477,48 @@ class ContributorSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'is_staff', 'pubsVisited', 'originalPrices',
-                  'currentVerifications', 'usingEmailAlerts', 'usingTelegramAlerts',
+                  'currentVerifications', 'countyBadges', 'usingEmailAlerts', 'usingTelegramAlerts',
                   'telegramActivated', 'telegramActivationKey', 'isDeveloper')
         # Can only patch alert settings
         read_only_fields = ('id', 'username', 'is_staff', 'pubsVisited', 'originalPrices',
-                            'currentVerifications', 'telegramActivated', 'telegramActivationKey')
+                            'currentVerifications', 'countyBadges', 'telegramActivated', 'telegramActivationKey')
+
+    def get_countyBadges(self, obj):
+        """
+        Distinct pubs per county among approved Guinness rows for this user.
+        One badge per county: highest BADGE_UNIQUE_PUB_TIERS tier with unique_pub_count >= tier.
+        """
+        tiers = GuindexParameters.BADGE_UNIQUE_PUB_TIERS
+        rows = (
+            Guinness.objects.filter(creator=obj)
+            .values('pub__county')
+            .annotate(unique_pubs=Count('pub', distinct=True))
+        )
+        out = []
+        for row in rows:
+            county = row['pub__county']
+            if not county:
+                continue
+            n = row['unique_pubs']
+            tier = None
+            for t in tiers:
+                if n >= t:
+                    tier = t
+                    break
+            if tier is None:
+                continue
+            # Filenames match assets on disk, e.g. Dublin_100_pubs.png (county as stored, spaces -> _).
+            slug = county.replace(' ', '_')
+            out.append(
+                {
+                    'county': county,
+                    'uniquePubs': n,
+                    'tier': tier,
+                    'image': '{}_{}_pubs.png'.format(slug, tier),
+                }
+            )
+        out.sort(key=lambda x: x['county'])
+        return out
 
     def validate(self, data):
         """

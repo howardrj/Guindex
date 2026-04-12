@@ -143,6 +143,11 @@ class GuindexParameters:
     GPS_WICKLOW_MAX_LONGITUDE   = '-5.9973359842'
     
     MAX_COUNTY_NAME_LEN = 15
+
+    # County badge images: static/images/{CountyName}_{tier}_pubs.png (name as in DB, spaces to underscores).
+    # Per county, only the highest tier where unique_pub_count >= tier is shown.
+    BADGE_UNIQUE_PUB_TIERS = (50, 20, 10, 1)
+
     SUPPORTED_COUNTIES  = [
         'Carlow',        
         'Cavan',

@@ -322,24 +322,24 @@
 
                    <br>
 
-                    <form>
+                    <form id="password_login_form" action="#" onsubmit="return false;">
                        <div class="form-group">
                            <div class="form-row">
                                <label for="password_login_email">Email</label>
-                               <input class="form-control" id="password_login_email" type="text" placeholder="Enter email">
+                               <input class="form-control" id="password_login_email" type="text" placeholder="Enter email" autocomplete="username">
                            </div>
                        </div>
                        <div class="form-group">
                            <div class="form-row">
                                <label for="password_login_password">Password</label>
-                               <input class="form-control" id="password_login_password" type="password" placeholder="Enter password">
+                               <input class="form-control" id="password_login_password" type="password" placeholder="Enter password" autocomplete="current-password">
                            </div>
                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" id="password_login_button" style="color:white">Submit</a>
+                    <button type="submit" form="password_login_form" class="btn btn-primary" id="password_login_button">Submit</button>
                     <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
                 </div>
             </div> 

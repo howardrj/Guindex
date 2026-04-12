@@ -42,12 +42,17 @@ function guindexParseJsonResponse(responseText) {
     }
 })();
 
-$(document).on('click', '#password_login_button', function () {
-    
-    var email    = document.getElementById('password_login_email').value;
+var g_passwordLoginBusy = false;
+
+function submitPasswordLogin() {
+    if (g_passwordLoginBusy) {
+        return;
+    }
+    g_passwordLoginBusy = true;
+
+    var email = document.getElementById('password_login_email').value;
     var password = document.getElementById('password_login_password').value;
 
-    // Use REST API to login to guindex.ie
     var request = new XMLHttpRequest();
 
     request.open('POST', G_API_BASE + 'rest-auth/login/', true);
@@ -56,71 +61,76 @@ $(document).on('click', '#password_login_button', function () {
     request.setRequestHeader('Accept', 'application/json');
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-    request.send(JSON.stringify({'email': email, 'password': password}));
+    request.send(JSON.stringify({ email: email, password: password }));
 
-    var button = this;
+    var button = document.getElementById('password_login_button');
     toggleLoader(button);
 
-    request.onreadystatechange = function processRequest()
-    {
-        if (request.readyState == 4)
-        {
+    request.onreadystatechange = function processRequest() {
+        if (request.readyState == 4) {
+            g_passwordLoginBusy = false;
             toggleLoader(button);
 
             var parsed = guindexParseJsonResponse(request.responseText);
             if (!parsed.ok) {
                 displayMessage(
-                    "Error",
-                    "<p>Login failed: the server did not return valid JSON (HTTP " +
+                    'Error',
+                    '<p>Login failed: the server did not return valid JSON (HTTP ' +
                         request.status +
-                        "). Check the network tab or try again later.</p>"
+                        '). Check the network tab or try again later.</p>'
                 );
                 return;
             }
             var response = parsed.data;
 
-            if (request.status >= 200 && request.status < 300)
-            {
-                localStorage.setItem('guindexUsername',      response['username']);
-                localStorage.setItem('guindexAccessToken',   response['key']);
-                localStorage.setItem('guindexUserId',        response['user']);
-                localStorage.setItem('guindexIsStaffMember', response['isStaff'] == "True" ? true : false);
+            if (request.status >= 200 && request.status < 300) {
+                localStorage.setItem('guindexUsername', response['username']);
+                localStorage.setItem('guindexAccessToken', response['key']);
+                localStorage.setItem('guindexUserId', response['user']);
+                localStorage.setItem(
+                    'guindexIsStaffMember',
+                    response['isStaff'] == 'True' ? true : false
+                );
 
-                // Do login stuff
-                g_loggedIn      = true;
-                g_username      = localStorage.getItem('guindexUsername');
-                g_accessToken   = localStorage.getItem('guindexAccessToken');
-                g_userId        = localStorage.getItem('guindexUserId');
+                g_loggedIn = true;
+                g_username = localStorage.getItem('guindexUsername');
+                g_accessToken = localStorage.getItem('guindexAccessToken');
+                g_userId = localStorage.getItem('guindexUserId');
                 g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
 
                 onLoginSuccess();
-            }
-            else
-            {
-                // Display errors
-                var error_message = '<p>Please fix the following error(s): </p>'
+            } else {
+                var error_message =
+                    '<p>Please fix the following error(s): </p>';
 
-                var error_table = '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
+                var error_table =
+                    '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
 
                 error_table += '<tr> <th> Field </th> <th> Error </th> </tr>';
 
-                Object.keys(response).forEach(function(key) {
-
+                Object.keys(response).forEach(function (key) {
                     error_table += '<tr>';
-
                     error_table += '<td>' + key + '</td>';
-
                     error_table += '<td>' + response[key] + '</td>';
-
                     error_table += '</tr>';
                 });
 
                 error_table += '</tbody></table>';
 
-                displayMessage("Error", error_message + error_table);
+                displayMessage('Error', error_message + error_table);
             }
         }
-    }
+    };
+}
+
+$(document).on('submit', '#password_login_form', function (e) {
+    e.preventDefault();
+    submitPasswordLogin();
+});
+
+$(document).on('click', '#password_login_button', function (e) {
+    e.preventDefault();
+    submitPasswordLogin();
 });
 
 function onLoginSuccess ()
