@@ -37,19 +37,23 @@ ALLOWED_HOSTS = [
     "guindex.ie",
     "www.guindex.ie",
     "127.0.0.1",
-    "localhost",
-    "[::1]",
     "172.28.5.22",
     "172.28.4.152",
     "10.0.3.148",
 ]
-# Comma-separated extra hosts (e.g. test domain or IP until guindex.ie DNS is ready)
-_extra_hosts = os.environ.get("DJANGO_ALLOWED_HOSTS", "").strip()
-if _extra_hosts:
-    ALLOWED_HOSTS.extend(
-        h.strip() for h in _extra_hosts.split(",") if h.strip()
+
+# Required for HTTPS POSTs (login, forms) when behind nginx; scheme + host (+ :port if non-default).
+# Not read from env by default — add origins here or extend via DJANGO_CSRF_TRUSTED_ORIGINS below.
+CSRF_TRUSTED_ORIGINS = [
+    "https://guindex.ie",
+    "https://www.guindex.ie",
+]
+_extra_csrf = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").strip()
+if _extra_csrf:
+    CSRF_TRUSTED_ORIGINS.extend(
+        o.strip() for o in _extra_csrf.split(",") if o.strip()
     )
-    ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
+    CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(CSRF_TRUSTED_ORIGINS))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -91,6 +95,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
 ]
+
+# Default is DENY, which blocks map.html's same-origin iframe to /guindex_map.
+# SAMEORIGIN still prevents other sites embedding your pages (clickjacking).
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# OSM tile servers require a non-empty Referer (tile usage policy). Sending the
+# page origin on cross-origin requests (e.g. map tiles) satisfies this.
+SECURE_REFERRER_POLICY = "origin-when-cross-origin"
 
 CORS_ALLOW_ALL_ORIGINS = True
 
