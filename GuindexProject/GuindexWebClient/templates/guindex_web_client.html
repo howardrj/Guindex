@@ -29,7 +29,7 @@
   <script async src='https://www.google-analytics.com/analytics.js'></script>
   <script type="text/javascript" src="{% static "javascript/particles.js" %}"></script>
   <meta charset="utf-8">
-  <!-- Align with OSM tile usage: send origin on cross-origin tile loads (not no-referrer). -->
+  <!-- OSM / Leaflet tiles: send Referer origin on cross-origin requests; do not use no-referrer. -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">

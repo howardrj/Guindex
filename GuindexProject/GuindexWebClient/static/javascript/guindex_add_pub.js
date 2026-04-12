@@ -27,7 +27,7 @@ function createAddPubMap(center) {
         attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
-        // OSM expects a Referer (typically origin) on tile requests; do not use no-referrer
+        // OSM: send Referer origin on tile requests (not no-referrer)
         referrerPolicy: "strict-origin-when-cross-origin",
     }).addTo(g_addPubMap);
 

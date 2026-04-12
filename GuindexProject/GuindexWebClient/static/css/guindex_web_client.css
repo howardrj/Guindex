@@ -51,6 +51,24 @@
     height: 80vh;
 }
 
+.guindex_map_toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.guindex_map_toolbar label {
+    margin: 0;
+}
+
+.guindex_map_toolbar .form-control-sm {
+    width: auto;
+    min-width: 10rem;
+    max-width: 16rem;
+}
+
 /*******************/
 /* Spinning Loader */
 /*******************/

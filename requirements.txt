@@ -10,3 +10,4 @@ drf-nested-routers
 python-telegram-bot>=20.0
 requests
 coreapi
+folium

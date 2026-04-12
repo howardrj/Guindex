@@ -1,10 +1,35 @@
 {% load static %}
 
-{% if async_template_loading %}
 <div id="map_page" class="page_content content-wrapper" style="display:none">
-</div>
-{% else %}
-<div id="map_page" class="page_content content-wrapper" style="display:none">
-   <iframe src="/new_guindex_map" id="guindex_map_iframe" loading="lazy"></iframe> 
-</div>
+{% if not async_template_loading %}
+  <div class="guindex_map_toolbar">
+    <label for="guindex_map_county">County</label>
+    <select class="form-control form-control-sm" id="guindex_map_county">
+      <option value="All" selected>All</option>
+      {% for county in guindex_counties %}
+      <option value="{{ county }}">{{ county }}</option>
+      {% endfor %}
+    </select>
+    <button type="button" class="btn btn-sm btn-secondary" id="guindex_map_show_btn">Show pubs map</button>
+  </div>
+  <iframe src="/new_guindex_map" id="guindex_map_iframe" title="Guindex pub map" loading="lazy"></iframe>
+  <script>
+  (function () {
+    var btn = document.getElementById("guindex_map_show_btn");
+    var sel = document.getElementById("guindex_map_county");
+    var iframe = document.getElementById("guindex_map_iframe");
+    if (!btn || !sel || !iframe) {
+      return;
+    }
+    btn.addEventListener("click", function () {
+      var v = sel.value;
+      var u = (typeof G_URL_BASE !== "undefined" ? G_URL_BASE : "") + "/new_guindex_map";
+      if (v && v !== "All") {
+        u += "?county=" + encodeURIComponent(v);
+      }
+      iframe.src = u;
+    });
+  })();
+  </script>
 {% endif %}
+</div>
