@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import include, re_path
 from django.contrib import admin
 
 from UserProfile import urls as UserProfileUrls
@@ -14,7 +14,7 @@ from rest_framework.schemas import get_schema_view
 urlpatterns = []
 
 # Append django admin url
-urlpatterns.append(url(r'^admin/', admin.site.urls))
+urlpatterns.append(re_path(r'^admin/', admin.site.urls))
 
 # Append UserProfile views
 urlpatterns.extend(UserProfileUrls.urlpatterns)
@@ -24,10 +24,10 @@ urlpatterns.extend(GuindexUrls.urlpatterns)
 
 # Append HTTP API schema url
 schema_view = get_schema_view(title='Guindex HTTP API')
-urlpatterns.append(url(r'^api/schema/$', schema_view))
+urlpatterns.append(re_path(r'^api/schema/$', schema_view))
 
 # Append HTTP API docs url
-urlpatterns.append(url(r'^api/docs/', include_docs_urls(title='Guindex HTTP API')))
+urlpatterns.append(re_path(r'^api/docs/', include_docs_urls(title='Guindex HTTP API')))
 
 # Append GuindexWebClient views
 urlpatterns.extend(GuindexWebClientUrls.urlpatterns)

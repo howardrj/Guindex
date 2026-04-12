@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 class PubBase(models.Model):
 
     creator = models.ForeignKey(User,
+                                on_delete = models.SET_NULL,
                                 help_text = 'ID of user who created this pub',
                                 null = True,
                                 blank = True,
@@ -56,7 +57,7 @@ class PubBase(models.Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return "'%s(%s)'" % (self.name, str(self.id) if self.id else "No DB ID")
 
 
@@ -194,6 +195,7 @@ class PubPendingPatch(PubBase):
     """
 
     clonedFrom = models.ForeignKey(Pub,
+                                   on_delete = models.CASCADE,
                                    help_text = 'Pub this patch was applied to')
 
     def getProposedPatches(self):
@@ -282,6 +284,7 @@ class PubPendingPatch(PubBase):
 class GuinnessBase(models.Model):
 
     creator = models.ForeignKey(User,
+                                on_delete = models.SET_NULL,
                                 help_text = 'ID of user who submitted this price',
                                 null = True,
                                 blank = True,
@@ -296,6 +299,7 @@ class GuinnessBase(models.Model):
                                 validators = [MinValueValidator(Decimal(GuindexParameters.MIN_GUINNESS_PRICE))])
 
     pub = models.ForeignKey(Pub,
+                            on_delete = models.CASCADE,
                             help_text = 'ID of pub this price belongs to')
 
     starRating   = models.IntegerField(help_text = 'Star rating (i.e. quality of pint)',
@@ -306,7 +310,7 @@ class GuinnessBase(models.Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return "'%s(%s) - Price: %.2f'" % (self.pub, str(self.id) if self.id else "No DB ID", self.price)
 
 
@@ -463,7 +467,7 @@ class StatisticsSingleton(models.Model):
     numUsers = models.IntegerField(help_text = 'Number of user accounts',
                                    default = 0)
 
-    def __unicode__(self):
+    def __str__(self):
         return "'StatisticsSingleton'"
 
     def save(self, *args, **kwargs):
@@ -489,6 +493,7 @@ class GuindexUser(models.Model):
     """
 
     user = models.OneToOneField(User,
+                                on_delete = models.CASCADE,
                                 help_text = 'User ID associated with this contributor',
                                 null = True,
                                 blank = True,
@@ -526,7 +531,7 @@ class AlertsSingleton(models.Model):
     lastCheckTime = models.DateTimeField(help_text = 'Last time alerts were checked',
                                          auto_now = True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "'AlerstSingleton'"
 
     def save(self, *args, **kwargs):

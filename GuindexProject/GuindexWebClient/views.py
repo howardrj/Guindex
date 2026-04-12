@@ -6,7 +6,6 @@ from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 
 from Guindex.GuindexParameters import GuindexParameters
-from GuindexWebClient.map_view_function import create_guindex_map
 
 logger = logging.getLogger(__name__)
 

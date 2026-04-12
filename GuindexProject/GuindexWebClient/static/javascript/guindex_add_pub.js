@@ -27,6 +27,8 @@ function createAddPubMap(center) {
         attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
+        // OSM tile policy: avoid sending page Referer (see Leaflet TileLayer.referrerPolicy)
+        referrerPolicy: "no-referrer",
     }).addTo(g_addPubMap);
 
     g_pubLocationMarker = L.marker(center, {

@@ -1,5 +1,5 @@
 import logging
-import urllib
+import urllib.parse
 import requests
 import argparse
 
@@ -7,10 +7,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
-from telegram.ext import Updater
-from telegram.ext import CommandHandler
-from telegram.ext import MessageHandler
-from telegram.ext import Filters
+from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
 from TelegramUser.models import TelegramUser
 from TelegramUser.TelegramUserParameters import TelegramUserParameters
@@ -18,7 +15,7 @@ from TelegramUser.TelegramUserParameters import TelegramUserParameters
 logger = logging.getLogger(TelegramUserParameters.BOT_NAME)
 
 
-class TelegramBot(Updater):
+class TelegramBot(object):
     """
         A class that defines minimal Telegram bot functionality.
     """
@@ -28,7 +25,7 @@ class TelegramBot(Updater):
         self._apiKey = apiKey
         self._commandDict = {} # For getting descriptions
 
-        super(TelegramBot, self).__init__(token = self._apiKey)
+        self.application = Application.builder().token(self._apiKey).build()
 
         # Add commands required according to Telegram docs
 
@@ -45,10 +42,14 @@ class TelegramBot(Updater):
         # self.addCommand('settings', self.SettingsCommandHandler)
 
         # Add unknown command handler for unknown commands
-        self.dispatcher.add_handler(MessageHandler(Filters.command, self.unknownCommand))
+        self.application.add_handler(MessageHandler(filters.COMMAND, self.unknownCommand))
 
         # Add unknown command handler for plain text messages
-        self.dispatcher.add_handler(MessageHandler(Filters.text, self.unknownCommand))
+        self.application.add_handler(MessageHandler(filters.TEXT, self.unknownCommand))
+
+    def start_polling(self, **kwargs):
+        """Poll for updates (replaces Updater.start_polling; python-telegram-bot v20+)."""
+        self.application.run_polling(**kwargs)
 
     @staticmethod
     def sendMessage(text, chatId, apiKey = settings.BOT_HTTP_API_TOKEN):
@@ -57,7 +58,7 @@ class TelegramBot(Updater):
             Used by ProcessAlerts.py script.
             Make it static so we don't need TelegramBot object.
         """
-        message = urllib.quote_plus(text.encode('utf-8'))
+        message = urllib.parse.quote_plus(text.encode('utf-8'))
 
         url = "https://api.telegram.org/bot{}/".format(apiKey) + "sendMessage?text={}&chat_id={}".format(message, chatId)
 
@@ -71,7 +72,11 @@ class TelegramBot(Updater):
     def addCommand(self, commandName, commandHandler):
 
         self._commandDict[commandName] = commandHandler(None, None, None)
-        self.dispatcher.add_handler(CommandHandler(commandName, commandHandler, pass_args = True))
+
+        def command_callback(update, context, HandlerClass=commandHandler):
+            HandlerClass(context.bot, update, context.args)
+
+        self.application.add_handler(CommandHandler(commandName, command_callback))
 
     def getCommandDescriptions(self):
         """
@@ -84,13 +89,15 @@ class TelegramBot(Updater):
             # Only take first line of description for now.
             print(command_name + ' - ' + command.getCommandDescription().split('\n', 1)[0])
 
-    def unknownCommand(self, bot, update):
+    def unknownCommand(self, update, context):
         """
             Handler for when we receive unknown command.
         """
         logger.info("Received unknown command")
 
-        bot.send_message(chat_id = update.message.chat_id, text = "Oops! I didn't understand that command.")
+        chat_id = update.effective_chat.id if update.effective_chat else None
+        if chat_id is not None:
+            context.bot.send_message(chat_id=chat_id, text="Oops! I didn't understand that command.")
 
     class TelegramCommandHandler():
         """
@@ -109,10 +116,10 @@ class TelegramBot(Updater):
             if not bot: # HACK for printing descriptions
                 return
 
-            logger.info("Received %s command", update.message['text'])
+            logger.info("Received %s command", update.message.text if update.message else None)
 
             self._bot              = bot
-            self._chatId           = update.message.chat_id
+            self._chatId           = update.effective_chat.id
             self._commandArguments = args
 
             # Default error message. Should be updated in functions
@@ -324,7 +331,7 @@ class TelegramBot(Updater):
             # Check activation keys match
             if not self.user.telegramuser.activationKey == telegram_activation_key:
                 logger.error("User %d: Activation keys do not match, %s : %s",
-                             self.user.id, self.usertelegramuser.activationKey, telegram_activation_key)
+                             self.user.id, self.user.telegramuser.activationKey, telegram_activation_key)
                 self.errorMessage = "Incorrect activation key."
                 raise
 

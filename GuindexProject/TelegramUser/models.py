@@ -3,7 +3,7 @@ import logging
 from django.db import models
 from django.contrib.auth.models import User
 
-from TelegramUserParameters import TelegramUserParameters
+from TelegramUser.TelegramUserParameters import TelegramUserParameters
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 class TelegramUser(models.Model):
 
     user                = models.OneToOneField(User,
+                                               on_delete    = models.CASCADE,
                                                null         = True,
                                                blank        = True,
                                                default      = None,

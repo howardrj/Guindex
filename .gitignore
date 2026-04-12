@@ -26,3 +26,13 @@ rpmbuild/SRPMS/
 guindex_*.min.js
 guindex_map.html
 *.bk
+guin_secrets.py
+
+# Local dev
+GuindexProject/logs/
+.venv/
+venv/
+CDN/
+
+GuindexProject/Guindex/migrations/*.py
+GuindexProject/TelegramUser/migrations/*.py

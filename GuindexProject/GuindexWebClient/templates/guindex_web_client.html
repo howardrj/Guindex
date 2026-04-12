@@ -14,6 +14,13 @@
     <script type="text/javascript" src="{% static "javascript/guindex_globals.js" %}"> </script>
   {% endif %}
   <script>
+    window.statusChangeCallback = window.statusChangeCallback || function (response) {
+      if (typeof window.guindexFacebookStatusChange === 'function') {
+        window.guindexFacebookStatusChange(response);
+      }
+    };
+  </script>
+  <script>
     window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 
     ga('create', '{{ google_analytics_key }}', 'auto'); 
@@ -53,6 +60,7 @@
   </script>
 
   <script>
+      // statusChangeCallback is defined in guindex_globals.js (loads before this block)
 
       window.fbAsyncInit = function() {
 

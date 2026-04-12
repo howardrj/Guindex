@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import include, re_path
 from rest_framework_nested import routers
 
 from Guindex import views
@@ -13,11 +13,11 @@ router.register(r'^api/statistics', views.StatisticsViewSet)
 router.register(r'^api/contributors', views.ContributorViewSet)
 
 pubs_router = routers.NestedSimpleRouter(router, r'^api/pubs', lookup = 'pub')
-pubs_router.register(r'prices', views.GuinnessViewSet, base_name = 'pub-prices')
+pubs_router.register(r'prices', views.GuinnessViewSet, basename = 'pub-prices')
 
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
-    url(r'^', include(pubs_router.urls)),
-    url(r'^api/contact/$', views.Contact.as_view()),
+    re_path(r'^', include(router.urls)),
+    re_path(r'^', include(pubs_router.urls)),
+    re_path(r'^api/contact/$', views.Contact.as_view()),
 ]

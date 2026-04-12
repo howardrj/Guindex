@@ -25,7 +25,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = secrets.KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# Local dev: export DJANGO_DEBUG=1  (registration API and extra checks)
+DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
 
 # Enable timezone support
 USE_TZ = True
@@ -44,11 +45,11 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_datatables',
-    'rest_auth',
+    'dj_rest_auth',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
-    'rest_auth.registration',
+    'dj_rest_auth.registration',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.twitter',
@@ -61,19 +62,27 @@ INSTALLED_APPS = (
 
 SITE_ID = 1 # Need for rest_auth stuff
 
-MIDDLEWARE_CLASSES = (
+# Django 2.0+: MIDDLEWARE (not MIDDLEWARE_CLASSES); SessionAuthenticationMiddleware removed
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-)
+    'allauth.account.middleware.AccountMiddleware',
+]
 
+CORS_ALLOW_ALL_ORIGINS = True
+# Legacy name still read by some django-cors-headers versions:
 CORS_ORIGIN_ALLOW_ALL = True
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Allow embedding /new_guindex_map in same-origin iframe (map tab)
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 ROOT_URLCONF = 'GuindexProject.urls'
 
@@ -99,20 +108,45 @@ WSGI_APPLICATION = 'GuindexProject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+# SQLite: GUINDEX_DATABASE_PATH overrides. Otherwise prefer repo-root Guindex.db (next to GuindexProject/),
+# then GuindexProject/Guindex.db. Production often uses export GUINDEX_DATABASE_PATH=/usr/share/Guindex.db
+_REPO_DIR = os.path.dirname(BASE_DIR)
+
+
+def _sqlite_database_path():
+    override = os.environ.get('GUINDEX_DATABASE_PATH', '').strip()
+    if override:
+        return override
+    repo_db = os.path.join(_REPO_DIR, 'Guindex.db')
+    local_db = os.path.join(BASE_DIR, 'Guindex.db')
+    if os.path.isfile(repo_db):
+        return repo_db
+    return local_db
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/usr/share/Guindex.db',
+        'NAME': _sqlite_database_path(),
     }
 }
 
-# Cache
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'guindex_cache',
+# Cache: DB cache needs `python manage.py createcachetable`. Default LocMem avoids that for local dev.
+# Production with DB cache: export GUINDEX_USE_DB_CACHE=1 && createcachetable
+if os.environ.get('GUINDEX_USE_DB_CACHE', '0') == '1':
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'guindex_cache',
+        }
     }
-}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'guindex',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -163,6 +197,15 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'
 
+# Log files: os.path.join(BASE_DIR, "/var/log/...") ignores BASE_DIR (absolute second path → /var/log).
+# Default: GuindexProject/logs/. Production: export GUINDEX_LOG_DIR=/var/log
+LOG_ROOT = os.environ.get('GUINDEX_LOG_DIR', os.path.join(BASE_DIR, 'logs')).rstrip(os.sep)
+if not os.path.isdir(LOG_ROOT):
+    try:
+        os.makedirs(LOG_ROOT)
+    except OSError:
+        pass
+
 # Logging
 LOGGING = {
     'version': 1,
@@ -177,7 +220,7 @@ LOGGING = {
         'TelegramUserLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/TelegramUser.log"),
+            'filename': os.path.join(LOG_ROOT, 'TelegramUser.log'),
             'maxBytes': 1024 * 1024 * 10,
             'backupCount': 10,
             'formatter': 'verbose'
@@ -185,7 +228,7 @@ LOGGING = {
         'GuindexLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/Guindex.log"),
+            'filename': os.path.join(LOG_ROOT, 'Guindex.log'),
             'maxBytes': 1024 * 1024 * 10,
             'backupCount': 10,
             'formatter': 'verbose'
@@ -193,7 +236,7 @@ LOGGING = {
         'GuindexWebClientLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexWebClient.log"),
+            'filename': os.path.join(LOG_ROOT, 'GuindexWebClient.log'),
             'maxBytes': 1024 * 1024 * 10,
             'backupCount': 10,
             'formatter': 'verbose'
@@ -201,7 +244,7 @@ LOGGING = {
         'GuindexStatsLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexStats.log"),
+            'filename': os.path.join(LOG_ROOT, 'GuindexStats.log'),
             'maxBytes': 1024 * 1024 * 10,
             'backupCount': 10,
             'formatter': 'verbose'
@@ -209,7 +252,7 @@ LOGGING = {
         'GuindexAlertsLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexAlerts.log"),
+            'filename': os.path.join(LOG_ROOT, 'GuindexAlerts.log'),
             'maxBytes': 1024 * 1024 * 10,
             'backupCount': 10,
             'formatter': 'verbose'
@@ -217,7 +260,7 @@ LOGGING = {
         'GuindexDbBackupLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexDbBackup.log"),
+            'filename': os.path.join(LOG_ROOT, 'GuindexDbBackup.log'),
             'maxBytes': 1024 * 1024 * 10,
             'backupCount': 10,
             'formatter': 'verbose'
@@ -225,7 +268,7 @@ LOGGING = {
         'GuindexBotLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexBot.log"),
+            'filename': os.path.join(LOG_ROOT, 'GuindexBot.log'),
             'maxBytes': 1024 * 1024 * 10,
             'backupCount': 10,
             'formatter': 'verbose'
@@ -233,7 +276,7 @@ LOGGING = {
         'GuindexMapLogFile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "/var/log/GuindexMap.log"),
+            'filename': os.path.join(LOG_ROOT, 'GuindexMap.log'),
             'maxBytes': 1024 * 1024 * 10,
             'backupCount': 10,
             'formatter': 'verbose'
@@ -327,10 +370,9 @@ FACEBOOK_APP_ID = secrets.FACEBOOK_APP_ID
 # Google Analytics API
 GOOGLE_ANALYTICS_KEY = secrets.GOOGLE_ANALYTICS_KEY
 
-# Settings for rest-auth login
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_REQUIRED = True   
-ACCOUNT_USERNAME_REQUIRED = False
+# django-allauth 65+ (replaces ACCOUNT_AUTHENTICATION_METHOD / *_EMAIL_REQUIRED / *_USERNAME_REQUIRED)
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 
 AUTHENTICATION_BACKENDS = (
  # Needed to login by username in Django admin, regardless of `allauth`

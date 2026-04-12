@@ -1,7 +1,7 @@
 import logging
 
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-from rest_auth.registration.views import SocialLoginView, SocialConnectView
+from dj_rest_auth.registration.views import SocialLoginView, SocialConnectView
 
 logger = logging.getLogger(__name__)
 
