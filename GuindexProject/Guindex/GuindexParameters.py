@@ -22,10 +22,11 @@ class GuindexParameters:
     ALERTS_CHECK_PERIOD      = 86400 * 7
 
     # Map generation parameters
-    MAP_GENERATION_PERIOD   = 86400
-    DUBLIN_CENTER_LATITUDE  = 53.345280 
-    DUBLIN_CENTER_LONGITUDE = -6.272161
-    MAP_ZOOM_LEVEL          = 17
+    MAP_GENERATION_PERIOD   = 30
+    DUBLIN_CENTER_LATITUDE  = 53.489969 
+    DUBLIN_CENTER_LONGITUDE = -7.565688
+    MAP_ZOOM_LEVEL          = 7
+    MAX_MAP_LINK_LEN        = 2000
 
     # Alerts Server Parameters
     ALERTS_LISTEN_IP   = '127.0.0.1'
@@ -142,6 +143,11 @@ class GuindexParameters:
     GPS_WICKLOW_MAX_LONGITUDE   = '-5.9973359842'
     
     MAX_COUNTY_NAME_LEN = 15
+
+    # County badge images: static/images/{CountyName}_{tier}_pubs.png (name as in DB, spaces to underscores).
+    # Per county, only the highest tier where unique_pub_count >= tier is shown.
+    BADGE_UNIQUE_PUB_TIERS = (50, 20, 10, 1)
+
     SUPPORTED_COUNTIES  = [
         'Carlow',        
         'Cavan',
@@ -187,7 +193,7 @@ class GuindexParameters:
         frame = inspect.currentframe()
         function_name = inspect.getframeinfo(frame).function
 
-        for key, attribute in class_attributes.iteritems():
+        for key, attribute in class_attributes.items():
 
             if not key.startswith("__") and key != function_name:
 

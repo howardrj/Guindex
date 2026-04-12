@@ -282,7 +282,8 @@ body.sidenav-toggled #mainNav.static-top #sidenavToggler i {
 
 .content-wrapper {
   overflow-x: hidden;
-  background: white;
+  background-image: url("../images/guindex_background_lr.jpg");
+  background-size: contain;
 }
 
 @media (min-width: 992px) {

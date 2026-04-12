@@ -22,6 +22,7 @@
   <script async src='https://www.google-analytics.com/analytics.js'></script>
   <script type="text/javascript" src="{% static "javascript/particles.js" %}"></script>
   <meta charset="utf-8">
+  <meta name="referrer" content="origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
   <meta name="author" content="">
@@ -33,6 +34,7 @@
   <link rel="stylesheet" href="{% static "css/dataTables.bootstrap4.css" %}">
   <link rel="stylesheet" href="{% static "css/sb-admin.css" %}">
   <link rel="stylesheet" href="{% static "css/guindex_web_client.css" %}">
+  <link rel="stylesheet" href="{% static "vendor/leaflet/leaflet.css" %}">
 </head>
 
 <body class="fixed-nav sticky-footer" id="page-top">
@@ -97,16 +99,47 @@
 	    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Map">
           <a class="nav-link page_content_link" data-content_page_id="map_page">
             <i class="fa fa-fw fa-map-o"></i>
-            <span class="nav-link-text">Map</span>
+            <span class="nav-link-text">Map (takes a few seconds)</span>
           </a>
         </li>
-	    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Statistics">
+
+	<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Data">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseData" data-parent="#exampleAccordion">
+            <i class="fa fa-fw fa-table"></i>
+            <span class="nav-link-text">Pubs & Prices</span>
+          </a>
+          <ul class="sidenav-second-level collapse" id="collapseData" style="background-color:black">
+            <li>
+              <a class="nav-link page_content_link" data-content_page_id="data_table_page"> Current Database </a>
+            </li>
+            <li>
+              <a class="nav-link page_content_link" data-content_page_id="data_add_pub_page"> Add a Pub </a>
+            </li>
+          </ul>
+        </li>
+	
+	<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Contributions">
+          <a class="nav-link page_content_link" data-content_page_id="contributions_page">
+            <i class="fa fa-fw fa-user"></i>
+            <span class="nav-link-text">Contributions</span>
+          </a>
+        </li>
+
+        <li id="pending_contributions_li" class="nav-item" data-toggle="tooltip" data-placement="right" title="Pending Contributions" style="display:none">
+          <a class="nav-link page_content_link" data-content_page_id="pending_contributions_page">
+            <i class="fa fa-fw fa-clock-o"></i>
+            <span class="nav-link-text">Pending Contributions</span>
+          </a>
+        </li>
+
+	<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Statistics">
           <a class="nav-link page_content_link" data-content_page_id="statistics_page">
             <i class="fa fa-fw fa-dashboard"></i>
             <span class="nav-link-text">Statistics</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Analysis">
+        
+	<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Analysis">
           <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseAnalysis" data-parent="#exampleAccordion">
             <i class="fa fa-fw fa-area-chart"></i>
             <span class="nav-link-text">Analysis</span>
@@ -130,38 +163,13 @@
           </ul>
         </li>
 
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Data">
-          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseData" data-parent="#exampleAccordion">
-            <i class="fa fa-fw fa-table"></i>
-            <span class="nav-link-text">Data</span>
-          </a>
-          <ul class="sidenav-second-level collapse" id="collapseData" style="background-color:black">
-            <li>
-              <a class="nav-link page_content_link" data-content_page_id="data_table_page"> Table </a>
-            </li>
-            <li>
-              <a class="nav-link page_content_link" data-content_page_id="data_add_pub_page"> Add a Pub </a>
-            </li>
-          </ul>
-        </li>
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Settings">
           <a class="nav-link page_content_link" data-content_page_id="settings_page">
             <i class="fa fa-fw fa-wrench"></i>
             <span class="nav-link-text">Settings</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Contributions">
-          <a class="nav-link page_content_link" data-content_page_id="contributions_page">
-            <i class="fa fa-fw fa-user"></i>
-            <span class="nav-link-text">Contributions</span>
-          </a>
-        </li>
-        <li id="pending_contributions_li" class="nav-item" data-toggle="tooltip" data-placement="right" title="Pending Contributions" style="display:none">
-          <a class="nav-link page_content_link" data-content_page_id="pending_contributions_page">
-            <i class="fa fa-fw fa-clock-o"></i>
-            <span class="nav-link-text">Pending Contributions</span>
-          </a>
-        </li>
+
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Links">
           <a class="nav-link page_content_link" data-content_page_id="links_page">
             <i class="fa fa-fw fa-link"></i>
@@ -324,17 +332,17 @@
 
                         <br>
 
-                        <form>
+                        <form id="password_login_form" action="#" onsubmit="return false;">
                             <div class="form-group">
                                 <div class="form-row">
                                     <label for="password_login_email">Email</label>
-                                    <input class="form-control" id="password_login_email" type="text" placeholder="Enter email">
+                                    <input class="form-control" id="password_login_email" type="text" placeholder="Enter email"  autocomplete="username">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="form-row">
                                     <label for="password_login_password">Password</label>
-                                    <input class="form-control" id="password_login_password" type="password" placeholder="Enter password">
+                                    <input class="form-control" id="password_login_password" type="password" placeholder="Enter password" autocomplete="current-password">
                                 </div>
                             </div>
                         </form>
@@ -350,7 +358,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" id="password_login_button">Submit</a>
+                    <button type="submit" form="password_login_form" class="btn btn-primary" id="password_login_button">Submit</button>
                     <a class="btn btn-primary" id="logout_button" style="display:none">Logout</a>
                     <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
                 </div>
@@ -528,11 +536,15 @@
     <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_login.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_main.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "vendor/leaflet/leaflet.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.min.js" %}"></script>
   {% else %}
     <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_login.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_main.js" %}"></script>
+    <script type="text/javascript" src="{% static "vendor/leaflet/leaflet.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
   {% endif %}
 

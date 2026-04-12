@@ -48,5 +48,7 @@ class Command(BaseCommand):
                 logger.error("Failed to upload %s to dropbox", copied_db_leaf)
                 # TODO Take action     
 
+            del dropbox_context
+
             logger.info("Sleeping for %d seconds", GuindexParameters.DB_BACKUP_PERIOD)
             time.sleep(GuindexParameters.DB_BACKUP_PERIOD)

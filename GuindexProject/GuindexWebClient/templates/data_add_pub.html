@@ -1,18 +1,8 @@
-{% load static %}
-
 {% if async_template_loading %}
 <div id="data_add_pub_page" class="page_content content-wrapper" style="display:none">
 </div>
 {% else %}
 <div id="data_add_pub_page" class="page_content content-wrapper" style="display:none">
-
-    {% if not debug %}
-    <script type="text/javascript" src="{% static "javascript/guindex_add_pub.min.js" %}"></script>
-    {% else %}
-    <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>
-    {% endif %}
-
-    <script src="https://maps.googleapis.com/maps/api/js?key={{google_maps_api_key}}&callback=initAddPubMap"></script>
 
     <div class="container-fluid">
         <div class="card card-register mx-auto mt-5">
@@ -27,20 +17,19 @@
                             <input class="form-control" id="add_pub_name" type="text" placeholder="Enter pub name">
                         </div>
                     </div>
-	                <div class="form-group">
+                    <div class="form-group">
                         <div class="form-row">
-        			        <label for="add_pub_county">County</label>
-
-    			            <select class="form-control" id="add_pub_county">
+                            <label for="add_pub_county">County</label>
+                            <select class="form-control" id="add_pub_county">
                                 {% for county in guindex_counties %}
-                                    <option> {{ county }} </option>
+                                    <option value="{{ county }}">{{ county }}</option>
                                 {% endfor %}
-    			            </select>
+                            </select>
                         </div>
-  			        </div>
+                    </div>
                     <div class="form-group">
                         <div class="form-row" id="add_pub_map_container">
-                            <label for="add_pub_map">Latitude/Longitude</label>
+                            <label for="add_pub_map">Latitude/Longitude (click map or drag marker)</label>
                             <div id="add_pub_map" style="margin-top:40px"></div>
                         </div>
                     </div>
@@ -52,5 +41,7 @@
             </div>
         </div>
     </div>
+
+    {# Leaflet + guindex_add_pub.js load in guindex_web_client.html so async tab injection has L defined. #}
 </div>
 {% endif %}

@@ -6,6 +6,7 @@ from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 
 from Guindex.GuindexParameters import GuindexParameters
+from GuindexWebClient.map_view_function import create_guindex_map
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ def guindexWebClient(request):
         'google_analytics_key'  : settings.GOOGLE_ANALYTICS_KEY,
         'facebook_app_id'       : settings.FACEBOOK_APP_ID,
         'guindex_counties'      : GuindexParameters.SUPPORTED_COUNTIES,
-        'debug'                 : settings.DEBUG,
+        'debug'                 : True,
         'async_template_loading': True,
     }
 
@@ -45,7 +46,7 @@ def guindexWebClientWithTemplate(request, template):
     except:
         return HttpResponseNotFound('<h1> Page not found </h1>')
 
-    if template == 'guindex_map':
+    if template == 'guindex_map' or template == "new_guindex_map":
         return rendered_template
 
     context_dict = {
@@ -53,7 +54,7 @@ def guindexWebClientWithTemplate(request, template):
         'google_analytics_key'  : settings.GOOGLE_ANALYTICS_KEY,
         'facebook_app_id'       : settings.FACEBOOK_APP_ID,
         'guindex_counties'      : GuindexParameters.SUPPORTED_COUNTIES,
-        'debug'                 : settings.DEBUG,
+        'debug'                 : True,
         'async_template_loading': True,
     }
 
@@ -67,11 +68,17 @@ def asyncLoadTemplate(request, template):
     context_dict = {
         'google_maps_api_key'   : settings.GOOGLE_MAPS_API_KEY,
         'guindex_counties'      : GuindexParameters.SUPPORTED_COUNTIES,
-        'debug'                 : settings.DEBUG,
+        'debug'                 : True,
         'async_template_loading': False,
     }
+
+#    if template == "map":
+ #       folium_map = create_guindex_map()
+
+  #      context_dict['map'] = folium_map._repr_html_()
 
     try:
         return render(request, template + '.html', context_dict)
     except:
         return HttpResponseNotFound('<h1> Page not found </h1>')
+
