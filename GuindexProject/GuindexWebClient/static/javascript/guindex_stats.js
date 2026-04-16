@@ -120,7 +120,13 @@ $(function () {
 	{county:"Cavan",colour1:"darkblue", colour2:"white"},
 	{county:"Carlow",colour1:"red", colour2:"yellow"},
 	{county:"Longford",colour1:"blue", colour2:"white"},
-	{county:"Monaghan",colour1:"white", colour2:"blue"}];
+	{county:"Monaghan",colour1:"white", colour2:"blue"},
+	{county:"Antrim",colour1:"gold", colour2:"white"},
+	{county:"Armagh",colour1:"orange", colour2:"white"},
+	{county:"Derry",colour1:"red", colour2:"white"},
+	{county:"Down",colour1:"red", colour2:"black"},
+	{county:"Fermanagh",colour1:"green", colour2:"white"},
+	{county:"Tyrone",colour1:"white", colour2:"red"}];
 
 	function addData(chart, label, data) {
 	    chart.data.labels.push(label);

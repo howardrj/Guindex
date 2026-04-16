@@ -23,6 +23,13 @@ function populateGuindexDataTable()
             title: "Price",
             data: "lastPrice",
             defaultContent: "N.A.",
+            render: function (data, type, row) {
+                if (data == null || data === "") {
+                    return "N.A.";
+                }
+                var sym = row["currency"] || "€";
+                return sym + data;
+            },
         },
         {
             title: "Average Star Rating",
@@ -39,7 +46,7 @@ function populateGuindexDataTable()
                 {
                     if (i < star_rating)
                     {
-                        html_string += '<i class="fa fa-star" aria-hidden="true" stle="color:black"></i>';
+                        html_string += '<i class="fa fa-star" aria-hidden="true" style="color:black"></i>';
                     }
                     else
                     {
@@ -75,7 +82,11 @@ function populateGuindexDataTable()
             visible: false,
             render: function (data, type, row) {
 
-                var input_field = '<input class="price_input" type="number" step="0.01" min="0" max="10"/> <br>';
+                var cur = row["currency"] || "€";
+                var input_field =
+                    '<input class="price_input" type="number" step="0.01" min="0" max="10" placeholder="' +
+                    cur +
+                    '"/> <br>';
 
                 var stars = "";
 
