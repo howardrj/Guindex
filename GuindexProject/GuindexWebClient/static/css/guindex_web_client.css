@@ -8,6 +8,12 @@
     margin: 5px auto;
 }
 
+/* County currency hint in submit-price field (placeholder until user types) */
+.price_input::placeholder {
+    color: #999;
+    opacity: 1;
+}
+
 .hoverable {
     cursor: hand;
     cursor: pointer;

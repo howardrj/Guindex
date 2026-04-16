@@ -160,11 +160,16 @@ class PubSerializer(serializers.ModelSerializer):
         Serializer for creating, updating and retrieving Pub objects.
     """
 
+    currency = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Pub
         fields = '__all__'
         read_only_fields = ('id', 'creator', 'creationDate', 'mapLink', 'averageRating',
                             'lastPrice', 'lastSubmissionTime')
+
+    def get_currency(self, obj):
+        return GuindexParameters.COUNTY_CURRENCIES.get(obj.county, '€')
 
     def validate(self, data):
         """
