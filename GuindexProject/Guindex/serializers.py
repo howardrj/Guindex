@@ -167,9 +167,18 @@ class PubSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id', 'creator', 'creationDate', 'mapLink', 'averageRating',
                             'lastPrice', 'lastSubmissionTime')
+        # django-rest-framework-datatables strips keys not listed in DataTables columns[];
+        # keep this so row.currency is present for Price / submit column renderers.
+        datatables_always_serialize = ('currency',)
 
     def get_currency(self, obj):
-        return GuindexParameters.COUNTY_CURRENCIES.get(obj.county, '€')
+        county = (obj.county or '').strip()
+        if not county:
+            return '€'
+        for name, symbol in GuindexParameters.COUNTY_CURRENCIES.items():
+            if name.lower() == county.lower():
+                return symbol
+        return '€'
 
     def validate(self, data):
         """
