@@ -21,15 +21,12 @@ This file helps new contributors (and Cursor agents) mirror a working local envi
 
 3. **Secrets:** `GuindexProject/GuindexProject/settings.py` imports `secrets` (e.g. `KEY`, `EMAIL`, API keys). Create `GuindexProject/GuindexProject/secrets.py` from your teammate’s template or copy — it is usually **gitignored** and must not be committed.
 
-4. **Database:** SQLite by default. Paths are resolved in settings; optionally set:
-   ```bash
-   export GUINDEX_DATABASE_PATH=/absolute/path/to/Guindex.db
-   ```
-   Then apply migrations:
+4. **Database:** Uses **SQLite only** — no PostgreSQL/MySQL install, host, or password for normal local work. Django chooses the file automatically: **`Guindex.db` at the repo root** (next to `GuindexProject/`) if it exists, otherwise **`GuindexProject/Guindex.db`**. Override with `GUINDEX_DATABASE_PATH` only if you want the file elsewhere. Then:
    ```bash
    cd GuindexProject
    python manage.py migrate
    ```
+   That creates or updates the schema. Optionally copy a teammate’s `Guindex.db` for real data; otherwise the DB starts empty after migrate.
 
 ## Environment variables (local dev)
 
