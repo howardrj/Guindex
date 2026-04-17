@@ -27,7 +27,7 @@ function populateGuindexDataTable()
                 if (data == null || data === "") {
                     return "N.A.";
                 }
-                var sym = row["currency"] || "€";
+                var sym = row["currency"] || "\u20ac";
                 return sym + data;
             },
         },
@@ -82,7 +82,7 @@ function populateGuindexDataTable()
             visible: false,
             render: function (data, type, row) {
 
-                var cur = row["currency"] || "€";
+                var cur = row["currency"] || "\u20ac";
                 var input_field =
                     '<input class="price_input" type="number" step="0.01" min="0" max="10" placeholder="' +
                     cur +
