@@ -37,6 +37,14 @@ class GuindexParameters:
     GPS_COORD_DECIMAL_PLACES = 20
     GPS_COORD_MAX_DIGITS     = 23
 
+    GPS_ANTRIM_MIN_LATITUDE     = '54.4772774'
+    GPS_ANTRIM_MAX_LATITUDE     = '55.3130865'
+    GPS_ANTRIM_MIN_LONGITUDE    = '-6.6689888'
+    GPS_ANTRIM_MAX_LONGITUDE    = '-5.6879629'
+    GPS_ARMAGH_MIN_LATITUDE     = '54.0364597'
+    GPS_ARMAGH_MAX_LATITUDE     = '54.5675362'
+    GPS_ARMAGH_MIN_LONGITUDE    = '-6.8780377'
+    GPS_ARMAGH_MAX_LONGITUDE    = '-6.290864'
     GPS_CARLOW_MIN_LATITUDE     = '52.4633869052'
     GPS_CARLOW_MAX_LATITUDE     = '52.9176936493'
     GPS_CARLOW_MIN_LONGITUDE    = '-7.1072067086'
@@ -53,14 +61,26 @@ class GuindexParameters:
     GPS_CORK_MAX_LATITUDE       = '52.3877509338'
     GPS_CORK_MIN_LONGITUDE      = '-10.2475415358'
     GPS_CORK_MAX_LONGITUDE      = '-7.8404021003'
+    GPS_DERRY_MIN_LATITUDE      = '54.6282688'
+    GPS_DERRY_MAX_LATITUDE      = '55.2002556'
+    GPS_DERRY_MIN_LONGITUDE    = '-7.4074364'
+    GPS_DERRY_MAX_LONGITUDE    = '-6.4570362'
     GPS_DONEGAL_MIN_LATITUDE    = '54.4588514997393'
     GPS_DONEGAL_MAX_LATITUDE    = '55.4463629142'
     GPS_DONEGAL_MIN_LONGITUDE   = '-8.834035422'
     GPS_DONEGAL_MAX_LONGITUDE   = '-6.921215597'
+    GPS_DOWN_MIN_LATITUDE       = '54.0228909'
+    GPS_DOWN_MAX_LATITUDE       = '54.6992448'
+    GPS_DOWN_MIN_LONGITUDE      = '-6.4003727'
+    GPS_DOWN_MAX_LONGITUDE      = '-5.4268157'
     GPS_DUBLIN_MIN_LATITUDE     = '53.1779929359909'
     GPS_DUBLIN_MAX_LATITUDE     = '53.6345095065'
     GPS_DUBLIN_MIN_LONGITUDE    = '-6.546150018'
     GPS_DUBLIN_MAX_LONGITUDE    = '-5.9955549997'
+    GPS_FERMANAGH_MIN_LATITUDE  = '54.1132751'
+    GPS_FERMANAGH_MAX_LATITUDE  = '54.6105377'
+    GPS_FERMANAGH_MIN_LONGITUDE = '-8.1775098'
+    GPS_FERMANAGH_MAX_LONGITUDE = '-7.1415157'
     GPS_GALWAY_MIN_LATITUDE     = '52.9679414729'
     GPS_GALWAY_MAX_LATITUDE     = '53.7187021311'
     GPS_GALWAY_MIN_LONGITUDE    = '-10.3015401125'
@@ -125,6 +145,10 @@ class GuindexParameters:
     GPS_TIPPERARY_MAX_LATITUDE  = '53.1673712452'
     GPS_TIPPERARY_MIN_LONGITUDE = '-8.4793447933'
     GPS_TIPPERARY_MAX_LONGITUDE = '-7.371335621'
+    GPS_TYRONE_MIN_LATITUDE     = '54.3253027'
+    GPS_TYRONE_MAX_LATITUDE     = '54.9453614'
+    GPS_TYRONE_MIN_LONGITUDE    = '-7.9208903'
+    GPS_TYRONE_MAX_LONGITUDE    = '-6.4065901'
     GPS_WATERFORD_MIN_LATITUDE  = '51.937785831'
     GPS_WATERFORD_MAX_LATITUDE  = '52.3636788119'
     GPS_WATERFORD_MIN_LONGITUDE = '-8.1619704153'
@@ -149,12 +173,17 @@ class GuindexParameters:
     BADGE_UNIQUE_PUB_TIERS = (50, 20, 10, 1)
 
     SUPPORTED_COUNTIES  = [
+        'Antrim',
+        'Armagh',
         'Carlow',        
         'Cavan',
         'Clare',
         'Cork',
+        'Derry',
         'Donegal',
+        'Down',
         'Dublin',
+        'Fermanagh',
         'Galway',
         'Kerry',
         'Kildare',
@@ -171,11 +200,24 @@ class GuindexParameters:
         'Roscommon',
         'Sligo',
         'Tipperary',
+        'Tyrone',
         'Waterford',
         'Westmeath',
         'Wexford',
         'Wicklow',
     ]
+
+    COUNTY_CURRENCIES = {
+        c: u"\u20ac" for c in SUPPORTED_COUNTIES if c not in ["Antrim", "Armagh", "Derry", "Down", "Fermanagh", "Tyrone"]
+    }
+    COUNTY_CURRENCIES.update({
+        "Antrim": u"\u00a3",
+        "Armagh": u"\u00a3",
+        "Derry": u"\u00a3",
+        "Down": u"\u00a3",
+        "Fermanagh": u"\u00a3",
+        "Tyrone": u"\u00a3",
+    })
 
     # Contact Form Parameters
     MAX_CONTACT_FORM_NAME_LEN    = 30

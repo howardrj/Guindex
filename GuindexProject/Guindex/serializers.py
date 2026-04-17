@@ -160,11 +160,25 @@ class PubSerializer(serializers.ModelSerializer):
         Serializer for creating, updating and retrieving Pub objects.
     """
 
+    currency = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Pub
         fields = '__all__'
         read_only_fields = ('id', 'creator', 'creationDate', 'mapLink', 'averageRating',
                             'lastPrice', 'lastSubmissionTime')
+        # django-rest-framework-datatables strips keys not listed in DataTables columns[];
+        # keep this so row.currency is present for Price / submit column renderers.
+        datatables_always_serialize = ('currency',)
+
+    def get_currency(self, obj):
+        county = (obj.county or '').strip()
+        if not county:
+            return u"\u20ac"
+        for name, symbol in GuindexParameters.COUNTY_CURRENCIES.items():
+            if name.lower() == county.lower():
+                return symbol
+        return u"\u20ac"
 
     def validate(self, data):
         """
