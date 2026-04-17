@@ -169,7 +169,7 @@ class PubSerializer(serializers.ModelSerializer):
                             'lastPrice', 'lastSubmissionTime')
 
     def get_currency(self, obj):
-        return GuindexParameters.COUNTY_CURRENCIES.get(obj.county, '€')
+        return GuindexParameters.COUNTY_CURRENCIES.get(obj.county, u'\u20ac')
 
     def validate(self, data):
         """
