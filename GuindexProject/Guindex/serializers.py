@@ -174,11 +174,11 @@ class PubSerializer(serializers.ModelSerializer):
     def get_currency(self, obj):
         county = (obj.county or '').strip()
         if not county:
-            return '€'
+            return u"\u20ac"
         for name, symbol in GuindexParameters.COUNTY_CURRENCIES.items():
             if name.lower() == county.lower():
                 return symbol
-        return '€'
+        return u"\u20ac"
 
     def validate(self, data):
         """

@@ -208,15 +208,15 @@ class GuindexParameters:
     ]
 
     COUNTY_CURRENCIES = {
-        c: "€" for c in SUPPORTED_COUNTIES if c not in ["Antrim", "Armagh", "Derry", "Down", "Fermanagh", "Tyrone"]
+        c: u"\u20ac" for c in SUPPORTED_COUNTIES if c not in ["Antrim", "Armagh", "Derry", "Down", "Fermanagh", "Tyrone"]
     }
     COUNTY_CURRENCIES.update({
-        "Antrim": "£",
-        "Armagh": "£",
-        "Derry": "£",
-        "Down": "£",
-        "Fermanagh": "£",
-        "Tyrone": "£",
+        "Antrim": u"\u00a3",
+        "Armagh": u"\u00a3",
+        "Derry": u"\u00a3",
+        "Down": u"\u00a3",
+        "Fermanagh": u"\u00a3",
+        "Tyrone": u"\u00a3",
     })
 
     # Contact Form Parameters
