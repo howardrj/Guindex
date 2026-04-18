@@ -238,6 +238,13 @@
           <a class="nav-link" data-toggle="modal" id="login_link" data-target="#exampleModal">
             <i class="fa fa-fw fa-sign-in"></i>Login</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" id="logout_link" style="display:none;" title="Log out">
+            <i class="fa fa-fw fa-sign-out"></i>
+            <span class="nav-link-text">Log out</span>
+            <small id="logout_link_username" class="ml-1 d-none d-sm-inline" style="opacity:0.85;max-width:11rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></small>
+          </a>
+        </li>
         <li class="nav-item" id="facebook_connect_nav_item" style="display:none">
           <a class="nav-link" data-toggle="modal" id="facebook_connect_modal_link" data-target="#facebook_connect_modal">
             <i class="fa fa-fw fa-plug"></i>Connect
@@ -268,6 +275,7 @@
   {% include "info_privacy.html" %}
   {% include "info_tos.html" %}
   {% include "help_contact.html" %}
+  {% include "sign_up.html" %}
   {% include "help_api.html" %}
 
   <footer class="sticky-footer" style="background-color:black; color: white;">
@@ -296,7 +304,7 @@
             </li>
           </ul>
 
-          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <button class="close" type="button" data-dismiss="modal" id="login_close_button" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
@@ -329,14 +337,13 @@
                     
                     <span id="password_login_modal_body_default">
                         <p>
-                            Login with your previously created account credentials if you would like to start contributing to the Guindex.
+                            Log in with your email and password if you would like to contribute to the Guindex.
                         </p>
 
                         <br>
 
                         <p>
-                            Please note that this option is only available to users who signed up for the first version of the Guindex.
-                            As a security measure, the Guindex now only offers sign up via Facebook. Support for authentication via other social apps will be added in due course.
+                            New accounts: open the <strong>Overview</strong> page and use <strong>Sign up with email</strong>, or continue with <strong>Login with Facebook</strong> on the other tab.
                         </p>
 
                         <br>

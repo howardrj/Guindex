@@ -12,34 +12,91 @@ function guindexParseJsonResponse(responseText) {
     }
 }
 
+/** HTML-escape plain text for safe insertion into modal HTML */
+function guindexEscapeHtml(s) {
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+/**
+ * Format DRF / dj-rest-auth validation payloads (strings, arrays, detail-only).
+ */
+function guindexFormatRestValidationErrors(response) {
+    if (response == null || typeof response !== 'object') {
+        return '<p>' + guindexEscapeHtml(String(response != null ? response : 'Unknown error')) + '</p>';
+    }
+    var keys = Object.keys(response);
+    if (keys.length === 0) {
+        return '<p>Unknown error.</p>';
+    }
+    var errorTable =
+        '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
+    errorTable += '<tr> <th> Field </th> <th> Error </th> </tr>';
+    keys.forEach(function (key) {
+        var val = response[key];
+        var cell;
+        if (val == null) {
+            cell = '';
+        } else if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+            cell = guindexEscapeHtml(String(val));
+        } else {
+            cell = guindexEscapeHtml(JSON.stringify(val));
+        }
+        errorTable += '<tr><td>' + guindexEscapeHtml(key) + '</td><td>' + cell + '</td></tr>';
+    });
+    errorTable += '</tbody></table>';
+    return '<p>Please fix the following error(s): </p>' + errorTable;
+}
+
+/** Never treat the literal strings "undefined" / "null" or blank as a valid display name */
+function guindexSanitizeDisplayName(v) {
+    if (v == null) {
+        return '';
+    }
+    var s = String(v).trim();
+    if (!s || s === 'undefined' || s === 'null') {
+        return '';
+    }
+    return s;
+}
+
+function guindexAuthStorageLooksValid() {
+    var u = guindexSanitizeDisplayName(localStorage.getItem('guindexUsername'));
+    var t = (localStorage.getItem('guindexAccessToken') || '').trim();
+    var id = (localStorage.getItem('guindexUserId') || '').trim();
+    var st = localStorage.getItem('guindexIsStaffMember');
+    if (!u || !t || !id || st == null) {
+        return false;
+    }
+    if (id === 'undefined' || id === 'null') {
+        return false;
+    }
+    return true;
+}
+
 /*********/
 /* Login */
 /*********/
 (function () {
 
-    if (localStorage.hasOwnProperty('guindexUsername') &&
-        localStorage.hasOwnProperty('guindexAccessToken') &&
-        localStorage.hasOwnProperty('guindexUserId') &&
-        localStorage.hasOwnProperty('guindexIsStaffMember'))
-    {
-        g_loggedIn      = true;
-        g_username      = localStorage.getItem('guindexUsername');
-        g_accessToken   = localStorage.getItem('guindexAccessToken');
-        g_userId        = localStorage.getItem('guindexUserId');
-        g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
-
-        onLoginSuccess();
-    }
-    else
-    {
-        // Remove login paremeters from local storage to be safe
+    if (!guindexAuthStorageLooksValid()) {
         localStorage.removeItem('guindexUsername');
         localStorage.removeItem('guindexAccessToken');
         localStorage.removeItem('guindexUserId');
         localStorage.removeItem('guindexIsStaffMember');
-
-        // Carry on as normal ...
+        return;
     }
+
+    g_loggedIn = true;
+    g_username = guindexSanitizeDisplayName(localStorage.getItem('guindexUsername'));
+    g_accessToken = localStorage.getItem('guindexAccessToken');
+    g_userId = localStorage.getItem('guindexUserId');
+    g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
+
+    onLoginSuccess();
 })();
 
 var g_passwordLoginBusy = false;
@@ -84,40 +141,36 @@ function submitPasswordLogin() {
             var response = parsed.data;
 
             if (request.status >= 200 && request.status < 300) {
-                localStorage.setItem('guindexUsername', response['username']);
+                var emailEl = document.getElementById('password_login_email');
+                var formEmail = emailEl ? emailEl.value.trim() : '';
+                var displayName =
+                    guindexSanitizeDisplayName(response['email']) ||
+                    guindexSanitizeDisplayName(response['username']) ||
+                    guindexSanitizeDisplayName(formEmail) ||
+                    'Account';
+                var staffRaw = response['isStaff'];
+                var isStaff =
+                    staffRaw === true ||
+                    staffRaw === 'True' ||
+                    staffRaw === 'true';
+
+                localStorage.setItem('guindexUsername', displayName);
                 localStorage.setItem('guindexAccessToken', response['key']);
-                localStorage.setItem('guindexUserId', response['user']);
                 localStorage.setItem(
-                    'guindexIsStaffMember',
-                    response['isStaff'] == 'True' ? true : false
+                    'guindexUserId',
+                    response['user'] != null ? String(response['user']) : ''
                 );
+                localStorage.setItem('guindexIsStaffMember', isStaff ? 'true' : 'false');
 
                 g_loggedIn = true;
-                g_username = localStorage.getItem('guindexUsername');
+                g_username = guindexSanitizeDisplayName(localStorage.getItem('guindexUsername'));
                 g_accessToken = localStorage.getItem('guindexAccessToken');
                 g_userId = localStorage.getItem('guindexUserId');
                 g_isStaffMember = localStorage.getItem('guindexIsStaffMember');
 
                 onLoginSuccess();
             } else {
-                var error_message =
-                    '<p>Please fix the following error(s): </p>';
-
-                var error_table =
-                    '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
-
-                error_table += '<tr> <th> Field </th> <th> Error </th> </tr>';
-
-                Object.keys(response).forEach(function (key) {
-                    error_table += '<tr>';
-                    error_table += '<td>' + key + '</td>';
-                    error_table += '<td>' + response[key] + '</td>';
-                    error_table += '</tr>';
-                });
-
-                error_table += '</tbody></table>';
-
-                displayMessage('Error', error_message + error_table);
+                displayMessage('Error', guindexFormatRestValidationErrors(response));
             }
         }
     };
@@ -146,9 +199,8 @@ function onLoginSuccess ()
         return;
     }
 
-    // Show pending contributions tab 
-    if (g_isStaffMember)
-    {
+    // Show pending contributions tab (localStorage stores string "true" / "false")
+    if (g_isStaffMember === 'true') {
         document.getElementById('pending_contributions_li').style.display = 'list-item';
     }
 
@@ -159,17 +211,40 @@ function onLoginSuccess ()
         page_contents[i].dispatchEvent(new Event('on_login'));
     }
 
-    // Set login status link to display username
+    // Set login status link to display username (navbar shows Log out when signed in)
     var login_link = document.getElementById('login_link');
     var logout_link = document.getElementById('logout_link');
     var logout_modal_username = document.getElementById('logout_modal_username');
 
-    login_link.style.display = 'none';
-    logout_link.innerHTML = g_username;
-    logout_link.style.display = 'inline';
-    logout_modal_username.innerHTML = g_username;
+    if (login_link) {
+        login_link.style.display = 'none';
+    }
+    if (logout_link) {
+        var logoutName = document.getElementById('logout_link_username');
+        var safeName = guindexSanitizeDisplayName(g_username);
+        if (logoutName) {
+            logoutName.textContent = safeName ? safeName : '';
+        }
+        logout_link.style.display = 'inline-flex';
+    }
+    if (logout_modal_username) {
+        logout_modal_username.textContent = guindexSanitizeDisplayName(g_username);
+    }
 
-    document.getElementById('login_close_button').click();
+    var loginClose = document.getElementById('login_close_button');
+    if (loginClose) {
+        loginClose.click();
+    } else {
+        $('#exampleModal').modal('hide');
+    }
+
+    var signedInLabel = guindexSanitizeDisplayName(g_username) || 'your account';
+    displayMessage(
+        'Signed in',
+        '<p>You are logged in as <strong>' +
+            guindexEscapeHtml(signedInLabel) +
+            '</strong>.</p>'
+    );
 }
 
 /**********/
@@ -228,27 +303,7 @@ $(document).on('click', '#password_signup_button', function () {
             }
             else
             {
-                // Display errors
-                var error_message = '<p>Please fix the following error(s): </p>'
-
-                var error_table = '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
-
-                error_table += '<tr> <th> Field </th> <th> Error </th> </tr>';
-
-                Object.keys(response).forEach(function(key) {
-
-                    error_table += '<tr>';
-
-                    error_table += '<td>' + key + '</td>';
-
-                    error_table += '<td>' + response[key] + '</td>';
-
-                    error_table += '</tr>';
-                });
-
-                error_table += '</tbody></table>';
-
-                displayMessage("Error", error_message + error_table);
+                displayMessage("Error", guindexFormatRestValidationErrors(response));
             }
         }
     }
@@ -312,27 +367,7 @@ $(document).on('click', '#forgot_password_button', function () {
             }
             else
             {
-                // Display errors
-                var error_message = '<p>Please fix the following error(s): </p>'
-
-                var error_table = '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
-
-                error_table += '<tr> <th> Field </th> <th> Error </th> </tr>';
-
-                Object.keys(response).forEach(function(key) {
-
-                    error_table += '<tr>';
-
-                    error_table += '<td>' + key + '</td>';
-
-                    error_table += '<td>' + response[key] + '</td>';
-
-                    error_table += '</tr>';
-                });
-
-                error_table += '</tbody></table>';
-
-                displayMessage("Error", error_message + error_table);
+                displayMessage("Error", guindexFormatRestValidationErrors(response));
             }
         }
     }
@@ -350,14 +385,45 @@ function onForgotPasswordSubmitSuccess ()
 /* Logout */
 /**********/
 
+/**
+ * Invalidate server token (POST rest-auth/logout/) then clear client and reload.
+ * @param {HTMLElement|null} buttonEl optional node for toggleLoader (e.g. modal Logout button)
+ */
+function guindexPerformLogout(buttonEl) {
+    var token = localStorage.getItem('guindexAccessToken');
+    if (!token) {
+        clearLocalStorage();
+        location.reload();
+        return;
+    }
+    if (buttonEl) {
+        toggleLoader(buttonEl);
+    }
+    var req = new XMLHttpRequest();
+    req.open('POST', G_API_BASE + 'rest-auth/logout/', true);
+    req.setRequestHeader('Authorization', 'Token ' + token);
+    req.setRequestHeader('Accept', 'application/json');
+    req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    req.send(null);
+    req.onreadystatechange = function () {
+        if (req.readyState !== 4) {
+            return;
+        }
+        if (buttonEl) {
+            toggleLoader(buttonEl);
+        }
+        clearLocalStorage();
+        location.reload();
+    };
+}
+
 $(document).on('click', '#logout_button', function () {
+    guindexPerformLogout(this);
+});
 
-    toggleLoader(this);
-
-    clearLocalStorage();
-
-    // Reload page (easiest thing to do here)
-    location.reload();
+$(document).on('click', '#logout_link', function (e) {
+    e.preventDefault();
+    guindexPerformLogout(null);
 });
 
 function clearLocalStorage ()

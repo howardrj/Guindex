@@ -52,6 +52,13 @@ Or: `DJANGO_DEBUG=1 python manage.py runserver`
 - With **`DJANGO_DEBUG=1`**, Django’s dev server serves static files from installed apps (e.g. `GuindexWebClient/static/`).
 - **`collectstatic`** copies into `STATIC_ROOT` (`GuindexProject/CDN/`). Use that when testing production-like static layout or nginx; it is not required for everyday `runserver` with `DJANGO_DEBUG=1`.
 
+### Production JavaScript (`DJANGO_DEBUG` unset / `DEBUG=False`)
+
+[`guindex_web_client.html`](GuindexProject/GuindexWebClient/templates/guindex_web_client.html) loads **`.min.js`** versions of several Guindex scripts (e.g. `guindex_login.min.js`, `guindex_tabs.min.js`, `guindex_main.min.js`, `guindex_web_client_utils.min.js`). When you change the non-minified `.js` sources, **sync or regenerate** the corresponding `.min.js` files before deploying without debug, or production will serve **stale** login/logout and tab behavior.
+
+- At minimum, after editing [`guindex_login.js`](GuindexProject/GuindexWebClient/static/javascript/guindex_login.js), update [`guindex_login.min.js`](GuindexProject/GuindexWebClient/static/javascript/guindex_login.min.js) (copy for parity, or run `npx terser` / your bundler for a true minified build).
+- The same applies to any other `guindex_*.min.js` files referenced in that template that your pipeline does not auto-generate.
+
 ## DataTables / API (smoke check)
 
 The pubs table loads from **`/api/pubs/?format=datatables`** (see `guindex_table.js`). If the table is empty or broken locally, check the browser Network tab for that request and run `python manage.py check`.

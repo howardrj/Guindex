@@ -382,6 +382,7 @@ AUTHENTICATION_BACKENDS = (
  "allauth.account.auth_backends.AuthenticationBackend",
 )
 
-REST_AUTH_SERIALIZERS = {
+# dj-rest-auth reads REST_AUTH (not REST_AUTH_SERIALIZERS) for TOKEN_SERIALIZER, etc.
+REST_AUTH = {
     'TOKEN_SERIALIZER': 'UserProfile.serializers.TokenSerializer',
 }

@@ -1,0 +1,56 @@
+{% load static %}
+
+{% if async_template_loading %}
+<div id="sign_up_page" class="page_content content-wrapper" style="display:none">
+</div>
+{% else %}
+<div id="sign_up_page" class="page_content content-wrapper" style="display:none">
+
+    {% if not debug %}
+    <script type="text/javascript" src="{% static "javascript/guindex_signup.min.js" %}"></script>
+    {% else %}
+    <script type="text/javascript" src="{% static "javascript/guindex_signup.js" %}"></script>
+    {% endif %}
+
+    <div class="container-fluid">
+        <div class="card card-register mx-auto mt-5">
+            <div class="card-header">
+                Sign up with email
+            </div>
+            <div class="card-body">
+                <p>
+                    Create a Guindex account with your email address and a password.
+                    If you have not contributed before, please read the
+                    <a class="page_content_link" data-content_page_id="info_faq_page" style="font-weight:bold">submissions FAQ</a>
+                    before submitting data.
+                </p>
+
+                <form id="sign_up_form" action="#" onsubmit="return false;">
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="sign_up_email">Email</label>
+                            <input class="form-control" id="sign_up_email" type="email" placeholder="Enter email" autocomplete="username" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="sign_up_password1">Password</label>
+                            <input class="form-control" id="sign_up_password1" type="password" placeholder="Choose a password" autocomplete="new-password" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="sign_up_password2">Confirm password</label>
+                            <input class="form-control" id="sign_up_password2" type="password" placeholder="Confirm password" autocomplete="new-password" required>
+                        </div>
+                    </div>
+                    <div class="card_footer" style="text-align:center">
+                        <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+                        <button type="submit" class="btn btn-primary" id="sign_up_submit_button">Create account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
