@@ -6,9 +6,9 @@ logger = logging.getLogger(__name__)
 
 class TelegramUserParameters:
 
-    ACTIVATION_KEY_LENGTH = 6
+    ACTIVATION_KEY_LENGTH = 32
     CHAT_ID_LENGTH        = 32
-    BOT_NAME              = "GuindexBot"
+    BOT_NAME              = "GuindexIEBot"
 
     @staticmethod
     def getParameters():

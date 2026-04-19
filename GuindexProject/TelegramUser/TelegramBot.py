@@ -2,6 +2,7 @@ import logging
 import urllib
 import requests
 import argparse
+import hashlib
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -39,7 +40,7 @@ class TelegramBot(Updater):
         self.addCommand('start', self.StartCommandHandler)
 
         # Add /help command handler
-        # self.addCommand('help', self.HelpCommandHandler)
+        #self.addCommand('help', self.HelpCommandHandler)
 
         # Add /settings command handler
         # self.addCommand('settings', self.SettingsCommandHandler)
@@ -57,16 +58,26 @@ class TelegramBot(Updater):
             Used by ProcessAlerts.py script.
             Make it static so we don't need TelegramBot object.
         """
-        message = urllib.quote_plus(text.encode('utf-8'))
 
-        url = "https://api.telegram.org/bot{}/".format(apiKey) + "sendMessage?text={}&chat_id={}".format(message, chatId)
+        # Ensure Python 2 unicode safety
+        if isinstance(text, unicode):
+            text = text.encode('utf-8')
 
-        # Send request
-        response = requests.get(url)
+        url = "https://api.telegram.org/bot{}/sendMessage".format(apiKey)
+
+        payload = {
+            "text": text,
+            "chat_id": chatId
+        }
+
+        response = requests.post(url, data=payload)
 
         if response.status_code != 200:
-            logger.error("Failed to send message to chat ID %s: RC = %d", chatId, response.status_code)
-            raise
+            logger.error(
+                "Failed to send message to chat ID %s: RC = %d",
+                chatId,
+                response.status_code
+            )
 
     def addCommand(self, commandName, commandHandler):
 
@@ -296,18 +307,29 @@ class TelegramBot(Updater):
                 self.errorMessage = "Unable to get Telegram Activation Key from parsed arguments"
                 raise
 
-            logger.debug("Attempting to find User with Telegram Activation Key %s", telegram_activation_key)
+            logger.debug("Attempting to find User with Telegram Activation Key Hash")
 
-            try:
-                telegram_user = TelegramUser.objects.get(activationKey = telegram_activation_key)
-            except ObjectDoesNotExist:
-                logger.error("No user existis with Telegram Activation Key %s", telegram_activation_key)
-                self.errorMessage = "No user exists with Telegram Activation Key %s" % telegram_activation_key
+            key_hash = hashlib.sha256(telegram_activation_key.encode('utf-8')).hexdigest()
+
+            qs = TelegramUser.objects.filter(activationKeyHash=key_hash)
+            telegram_user = qs[0] if qs else None 
+
+            # Fallback to using just activation key for backwards compatability
+            # if not telegram_user:
+            #
+            #    logger.debug("Attempting to find User with Telegram Activation Key")
+            #
+            #    qs = TelegramUser.objects.filter(activationKey=telegram_activation_key)
+            #    telegram_user = qs[0] if qs else None
+
+            if not telegram_user:
+                logger.error("No user exists with Telegram Activation Key")
+                self.errorMessage = "No user exists with Telegram Activation Key"
                 raise
 
             self.user = telegram_user.user
 
-            logger.debug("Successfully found User with Telegram Activation Key %s - %d", telegram_activation_key, self.user.id)
+            logger.debug("Successfully found User with Telegram Activation Key - %d", self.user.id)
 
         def onParseSuccess(self):
 
@@ -323,8 +345,8 @@ class TelegramBot(Updater):
 
             # Check activation keys match
             if not self.user.telegramuser.activationKey == telegram_activation_key:
-                logger.error("User %d: Activation keys do not match, %s : %s",
-                             self.user.id, self.usertelegramuser.activationKey, telegram_activation_key)
+                logger.error("User %d: Activation keys do not match",
+                             self.user.id)
                 self.errorMessage = "Incorrect activation key."
                 raise
 

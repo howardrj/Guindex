@@ -37,7 +37,6 @@
             <p> Here is your weekly Guindex activity update: </p>
 
             {% if new_prices|length %}
-                {% autoescape off %}
 
                 <h3> New Price Submissions </h3>
 
@@ -67,11 +66,9 @@
                     <br>
                 {% endfor %}
 
-                {% endautoescape %}
             {% endif %}
 
             {% if new_pubs|length %}
-                {% autoescape off %}
 
                 <h3> New Pub Submissions </h3>
 
@@ -101,13 +98,11 @@
                    <br>
                 {% endfor %}
 
-                {% endautoescape %}
             {% endif %}
 
             {% if user.is_staff %}
 
                 {% if new_pending_price_creates|length %}
-                    {% autoescape off %}
 
                     <h3> New Pending Price Submissions </h3>
 
@@ -145,11 +140,9 @@
                         <br>
                     {% endfor %}
 
-                    {% endautoescape %}
                 {% endif %}
 
                 {% if new_pending_pub_creates|length %}
-                    {% autoescape off %}
 
                     <h3> New Pending Pub Submissions </h3>
 
@@ -187,11 +180,9 @@
                         <br>
                     {% endfor %}
 
-                    {% endautoescape %}
                 {% endif %}
 
                 {% if new_pending_pub_patches|length %}
-                    {% autoescape off %}
 
                     <h3> New Pending Pub Changes </h3>
 
@@ -233,7 +224,6 @@
                         <br>
                     {% endfor %}
 
-                    {% endautoescape %}
                 {% endif %}
 
             {% endif %}

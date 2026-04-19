@@ -8,6 +8,8 @@ from django.conf import settings
 from TelegramUser.models import TelegramUser
 from TelegramUserParameters import TelegramUserParameters
 
+import hashlib
+
 logger = logging.getLogger(__name__)
 
 
@@ -17,9 +19,11 @@ def createNewTelegramUser(user):
 
     telegram_user = TelegramUser()
 
-    telegram_user.activationKey = generateActivationKey()
-    telegram_user.chatId        = generateChatId()
-    telegram_user.user          = user
+    telegram_user.activationKey     = generateActivationKey()
+    telegram_user.activationKeyHash = generateActivationKey()
+    telegram_user.activationKeyHash = hashlib.sha256(activation_key.encode('utf-8')).hexdigest()
+    telegram_user.chatId            = generateChatId()
+    telegram_user.user              = user
 
     telegram_user.save()
 
@@ -66,7 +70,7 @@ def generateActivationKey():
         except ObjectDoesNotExist:
             key_is_free = True
 
-    logger.info("Generated activation key %s", activation_key)
+    logger.info("Generated activation key")
 
     return activation_key
 

@@ -30,7 +30,7 @@ DEBUG = False
 # Enable timezone support
 USE_TZ = True
 
-ALLOWED_HOSTS = ['45.79.148.4', 'guindex.ie', 'www.guindex.ie', '127.0.0.1', '172.28.5.22', '172.28.4.152']
+ALLOWED_HOSTS = ['guindex.ie', 'www.guindex.ie' ]
 
 # Application definition
 
@@ -73,7 +73,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
 
 ROOT_URLCONF = 'GuindexProject.urls'
 

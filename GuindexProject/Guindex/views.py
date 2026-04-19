@@ -7,6 +7,7 @@ from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
+from rest_framework.throttling import SimpleRateThrottle
 
 from rest_framework_datatables.filters import DatatablesFilterBackend
 from Guindex.filters import GuindexDatatablesFilterBackend
@@ -160,10 +161,18 @@ class ContributorViewSet(viewsets.ModelViewSet):
 # Contact API Views #
 #####################
 
+class ContactThrottle(SimpleRateThrottle):
+    scope = "contact"
+    rate = "5/hour"  # adjust as needed
+
+    def get_cache_key(self, request, view):
+        return self.get_ident(request)
+
 class Contact(generics.CreateAPIView):
 
     serializer_class   = ContactSerializer
     permission_classes = (permissions.AllowAny, )
+    throttle_classes   = [ContactThrottle]
 
     def __init__(self, *args, **kwargs):
 
