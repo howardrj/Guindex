@@ -172,7 +172,9 @@ function onLoginSuccess ()
     login_link.style.display = 'none';
     logout_link.innerHTML = g_username;
     logout_link.style.display = 'inline';
-    logout_modal_username.innerHTML = g_username;
+    if (logout_modal_username) {
+        logout_modal_username.innerHTML = g_username;
+    }
 
     document.getElementById('login_close_button').click();
 }
@@ -182,11 +184,11 @@ function onLoginSuccess ()
 /**********/
 
 $(document).on('click', '#password_signup_button', function () {
-    
-    var username  = document.getElementById('password_signup_username').value;
     var email     = document.getElementById('password_signup_email').value;
     var password1 = document.getElementById('password_signup_password1').value;
     var password2 = document.getElementById('password_signup_password2').value;
+    // Backend serializer may still expect username in this legacy stack; derive from email.
+    var username = (email || '').trim();
 
     // Use REST API to login to guindex.ie
     var request = new XMLHttpRequest();
