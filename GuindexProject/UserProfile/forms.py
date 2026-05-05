@@ -9,7 +9,7 @@ import hashlib
 from allauth.account import app_settings as allauth_account_settings
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import default_token_generator
-from allauth.account.utils import filter_users_by_email, user_pk_to_url_str, user_username
+from allauth.account.utils import user_pk_to_url_str, user_username
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
 from rest_auth.forms import (
@@ -25,8 +25,22 @@ class GuindexPasswordResetForm(RestAuthAllAuthPasswordResetForm):
     def clean_email(self):
         email = self.cleaned_data["email"]
         email = get_adapter().clean_email(email)
-        self.users = filter_users_by_email(email, is_active=True, prefer_verified=True)
+        self.users = self._filter_users_for_reset(email)
         return self.cleaned_data["email"]
+
+    @staticmethod
+    def _filter_users_for_reset(email):
+        """
+        Support old/new allauth function signatures.
+        """
+        from allauth.account.utils import filter_users_by_email
+        try:
+            return filter_users_by_email(email, is_active=True, prefer_verified=True)
+        except TypeError:
+            try:
+                return filter_users_by_email(email, is_active=True)
+            except TypeError:
+                return filter_users_by_email(email)
 
     @staticmethod
     def _cache_keys(email):

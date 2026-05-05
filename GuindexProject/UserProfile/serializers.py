@@ -1,10 +1,10 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from allauth.account.adapter import get_adapter
-from allauth.account.utils import filter_users_by_email
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import PasswordResetSerializer
 
@@ -27,11 +27,29 @@ class GuindexRegisterSerializer(RegisterSerializer):
 
     def validate_email(self, value):
         email = get_adapter().clean_email(value)
-        if email and filter_users_by_email(email, is_active=None):
+        if email and self._users_for_email(email):
             raise serializers.ValidationError(
                 _('A user is already registered with this e-mail address.')
             )
         return email
+
+    def _users_for_email(self, email):
+        """
+        Compatible lookup across old/new allauth versions.
+        """
+        try:
+            from allauth.account.utils import filter_users_by_email
+            try:
+                return filter_users_by_email(email, is_active=None)
+            except TypeError:
+                # Older signature without is_active.
+                return filter_users_by_email(email)
+        except Exception:
+            User = get_user_model()
+            try:
+                return list(User.objects.filter(email__iexact=email))
+            except Exception:
+                return list(User.objects.filter(email=email))
 
 
 class GuindexPasswordResetSerializer(PasswordResetSerializer):
