@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 
 from django.shortcuts import render
-from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 
 from Guindex.GuindexParameters import GuindexParameters
 from GuindexWebClient.map_view_function import create_guindex_map
+from GuindexWebClient.spa_utils import web_client_template_context
 
 logger = logging.getLogger(__name__)
 
@@ -22,16 +23,15 @@ def guindexWebClient(request):
 
     logger.info("Received Guindex web client request from user %s", request.user)
 
-    context_dict = {
-        'google_maps_api_key'   : settings.GOOGLE_MAPS_API_KEY,
-        'google_analytics_key'  : settings.GOOGLE_ANALYTICS_KEY,
-        'facebook_app_id'       : settings.FACEBOOK_APP_ID,
-        'guindex_counties'      : GuindexParameters.SUPPORTED_COUNTIES,
-        'debug'                 : True,
-        'async_template_loading': True,
-    }
+    return render(request, 'guindex_web_client.html', web_client_template_context(request))
 
-    return render(request, 'guindex_web_client.html', context_dict)
+
+def password_reset_confirm_page(request, uid, token):
+    logger.info("Password reset confirm page for uid prefix=%s", (uid or "")[:8])
+    ctx = web_client_template_context(request)
+    ctx["uid_json"] = json.dumps(uid)
+    ctx["token_json"] = json.dumps(token)
+    return render(request, 'password_reset_confirm_standalone.html', ctx)
 
 
 def guindexWebClientWithTemplate(request, template):
@@ -49,28 +49,17 @@ def guindexWebClientWithTemplate(request, template):
     if template == 'guindex_map' or template == "new_guindex_map":
         return rendered_template
 
-    context_dict = {
-        'google_maps_api_key'   : settings.GOOGLE_MAPS_API_KEY,
-        'google_analytics_key'  : settings.GOOGLE_ANALYTICS_KEY,
-        'facebook_app_id'       : settings.FACEBOOK_APP_ID,
-        'guindex_counties'      : GuindexParameters.SUPPORTED_COUNTIES,
-        'debug'                 : True,
-        'async_template_loading': True,
-    }
-
-    return render(request, 'guindex_web_client.html', context_dict)
+    return render(request, 'guindex_web_client.html', web_client_template_context(request))
 
 
 def asyncLoadTemplate(request, template):
 
     logger.info("Received async load template for template %s request from user %s", template, request.user)
 
-    context_dict = {
-        'google_maps_api_key'   : settings.GOOGLE_MAPS_API_KEY,
-        'guindex_counties'      : GuindexParameters.SUPPORTED_COUNTIES,
-        'debug'                 : True,
-        'async_template_loading': False,
-    }
+    context_dict = web_client_template_context(
+        request,
+        extra={'async_template_loading': False},
+    )
 
 #    if template == "map":
  #       folium_map = create_guindex_map()

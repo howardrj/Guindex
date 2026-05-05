@@ -1,7 +1,5 @@
 (function () {
 
-    console.log("Here");
-
     var page_content_divs = document.getElementsByClassName('page_content');
     var g_firstPage = true;
 

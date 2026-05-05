@@ -5,6 +5,11 @@ from GuindexWebClient import views
 urlpatterns = [
     url(r'^faq\/?$', views.faq),
     url(r'^async_load/(?P<template>.+)$', views.asyncLoadTemplate),
+    url(
+        r'^password/reset/confirm/(?P<uid>[^/]+)/(?P<token>[^/]+)/$',
+        views.password_reset_confirm_page,
+        name='password_reset_confirm',
+    ),
     url(r'^$', views.guindexWebClient),
     url(r'^(?P<template>.+)$', views.guindexWebClientWithTemplate),
     url(r'^social_sigup/$', views.guindexWebClient, name = 'socialaccount_signup'),

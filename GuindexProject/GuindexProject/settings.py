@@ -307,8 +307,11 @@ REST_FRAMEWORK = {
     }
 }
 
-# Allauth settings
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+# Allauth settings (email sign-up + account activation)
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'
+ACCOUNT_UNIQUE_EMAIL = True
 
 # Telegram API
 BOT_HTTP_API_TOKEN = secrets.BOT_HTTP_API_TOKEN
@@ -331,6 +334,7 @@ GOOGLE_ANALYTICS_KEY = secrets.GOOGLE_ANALYTICS_KEY
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True   
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_ADAPTER = 'GuindexWebClient.adapters.GuindexAccountAdapter'
 
 AUTHENTICATION_BACKENDS = (
  # Needed to login by username in Django admin, regardless of `allauth`
@@ -342,4 +346,9 @@ AUTHENTICATION_BACKENDS = (
 
 REST_AUTH_SERIALIZERS = {
     'TOKEN_SERIALIZER': 'UserProfile.serializers.TokenSerializer',
+    'PASSWORD_RESET_SERIALIZER': 'UserProfile.serializers.GuindexPasswordResetSerializer',
+}
+
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'UserProfile.serializers.GuindexRegisterSerializer',
 }

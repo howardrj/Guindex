@@ -133,6 +133,11 @@ $(document).on('click', '#password_login_button', function (e) {
     submitPasswordLogin();
 });
 
+$(document).on('click', '#password_login_forgot_toggle', function (e) {
+    e.preventDefault();
+    $('#password_login_forgot_section').toggle();
+});
+
 function onLoginSuccess ()
 {
     if (document.readyState != "complete")
@@ -258,44 +263,77 @@ function onSignupSuccess ()
 {
     document.getElementById('login_close_button').click();
 
-    displayMessage('Account Verificatiom Email Sent', 
-                   "Please check your email and verify your account before logging in");
+    displayMessage(
+        'Verification email sent',
+        '<p>Please check your email and verify your account before logging in.</p>'
+    );
 }
 
 /*******************/
 /* Forgot Password */
 /*******************/
 
-$(document).on('click', '#forgot_password_button', function () {
-    
-    var email = document.getElementById('forgot_password_email').value;
+$(document).off('click.guindexForgotPassword', '#forgot_password_button').on(
+    'click.guindexForgotPassword',
+    '#forgot_password_button',
+    function () {
+        var emailEl = document.getElementById('forgot_password_email');
+        var email = emailEl ? emailEl.value.trim() : '';
+        var fbClear = document.getElementById('forgot_password_feedback');
+        if (fbClear) {
+            fbClear.style.display = 'none';
+            fbClear.textContent = '';
+            fbClear.className = 'small mt-2 mb-0';
+        }
+        if (!email) {
+            var fb = document.getElementById('forgot_password_feedback');
+            if (fb) {
+                fb.style.display = 'block';
+                fb.className = 'small mt-2 mb-0 text-danger';
+                fb.textContent = 'Please enter your email address.';
+            }
+            return;
+        }
 
-    // Use REST API to login to guindex.ie
-    var request = new XMLHttpRequest();
+        if (window.__guindexForgotPasswordPending) {
+            return;
+        }
+        window.__guindexForgotPasswordPending = true;
 
-    request.open('POST', G_API_BASE + 'rest-auth/password/reset/', true);
+        var request = new XMLHttpRequest();
+        request.open('POST', G_API_BASE + 'rest-auth/password/reset/', true);
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('Accept', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.setRequestHeader('Accept', 'application/json');
-    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        var forgot_password_data = {
+            'email': email
+        };
 
-    var forgot_password_data = {
-        'email': email,
-    }
+        var button = this;
+        button.disabled = true;
+        request.send(JSON.stringify(forgot_password_data));
+        toggleLoader(button);
 
-    request.send(JSON.stringify(forgot_password_data));
-
-    var button = this;
-    toggleLoader(button);
-
-    request.onreadystatechange = function processRequest()
-    {
-        if (request.readyState == 4)
+        request.onreadystatechange = function processRequest()
         {
+            if (request.readyState !== 4) {
+                return;
+            }
+
+            window.__guindexForgotPasswordPending = false;
+            button.disabled = false;
             toggleLoader(button);
 
             var parsed = guindexParseJsonResponse(request.responseText);
             if (!parsed.ok) {
+                var fbErr = document.getElementById('forgot_password_feedback');
+                if (fbErr) {
+                    fbErr.style.display = 'block';
+                    fbErr.className = 'small mt-2 mb-0 text-danger';
+                    fbErr.textContent =
+                        'Something went wrong (HTTP ' + request.status + '). Try again later.';
+                }
                 displayMessage(
                     "Error",
                     "<p>Password reset request failed: the server did not return JSON (HTTP " +
@@ -312,38 +350,40 @@ $(document).on('click', '#forgot_password_button', function () {
             }
             else
             {
-                // Display errors
-                var error_message = '<p>Please fix the following error(s): </p>'
-
-                var error_table = '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
-
-                error_table += '<tr> <th> Field </th> <th> Error </th> </tr>';
-
-                Object.keys(response).forEach(function(key) {
-
-                    error_table += '<tr>';
-
-                    error_table += '<td>' + key + '</td>';
-
-                    error_table += '<td>' + response[key] + '</td>';
-
-                    error_table += '</tr>';
-                });
-
-                error_table += '</tbody></table>';
-
-                displayMessage("Error", error_message + error_table);
+                displayMessage("Error", guindexFormatRestValidationErrors(response));
+                var fbBad = document.getElementById('forgot_password_feedback');
+                if (fbBad) {
+                    fbBad.style.display = 'block';
+                    fbBad.className = 'small mt-2 mb-0 text-danger';
+                    fbBad.textContent = 'Could not send reset email. See the message above.';
+                }
             }
-        }
+        };
     }
-});
+);
 
 function onForgotPasswordSubmitSuccess ()
 {
-    document.getElementById('login_close_button').click();
+    var fb = document.getElementById('forgot_password_feedback');
+    if (fb) {
+        fb.style.display = 'block';
+        fb.className = 'small mt-2 mb-0 text-success';
+        fb.innerHTML =
+            '<strong>Check your email.</strong> If an account exists for that address, we sent a link to choose a new password. ' +
+            'Also check your spam folder. You can close this window when you are done.';
+    }
 
-    displayMessage('Password Reset Sent', 
-                   "Please check your email to reset your password");
+    displayMessage(
+        'Password reset',
+        '<p>If that email is registered with Guindex, we sent a reset link. Check your inbox and spam folder.</p>'
+    );
+
+    setTimeout(function () {
+        var closeBtn = document.getElementById('login_close_button');
+        if (closeBtn) {
+            closeBtn.click();
+        }
+    }, 2500);
 }
 
 /**********/

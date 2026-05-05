@@ -16,6 +16,9 @@ urlpatterns = []
 # Append django admin url
 urlpatterns.append(url(r'^admin/', admin.site.urls))
 
+# allauth named routes (used by confirm-email/login redirects)
+urlpatterns.append(url(r'^accounts/', include('allauth.account.urls')))
+
 # Append UserProfile views
 urlpatterns.extend(UserProfileUrls.urlpatterns)
 
