@@ -16,6 +16,10 @@ urlpatterns = []
 # Append django admin url
 urlpatterns.append(re_path(r'^admin/', admin.site.urls))
 
+# django-allauth named routes (e.g. account_login) — used after email confirmation
+# and by adapters. SPA still uses /api/rest-auth/* for API login.
+urlpatterns.append(re_path(r'^accounts/', include('allauth.account.urls')))
+
 # Append UserProfile views
 urlpatterns.extend(UserProfileUrls.urlpatterns)
 

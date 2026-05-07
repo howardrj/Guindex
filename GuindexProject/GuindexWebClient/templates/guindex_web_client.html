@@ -362,6 +362,21 @@
                                 </div>
                             </div>
                         </form>
+
+                        <p class="mb-0">
+                            <a href="#" id="password_login_forgot_toggle">Forgot password?</a>
+                        </p>
+                        <div id="password_login_forgot_section" style="display:none; margin-top:10px;">
+                            <p class="small text-muted mb-2">
+                                Enter the email for your Guindex account. We will send a link to choose a new password.
+                            </p>
+                            <div class="form-group">
+                                <label for="forgot_password_email">Email</label>
+                                <input class="form-control" id="forgot_password_email" type="email" placeholder="Your account email" autocomplete="email">
+                            </div>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="forgot_password_button">Send reset link</button>
+                            <p id="forgot_password_feedback" class="small mt-2 mb-0" style="display:none;" aria-live="polite"></p>
+                        </div>
                     </span>
                     <span id="password_login_modal_body_logged_in_this_way" style="display:none">
                         You are currently logged in as <span id="password_login_username"></span>.

@@ -1,7 +1,5 @@
 (function () {
 
-    console.log("Here");
-
     var page_content_divs = document.getElementsByClassName('page_content');
     var g_firstPage = true;
 
@@ -114,7 +112,6 @@
         }
     }
 
-    // Call it once at startup
     onUrlChange();
 
     // Callback invoked each time we step through history

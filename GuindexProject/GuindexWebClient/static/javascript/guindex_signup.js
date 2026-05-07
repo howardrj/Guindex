@@ -59,11 +59,20 @@ function submitSignUp() {
         var response = parsed.data;
 
         if (request.status >= 200 && request.status < 300) {
-            displayMessage(
-                'Account created',
-                '<p>Your account is ready. Use <strong>Login</strong> in the menu, choose ' +
-                    '<strong>Login with Password</strong>, and sign in with this email and password.</p>'
-            );
+            var hasToken = response && response.key;
+            if (hasToken) {
+                displayMessage(
+                    'Account created',
+                    '<p>Your account is ready. Use <strong>Login</strong> in the menu, choose ' +
+                        '<strong>Login with Password</strong>, and sign in with this email and password.</p>'
+                );
+            } else {
+                displayMessage(
+                    'Check your email',
+                    '<p>We sent a verification link to your address. Open it to activate your account, ' +
+                        'then use <strong>Login with Password</strong>.</p>'
+                );
+            }
             document.getElementById('sign_up_email').value = '';
             document.getElementById('sign_up_password1').value = '';
             document.getElementById('sign_up_password2').value = '';

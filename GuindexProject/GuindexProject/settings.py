@@ -350,8 +350,13 @@ REST_FRAMEWORK = {
     }
 }
 
-# Allauth settings
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+# Allauth settings (email sign-up + dj-rest-auth registration)
+# mandatory: users cannot log in until they confirm the verification link in email.
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# One-click confirm from the link in the email (GET runs confirmation).
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+# After confirming email (anonymous user), send them to the SPA instead of /accounts/login/.
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'
 
 # Telegram API
 BOT_HTTP_API_TOKEN = secrets.BOT_HTTP_API_TOKEN
@@ -373,6 +378,7 @@ GOOGLE_ANALYTICS_KEY = secrets.GOOGLE_ANALYTICS_KEY
 # django-allauth 65+ (replaces ACCOUNT_AUTHENTICATION_METHOD / *_EMAIL_REQUIRED / *_USERNAME_REQUIRED)
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_ADAPTER = 'GuindexWebClient.adapters.GuindexAccountAdapter'
 
 AUTHENTICATION_BACKENDS = (
  # Needed to login by username in Django admin, regardless of `allauth`
@@ -385,4 +391,10 @@ AUTHENTICATION_BACKENDS = (
 # dj-rest-auth reads REST_AUTH (not REST_AUTH_SERIALIZERS) for TOKEN_SERIALIZER, etc.
 REST_AUTH = {
     'TOKEN_SERIALIZER': 'UserProfile.serializers.TokenSerializer',
+    'REGISTER_SERIALIZER': 'UserProfile.serializers.GuindexRegisterSerializer',
+    'PASSWORD_RESET_SERIALIZER': 'UserProfile.serializers.GuindexPasswordResetSerializer',
+    'PASSWORD_RESET_USE_SITES_DOMAIN': False,
 }
+
+# allauth default is True; set explicitly so signup + EmailAddress stay aligned.
+ACCOUNT_UNIQUE_EMAIL = True
