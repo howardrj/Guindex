@@ -15,6 +15,7 @@ from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
 from Guindex.models import Guinness, GuinnessPendingCreate
 from Guindex.models import StatisticsSingleton
 from Guindex.GuindexParameters import GuindexParameters
+from TelegramUser.TelegramUserParameters import TelegramUserParameters
 
 logger = logging.getLogger(__name__)
 
@@ -488,14 +489,32 @@ class ContributorSerializer(serializers.ModelSerializer):
                                                   read_only = True,
                                                   source = 'telegramuser.activationKey')
 
+    telegramBotUsername = serializers.SerializerMethodField(
+        help_text = 'Telegram bot username (@handle) for activation.',
+        read_only = True,
+    )
+
+    telegramBotLink = serializers.SerializerMethodField(
+        help_text = 'Telegram deep link (t.me) for the Guindex bot.',
+        read_only = True,
+    )
+
     class Meta:
         model = User
         fields = ('id', 'username', 'is_staff', 'pubsVisited', 'originalPrices',
                   'currentVerifications', 'countyBadges', 'usingEmailAlerts', 'usingTelegramAlerts',
-                  'telegramActivated', 'telegramActivationKey', 'isDeveloper')
+                  'telegramActivated', 'telegramActivationKey', 'telegramBotUsername', 'telegramBotLink',
+                  'isDeveloper')
         # Can only patch alert settings
         read_only_fields = ('id', 'username', 'is_staff', 'pubsVisited', 'originalPrices',
-                            'currentVerifications', 'countyBadges', 'telegramActivated', 'telegramActivationKey')
+                            'currentVerifications', 'countyBadges', 'telegramActivated', 'telegramActivationKey',
+                            'telegramBotUsername', 'telegramBotLink')
+
+    def get_telegramBotUsername(self, obj):
+        return TelegramUserParameters.BOT_NAME
+
+    def get_telegramBotLink(self, obj):
+        return TelegramUserParameters.TELEGRAM_BOT_LINK
 
     def get_countyBadges(self, obj):
         """

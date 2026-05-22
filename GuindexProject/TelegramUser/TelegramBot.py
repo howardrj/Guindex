@@ -266,12 +266,17 @@ class TelegramBot(Updater):
 
         def getSuccessMessage(self):
 
-            # TODO Get this from config file
-            start_message = ("Hello! I'm the %s. To begin receiving alerts and "
-                             "contributing to the Guindex please activate your account.\n"
-                             "To do this send the command '/activate <username> <telegram_activation_key>'. "
-                             "Your Telegram activation key was sent to you in a previous email when you first logged in.\n"
-                             "For a list of futher commands send /help. Happy Gargling!" % TelegramUserParameters.BOT_NAME)
+            start_message = (
+                "Hello! I'm %s. To receive Guindex alerts via Telegram, activate your account.\n"
+                "Open %s or search for @%s in Telegram, then send:\n"
+                "/activate <your_activation_key>\n"
+                "Your activation key is in the User Settings tab on the Guindex website."
+                % (
+                    TelegramUserParameters.BOT_NAME,
+                    TelegramUserParameters.TELEGRAM_BOT_LINK,
+                    TelegramUserParameters.BOT_NAME,
+                )
+            )
 
             return start_message
 
@@ -296,7 +301,7 @@ class TelegramBot(Updater):
 
         def findUser(self):
             """
-                Find User using username parsed from /activate command.
+                Find User using activation key parsed from /activate command.
                 Only command that needs to overwrite this.
             """
 

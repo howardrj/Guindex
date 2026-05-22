@@ -17,14 +17,14 @@
 
             <p> {{ project_title }} offers the feature of interaction via Telegram. </p>
 
-            <p> To register to use Telegram, follow the below steps: </p>
+            <p> To use Telegram with {{ project_title }}, follow the steps below. Your activation key is also shown in User Settings on the website. </p>
 
             <ol>
-                <li> Add {{ telegram_user_parameters.BOT_NAME }} to your Telegram contacts </li>
-                <li> Send the following command in a message to {{ telegram_user_parameters.BOT_NAME }}:
-                    /activate {{ username }} {{ telegram_activation_key }} 
+                <li> Open <a href="{{ telegram_user_parameters.TELEGRAM_BOT_LINK }}">{{ telegram_user_parameters.TELEGRAM_BOT_LINK }}</a> or search for @{{ telegram_user_parameters.BOT_NAME }} in Telegram </li>
+                <li> Send this command to {{ telegram_user_parameters.BOT_NAME }}:
+                    /activate {{ telegram_activation_key }}
                 </li>
-                <li> Confirm that you get a response from the {{ telegram_user_parameters.BOT_NAME }} verifying the activation was successful. </li>
+                <li> Confirm you receive a success message from {{ telegram_user_parameters.BOT_NAME }} </li>
             </ol>
             
             <p> Regards, </p>

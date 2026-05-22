@@ -79,8 +79,10 @@ function populateUserSettingsTable ()
 
     if (!g_userSettings['telegramActivated'])
     {
-        telegram_description += " To activate your Telegram account, please add the GuindexBot as a contact using" +
-                                " the Telegram app and send: /activate " + g_userSettings['telegramActivationKey'] + '.';
+        var botName = g_userSettings['telegramBotUsername'] || 'GuindexIEBot';
+        var botLink = g_userSettings['telegramBotLink'] || 'https://t.me/GuindexIEBot';
+        telegram_description += ' To activate, open ' + botLink + ' (or search for @' + botName +
+                                ' in Telegram) and send: /activate ' + g_userSettings['telegramActivationKey'] + '.';
     }
 
     suffix = '<div id="telegram_alerts_toggler_div" class="slider round"> </div></label>';

@@ -9,6 +9,7 @@ class TelegramUserParameters:
     ACTIVATION_KEY_LENGTH = 32
     CHAT_ID_LENGTH        = 32
     BOT_NAME              = "GuindexIEBot"
+    TELEGRAM_BOT_LINK     = "https://t.me/GuindexIEBot"
 
     @staticmethod
     def getParameters():
