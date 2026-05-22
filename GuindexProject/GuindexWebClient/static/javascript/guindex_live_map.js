@@ -102,22 +102,48 @@
         return url;
     }
 
+    function getQueryParam(name) {
+        var search = window.location.search || '';
+        var pattern = new RegExp('[?&]' + name + '=([^&]*)');
+        var match = pattern.exec(search);
+
+        if (!match) {
+            return '';
+        }
+
+        try {
+            return decodeURIComponent(match[1].replace(/\+/g, ' '));
+        } catch (e) {
+            return match[1];
+        }
+    }
+
+    function isLoadAllFromUrl() {
+        return getQueryParam('load') === 'all';
+    }
+
+    function getCountyFromUrl() {
+        return (getQueryParam('county') || '').trim();
+    }
+
     function resolveInitialCounty() {
         if (config.initialCounty) {
             return config.initialCounty;
         }
 
-        try {
-            var county = new URLSearchParams(window.location.search).get('county') || '';
+        return getCountyFromUrl();
+    }
 
-            if (county && config.countyViewports && config.countyViewports[county]) {
-                return county;
-            }
-        } catch (e) {
-            // Ignore URL parse errors.
+    function shouldAutoLoadPubs() {
+        if (config.loadOnStart) {
+            return true;
         }
 
-        return '';
+        if (isLoadAllFromUrl()) {
+            return true;
+        }
+
+        return !!getCountyFromUrl();
     }
 
     function parsePage(responseText) {
@@ -361,8 +387,8 @@
 
         initMap();
 
-        if (config.loadOnStart) {
-            loadPubsForCounty(resolveInitialCounty());
+        if (shouldAutoLoadPubs()) {
+            loadPubsForCounty(isLoadAllFromUrl() ? '' : resolveInitialCounty());
         } else {
             setStatus('Select a county to view pubs on the map.');
         }
