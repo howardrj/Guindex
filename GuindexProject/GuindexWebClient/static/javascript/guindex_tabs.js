@@ -2,6 +2,38 @@
 
     console.log("Here");
 
+    if (typeof window.guindexLoadMapIframeForCounty !== 'function') {
+        window.guindexLoadMapIframeForCounty = function (value) {
+            var iframe = document.getElementById('guindex_map_iframe');
+            var placeholder = document.getElementById('map_iframe_placeholder');
+            var base = (typeof G_URL_BASE !== 'undefined') ? G_URL_BASE : (location.protocol + '//' + location.host);
+
+            if (!iframe) {
+                console.error('Guindex map: #guindex_map_iframe not found');
+                return;
+            }
+
+            if (!value) {
+                iframe.removeAttribute('src');
+                iframe.style.display = 'none';
+                if (placeholder) {
+                    placeholder.style.display = 'block';
+                }
+                return;
+            }
+
+            var mapUrl = base + '/live_guindex_map/';
+            mapUrl += (value === '__all__') ? '?load=all' : ('?county=' + encodeURIComponent(value));
+
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+
+            iframe.style.display = 'block';
+            iframe.src = mapUrl;
+        };
+    }
+
     var page_content_divs = document.getElementsByClassName('page_content');
     var g_firstPage = true;
 
@@ -69,23 +101,65 @@
         {
             if (request.readyState == 4 && request.status == 200)
             {
-                var html = new DOMParser().parseFromString(request.responseText, 'text/html').body.firstChild;
-
-                // Update page content
-                page_content.innerHTML = "";
-
-                $('#' + page_content_id).append(html.innerHTML);
-
+                injectAsyncPageContent(page_content, request.responseText);
                 onTabLoad(page_content);
             }
         }
     });
 
+    function injectAsyncPageContent(page_content, responseText)
+    {
+        var doc = new DOMParser().parseFromString(responseText, 'text/html');
+        var loaded = doc.getElementById(page_content.id);
+
+        page_content.innerHTML = '';
+
+        if (loaded) {
+            page_content.innerHTML = loaded.innerHTML;
+        } else if (doc.body) {
+            page_content.innerHTML = doc.body.innerHTML;
+        } else {
+            page_content.innerHTML = responseText;
+        }
+    }
+
+    function guindexOnMapTabReady() {
+        if (typeof window.guindexBindMapCountySelect === 'function') {
+            window.guindexBindMapCountySelect();
+        }
+
+        if (typeof window.guindexMapOnTabLoaded === 'function') {
+            window.guindexMapOnTabLoaded();
+        }
+    }
+
     function onTabLoad(tabContent)
     {
         tabContent.setAttribute('data-content_loaded', '1');
+
+        if (tabContent.id === 'map_page') {
+            guindexOnMapTabReady();
+        }
+
         tabContent.dispatchEvent(new Event('tab_display'));
     }
+
+    document.addEventListener('tab_display', function (evt) {
+        if (evt.target && evt.target.id === 'map_page')
+        {
+            guindexOnMapTabReady();
+
+            if (typeof window.guindexNotifyMapIframeResize === 'function')
+            {
+                var iframe = document.getElementById('guindex_map_iframe');
+                if (iframe && iframe.getAttribute('src'))
+                {
+                    window.setTimeout(window.guindexNotifyMapIframeResize, 100);
+                    window.setTimeout(window.guindexNotifyMapIframeResize, 500);
+                }
+            }
+        }
+    }, true);
 
     function onUrlChange()
     {
@@ -132,7 +206,12 @@
         }
 
         // Display corresponding page content
-        document.getElementById(page_content_id).style.display = 'block';
+        var page_content = document.getElementById(page_content_id);
+        page_content.style.display = 'block';
+
+        if (page_content_id === 'map_page') {
+            guindexOnMapTabReady();
+        }
     };
 
 })();

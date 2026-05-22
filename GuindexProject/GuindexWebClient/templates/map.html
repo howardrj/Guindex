@@ -5,6 +5,19 @@
 </div>
 {% else %}
 <div id="map_page" class="page_content content-wrapper" style="display:none">
-   <iframe src="/new_guindex_map" id="guindex_map_iframe" loading="lazy"></iframe> 
+    <div id="map_toolbar">
+        <label for="map_county_select">County</label>
+        <select id="map_county_select" class="form-control form-control-sm" onchange="if(window.guindexLoadMapIframeForCounty){window.guindexLoadMapIframeForCounty(this.value);}">
+            <option value="" selected>Select a county...</option>
+            <option value="__all__">All</option>
+            {% for county in guindex_counties %}
+            <option value="{{ county }}">{{ county }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div id="map_iframe_container">
+        <p id="map_iframe_placeholder">Select a county to view pubs on the map.</p>
+        <iframe id="guindex_map_iframe" title="Guindex map" style="display:none"></iframe>
+    </div>
 </div>
 {% endif %}
