@@ -2,9 +2,10 @@
 
     var config = window.GUINDEX_MAP_CONFIG || {};
     var MAP_PAGE_SIZE = 250;
+    var MAP_ALL_VALUE = '__all__';
     var map = null;
-    var statusEl = document.getElementById('map_status');
-    var countySelectEl = document.getElementById('map_county_select');
+    var statusEl = null;
+    var countySelectEl = null;
     var iconCache = {};
     var activeClusterLayer = null;
     var loadGeneration = 0;
@@ -32,15 +33,29 @@
 
     window.guindexMapInvalidateSize = refreshMapSize;
 
-    function markerIcon(color) {
-        if (!iconCache[color]) {
-            iconCache[color] = L.divIcon({
-                className: 'guindex-map-marker guindex-map-marker-' + color,
-                iconSize: [14, 14],
-                iconAnchor: [7, 7]
-            });
+    function markerIcon(color, iconName) {
+        var cacheKey = color + ':' + (iconName || '');
+
+        if (!iconCache[cacheKey]) {
+            if (typeof L.AwesomeMarkers === 'undefined') {
+                console.error('Guindex map: Leaflet.AwesomeMarkers is not loaded');
+                iconCache[cacheKey] = L.divIcon({
+                    className: 'guindex-map-fallback-icon',
+                    iconSize: [12, 12],
+                    iconAnchor: [6, 6]
+                });
+            } else {
+                iconCache[cacheKey] = L.AwesomeMarkers.icon({
+                    icon: iconName || 'beer',
+                    markerColor: color || 'lightgray',
+                    prefix: 'fa',
+                    iconColor: 'white',
+                    extraClasses: 'fa-rotate-0'
+                });
+            }
         }
-        return iconCache[color];
+
+        return iconCache[cacheKey];
     }
 
     function getCountyViewport(county) {
@@ -121,7 +136,6 @@
         var lat;
         var lng;
         var color;
-        var label;
         var marker;
 
         for (i = 0; i < pubs.length; i++) {
@@ -133,13 +147,19 @@
                 continue;
             }
 
-            color = pub.markerColor || 'darkgray';
-            label = pub.label || 'Pub';
+            color = pub.markerColor || 'lightgray';
             marker = L.marker([lat, lng], {
-                icon: markerIcon(color),
-                title: label
+                icon: markerIcon(color, pub.markerIcon),
+                title: pub.name || 'Pub'
             });
-            marker.bindPopup(label);
+
+            if (pub.popupHtml) {
+                marker.bindPopup(
+                    '<div class="guindex-map-popup">' + pub.popupHtml + '</div>',
+                    { maxWidth: 280 }
+                );
+            }
+
             markers.push(marker);
         }
 
@@ -310,18 +330,42 @@
     }
 
     function onCountyChange() {
-        var county = countySelectEl ? countySelectEl.value : '';
-        loadPubsForCounty(county);
+        if (!countySelectEl) {
+            return;
+        }
+
+        var value = countySelectEl.value;
+
+        if (!value) {
+            loadGeneration += 1;
+            clearMarkers();
+            map.setView([config.centerLat, config.centerLng], config.zoom);
+            setStatus('Select a county to view pubs on the map.');
+            refreshMapSize();
+            return;
+        }
+
+        if (value === MAP_ALL_VALUE) {
+            loadPubsForCounty('');
+            return;
+        }
+
+        loadPubsForCounty(value);
     }
 
     function startMap() {
+        statusEl = document.getElementById('map_status');
+        countySelectEl = document.getElementById('map_county_select');
+
         initMap();
 
         if (countySelectEl) {
             countySelectEl.addEventListener('change', onCountyChange);
+        } else {
+            console.error('Guindex map: #map_county_select not found');
         }
 
-        loadPubsForCounty('');
+        setStatus('Select a county to view pubs on the map.');
 
         window.setTimeout(refreshMapSize, 100);
         window.setTimeout(refreshMapSize, 400);

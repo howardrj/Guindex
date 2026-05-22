@@ -128,7 +128,7 @@ class MapPubList(generics.ListAPIView):
     def get_queryset(self):
         return Pub.objects.all().only(
             'id', 'name', 'latitude', 'longitude', 'closed',
-            'servingGuinness', 'lastPrice', 'county',
+            'servingGuinness', 'lastPrice', 'county', 'lastSubmissionTime',
         )
 
 

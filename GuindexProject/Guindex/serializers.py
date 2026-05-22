@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.utils.html import escape
 from django.db.models import Count
 from django.core.validators import validate_email as validateEmail
 from django.core.mail import send_mail as sendMail
@@ -284,19 +285,42 @@ def map_pub_marker_color(pub):
         return 'black'
     if pub.lastPrice is not None:
         return 'green'
-    return 'darkgray'
+    return 'lightgray'
 
 
-def map_pub_marker_label(pub):
-    name = pub.name
+def map_pub_marker_icon(pub):
+    icons = {
+        'green': 'beer',
+        'red': 'exclamation',
+        'black': 'window-close',
+        'lightgray': 'question',
+    }
+    return icons[map_pub_marker_color(pub)]
+
+
+def map_pub_popup_html(pub):
+    """
+        Popup HTML aligned with the Folium map (AwesomeMarkers) output.
+    """
+    name = escape(pub.name)
+
     if pub.closed:
-        return u'%s - Closed' % name
+        return u'%s<br>closed' % name
+
     if not pub.servingGuinness:
-        return u'%s - Not Serving Guinness' % name
+        return u'%s<br>not serving Guinness' % name
+
     if pub.lastPrice is not None:
         currency = map_pub_currency_symbol(pub)
-        return u'%s - %s%.2f' % (name, currency, pub.lastPrice)
-    return u'%s - Not Yet Visited' % name
+        price_line = u'%s%s' % (currency, pub.lastPrice)
+
+        if pub.lastSubmissionTime:
+            submitted = pub.lastSubmissionTime.strftime('%Y-%m-%d')
+            return u'%s<br>%s<br>Submitted: %s' % (name, price_line, submitted)
+
+        return u'%s<br>%s' % (name, price_line)
+
+    return u'%s<br>No data submitted' % name
 
 
 class MapPubSerializer(serializers.ModelSerializer):
@@ -305,17 +329,24 @@ class MapPubSerializer(serializers.ModelSerializer):
     """
 
     markerColor = serializers.SerializerMethodField()
-    label = serializers.SerializerMethodField()
+    markerIcon = serializers.SerializerMethodField()
+    popupHtml = serializers.SerializerMethodField()
 
     class Meta:
         model = Pub
-        fields = ('id', 'latitude', 'longitude', 'markerColor', 'label')
+        fields = (
+            'id', 'name', 'latitude', 'longitude',
+            'markerColor', 'markerIcon', 'popupHtml',
+        )
 
     def get_markerColor(self, obj):
         return map_pub_marker_color(obj)
 
-    def get_label(self, obj):
-        return map_pub_marker_label(obj)
+    def get_markerIcon(self, obj):
+        return map_pub_marker_icon(obj)
+
+    def get_popupHtml(self, obj):
+        return map_pub_popup_html(obj)
 
 
 ################################
