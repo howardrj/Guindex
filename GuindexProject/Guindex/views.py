@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
-from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
 from rest_framework.throttling import SimpleRateThrottle
 
@@ -103,27 +103,33 @@ class PubViewSet(viewsets.ModelViewSet):
     search_fields      = ('name',)
 
 
+class MapPubPagination(PageNumberPagination):
+    """
+        Small pages so each JSON response stays under proxy/browser size limits.
+        (A single ~5000-pub JSON payload was being truncated mid-transfer.)
+    """
+    page_size = 250
+    page_size_query_param = 'page_size'
+    max_page_size = 500
+
+
 class MapPubList(generics.ListAPIView):
     """
-        All approved pubs for the live Leaflet map.
-        Returns a single JSON array (no DataTables pagination).
+        Approved pubs for the live Leaflet map, paginated for reliable delivery.
+        Filter with ?county=Dublin (exact match on supported county names).
     """
 
     serializer_class = MapPubSerializer
     permission_classes = (permissions.AllowAny, )
-    pagination_class = None
+    pagination_class = MapPubPagination
+    filter_backends = (DjangoFilterBackend, )
+    filter_fields = ('county', )
 
     def get_queryset(self):
         return Pub.objects.all().only(
             'id', 'name', 'latitude', 'longitude', 'closed',
             'servingGuinness', 'lastPrice', 'county',
         )
-
-    def list(self, request, *args, **kwargs):
-        # Bypass global DataTables pagination (PAGE_SIZE=100).
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
 
 ##############################

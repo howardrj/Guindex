@@ -301,28 +301,21 @@ def map_pub_marker_label(pub):
 
 class MapPubSerializer(serializers.ModelSerializer):
     """
-        Lightweight pub payload for the live Leaflet map (no pagination).
+        Minimal pub payload for the live Leaflet map (loaded in small pages).
     """
 
     markerColor = serializers.SerializerMethodField()
     label = serializers.SerializerMethodField()
-    currency = serializers.SerializerMethodField()
 
     class Meta:
         model = Pub
-        fields = (
-            'id', 'name', 'latitude', 'longitude', 'closed', 'servingGuinness',
-            'lastPrice', 'county', 'markerColor', 'label', 'currency',
-        )
+        fields = ('id', 'latitude', 'longitude', 'markerColor', 'label')
 
     def get_markerColor(self, obj):
         return map_pub_marker_color(obj)
 
     def get_label(self, obj):
         return map_pub_marker_label(obj)
-
-    def get_currency(self, obj):
-        return map_pub_currency_symbol(obj)
 
 
 ################################

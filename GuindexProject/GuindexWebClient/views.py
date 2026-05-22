@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 import os
 
@@ -24,11 +25,17 @@ def serve_live_guindex_map(request):
     """
     map_api_url = request.build_absolute_uri('/api/map/pubs/')
 
+    county_viewports = {}
+    for county in GuindexParameters.SUPPORTED_COUNTIES:
+        county_viewports[county] = GuindexParameters.get_county_map_viewport(county)
+
     context = {
         'map_center_lat': GuindexParameters.DUBLIN_CENTER_LATITUDE,
         'map_center_lng': GuindexParameters.DUBLIN_CENTER_LONGITUDE,
         'map_zoom': GuindexParameters.MAP_ZOOM_LEVEL,
         'map_api_url': map_api_url,
+        'map_counties': GuindexParameters.SUPPORTED_COUNTIES,
+        'county_viewports_json': json.dumps(county_viewports),
     }
 
     return render(request, 'live_guindex_map.html', context)

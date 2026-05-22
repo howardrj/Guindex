@@ -1,9 +1,14 @@
 (function () {
 
     var config = window.GUINDEX_MAP_CONFIG || {};
+    var MAP_PAGE_SIZE = 250;
     var map = null;
     var statusEl = document.getElementById('map_status');
+    var countySelectEl = document.getElementById('map_county_select');
     var iconCache = {};
+    var activeClusterLayer = null;
+    var loadGeneration = 0;
+    var selectedCounty = '';
 
     function setStatus(message) {
         if (statusEl) {
@@ -38,25 +43,68 @@
         return iconCache[color];
     }
 
-    function parsePubs(responseText) {
+    function getCountyViewport(county) {
+        if (!county || !config.countyViewports) {
+            return null;
+        }
+        return config.countyViewports[county] || null;
+    }
+
+    function applyCountyViewport(county) {
+        var vp = getCountyViewport(county);
+
+        if (vp) {
+            map.fitBounds(
+                [[vp.minLat, vp.minLng], [vp.maxLat, vp.maxLng]],
+                { padding: [24, 24] }
+            );
+            return;
+        }
+
+        map.setView([config.centerLat, config.centerLng], config.zoom);
+    }
+
+    function clearMarkers() {
+        if (activeClusterLayer) {
+            map.removeLayer(activeClusterLayer);
+            activeClusterLayer = null;
+        }
+    }
+
+    function appendQueryParam(url, key, value) {
+        return url + (url.indexOf('?') >= 0 ? '&' : '?') + key + '=' + encodeURIComponent(value);
+    }
+
+    function buildApiUrl(county) {
+        var url = appendQueryParam(config.apiUrl, 'page_size', String(MAP_PAGE_SIZE));
+
+        if (county) {
+            url = appendQueryParam(url, 'county', county);
+        }
+
+        return url;
+    }
+
+    function parsePage(responseText) {
         var raw = (responseText || '').trim();
         if (!raw) {
-            return [];
+            return { pubs: [], next: null };
         }
         var data = JSON.parse(raw);
         if (Array.isArray(data)) {
-            return data;
+            return { pubs: data, next: null };
         }
-        if (data && Array.isArray(data.results)) {
-            return data.results;
-        }
-        if (data && Array.isArray(data.data)) {
-            return data.data;
-        }
-        return [];
+        return {
+            pubs: (data && data.results) ? data.results : [],
+            next: (data && data.next) ? data.next : null
+        };
     }
 
-    function addPubsToMap(pubs) {
+    function addPubsToMap(pubs, county, thisLoad) {
+        if (thisLoad !== loadGeneration) {
+            return;
+        }
+
         setStatus('Placing ' + pubs.length + ' markers...');
 
         var cluster = L.markerClusterGroup({
@@ -86,7 +134,7 @@
             }
 
             color = pub.markerColor || 'darkgray';
-            label = pub.label || pub.name || 'Pub';
+            label = pub.label || 'Pub';
             marker = L.marker([lat, lng], {
                 icon: markerIcon(color),
                 title: label
@@ -95,23 +143,37 @@
             markers.push(marker);
         }
 
+        if (thisLoad !== loadGeneration) {
+            return;
+        }
+
         if (markers.length) {
             cluster.addLayers(markers);
-            map.addLayer(cluster);
+            activeClusterLayer = cluster;
+            map.addLayer(activeClusterLayer);
 
             window.setTimeout(function () {
-                try {
-                    map.fitBounds(cluster.getBounds().pad(0.05));
-                } catch (e) {
-                    map.setView([config.centerLat, config.centerLng], config.zoom);
+                if (thisLoad !== loadGeneration) {
+                    return;
                 }
+
+                try {
+                    if (county) {
+                        applyCountyViewport(county);
+                    } else {
+                        map.fitBounds(activeClusterLayer.getBounds().pad(0.05));
+                    }
+                } catch (e) {
+                    applyCountyViewport(county);
+                }
+
                 refreshMapSize();
                 hideStatus();
             }, 0);
         } else {
-            map.setView([config.centerLat, config.centerLng], config.zoom);
+            applyCountyViewport(county);
             refreshMapSize();
-            setStatus('No pubs with valid coordinates to display.');
+            setStatus(county ? ('No pubs found in ' + county + '.') : 'No pubs with valid coordinates to display.');
         }
     }
 
@@ -133,18 +195,19 @@
         refreshMapSize();
     }
 
-    function loadPubs() {
-        var apiUrl = config.apiUrl;
-
-        if (!apiUrl) {
-            setStatus('Map API URL is not configured.');
+    function fetchMapPubPage(url, accumulated, thisLoad, county, onDone, onFail) {
+        if (thisLoad !== loadGeneration) {
             return;
         }
 
-        setStatus('Loading pubs from server...');
+        setStatus(
+            'Loading pubs' +
+            (county ? ' in ' + county : '') +
+            ' (' + accumulated.length + ' loaded)...'
+        );
 
         var request = new XMLHttpRequest();
-        request.open('GET', apiUrl, true);
+        request.open('GET', url, true);
         request.setRequestHeader('Accept', 'application/json');
         request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
@@ -153,37 +216,112 @@
                 return;
             }
 
-            if (request.status < 200 || request.status >= 300) {
-                setStatus('Failed to load map data (HTTP ' + request.status + ').');
+            if (thisLoad !== loadGeneration) {
                 return;
             }
 
-            window.setTimeout(function () {
-                try {
-                    var pubs = parsePubs(request.responseText);
-                    if (!pubs.length) {
-                        setStatus('No pub data returned from server.');
-                        console.warn('Guindex map: empty pub list from', apiUrl);
-                        return;
-                    }
-                    addPubsToMap(pubs);
-                } catch (e) {
-                    console.error('Guindex map parse error:', e);
-                    setStatus('Failed to parse map data from server.');
-                }
-            }, 0);
+            if (request.status < 200 || request.status >= 300) {
+                onFail('Failed to load map data (HTTP ' + request.status + ').');
+                return;
+            }
+
+            var page;
+            try {
+                page = parsePage(request.responseText);
+            } catch (e) {
+                console.error('Guindex map parse error:', e, 'url:', url);
+                onFail(
+                    'Map data response was incomplete or invalid. ' +
+                    'The server may be truncating large responses.'
+                );
+                return;
+            }
+
+            accumulated = accumulated.concat(page.pubs);
+
+            if (page.next) {
+                fetchMapPubPage(page.next, accumulated, thisLoad, county, onDone, onFail);
+                return;
+            }
+
+            onDone(accumulated);
         };
 
         request.onerror = function () {
-            setStatus('Network error while loading map data.');
+            if (thisLoad !== loadGeneration) {
+                return;
+            }
+            onFail('Network error while loading map data.');
         };
 
         request.send(null);
     }
 
+    function loadPubsForCounty(county) {
+        var apiUrl = config.apiUrl;
+
+        if (!apiUrl) {
+            setStatus('Map API URL is not configured.');
+            return;
+        }
+
+        loadGeneration += 1;
+        var thisLoad = loadGeneration;
+        selectedCounty = county || '';
+
+        clearMarkers();
+        applyCountyViewport(selectedCounty);
+
+        var statusPrefix = selectedCounty ? ('Loading ' + selectedCounty + ' pubs...') : 'Loading all pubs...';
+        setStatus(statusPrefix);
+
+        fetchMapPubPage(
+            buildApiUrl(selectedCounty),
+            [],
+            thisLoad,
+            selectedCounty,
+            function (pubs) {
+                if (thisLoad !== loadGeneration) {
+                    return;
+                }
+
+                if (!pubs.length) {
+                    applyCountyViewport(selectedCounty);
+                    refreshMapSize();
+                    setStatus(
+                        selectedCounty ?
+                            ('No pubs found in ' + selectedCounty + '.') :
+                            'No pub data returned from server.'
+                    );
+                    return;
+                }
+
+                window.setTimeout(function () {
+                    addPubsToMap(pubs, selectedCounty, thisLoad);
+                }, 0);
+            },
+            function (message) {
+                if (thisLoad !== loadGeneration) {
+                    return;
+                }
+                setStatus(message);
+            }
+        );
+    }
+
+    function onCountyChange() {
+        var county = countySelectEl ? countySelectEl.value : '';
+        loadPubsForCounty(county);
+    }
+
     function startMap() {
         initMap();
-        loadPubs();
+
+        if (countySelectEl) {
+            countySelectEl.addEventListener('change', onCountyChange);
+        }
+
+        loadPubsForCounty('');
 
         window.setTimeout(refreshMapSize, 100);
         window.setTimeout(refreshMapSize, 400);
