@@ -69,120 +69,35 @@
         {
             if (request.readyState == 4 && request.status == 200)
             {
-                var html = new DOMParser().parseFromString(request.responseText, 'text/html').body.firstChild;
-
-                // Update page content
-                page_content.innerHTML = "";
-
-                $('#' + page_content_id).append(html.innerHTML);
-
+                injectAsyncPageContent(page_content, request.responseText);
                 onTabLoad(page_content);
             }
         }
     });
 
-    function guindexNotifyMapIframeResize()
+    function injectAsyncPageContent(page_content, responseText)
     {
-        var iframe = document.getElementById('guindex_map_iframe');
+        var doc = new DOMParser().parseFromString(responseText, 'text/html');
+        var loaded = doc.getElementById(page_content.id);
 
-        if (!iframe || !iframe.contentWindow)
-        {
-            return;
-        }
+        page_content.innerHTML = '';
 
-        try {
-            if (typeof iframe.contentWindow.guindexMapInvalidateSize === 'function')
-            {
-                iframe.contentWindow.guindexMapInvalidateSize();
-            }
-        } catch (e) {
-            // Ignore if iframe is not ready yet.
+        if (loaded) {
+            page_content.innerHTML = loaded.innerHTML;
+        } else if (doc.body) {
+            page_content.innerHTML = doc.body.innerHTML;
+        } else {
+            page_content.innerHTML = responseText;
         }
     }
-
-    function guindexBindMapIframeResize()
-    {
-        var iframe = document.getElementById('guindex_map_iframe');
-
-        if (!iframe || iframe.getAttribute('data-guindex-load-bound'))
-        {
-            return;
-        }
-
-        iframe.setAttribute('data-guindex-load-bound', '1');
-        iframe.addEventListener('load', function () {
-            guindexNotifyMapIframeResize();
-            window.setTimeout(guindexNotifyMapIframeResize, 200);
-            window.setTimeout(guindexNotifyMapIframeResize, 800);
-        });
-    }
-
-    function guindexResetMapIframe()
-    {
-        var iframe = document.getElementById('guindex_map_iframe');
-        var placeholder = document.getElementById('map_iframe_placeholder');
-
-        if (iframe)
-        {
-            iframe.removeAttribute('src');
-            iframe.style.display = 'none';
-        }
-
-        if (placeholder)
-        {
-            placeholder.style.display = 'block';
-        }
-    }
-
-    function guindexLoadMapIframeForCounty(value)
-    {
-        var iframe = document.getElementById('guindex_map_iframe');
-        var placeholder = document.getElementById('map_iframe_placeholder');
-
-        if (!iframe)
-        {
-            return;
-        }
-
-        guindexBindMapIframeResize();
-
-        if (!value)
-        {
-            guindexResetMapIframe();
-            return;
-        }
-
-        var mapUrl = G_URL_BASE + '/live_guindex_map/';
-
-        if (value === '__all__')
-        {
-            mapUrl += '?load=all';
-        }
-        else
-        {
-            mapUrl += '?county=' + encodeURIComponent(value);
-        }
-
-        if (placeholder)
-        {
-            placeholder.style.display = 'none';
-        }
-
-        iframe.style.display = 'block';
-        iframe.src = mapUrl;
-    }
-
-    $(document).on('change', '#map_county_select', function () {
-        guindexLoadMapIframeForCounty($(this).val());
-    });
 
     function onTabLoad(tabContent)
     {
         tabContent.setAttribute('data-content_loaded', '1');
 
-        if (tabContent.id === 'map_page')
+        if (tabContent.id === 'map_page' && typeof window.guindexMapOnTabLoaded === 'function')
         {
-            guindexBindMapIframeResize();
+            window.guindexMapOnTabLoaded();
         }
 
         tabContent.dispatchEvent(new Event('tab_display'));
@@ -191,21 +106,22 @@
     document.addEventListener('tab_display', function (evt) {
         if (evt.target && evt.target.id === 'map_page')
         {
-            guindexBindMapIframeResize();
-
-            if (iframeHasSrc())
+            if (typeof window.guindexMapOnTabLoaded === 'function')
             {
-                window.setTimeout(guindexNotifyMapIframeResize, 100);
-                window.setTimeout(guindexNotifyMapIframeResize, 500);
+                window.guindexMapOnTabLoaded();
+            }
+
+            if (typeof window.guindexNotifyMapIframeResize === 'function')
+            {
+                var iframe = document.getElementById('guindex_map_iframe');
+                if (iframe && iframe.getAttribute('src'))
+                {
+                    window.setTimeout(window.guindexNotifyMapIframeResize, 100);
+                    window.setTimeout(window.guindexNotifyMapIframeResize, 500);
+                }
             }
         }
     }, true);
-
-    function iframeHasSrc()
-    {
-        var iframe = document.getElementById('guindex_map_iframe');
-        return iframe && iframe.getAttribute('src');
-    }
 
     function onUrlChange()
     {
@@ -255,15 +171,9 @@
         var page_content = document.getElementById(page_content_id);
         page_content.style.display = 'block';
 
-        if (page_content_id === 'map_page')
+        if (page_content_id === 'map_page' && typeof window.guindexMapOnTabLoaded === 'function')
         {
-            guindexBindMapIframeResize();
-
-            if (iframeHasSrc())
-            {
-                window.setTimeout(guindexNotifyMapIframeResize, 100);
-                window.setTimeout(guindexNotifyMapIframeResize, 500);
-            }
+            window.guindexMapOnTabLoaded();
         }
     };
 
