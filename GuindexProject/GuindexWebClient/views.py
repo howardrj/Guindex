@@ -6,6 +6,8 @@ import os
 from django.shortcuts import render
 from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponseRedirect, FileResponse
+from django.utils.encoding import force_text
+from django.utils.http import urlquote
 
 from Guindex.GuindexParameters import GuindexParameters
 
@@ -17,9 +19,7 @@ def _web_client_context(request, **extra):
         'google_analytics_key': settings.GOOGLE_ANALYTICS_KEY,
         'facebook_app_id': settings.FACEBOOK_APP_ID,
         'guindex_counties': GuindexParameters.SUPPORTED_COUNTIES,
-        # Keep True so templates load .js sources (same as before); production
-        # still uses .min.js for the bundles listed in guindex_web_client.html.
-        'debug': True,
+        'debug': settings.DEBUG,
         'async_template_loading': True,
     }
     context.update(extra)
@@ -41,10 +41,17 @@ def serve_live_guindex_map(request):
     """
     map_api_url = request.build_absolute_uri('/api/map/pubs/')
 
-    county_param = (request.GET.get('county') or '').strip()
+    county_param = force_text(request.GET.get('county') or '').strip()
     load_all = request.GET.get('load') == 'all'
-    initial_county = county_param if county_param in GuindexParameters.SUPPORTED_COUNTIES else ''
+    initial_county = ''
+    for supported in GuindexParameters.SUPPORTED_COUNTIES:
+        if county_param == force_text(supported):
+            initial_county = supported
+            break
     load_on_start = load_all or bool(initial_county)
+
+    if initial_county:
+        map_api_url += '?county=' + urlquote(initial_county)
 
     county_viewports = {}
     for county in GuindexParameters.SUPPORTED_COUNTIES:
@@ -58,6 +65,7 @@ def serve_live_guindex_map(request):
         'county_viewports_json': json.dumps(county_viewports),
         'load_on_start_json': json.dumps(load_on_start),
         'initial_county_json': json.dumps(initial_county),
+        'debug': settings.DEBUG,
     }
 
     return render(request, 'live_guindex_map.html', context)

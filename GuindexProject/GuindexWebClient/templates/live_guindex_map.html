@@ -60,6 +60,10 @@
             initialCounty: {{ initial_county_json|safe }}
         };
     </script>
+    {% if not debug %}
+    <script src="{% static 'javascript/guindex_live_map.min.js' %}"></script>
+    {% else %}
     <script src="{% static 'javascript/guindex_live_map.js' %}"></script>
+    {% endif %}
 </body>
 </html>

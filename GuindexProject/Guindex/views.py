@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 import logging
 
 from django.contrib.auth.models import User
+from django.utils.encoding import force_text
 from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import generics
@@ -132,7 +134,7 @@ class MapPubList(generics.ListAPIView):
             'servingGuinness', 'lastPrice', 'county', 'lastSubmissionTime',
         ).order_by('name')
 
-        county = (self.request.query_params.get('county') or '').strip()
+        county = force_text(self.request.query_params.get('county') or '').strip()
         if county:
             qs = qs.filter(county=county)
 

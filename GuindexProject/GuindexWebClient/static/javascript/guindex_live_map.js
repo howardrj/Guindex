@@ -1,3 +1,4 @@
+/* guindex-live-map-v4: county filter on /api/map/pubs/ */
 (function () {
 
     var config = window.GUINDEX_MAP_CONFIG || {};
@@ -88,15 +89,44 @@
         return url + (url.indexOf('?') >= 0 ? '&' : '?') + key + '=' + encodeURIComponent(value);
     }
 
+    function getCountyFromApiUrl() {
+        if (!config.apiUrl || config.apiUrl.indexOf('county=') < 0) {
+            return '';
+        }
+
+        var query = config.apiUrl.split('?')[1] || '';
+        var match = /(?:^|&)county=([^&]*)/.exec(query);
+
+        if (!match) {
+            return '';
+        }
+
+        try {
+            return decodeURIComponent(match[1].replace(/\+/g, ' '));
+        } catch (e) {
+            return match[1];
+        }
+    }
+
+    function effectiveCounty(county) {
+        if (isLoadAllFromUrl()) {
+            return '';
+        }
+
+        return (county || config.initialCounty || getCountyFromUrl() ||
+            getCountyFromApiUrl() || '').trim();
+    }
+
     function buildApiUrl(county, pageUrl) {
         var url = pageUrl || config.apiUrl;
+        var countyFilter = effectiveCounty(county);
 
         if (!pageUrl) {
             url = appendQueryParam(url, 'page_size', String(MAP_PAGE_SIZE));
         }
 
-        if (county && url.indexOf('county=') < 0) {
-            url = appendQueryParam(url, 'county', county);
+        if (countyFilter && url.indexOf('county=') < 0) {
+            url = appendQueryParam(url, 'county', countyFilter);
         }
 
         return url;
@@ -340,7 +370,7 @@
 
         loadGeneration += 1;
         var thisLoad = loadGeneration;
-        selectedCounty = county || '';
+        selectedCounty = effectiveCounty(county);
 
         clearMarkers();
         applyCountyViewport(selectedCounty);
@@ -388,7 +418,7 @@
         initMap();
 
         if (shouldAutoLoadPubs()) {
-            loadPubsForCounty(isLoadAllFromUrl() ? '' : resolveInitialCounty());
+            loadPubsForCounty(isLoadAllFromUrl() ? '' : effectiveCounty(''));
         } else {
             setStatus('Select a county to view pubs on the map.');
         }

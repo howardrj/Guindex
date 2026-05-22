@@ -1,6 +1,7 @@
 /**
  * Parent-page map tab: county dropdown and iframe loading.
  * Loaded on every page (debug and production) so it is not tied to guindex_tabs.min.js.
+ * Deploy marker: guindex-map-parent-v3 (file is ~120 lines; older copies ~200+ are stale).
  */
 (function () {
 
