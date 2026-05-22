@@ -7,7 +7,7 @@
 <div id="map_page" class="page_content content-wrapper" style="display:none">
     <div id="map_toolbar">
         <label for="map_county_select">County</label>
-        <select id="map_county_select" class="form-control form-control-sm">
+        <select id="map_county_select" class="form-control form-control-sm" onchange="if(window.guindexLoadMapIframeForCounty){window.guindexLoadMapIframeForCounty(this.value);}">
             <option value="" selected>Select a county...</option>
             <option value="__all__">All</option>
             {% for county in guindex_counties %}

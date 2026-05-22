@@ -84,31 +84,22 @@
             placeholder.style.display = 'none';
         }
 
-        if (iframeIsLoadingCounty(iframe, value)) {
-            return;
-        }
-
         iframe.style.display = 'block';
         iframe.src = mapUrl;
     };
 
-    function iframeIsLoadingCounty(iframe, value) {
-        if (!iframe.src) {
-            return false;
+    window.guindexBindMapCountySelect = function () {
+        var select = document.getElementById('map_county_select');
+
+        if (!select || select.getAttribute('data-guindex-bound')) {
+            return;
         }
 
-        try {
-            var u = new URL(iframe.src, mapBaseUrl());
-
-            if (value === '__all__') {
-                return u.searchParams.get('load') === 'all';
-            }
-
-            return u.searchParams.get('county') === value;
-        } catch (e) {
-            return false;
-        }
-    }
+        select.setAttribute('data-guindex-bound', '1');
+        select.addEventListener('change', function () {
+            window.guindexLoadMapIframeForCounty(this.value);
+        });
+    };
 
     window.guindexOnMapCountyChange = function (selectEl) {
         var value = selectEl ? selectEl.value : '';
@@ -119,8 +110,10 @@
 
     window.guindexMapOnTabLoaded = function () {
         guindexBindMapIframeResize();
+        window.guindexBindMapCountySelect();
     };
 
+    // Delegated handler works once async map tab injects #map_county_select.
     document.addEventListener('change', function (evt) {
         if (evt.target && evt.target.id === 'map_county_select') {
             window.guindexLoadMapIframeForCounty(evt.target.value);
