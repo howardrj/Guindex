@@ -81,12 +81,48 @@
         }
     });
 
+    function guindexNotifyMapIframeResize()
+    {
+        var iframe = document.getElementById('guindex_map_iframe');
+
+        if (!iframe || !iframe.contentWindow)
+        {
+            return;
+        }
+
+        try {
+            if (typeof iframe.contentWindow.guindexMapInvalidateSize === 'function')
+            {
+                iframe.contentWindow.guindexMapInvalidateSize();
+            }
+        } catch (e) {
+            // Ignore if iframe is not ready yet.
+        }
+    }
+
     function guindexEnsureMapIframeLoaded()
     {
         var iframe = document.getElementById('guindex_map_iframe');
 
-        if (!iframe || iframe.getAttribute('src'))
+        if (!iframe)
         {
+            return;
+        }
+
+        if (!iframe.getAttribute('data-guindex-load-bound'))
+        {
+            iframe.setAttribute('data-guindex-load-bound', '1');
+            iframe.addEventListener('load', function () {
+                guindexNotifyMapIframeResize();
+                window.setTimeout(guindexNotifyMapIframeResize, 200);
+                window.setTimeout(guindexNotifyMapIframeResize, 800);
+            });
+        }
+
+        if (iframe.getAttribute('src'))
+        {
+            guindexNotifyMapIframeResize();
+            window.setTimeout(guindexNotifyMapIframeResize, 200);
             return;
         }
 
@@ -111,6 +147,8 @@
         if (evt.target && evt.target.id === 'map_page')
         {
             guindexEnsureMapIframeLoaded();
+            window.setTimeout(guindexNotifyMapIframeResize, 100);
+            window.setTimeout(guindexNotifyMapIframeResize, 500);
         }
     }, true);
 
@@ -165,6 +203,8 @@
         if (page_content_id === 'map_page')
         {
             guindexEnsureMapIframeLoaded();
+            window.setTimeout(guindexNotifyMapIframeResize, 100);
+            window.setTimeout(guindexNotifyMapIframeResize, 500);
         }
     };
 
