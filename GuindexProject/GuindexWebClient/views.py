@@ -17,7 +17,9 @@ def _web_client_context(request, **extra):
         'google_analytics_key': settings.GOOGLE_ANALYTICS_KEY,
         'facebook_app_id': settings.FACEBOOK_APP_ID,
         'guindex_counties': GuindexParameters.SUPPORTED_COUNTIES,
-        'debug': settings.DEBUG,
+        # Keep True so templates load .js sources (same as before); production
+        # still uses .min.js for the bundles listed in guindex_web_client.html.
+        'debug': True,
         'async_template_loading': True,
     }
     context.update(extra)
