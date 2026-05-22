@@ -20,10 +20,15 @@ NEW_GUINDEX_MAP_TEMPLATE = os.path.join(
 
 def serve_live_guindex_map(request):
     """
-    Live Leaflet map: small HTML shell loads pub markers from /api/map/pubs/.
-    Works on Python 2.7 (no Folium); data is always current from the database.
+    Live Leaflet map: loads pub markers from /api/map/pubs/ when opened with
+    ?county=Name or ?load=all (set by parent page county dropdown via iframe src).
     """
     map_api_url = request.build_absolute_uri('/api/map/pubs/')
+
+    county_param = (request.GET.get('county') or '').strip()
+    load_all = request.GET.get('load') == 'all'
+    initial_county = county_param if county_param in GuindexParameters.SUPPORTED_COUNTIES else ''
+    load_on_start = load_all or bool(initial_county)
 
     county_viewports = {}
     for county in GuindexParameters.SUPPORTED_COUNTIES:
@@ -34,8 +39,9 @@ def serve_live_guindex_map(request):
         'map_center_lng': GuindexParameters.DUBLIN_CENTER_LONGITUDE,
         'map_zoom': GuindexParameters.MAP_ZOOM_LEVEL,
         'map_api_url': map_api_url,
-        'map_counties': GuindexParameters.SUPPORTED_COUNTIES,
         'county_viewports_json': json.dumps(county_viewports),
+        'load_on_start_json': json.dumps(load_on_start),
+        'initial_county_json': json.dumps(initial_county),
     }
 
     return render(request, 'live_guindex_map.html', context)

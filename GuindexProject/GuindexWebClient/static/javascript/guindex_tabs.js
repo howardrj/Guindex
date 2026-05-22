@@ -100,36 +100,81 @@
         }
     }
 
-    function guindexEnsureMapIframeLoaded()
+    function guindexBindMapIframeResize()
     {
         var iframe = document.getElementById('guindex_map_iframe');
+
+        if (!iframe || iframe.getAttribute('data-guindex-load-bound'))
+        {
+            return;
+        }
+
+        iframe.setAttribute('data-guindex-load-bound', '1');
+        iframe.addEventListener('load', function () {
+            guindexNotifyMapIframeResize();
+            window.setTimeout(guindexNotifyMapIframeResize, 200);
+            window.setTimeout(guindexNotifyMapIframeResize, 800);
+        });
+    }
+
+    function guindexResetMapIframe()
+    {
+        var iframe = document.getElementById('guindex_map_iframe');
+        var placeholder = document.getElementById('map_iframe_placeholder');
+
+        if (iframe)
+        {
+            iframe.removeAttribute('src');
+            iframe.style.display = 'none';
+        }
+
+        if (placeholder)
+        {
+            placeholder.style.display = 'block';
+        }
+    }
+
+    function guindexLoadMapIframeForCounty(value)
+    {
+        var iframe = document.getElementById('guindex_map_iframe');
+        var placeholder = document.getElementById('map_iframe_placeholder');
 
         if (!iframe)
         {
             return;
         }
 
-        if (!iframe.getAttribute('data-guindex-load-bound'))
-        {
-            iframe.setAttribute('data-guindex-load-bound', '1');
-            iframe.addEventListener('load', function () {
-                guindexNotifyMapIframeResize();
-                window.setTimeout(guindexNotifyMapIframeResize, 200);
-                window.setTimeout(guindexNotifyMapIframeResize, 800);
-            });
-        }
+        guindexBindMapIframeResize();
 
-        if (iframe.getAttribute('src'))
+        if (!value)
         {
-            guindexNotifyMapIframeResize();
-            window.setTimeout(guindexNotifyMapIframeResize, 200);
+            guindexResetMapIframe();
             return;
         }
 
-        var mapUrl = iframe.getAttribute('data-src') || '/live_guindex_map/';
+        var mapUrl = G_URL_BASE + '/live_guindex_map/';
 
-        iframe.setAttribute('src', mapUrl);
+        if (value === '__all__')
+        {
+            mapUrl += '?load=all';
+        }
+        else
+        {
+            mapUrl += '?county=' + encodeURIComponent(value);
+        }
+
+        if (placeholder)
+        {
+            placeholder.style.display = 'none';
+        }
+
+        iframe.style.display = 'block';
+        iframe.src = mapUrl;
     }
+
+    $(document).on('change', '#map_county_select', function () {
+        guindexLoadMapIframeForCounty($(this).val());
+    });
 
     function onTabLoad(tabContent)
     {
@@ -137,7 +182,7 @@
 
         if (tabContent.id === 'map_page')
         {
-            guindexEnsureMapIframeLoaded();
+            guindexBindMapIframeResize();
         }
 
         tabContent.dispatchEvent(new Event('tab_display'));
@@ -146,11 +191,21 @@
     document.addEventListener('tab_display', function (evt) {
         if (evt.target && evt.target.id === 'map_page')
         {
-            guindexEnsureMapIframeLoaded();
-            window.setTimeout(guindexNotifyMapIframeResize, 100);
-            window.setTimeout(guindexNotifyMapIframeResize, 500);
+            guindexBindMapIframeResize();
+
+            if (iframeHasSrc())
+            {
+                window.setTimeout(guindexNotifyMapIframeResize, 100);
+                window.setTimeout(guindexNotifyMapIframeResize, 500);
+            }
         }
     }, true);
+
+    function iframeHasSrc()
+    {
+        var iframe = document.getElementById('guindex_map_iframe');
+        return iframe && iframe.getAttribute('src');
+    }
 
     function onUrlChange()
     {
@@ -202,9 +257,13 @@
 
         if (page_content_id === 'map_page')
         {
-            guindexEnsureMapIframeLoaded();
-            window.setTimeout(guindexNotifyMapIframeResize, 100);
-            window.setTimeout(guindexNotifyMapIframeResize, 500);
+            guindexBindMapIframeResize();
+
+            if (iframeHasSrc())
+            {
+                window.setTimeout(guindexNotifyMapIframeResize, 100);
+                window.setTimeout(guindexNotifyMapIframeResize, 500);
+            }
         }
     };
 

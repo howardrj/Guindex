@@ -2,10 +2,8 @@
 
     var config = window.GUINDEX_MAP_CONFIG || {};
     var MAP_PAGE_SIZE = 250;
-    var MAP_ALL_VALUE = '__all__';
     var map = null;
     var statusEl = null;
-    var countySelectEl = null;
     var iconCache = {};
     var activeClusterLayer = null;
     var loadGeneration = 0;
@@ -329,43 +327,20 @@
         );
     }
 
-    function onCountyChange() {
-        if (!countySelectEl) {
-            return;
-        }
-
-        var value = countySelectEl.value;
-
-        if (!value) {
-            loadGeneration += 1;
-            clearMarkers();
-            map.setView([config.centerLat, config.centerLng], config.zoom);
-            setStatus('Select a county to view pubs on the map.');
-            refreshMapSize();
-            return;
-        }
-
-        if (value === MAP_ALL_VALUE) {
-            loadPubsForCounty('');
-            return;
-        }
-
-        loadPubsForCounty(value);
-    }
-
     function startMap() {
         statusEl = document.getElementById('map_status');
-        countySelectEl = document.getElementById('map_county_select');
 
         initMap();
 
-        if (countySelectEl) {
-            countySelectEl.addEventListener('change', onCountyChange);
+        if (config.loadOnStart) {
+            if (config.initialCounty) {
+                loadPubsForCounty(config.initialCounty);
+            } else {
+                loadPubsForCounty('');
+            }
         } else {
-            console.error('Guindex map: #map_county_select not found');
+            setStatus('Select a county to view pubs on the map.');
         }
-
-        setStatus('Select a county to view pubs on the map.');
 
         window.setTimeout(refreshMapSize, 100);
         window.setTimeout(refreshMapSize, 400);

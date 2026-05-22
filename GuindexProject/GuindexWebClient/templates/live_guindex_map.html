@@ -20,25 +20,6 @@
             bottom: 0;
             left: 0;
         }
-        #map_controls {
-            position: absolute;
-            z-index: 1001;
-            top: 10px;
-            left: 10px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 8px 10px;
-            border-radius: 4px;
-            font-family: sans-serif;
-            font-size: 14px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
-        }
-        #map_controls label {
-            margin-right: 6px;
-            font-weight: bold;
-        }
-        #map_county_select {
-            min-width: 140px;
-        }
         #map_status {
             position: absolute;
             z-index: 1000;
@@ -62,16 +43,6 @@
     </style>
 </head>
 <body>
-    <div id="map_controls">
-        <label for="map_county_select">County</label>
-        <select id="map_county_select">
-            <option value="" selected>Select a county...</option>
-            <option value="__all__">All</option>
-            {% for county in map_counties %}
-            <option value="{{ county }}">{{ county }}</option>
-            {% endfor %}
-        </select>
-    </div>
     <div id="map_status">Select a county to view pubs on the map.</div>
     <div id="map"></div>
 
@@ -84,7 +55,9 @@
             centerLng: {{ map_center_lng }},
             zoom: {{ map_zoom }},
             apiUrl: "{{ map_api_url }}",
-            countyViewports: {{ county_viewports_json|safe }}
+            countyViewports: {{ county_viewports_json|safe }},
+            loadOnStart: {{ load_on_start_json|safe }},
+            initialCounty: {{ initial_county_json|safe }}
         };
     </script>
     <script src="{% static 'javascript/guindex_live_map.js' %}"></script>
