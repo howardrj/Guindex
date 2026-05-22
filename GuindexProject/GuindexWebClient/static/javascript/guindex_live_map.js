@@ -88,14 +88,36 @@
         return url + (url.indexOf('?') >= 0 ? '&' : '?') + key + '=' + encodeURIComponent(value);
     }
 
-    function buildApiUrl(county) {
-        var url = appendQueryParam(config.apiUrl, 'page_size', String(MAP_PAGE_SIZE));
+    function buildApiUrl(county, pageUrl) {
+        var url = pageUrl || config.apiUrl;
 
-        if (county) {
+        if (!pageUrl) {
+            url = appendQueryParam(url, 'page_size', String(MAP_PAGE_SIZE));
+        }
+
+        if (county && url.indexOf('county=') < 0) {
             url = appendQueryParam(url, 'county', county);
         }
 
         return url;
+    }
+
+    function resolveInitialCounty() {
+        if (config.initialCounty) {
+            return config.initialCounty;
+        }
+
+        try {
+            var county = new URLSearchParams(window.location.search).get('county') || '';
+
+            if (county && config.countyViewports && config.countyViewports[county]) {
+                return county;
+            }
+        } catch (e) {
+            // Ignore URL parse errors.
+        }
+
+        return '';
     }
 
     function parsePage(responseText) {
@@ -258,7 +280,14 @@
             accumulated = accumulated.concat(page.pubs);
 
             if (page.next) {
-                fetchMapPubPage(page.next, accumulated, thisLoad, county, onDone, onFail);
+                fetchMapPubPage(
+                    buildApiUrl(county, page.next),
+                    accumulated,
+                    thisLoad,
+                    county,
+                    onDone,
+                    onFail
+                );
                 return;
             }
 
@@ -333,11 +362,7 @@
         initMap();
 
         if (config.loadOnStart) {
-            if (config.initialCounty) {
-                loadPubsForCounty(config.initialCounty);
-            } else {
-                loadPubsForCounty('');
-            }
+            loadPubsForCounty(resolveInitialCounty());
         } else {
             setStatus('Select a county to view pubs on the map.');
         }

@@ -26,6 +26,7 @@ from Guindex.serializers import ContactSerializer
 from Guindex.models import Guinness, GuinnessPendingCreate
 from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
 from Guindex.models import StatisticsSingleton
+from Guindex.GuindexParameters import GuindexParameters
 
 logger = logging.getLogger(__name__)
 
@@ -126,10 +127,20 @@ class MapPubList(generics.ListAPIView):
     filter_fields = ('county', )
 
     def get_queryset(self):
-        return Pub.objects.all().only(
+        """
+        Server-side county filter only — the client does not load all pubs
+        and filter in the browser. ?county=Cork returns Cork pubs only.
+        """
+        qs = Pub.objects.all().only(
             'id', 'name', 'latitude', 'longitude', 'closed',
             'servingGuinness', 'lastPrice', 'county', 'lastSubmissionTime',
-        )
+        ).order_by('name')
+
+        county = (self.request.query_params.get('county') or '').strip()
+        if county in GuindexParameters.SUPPORTED_COUNTIES:
+            qs = qs.filter(county=county)
+
+        return qs
 
 
 ##############################

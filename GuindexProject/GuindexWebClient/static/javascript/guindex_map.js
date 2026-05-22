@@ -84,9 +84,31 @@
             placeholder.style.display = 'none';
         }
 
+        if (iframeIsLoadingCounty(iframe, value)) {
+            return;
+        }
+
         iframe.style.display = 'block';
         iframe.src = mapUrl;
     };
+
+    function iframeIsLoadingCounty(iframe, value) {
+        if (!iframe.src) {
+            return false;
+        }
+
+        try {
+            var u = new URL(iframe.src, mapBaseUrl());
+
+            if (value === '__all__') {
+                return u.searchParams.get('load') === 'all';
+            }
+
+            return u.searchParams.get('county') === value;
+        } catch (e) {
+            return false;
+        }
+    }
 
     window.guindexOnMapCountyChange = function (selectEl) {
         var value = selectEl ? selectEl.value : '';
@@ -98,12 +120,6 @@
     window.guindexMapOnTabLoaded = function () {
         guindexBindMapIframeResize();
     };
-
-    if (typeof $ !== 'undefined') {
-        $(document).on('change', '#map_county_select', function () {
-            window.guindexLoadMapIframeForCounty($(this).val());
-        });
-    }
 
     document.addEventListener('change', function (evt) {
         if (evt.target && evt.target.id === 'map_county_select') {
