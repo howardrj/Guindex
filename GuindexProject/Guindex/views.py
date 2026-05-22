@@ -15,6 +15,7 @@ from Guindex.filters import GuindexDatatablesFilterBackend
 from Guindex.serializers import GuinnessSerializer
 from Guindex.serializers import GuinnessPendingCreateSerializer
 from Guindex.serializers import PubSerializer
+from Guindex.serializers import MapPubSerializer
 from Guindex.serializers import PubPendingCreateSerializer
 from Guindex.serializers import PubPendingPatchSerializer
 from Guindex.serializers import StatisticsSerializer
@@ -99,6 +100,23 @@ class PubViewSet(viewsets.ModelViewSet):
     filter_backends    = (DjangoFilterBackend, SearchFilter, GuindexDatatablesFilterBackend,)
     filter_fields      = ('name', 'closed', 'servingGuinness', 'county', 'creator', )
     search_fields      = ('name',)
+
+
+class MapPubList(generics.ListAPIView):
+    """
+        All approved pubs for the live Leaflet map.
+        Returns a single JSON array (no DataTables pagination).
+    """
+
+    serializer_class = MapPubSerializer
+    permission_classes = (permissions.AllowAny, )
+    pagination_class = None
+
+    def get_queryset(self):
+        return Pub.objects.all().only(
+            'id', 'name', 'latitude', 'longitude', 'closed',
+            'servingGuinness', 'lastPrice', 'county',
+        )
 
 
 ##############################

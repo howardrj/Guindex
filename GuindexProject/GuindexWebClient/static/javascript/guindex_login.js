@@ -133,6 +133,20 @@ $(document).on('click', '#password_login_button', function (e) {
     submitPasswordLogin();
 });
 
+function guindexCloseLoginModal()
+{
+    var login_close_button = document.getElementById('login_close_button');
+
+    if (login_close_button)
+    {
+        login_close_button.click();
+    }
+    else if (typeof $ !== 'undefined')
+    {
+        $('#exampleModal').modal('hide');
+    }
+}
+
 function onLoginSuccess ()
 {
     if (document.readyState != "complete")
@@ -146,10 +160,15 @@ function onLoginSuccess ()
         return;
     }
 
-    // Show pending contributions tab 
+    // Show pending contributions tab
     if (g_isStaffMember)
     {
-        document.getElementById('pending_contributions_li').style.display = 'list-item';
+        var pending_contributions_li = document.getElementById('pending_contributions_li');
+
+        if (pending_contributions_li)
+        {
+            pending_contributions_li.style.display = 'list-item';
+        }
     }
 
     var page_contents = document.getElementsByClassName('page_content');
@@ -163,13 +182,42 @@ function onLoginSuccess ()
     var login_link = document.getElementById('login_link');
     var logout_link = document.getElementById('logout_link');
     var logout_modal_username = document.getElementById('logout_modal_username');
+    var password_login_username = document.getElementById('password_login_username');
+    var password_login_button = document.getElementById('password_login_button');
+    var logout_button = document.getElementById('logout_button');
 
-    login_link.style.display = 'none';
-    logout_link.innerHTML = g_username;
-    logout_link.style.display = 'inline';
-    logout_modal_username.innerHTML = g_username;
+    if (login_link)
+    {
+        login_link.style.display = 'none';
+    }
 
-    document.getElementById('login_close_button').click();
+    if (logout_link)
+    {
+        logout_link.innerHTML = '<i class="fa fa-fw fa-user"></i>' + g_username;
+        logout_link.style.display = 'inline';
+    }
+
+    if (logout_modal_username)
+    {
+        logout_modal_username.innerHTML = g_username;
+    }
+
+    if (password_login_username)
+    {
+        password_login_username.innerHTML = g_username;
+    }
+
+    if (password_login_button)
+    {
+        password_login_button.style.display = 'none';
+    }
+
+    if (logout_button)
+    {
+        logout_button.style.display = 'inline';
+    }
+
+    guindexCloseLoginModal();
 }
 
 /**********/
@@ -256,7 +304,7 @@ $(document).on('click', '#password_signup_button', function () {
 
 function onSignupSuccess ()
 {
-    document.getElementById('login_close_button').click();
+    guindexCloseLoginModal();
 
     displayMessage('Account Verificatiom Email Sent', 
                    "Please check your email and verify your account before logging in");
@@ -340,7 +388,7 @@ $(document).on('click', '#forgot_password_button', function () {
 
 function onForgotPasswordSubmitSuccess ()
 {
-    document.getElementById('login_close_button').click();
+    guindexCloseLoginModal();
 
     displayMessage('Password Reset Sent', 
                    "Please check your email to reset your password");

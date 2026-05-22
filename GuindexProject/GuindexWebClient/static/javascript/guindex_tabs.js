@@ -81,11 +81,38 @@
         }
     });
 
+    function guindexEnsureMapIframeLoaded()
+    {
+        var iframe = document.getElementById('guindex_map_iframe');
+
+        if (!iframe || iframe.getAttribute('src'))
+        {
+            return;
+        }
+
+        var mapUrl = iframe.getAttribute('data-src') || '/live_guindex_map/';
+
+        iframe.setAttribute('src', mapUrl);
+    }
+
     function onTabLoad(tabContent)
     {
         tabContent.setAttribute('data-content_loaded', '1');
+
+        if (tabContent.id === 'map_page')
+        {
+            guindexEnsureMapIframeLoaded();
+        }
+
         tabContent.dispatchEvent(new Event('tab_display'));
     }
+
+    document.addEventListener('tab_display', function (evt) {
+        if (evt.target && evt.target.id === 'map_page')
+        {
+            guindexEnsureMapIframeLoaded();
+        }
+    }, true);
 
     function onUrlChange()
     {
@@ -132,7 +159,13 @@
         }
 
         // Display corresponding page content
-        document.getElementById(page_content_id).style.display = 'block';
+        var page_content = document.getElementById(page_content_id);
+        page_content.style.display = 'block';
+
+        if (page_content_id === 'map_page')
+        {
+            guindexEnsureMapIframeLoaded();
+        }
     };
 
 })();

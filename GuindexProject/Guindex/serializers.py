@@ -266,6 +266,65 @@ class PubSerializer(serializers.ModelSerializer):
         if longitude < min_longitude or longitude > max_longitude:
             raise ValidationError("Longitude must be between %s - %s for this county." % (min_longitude, max_longitude))
 
+
+def map_pub_currency_symbol(pub):
+    county = (pub.county or '').strip()
+    if not county:
+        return u"\u20ac"
+    for name, symbol in GuindexParameters.COUNTY_CURRENCIES.items():
+        if name.lower() == county.lower():
+            return symbol
+    return u"\u20ac"
+
+
+def map_pub_marker_color(pub):
+    if pub.closed:
+        return 'red'
+    if not pub.servingGuinness:
+        return 'black'
+    if pub.lastPrice is not None:
+        return 'green'
+    return 'darkgray'
+
+
+def map_pub_marker_label(pub):
+    name = pub.name
+    if pub.closed:
+        return u'%s - Closed' % name
+    if not pub.servingGuinness:
+        return u'%s - Not Serving Guinness' % name
+    if pub.lastPrice is not None:
+        currency = map_pub_currency_symbol(pub)
+        return u'%s - %s%.2f' % (name, currency, pub.lastPrice)
+    return u'%s - Not Yet Visited' % name
+
+
+class MapPubSerializer(serializers.ModelSerializer):
+    """
+        Lightweight pub payload for the live Leaflet map (no pagination).
+    """
+
+    markerColor = serializers.SerializerMethodField()
+    label = serializers.SerializerMethodField()
+    currency = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Pub
+        fields = (
+            'id', 'name', 'latitude', 'longitude', 'closed', 'servingGuinness',
+            'lastPrice', 'county', 'markerColor', 'label', 'currency',
+        )
+
+    def get_markerColor(self, obj):
+        return map_pub_marker_color(obj)
+
+    def get_label(self, obj):
+        return map_pub_marker_label(obj)
+
+    def get_currency(self, obj):
+        return map_pub_currency_symbol(obj)
+
+
 ################################
 # PubPendingCreate Serializers #
 ################################

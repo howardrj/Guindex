@@ -1,14 +1,53 @@
 # -*- coding: utf-8 -*-
 import logging
+import os
 
 from django.shortcuts import render
 from django.conf import settings
-from django.http import HttpResponseNotFound, HttpResponseRedirect
+from django.http import HttpResponseNotFound, HttpResponseRedirect, FileResponse
 
 from Guindex.GuindexParameters import GuindexParameters
-from GuindexWebClient.map_view_function import create_guindex_map
 
 logger = logging.getLogger(__name__)
+
+NEW_GUINDEX_MAP_TEMPLATE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    'templates',
+    'new_guindex_map.html',
+)
+
+
+def serve_live_guindex_map(request):
+    """
+    Live Leaflet map: small HTML shell loads pub markers from /api/map/pubs/.
+    Works on Python 2.7 (no Folium); data is always current from the database.
+    """
+    map_api_url = request.build_absolute_uri('/api/map/pubs/')
+
+    context = {
+        'map_center_lat': GuindexParameters.DUBLIN_CENTER_LATITUDE,
+        'map_center_lng': GuindexParameters.DUBLIN_CENTER_LONGITUDE,
+        'map_zoom': GuindexParameters.MAP_ZOOM_LEVEL,
+        'map_api_url': map_api_url,
+    }
+
+    return render(request, 'live_guindex_map.html', context)
+
+
+def serve_new_guindex_map(request):
+    """
+    Serve the pre-generated Folium map as a static file with Content-Length set.
+    Avoids Django template rendering for the ~5MB HTML file, which can cause
+    NS_ERROR_NET_PARTIAL_TRANSFER in browsers when the response is truncated.
+    """
+    if not os.path.isfile(NEW_GUINDEX_MAP_TEMPLATE):
+        logger.error("Map template missing at %s", NEW_GUINDEX_MAP_TEMPLATE)
+        return HttpResponseNotFound('<h1>Map not found</h1>')
+
+    map_file = open(NEW_GUINDEX_MAP_TEMPLATE, 'rb')
+    response = FileResponse(map_file, content_type='text/html; charset=utf-8')
+    response['Cache-Control'] = 'public, max-age=300'
+    return response
 
 
 def faq(request):
@@ -46,8 +85,14 @@ def guindexWebClientWithTemplate(request, template):
     except:
         return HttpResponseNotFound('<h1> Page not found </h1>')
 
-    if template == 'guindex_map' or template == "new_guindex_map":
+    if template == 'guindex_map':
         return rendered_template
+
+    if template == 'live_guindex_map':
+        return serve_live_guindex_map(request)
+
+    if template == 'new_guindex_map':
+        return serve_new_guindex_map(request)
 
     context_dict = {
         'google_maps_api_key'   : settings.GOOGLE_MAPS_API_KEY,
