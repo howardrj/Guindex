@@ -64,10 +64,10 @@ function populateGuindexStatsTable ()
     // Check if table is being drawn from scratch or refreshed
     if (!g_guindexStatsTable)
     {
-        data_columns = [
+        var data_columns = [
             {title: "Statistic", "orderable": false},
-            {title: "Value",     "orderable": false},
-        ]
+            {title: "Value",     "orderable": false}
+        ];
 
         g_guindexStatsTable = $('#GuindexStatisticsTable').DataTable({
                                   responsive: true,
@@ -130,7 +130,7 @@ $(function () {
 
 	function addData(chart, label, data) {
 	    chart.data.labels.push(label);
-	    chart.data.datasets.forEach((dataset) => {
+	    chart.data.datasets.forEach(function (dataset) {
 	        dataset.data.push(data);
 	    });
 	    chart.update();
@@ -149,7 +149,7 @@ $(function () {
 	        ,"Loading", "Loading", "Loading", "Loading", "Loading", "Loading"
 	        ,"Loading", "Loading", "Loading", "Loading", "Loading", "Loading","Loading", "Loading"],
 	        datasets: [{
-	            label: 'Pubs Not Visited',
+	            'label': 'Pubs Not Visited',
 	            data: [0, 0, 0, 0, 0, 0
 	            ,0, 0, 0, 0, 0, 0
 	            ,0, 0, 0, 0, 0, 0
@@ -192,7 +192,7 @@ $(function () {
 	            borderWidth: 1
 	        },
 	        {
-	            label: 'Pubs Visited',
+	            'label': 'Pubs Visited',
 	            data: [0, 0, 0, 0, 0, 0
 	            ,0, 0, 0, 0, 0, 0
 	            ,0, 0, 0, 0, 0, 0
@@ -261,7 +261,7 @@ $(function () {
 	        },
 	        tooltips: {
 				callbacks: {
-					label: function(tooltipItem,data) {
+					'label': function(tooltipItem,data) {
 						var oppositeIndex = tooltipItem.datasetIndex;
 						if(oppositeIndex == 0){
 							oppositeIndex = 1;
@@ -289,7 +289,7 @@ $(function () {
 	        ,"Loading", "Loading", "Loading", "Loading", "Loading", "Loading"
 	        ,"Loading", "Loading", "Loading", "Loading", "Loading", "Loading","Loading", "Loading"],
 	        datasets: [{
-	            label: 'Average Price of a Pint',
+	            'label': 'Average Price of a Pint',
 	            data: [0, 0, 0, 0, 0, 0
 	            ,0, 0, 0, 0, 0, 0
 	            ,0, 0, 0, 0, 0, 0
@@ -364,7 +364,7 @@ $(function () {
 	        },
 	        tooltips: {
 				callbacks: {
-					label: function(tooltipItem,data) {
+					'label': function(tooltipItem,data) {
 						
 						//console.log(tooltipItem);
 						//var TotalToolTip = tooltipItem.xLabel + data.datasets[oppositeIndex].data[tooltipItem.index];
@@ -415,25 +415,36 @@ function appendPageToPubsList(pageNumber)
             {
                 //console.log(pubs_list.length);
                 //console.log(pubs_list[1]);
-                var res;
+                var res = {};
                 var CountryResult = [];
+                var pi;
+                var countyKey;
 
-                var CountryResult = pubs_list.reduce(function(res, value) {
-                  if (!res[value.county]) {
-                    res[value.county] = { county: value.county, qty: 0 , visited: 0 , notvisited: 0 , totalPrices:0 , averagePrice: 0 };
-                    CountryResult.push(res[value.county])
-                  }
+                for (pi = 0; pi < pubs_list.length; pi++) {
+                    countyKey = pubs_list[pi].county;
+                    if (!res[countyKey]) {
+                        res[countyKey] = {
+                            county: countyKey,
+                            qty: 0,
+                            visited: 0,
+                            notvisited: 0,
+                            totalPrices: 0,
+                            averagePrice: 0
+                        };
+                        CountryResult.push(res[countyKey]);
+                    }
 
-                  res[value.county].qty += 1;
-                  if(value.lastPrice == null){
-                  	res[value.county].notvisited += 1;
-                  }else{
-                  	res[value.county].visited += 1;
-                  	res[value.county].totalPrices += Number(value.lastPrice);
-                  	res[value.county].averagePrice = Math.round((res[value.county].totalPrices/res[value.county].visited)*100)/100;
-                  }
-                  return res;
-                }, {});
+                    res[countyKey].qty += 1;
+                    if (pubs_list[pi].lastPrice == null) {
+                        res[countyKey].notvisited += 1;
+                    } else {
+                        res[countyKey].visited += 1;
+                        res[countyKey].totalPrices += Number(pubs_list[pi].lastPrice);
+                        res[countyKey].averagePrice = Math.round(
+                            (res[countyKey].totalPrices / res[countyKey].visited) * 100
+                        ) / 100;
+                    }
+                }
 
 
                 //console.log(CountryResult);
