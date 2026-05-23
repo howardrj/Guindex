@@ -1,19 +1,25 @@
+import logging
 import re
 
-from django.conf import settings
+from django import forms as django_forms
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
+from allauth.account import app_settings as allauth_settings
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailAddress
+from allauth.account.utils import setup_user_email
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import (
     LoginSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetSerializer,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -102,13 +108,59 @@ class GuindexRegisterSerializer(RegisterSerializer):
             data['username'] = self._username_from_email(email)
         return data
 
+    def validate_password1(self, password):
+        try:
+            return get_adapter().clean_password(password)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(list(exc.messages))
+        except django_forms.ValidationError as exc:
+            raise serializers.ValidationError(list(exc.messages))
+
     def validate_email(self, value):
         email = get_adapter().clean_email(value)
-        if email and self._users_for_email(email):
+        if allauth_settings.UNIQUE_EMAIL and email and self._users_for_email(email):
             raise serializers.ValidationError(
                 _('A user is already registered with this e-mail address.')
             )
         return email
+
+    def save(self, request):
+        adapter = get_adapter()
+        user = adapter.new_user(request)
+        self.cleaned_data = self.get_cleaned_data()
+        try:
+            adapter.save_user(request, user, self)
+        except django_forms.ValidationError as exc:
+            raise serializers.ValidationError(list(exc.messages))
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(list(exc.messages))
+        except Exception as exc:
+            logger.exception('adapter.save_user failed during registration')
+            raise serializers.ValidationError(
+                _('Registration failed. Please try again or contact support.')
+            )
+
+        self.custom_signup(request, user)
+        self._setup_email_address(request, user)
+        return user
+
+    def _setup_email_address(self, request, user):
+        if EmailAddress.objects.filter(user=user).exists():
+            return
+        try:
+            setup_user_email(request, user, [])
+        except Exception:
+            logger.exception(
+                'setup_user_email failed for user pk=%s; creating EmailAddress',
+                user.pk,
+            )
+            if user.email:
+                EmailAddress.objects.create(
+                    user=user,
+                    email=user.email,
+                    verified=False,
+                    primary=True,
+                )
 
     def _users_for_email(self, email):
         """

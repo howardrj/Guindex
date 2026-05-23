@@ -1,7 +1,8 @@
 import logging
 
 from allauth.account import app_settings as allauth_settings
-from allauth.account.utils import complete_signup
+from allauth.account import signals as allauth_account_signals
+from allauth.account.utils import send_email_confirmation
 from allauth.account.views import ConfirmEmailView
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from django.conf import settings
@@ -69,18 +70,29 @@ class GuindexRegisterView(RegisterView):
         else:
             create_token(self.token_model, user, serializer)
 
+        # REST registration: do not call complete_signup (session login + redirect).
         try:
-            complete_signup(
-                self.request._request,
-                user,
-                allauth_settings.EMAIL_VERIFICATION,
-                None,
+            allauth_account_signals.user_signed_up.send(
+                sender=user.__class__,
+                request=django_request,
+                user=user,
             )
         except Exception:
-            logger.exception(
-                'complete_signup failed for user pk=%s (account may still exist)',
-                user.pk,
-            )
+            logger.exception('user_signed_up signal failed for user pk=%s', user.pk)
+
+        verification = allauth_settings.EMAIL_VERIFICATION
+        if verification in (
+            allauth_settings.EmailVerificationMethod.MANDATORY,
+            allauth_settings.EmailVerificationMethod.OPTIONAL,
+        ):
+            try:
+                send_email_confirmation(django_request, user, signup=True)
+            except Exception:
+                logger.exception(
+                    'send_email_confirmation failed for user pk=%s '
+                    '(account was created)',
+                    user.pk,
+                )
 
         return user
 
