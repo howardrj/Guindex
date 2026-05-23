@@ -4,6 +4,7 @@ import re
 from django import forms as django_forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
@@ -81,14 +82,13 @@ class GuindexRegisterSerializer(RegisterSerializer):
             value = re.sub(r'[^\w.@+-]', '_', email.split('@')[0])[:150] or 'user'
         return get_adapter().clean_username(value)
 
+    def _client_sent_username(self):
+        if not hasattr(self, 'initial_data') or not self.initial_data:
+            return False
+        return bool((self.initial_data.get('username') or '').strip())
+
     def validate(self, data):
-        email = (data.get('email') or '').strip()
-        username = (data.get('username') or '').strip()
-        if email and not username:
-            data = dict(data)
-            data['username'] = re.sub(
-                r'[^\w.@+-]', '_', email.split('@')[0]
-            )[:150] or 'user'
+        # Do not derive username here; get_cleaned_data() assigns a unique one.
         return super(GuindexRegisterSerializer, self).validate(data)
 
     def _username_from_email(self, email):
@@ -104,7 +104,7 @@ class GuindexRegisterSerializer(RegisterSerializer):
     def get_cleaned_data(self):
         data = super(GuindexRegisterSerializer, self).get_cleaned_data()
         email = (data.get('email') or '').strip()
-        if email and not (data.get('username') or '').strip():
+        if email and not self._client_sent_username():
             data['username'] = self._username_from_email(email)
         return data
 
@@ -134,8 +134,17 @@ class GuindexRegisterSerializer(RegisterSerializer):
             raise serializers.ValidationError(list(exc.messages))
         except DjangoValidationError as exc:
             raise serializers.ValidationError(list(exc.messages))
+        except IntegrityError:
+            logger.exception('adapter.save_user IntegrityError during registration')
+            raise serializers.ValidationError(
+                _('A user is already registered with this e-mail address or username.')
+            )
         except Exception as exc:
-            logger.exception('adapter.save_user failed during registration')
+            logger.exception(
+                'adapter.save_user failed during registration: %s: %s',
+                exc.__class__.__name__,
+                exc,
+            )
             raise serializers.ValidationError(
                 _('Registration failed. Please try again or contact support.')
             )
