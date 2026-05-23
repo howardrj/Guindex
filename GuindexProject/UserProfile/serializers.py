@@ -9,7 +9,11 @@ from rest_framework.authtoken.models import Token
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailAddress
 from rest_auth.registration.serializers import RegisterSerializer
-from rest_auth.serializers import LoginSerializer, PasswordResetSerializer
+from rest_auth.serializers import (
+    LoginSerializer,
+    PasswordResetConfirmSerializer,
+    PasswordResetSerializer,
+)
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -81,13 +85,21 @@ class GuindexRegisterSerializer(RegisterSerializer):
             )[:150] or 'user'
         return super(GuindexRegisterSerializer, self).validate(data)
 
+    def _username_from_email(self, email):
+        base = re.sub(r'[^\w.@+-]', '_', email.split('@')[0])[:150] or 'user'
+        User = get_user_model()
+        candidate = base
+        suffix = 0
+        while User.objects.filter(username=candidate).exists():
+            suffix += 1
+            candidate = '{0}_{1}'.format(base[:140], suffix)
+        return get_adapter().clean_username(candidate)
+
     def get_cleaned_data(self):
         data = super(GuindexRegisterSerializer, self).get_cleaned_data()
         email = (data.get('email') or '').strip()
         if email and not (data.get('username') or '').strip():
-            data['username'] = re.sub(
-                r'[^\w.@+-]', '_', email.split('@')[0]
-            )[:150] or 'user'
+            data['username'] = self._username_from_email(email)
         return data
 
     def validate_email(self, value):
@@ -124,3 +136,61 @@ class GuindexPasswordResetSerializer(PasswordResetSerializer):
         from UserProfile.forms import GuindexPasswordResetForm
         self.password_reset_form_class = GuindexPasswordResetForm
         super(GuindexPasswordResetSerializer, self).__init__(*args, **kwargs)
+
+
+class GuindexPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
+    """
+    rest-auth decodes uid as urlsafe base64; allauth reset links use base36
+    (user_pk_to_url_str). Tokens are issued with allauth's default_token_generator.
+    """
+
+    def validate(self, attrs):
+        from allauth.account.forms import default_token_generator as allauth_token
+        try:
+            from allauth.account.utils import url_str_to_user_pk
+        except ImportError:
+            from allauth.utils import url_str_to_user_pk
+        from django.contrib.auth.forms import SetPasswordForm
+        from django.contrib.auth.tokens import default_token_generator as django_token
+        from django.utils.encoding import force_text
+        from django.utils.http import urlsafe_base64_decode as uid_decoder
+
+        UserModel = get_user_model()
+        uid_raw = attrs.get('uid', '')
+
+        try:
+            pk = url_str_to_user_pk(uid_raw)
+            self.user = UserModel._default_manager.get(pk=pk)
+        except Exception:
+            try:
+                from allauth.compat import base36_to_int
+                pk = base36_to_int(uid_raw)
+                self.user = UserModel._default_manager.get(pk=pk)
+            except Exception:
+                try:
+                    pk = force_text(uid_decoder(uid_raw))
+                    self.user = UserModel._default_manager.get(pk=pk)
+                except Exception:
+                    raise serializers.ValidationError({'uid': ['Invalid value']})
+
+        self.custom_validation(attrs)
+
+        self.set_password_form = SetPasswordForm(
+            user=self.user,
+            data={
+                'new_password1': attrs.get('new_password1'),
+                'new_password2': attrs.get('new_password2'),
+            },
+        )
+        if not self.set_password_form.is_valid():
+            raise serializers.ValidationError(self.set_password_form.errors)
+
+        token = attrs.get('token', '')
+        if not allauth_token.check_token(self.user, token):
+            if not django_token.check_token(self.user, token):
+                raise serializers.ValidationError({'token': ['Invalid value']})
+
+        return attrs
+
+    def save(self):
+        return self.set_password_form.save()

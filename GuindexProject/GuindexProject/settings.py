@@ -349,6 +349,9 @@ REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER': 'UserProfile.serializers.GuindexLoginSerializer',
     'TOKEN_SERIALIZER': 'UserProfile.serializers.TokenSerializer',
     'PASSWORD_RESET_SERIALIZER': 'UserProfile.serializers.GuindexPasswordResetSerializer',
+    'PASSWORD_RESET_CONFIRM_SERIALIZER': (
+        'UserProfile.serializers.GuindexPasswordResetConfirmSerializer'
+    ),
 }
 
 REST_AUTH_REGISTER_SERIALIZERS = {
