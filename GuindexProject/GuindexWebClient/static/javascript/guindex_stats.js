@@ -2,12 +2,63 @@ var g_stats = null;
 var g_guindexStatsTable = null;
 var g_retrievingStats = false;
 var g_statsTableRendered = false;
+var g_myChart = null;
+var g_myPriceChart = null;
+var g_statsChartsInitialized = false;
+var g_statsPubsLoadStarted = false;
+var g_statsPubsList = [];
+
+var g_statsCountyColors = [
+	{county:"Dublin",colour1:"darkblue", colour2:"lightblue"},
+	{county:"Cork",colour1:"red", colour2:"white"},
+	{county:"Galway",colour1:"maroon", colour2:"white"},
+	{county:"Kerry",colour1:"green", colour2:"yellow"},
+	{county:"Limerick",colour1:"green", colour2:"white"},
+	{county:"Kildare",colour1:"white", colour2:"black"},
+	{county:"Mayo",colour1:"green", colour2:"red"},
+	{county:"Tipperary",colour1:"blue", colour2:"yellow"},
+	{county:"Donegal",colour1:"yellow", colour2:"green"},
+	{county:"Wexford",colour1:"purple", colour2:"yellow"},
+	{county:"Clare",colour1:"yellow", colour2:"blue"},
+	{county:"Meath",colour1:"green", colour2:"yellow"},
+	{county:"Westmeath",colour1:"maroon", colour2:"white"},
+	{county:"Waterford",colour1:"white", colour2:"blue"},
+	{county:"Sligo",colour1:"black", colour2:"white"},
+	{county:"Kilkenny",colour1:"black", colour2:"yellow"},
+	{county:"Louth",colour1:"red", colour2:"white"},
+	{county:"Offaly",colour1:"green", colour2:"gold"},
+	{county:"Wicklow",colour1:"blue", colour2:"yellow"},
+	{county:"Laois",colour1:"blue", colour2:"white"},
+	{county:"Roscommon",colour1:"yellow", colour2:"darkblue"},
+	{county:"Leitrim",colour1:"yellow", colour2:"green"},
+	{county:"Cavan",colour1:"darkblue", colour2:"white"},
+	{county:"Carlow",colour1:"red", colour2:"yellow"},
+	{county:"Longford",colour1:"blue", colour2:"white"},
+	{county:"Monaghan",colour1:"white", colour2:"blue"},
+	{county:"Antrim",colour1:"gold", colour2:"white"},
+	{county:"Armagh",colour1:"orange", colour2:"white"},
+	{county:"Derry",colour1:"red", colour2:"white"},
+	{county:"Down",colour1:"red", colour2:"black"},
+	{county:"Fermanagh",colour1:"green", colour2:"white"},
+	{county:"Tyrone",colour1:"white", colour2:"red"}
+];
 
 function populateGuindexStatsTable ()
 {
-    // Hack to avoid fetching stats each time tab is opened
-    if (g_statsTableRendered)
+    if (!document.getElementById('GuindexStatisticsTable')) {
         return;
+    }
+
+    guindexEnsureStatsChartsAndData();
+
+    if (g_statsTableRendered && $.fn.DataTable.isDataTable('#GuindexStatisticsTable')) {
+        return;
+    }
+
+    if (g_statsTableRendered) {
+        g_guindexStatsTable = null;
+        g_statsTableRendered = false;
+    }
 
     function getStats (callback)
     {
@@ -93,40 +144,18 @@ function populateGuindexStatsTable ()
 /******************/
 /* Dynamic Charts */
 /******************/
-$(function () {
-	
-	var CountyColors = [{county:"Dublin",colour1:"darkblue", colour2:"lightblue"},
-	{county:"Cork",colour1:"red", colour2:"white"},
-	{county:"Galway",colour1:"maroon", colour2:"white"},
-	{county:"Kerry",colour1:"green", colour2:"yellow"},
-	{county:"Limerick",colour1:"green", colour2:"white"},
-	{county:"Kildare",colour1:"white", colour2:"black"},
-	{county:"Mayo",colour1:"green", colour2:"red"},
-	{county:"Tipperary",colour1:"blue", colour2:"yellow"},
-	{county:"Donegal",colour1:"yellow", colour2:"green"},
-	{county:"Wexford",colour1:"purple", colour2:"yellow"},
-	{county:"Clare",colour1:"yellow", colour2:"blue"},
-	{county:"Meath",colour1:"green", colour2:"yellow"},
-	{county:"Westmeath",colour1:"maroon", colour2:"white"},
-	{county:"Waterford",colour1:"white", colour2:"blue"},
-	{county:"Sligo",colour1:"black", colour2:"white"},
-	{county:"Kilkenny",colour1:"black", colour2:"yellow"},
-	{county:"Louth",colour1:"red", colour2:"white"},
-	{county:"Offaly",colour1:"green", colour2:"gold"},
-	{county:"Wicklow",colour1:"blue", colour2:"yellow"},
-	{county:"Laois",colour1:"blue", colour2:"white"},
-	{county:"Roscommon",colour1:"yellow", colour2:"darkblue"},
-	{county:"Leitrim",colour1:"yellow", colour2:"green"},
-	{county:"Cavan",colour1:"darkblue", colour2:"white"},
-	{county:"Carlow",colour1:"red", colour2:"yellow"},
-	{county:"Longford",colour1:"blue", colour2:"white"},
-	{county:"Monaghan",colour1:"white", colour2:"blue"},
-	{county:"Antrim",colour1:"gold", colour2:"white"},
-	{county:"Armagh",colour1:"orange", colour2:"white"},
-	{county:"Derry",colour1:"red", colour2:"white"},
-	{county:"Down",colour1:"red", colour2:"black"},
-	{county:"Fermanagh",colour1:"green", colour2:"white"},
-	{county:"Tyrone",colour1:"white", colour2:"red"}];
+function guindexEnsureStatsChartsAndData()
+{
+    if (g_statsChartsInitialized) {
+        return;
+    }
+
+    var ctx = document.getElementById('myChart');
+    var ctx2 = document.getElementById('myPriceChart');
+
+    if (!ctx || !ctx2) {
+        return;
+    }
 
 	function addData(chart, label, data) {
 	    chart.data.labels.push(label);
@@ -140,8 +169,7 @@ $(function () {
 	   return n % 2 == 0;
 	}
 
-	var ctx = document.getElementById("myChart");
-	var myChart = new Chart(ctx, {
+	g_myChart = new Chart(ctx, {
 	    type: 'bar',
 	    data: {
 	        labels: ["Loading", "Loading", "Loading", "Loading", "Loading", "Loading"
@@ -280,8 +308,7 @@ $(function () {
 	    }
 	});
 
-	var ctx2 = document.getElementById("myPriceChart");
-	var myPriceChart = new Chart(ctx2, {
+	g_myPriceChart = new Chart(ctx2, {
 	    type: 'bar',
 	    data: {
 	        labels: ["Loading", "Loading", "Loading", "Loading", "Loading", "Loading"
@@ -378,16 +405,19 @@ $(function () {
 	});
 
 
-	var pubs_endpoint = "https://guindex.ie/api/pubs/"
-var pubs_list = [];
+    g_statsChartsInitialized = true;
 
-appendPageToPubsList(1);
+    if (!g_statsPubsLoadStarted) {
+        g_statsPubsLoadStarted = true;
+        guindexStatsAppendPageToPubsList(1);
+    }
+}
 
-function appendPageToPubsList(pageNumber)
+function guindexStatsAppendPageToPubsList(pageNumber)
 {
     var request = new XMLHttpRequest();
 
-    request.open('GET', pubs_endpoint + '?page=' + pageNumber, true);
+    request.open('GET', G_API_BASE + 'pubs/?page=' + pageNumber, true);
 
     request.setRequestHeader('Content-Type', 'application/json');
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -402,14 +432,14 @@ function appendPageToPubsList(pageNumber)
 
             for (var i = 0; i < response['results'].length; i++)
             {
-                pubs_list.push(response['results'][i]);
+                g_statsPubsList.push(response['results'][i]);
             }
 
             //console.log(response['next']);
             
             if (response['next'])
             {
-                appendPageToPubsList(++pageNumber);
+                guindexStatsAppendPageToPubsList(++pageNumber);
             }
             else
             {
@@ -420,8 +450,8 @@ function appendPageToPubsList(pageNumber)
                 var pi;
                 var countyKey;
 
-                for (pi = 0; pi < pubs_list.length; pi++) {
-                    countyKey = pubs_list[pi].county;
+                for (pi = 0; pi < g_statsPubsList.length; pi++) {
+                    countyKey = g_statsPubsList[pi].county;
                     if (!res[countyKey]) {
                         res[countyKey] = {
                             county: countyKey,
@@ -435,11 +465,11 @@ function appendPageToPubsList(pageNumber)
                     }
 
                     res[countyKey].qty += 1;
-                    if (pubs_list[pi].lastPrice == null) {
+                    if (g_statsPubsList[pi].lastPrice == null) {
                         res[countyKey].notvisited += 1;
                     } else {
                         res[countyKey].visited += 1;
-                        res[countyKey].totalPrices += Number(pubs_list[pi].lastPrice);
+                        res[countyKey].totalPrices += Number(g_statsPubsList[pi].lastPrice);
                         res[countyKey].averagePrice = Math.round(
                             (res[countyKey].totalPrices / res[countyKey].visited) * 100
                         ) / 100;
@@ -471,17 +501,17 @@ function appendPageToPubsList(pageNumber)
                 Object.keys(sortedCountryResults).forEach(function(key) {
 					//console.log(key, sortedCountryResults[key],sortedCountryResults[key].qty,sortedCountryResults[key].visited,sortedCountryResults[key].notvisited,sortedCountryResults[key].averagePrice);
 
-				    myChart.data.datasets[0].data[m] = sortedCountryResults[key][3];
-				    myChart.data.datasets[1].data[m] = sortedCountryResults[key][2];
+				    g_myChart.data.datasets[0].data[m] = sortedCountryResults[key][3];
+				    g_myChart.data.datasets[1].data[m] = sortedCountryResults[key][2];
 
-				    myChart.data.datasets[0].labels[m] = sortedCountryResults[key][4];
+				    g_myChart.data.datasets[0].labels[m] = sortedCountryResults[key][4];
 
-					myChart.data.labels[m] = sortedCountryResults[key][0];
+					g_myChart.data.labels[m] = sortedCountryResults[key][0];
 
-					for(var j = 0; j < CountyColors.length; j++){
-						if(sortedCountryResults[key][0] == CountyColors[j].county){
-							myChart.data.datasets[0].backgroundColor[m] = CountyColors[j].colour1;
-							myChart.data.datasets[1].backgroundColor[m] = CountyColors[j].colour2;
+					for(var j = 0; j < g_statsCountyColors.length; j++){
+						if(sortedCountryResults[key][0] == g_statsCountyColors[j].county){
+							g_myChart.data.datasets[0].backgroundColor[m] = g_statsCountyColors[j].colour1;
+							g_myChart.data.datasets[1].backgroundColor[m] = g_statsCountyColors[j].colour2;
 						}
 					}
 
@@ -493,14 +523,13 @@ function appendPageToPubsList(pageNumber)
                 Object.keys(sortedCountryPrice).forEach(function(key) {
 					//console.log(key, sortedCountryPrice[key],sortedCountryPrice[key].qty,sortedCountryPrice[key].visited,sortedCountryPrice[key].notvisited,sortedCountryPrice[key].averagePrice);
 
-				    myPriceChart.data.datasets[0].data[m] = sortedCountryPrice[key][4];
-					myPriceChart.data.labels[m] = sortedCountryPrice[key][0];
+				    g_myPriceChart.data.datasets[0].data[m] = sortedCountryPrice[key][4];
+					g_myPriceChart.data.labels[m] = sortedCountryPrice[key][0];
 
-					for(var j = 0; j < CountyColors.length; j++){
-						if(sortedCountryPrice[key][0] == CountyColors[j].county){
+					for(var j = 0; j < g_statsCountyColors.length; j++){
+						if(sortedCountryPrice[key][0] == g_statsCountyColors[j].county){
 
-							myPriceChart.data.datasets[0].backgroundColor[m] = CountyColors[j].colour1;
-							//myChart.data.datasets[1].backgroundColor[m] = CountyColors[j].colour2;
+							g_myPriceChart.data.datasets[0].backgroundColor[m] = g_statsCountyColors[j].colour1;
 						}
 					}
 
@@ -508,12 +537,10 @@ function appendPageToPubsList(pageNumber)
 
 				});
 
-				myChart.update();
-				myPriceChart.update();
+				g_myChart.update();
+				g_myPriceChart.update();
                 
             }
         }   
     }
 };
-
-});

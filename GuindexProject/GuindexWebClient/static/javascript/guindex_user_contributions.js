@@ -131,7 +131,16 @@ function populateUserContributionsTable() {
         return;
     }
 
-    if (g_userContributionsTableRendered) return;
+    if (!document.getElementById('GuindexContributionsTable')) {
+        return;
+    }
+
+    if (g_userContributionsTableRendered && $.fn.DataTable.isDataTable('#GuindexContributionsTable')) {
+        return;
+    }
+
+    g_userContributionsTableRendered = false;
+    g_userContributionsTable = null;
 
     function getUserContributions(callback) {
         if (g_retrievingUserContributions) return;
@@ -188,7 +197,7 @@ function populateUserContributionsTable() {
 
     // Check if table is being drawn from scratch or refreshed
     if (!g_userContributionsTable) {
-        data_columns = [
+        var data_columns = [
             { title: 'Statistic', orderable: false },
             { title: 'Value', orderable: false },
         ];

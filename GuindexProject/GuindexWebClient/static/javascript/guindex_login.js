@@ -175,7 +175,11 @@ function onLoginSuccess ()
 
     for (var i = 0; i < page_contents.length; i++)
     {
-        page_contents[i].dispatchEvent(new Event('on_login', { bubbles: true }));
+        if (typeof window.guindexDispatchEvent === 'function') {
+            window.guindexDispatchEvent(page_contents[i], 'on_login');
+        } else {
+            page_contents[i].dispatchEvent(new Event('on_login', { bubbles: true }));
+        }
 
         if (typeof window.guindexInitTabContent === 'function') {
             window.guindexInitTabContent(page_contents[i]);

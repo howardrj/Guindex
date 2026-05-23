@@ -29,8 +29,16 @@ function populateUserSettingsTable ()
         return;
     }
 
-    if (g_userSettingsTableRendered)
+    if (!document.getElementById('GuindexUserSettingsTable')) {
         return;
+    }
+
+    if (g_userSettingsTableRendered && $.fn.DataTable.isDataTable('#GuindexUserSettingsTable')) {
+        return;
+    }
+
+    g_userSettingsTableRendered = false;
+    g_userSettingsTable = null;
 
     function getUserSettings (callback)
     {

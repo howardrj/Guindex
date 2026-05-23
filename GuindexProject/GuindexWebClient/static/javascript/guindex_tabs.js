@@ -1,6 +1,21 @@
 (function () {
 
-    console.log("Here");
+    function guindexDispatchEvent(target, eventName) {
+        if (!target) {
+            return;
+        }
+        if (typeof Event === 'function') {
+            try {
+                target.dispatchEvent(new Event(eventName, { bubbles: true }));
+                return;
+            } catch (e) {
+                // fall through for older browsers
+            }
+        }
+        var evt = document.createEvent('Event');
+        evt.initEvent(eventName, true, true);
+        target.dispatchEvent(evt);
+    }
 
     if (typeof window.guindexLoadMapIframeForCounty !== 'function') {
         window.guindexLoadMapIframeForCounty = function (value) {
@@ -37,6 +52,44 @@
     var page_content_divs = document.getElementsByClassName('page_content');
     var g_firstPage = true;
 
+    /**
+     * Main page already includes full tab markup; avoid async_load replacing it
+     * (that strips inline listeners and breaks DataTables / login UI).
+     */
+    function guindexTabHasServerContent(tabContent) {
+        if (!tabContent || !tabContent.id) {
+            return false;
+        }
+
+        switch (tabContent.id) {
+            case 'data_table_page':
+                return !!tabContent.querySelector('#GuindexDataTable');
+            case 'statistics_page':
+                return !!tabContent.querySelector('#GuindexStatisticsTable') ||
+                    !!tabContent.querySelector('#myChart');
+            case 'contributions_page':
+                return !!tabContent.querySelector('.on_logged_in');
+            case 'settings_page':
+                return !!tabContent.querySelector('#GuindexUserSettingsTable') ||
+                    !!tabContent.querySelector('.on_logged_in');
+            case 'pending_contributions_page':
+                return !!tabContent.querySelector('table');
+            case 'map_page':
+                return !!tabContent.querySelector('#map_county_select');
+            default:
+                return tabContent.children.length > 0;
+        }
+    }
+
+    function guindexShowPreloadedTab(page_content) {
+        page_content.setAttribute('data-content_loaded', '1');
+        page_content.style.display = 'block';
+        if (typeof window.guindexInitTabContent === 'function') {
+            window.guindexInitTabContent(page_content);
+        }
+        guindexDispatchEvent(page_content, 'tab_display');
+    }
+
     $(document).on('click', '.page_content_link', function () {
 
         // Hide all page content
@@ -57,6 +110,10 @@
 
         var page_content = document.getElementById(page_content_id);
 
+        if (!page_content) {
+            return;
+        }
+
         // Update URL
         if (g_firstPage)
         {
@@ -64,14 +121,14 @@
             g_firstPage = false;
 
             history.replaceState(page_content_id,
-                                 'Guindex', 
-                                 location.protocol + '//' + location.hostname + ':' + location.port + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
+                                 'Guindex',
+                                 G_URL_BASE + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
         }
         else
         {
             history.pushState(page_content_id,
-                              'Guindex', 
-                              location.protocol + '//' + location.hostname + ':' + location.port + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
+                              'Guindex',
+                              G_URL_BASE + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
         }
     
         // Send analytics page view
@@ -84,7 +141,12 @@
             if (typeof window.guindexInitTabContent === 'function') {
                 window.guindexInitTabContent(page_content);
             }
-            page_content.dispatchEvent(new Event('tab_display', { bubbles: true }));
+            guindexDispatchEvent(page_content, 'tab_display');
+            return;
+        }
+
+        if (guindexTabHasServerContent(page_content)) {
+            guindexShowPreloadedTab(page_content);
             return;
         }
 
@@ -153,7 +215,8 @@
             return;
         }
 
-        if (tabContent.getAttribute('data-content_loaded') !== '1') {
+        if (tabContent.getAttribute('data-content_loaded') !== '1' &&
+            !guindexTabHasServerContent(tabContent)) {
             return;
         }
 
@@ -197,12 +260,13 @@
     }
 
     window.guindexInitTabContent = guindexInitTabContent;
+    window.guindexDispatchEvent = guindexDispatchEvent;
 
     function onTabLoad(tabContent)
     {
         tabContent.setAttribute('data-content_loaded', '1');
         guindexInitTabContent(tabContent);
-        tabContent.dispatchEvent(new Event('tab_display', { bubbles: true }));
+        guindexDispatchEvent(tabContent, 'tab_display');
     }
 
     document.addEventListener('tab_display', function (evt) {
@@ -265,9 +329,9 @@
 
         // Display corresponding page content
         var page_content = document.getElementById(page_content_id);
-        page_content.style.display = 'block';
 
         if (page_content) {
+            page_content.style.display = 'block';
             guindexInitTabContent(page_content);
         }
     };
