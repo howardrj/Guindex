@@ -19,10 +19,11 @@ def createNewTelegramUser(user):
 
     telegram_user = TelegramUser()
 
-    telegram_user.activationKey     = generateActivationKey()
-    telegram_user.activationKeyHash = generateActivationKey()
-    telegram_user.activationKeyHash = hashlib.sha256(activation_key.encode('utf-8')).hexdigest()
-    telegram_user.chatId            = generateChatId()
+    telegram_user.activationKey = generateActivationKey()
+    telegram_user.activationKeyHash = hashlib.sha256(
+        telegram_user.activationKey.encode('utf-8')
+    ).hexdigest()
+    telegram_user.chatId = generateChatId()
     telegram_user.user              = user
 
     telegram_user.save()

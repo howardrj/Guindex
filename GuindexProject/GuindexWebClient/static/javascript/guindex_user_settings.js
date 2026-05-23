@@ -6,21 +6,39 @@ var g_userSettingsTableRendered = false;
 // Can only be called if user is logged in
 function populateUserSettingsTable ()
 {
+    var settings_page = document.getElementById('settings_page');
+    var on_logged_in = settings_page ?
+        settings_page.getElementsByClassName('on_logged_in')[0] : null;
+    var on_logged_out = settings_page ?
+        settings_page.getElementsByClassName('on_logged_out')[0] : null;
+
+    if (!on_logged_in || !on_logged_out)
+    {
+        return;
+    }
+
     if (g_loggedIn)
     {
-        // Clear log in warning
-        var settings_page = document.getElementById('settings_page');
-
-        settings_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
-        settings_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
+        on_logged_in.style.display  = 'block';
+        on_logged_out.style.display = 'none';
     }
     else
     {
+        on_logged_in.style.display  = 'none';
+        on_logged_out.style.display = 'block';
         return;
     }
 
-    if (g_userSettingsTableRendered)
+    if (!document.getElementById('GuindexUserSettingsTable')) {
         return;
+    }
+
+    if (g_userSettingsTableRendered && $.fn.DataTable.isDataTable('#GuindexUserSettingsTable')) {
+        return;
+    }
+
+    g_userSettingsTableRendered = false;
+    g_userSettingsTable = null;
 
     function getUserSettings (callback)
     {
@@ -79,8 +97,10 @@ function populateUserSettingsTable ()
 
     if (!g_userSettings['telegramActivated'])
     {
-        telegram_description += " To activate your Telegram account, please add the GuindexBot as a contact using" +
-                                " the Telegram app and send: /activate " + g_userSettings['telegramActivationKey'] + '.';
+        var botName = g_userSettings['telegramBotUsername'] || 'GuindexIEBot';
+        var botLink = g_userSettings['telegramBotLink'] || 'https://t.me/GuindexIEBot';
+        telegram_description += ' To activate, open ' + botLink + ' (or search for @' + botName +
+                                ' in Telegram) and send: /activate ' + g_userSettings['telegramActivationKey'] + '.';
     }
 
     suffix = '<div id="telegram_alerts_toggler_div" class="slider round"> </div></label>';

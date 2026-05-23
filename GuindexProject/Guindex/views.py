@@ -1,11 +1,14 @@
+# -*- coding: utf-8 -*-
 import logging
 
 from django.contrib.auth.models import User
+from django.utils.encoding import force_text
 from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
 from rest_framework.throttling import SimpleRateThrottle
 
@@ -15,6 +18,7 @@ from Guindex.filters import GuindexDatatablesFilterBackend
 from Guindex.serializers import GuinnessSerializer
 from Guindex.serializers import GuinnessPendingCreateSerializer
 from Guindex.serializers import PubSerializer
+from Guindex.serializers import MapPubSerializer
 from Guindex.serializers import PubPendingCreateSerializer
 from Guindex.serializers import PubPendingPatchSerializer
 from Guindex.serializers import StatisticsSerializer
@@ -99,6 +103,42 @@ class PubViewSet(viewsets.ModelViewSet):
     filter_backends    = (DjangoFilterBackend, SearchFilter, GuindexDatatablesFilterBackend,)
     filter_fields      = ('name', 'closed', 'servingGuinness', 'county', 'creator', )
     search_fields      = ('name',)
+
+
+class MapPubPagination(PageNumberPagination):
+    """
+        Small pages so each JSON response stays under proxy/browser size limits.
+        (A single ~5000-pub JSON payload was being truncated mid-transfer.)
+    """
+    page_size = 250
+    page_size_query_param = 'page_size'
+    max_page_size = 500
+
+
+class MapPubList(generics.ListAPIView):
+    """
+        Approved pubs for the live Leaflet map, paginated for reliable delivery.
+        Filter with ?county=Dublin (exact match on supported county names).
+    """
+
+    serializer_class = MapPubSerializer
+    permission_classes = (permissions.AllowAny, )
+    pagination_class = MapPubPagination
+    filter_backends = (DjangoFilterBackend, )
+    filter_fields = ('county', )
+
+    def get_queryset(self):
+        # Server-side filter: ?county=Cork returns Cork pubs only (not client-side).
+        qs = Pub.objects.all().only(
+            'id', 'name', 'latitude', 'longitude', 'closed',
+            'servingGuinness', 'lastPrice', 'county', 'lastSubmissionTime',
+        ).order_by('name')
+
+        county = force_text(self.request.query_params.get('county') or '').strip()
+        if county:
+            qs = qs.filter(county=county)
+
+        return qs
 
 
 ##############################

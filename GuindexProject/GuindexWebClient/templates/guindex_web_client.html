@@ -229,6 +229,11 @@
           <a class="nav-link" data-toggle="modal" id="login_link" data-target="#exampleModal">
             <i class="fa fa-fw fa-sign-in"></i>Login</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="modal" id="logout_link" data-target="#exampleModal" style="display:none">
+            <i class="fa fa-fw fa-user"></i>
+          </a>
+        </li>
         <li class="nav-item" id="facebook_connect_nav_item" style="display:none">
           <a class="nav-link" data-toggle="modal" id="facebook_connect_modal_link" data-target="#facebook_connect_modal">
             <i class="fa fa-fw fa-plug"></i>Connect
@@ -381,6 +386,7 @@
                     </span>
                     <span id="password_login_modal_body_logged_in_this_way" style="display:none">
                         You are currently logged in as <span id="password_login_username"></span>.
+                        <span id="logout_modal_username" style="display:none"></span>
                     </span>
                     <span id="password_login_modal_body_logged_in_other_way" style="display:none">
                         You are currently logged in via Facebook. To login using a previously created account credentials instead,
@@ -389,7 +395,7 @@
                     </span>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal" id="login_close_button">Cancel</button>
                     <button type="submit" form="password_login_form" class="btn btn-primary" id="password_login_button">Submit</button>
                     <a class="btn btn-primary" id="logout_button" style="display:none">Logout</a>
                     <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
@@ -568,15 +574,27 @@
     <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_login.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_main.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_table.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_stats.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_user_contributions.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_user_settings.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_pending_contributions.min.js" %}"></script>
     <script type="text/javascript" src="{% static "vendor/leaflet/leaflet.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_map.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.min.js" %}"></script>
   {% else %}
     <script type="text/javascript" src="{% static "javascript/guindex_web_client_utils.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_login.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_main.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_table.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_stats.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_user_contributions.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_user_settings.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_pending_contributions.js" %}"></script>
     <script type="text/javascript" src="{% static "vendor/leaflet/leaflet.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_add_pub.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascript/guindex_map.js" %}"></script>
     <script type="text/javascript" src="{% static "javascript/guindex_tabs.js" %}"></script>
   {% endif %}
 

@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.utils.html import escape
 from django.db.models import Count
 from django.core.validators import validate_email as validateEmail
 from django.core.mail import send_mail as sendMail
@@ -15,6 +16,7 @@ from Guindex.models import Pub, PubPendingCreate, PubPendingPatch
 from Guindex.models import Guinness, GuinnessPendingCreate
 from Guindex.models import StatisticsSingleton
 from Guindex.GuindexParameters import GuindexParameters
+from TelegramUser.TelegramUserParameters import TelegramUserParameters
 
 logger = logging.getLogger(__name__)
 
@@ -265,6 +267,88 @@ class PubSerializer(serializers.ModelSerializer):
         if longitude < min_longitude or longitude > max_longitude:
             raise ValidationError("Longitude must be between %s - %s for this county." % (min_longitude, max_longitude))
 
+
+def map_pub_currency_symbol(pub):
+    county = (pub.county or '').strip()
+    if not county:
+        return u"\u20ac"
+    for name, symbol in GuindexParameters.COUNTY_CURRENCIES.items():
+        if name.lower() == county.lower():
+            return symbol
+    return u"\u20ac"
+
+
+def map_pub_marker_color(pub):
+    if pub.closed:
+        return 'red'
+    if not pub.servingGuinness:
+        return 'black'
+    if pub.lastPrice is not None:
+        return 'green'
+    return 'lightgray'
+
+
+def map_pub_marker_icon(pub):
+    icons = {
+        'green': 'beer',
+        'red': 'exclamation',
+        'black': 'window-close',
+        'lightgray': 'question',
+    }
+    return icons[map_pub_marker_color(pub)]
+
+
+def map_pub_popup_html(pub):
+    """
+        Popup HTML aligned with the Folium map (AwesomeMarkers) output.
+    """
+    name = escape(pub.name)
+
+    if pub.closed:
+        return u'%s<br>closed' % name
+
+    if not pub.servingGuinness:
+        return u'%s<br>not serving Guinness' % name
+
+    if pub.lastPrice is not None:
+        currency = map_pub_currency_symbol(pub)
+        price_line = u'%s%s' % (currency, pub.lastPrice)
+
+        if pub.lastSubmissionTime:
+            submitted = pub.lastSubmissionTime.strftime('%Y-%m-%d')
+            return u'%s<br>%s<br>Submitted: %s' % (name, price_line, submitted)
+
+        return u'%s<br>%s' % (name, price_line)
+
+    return u'%s<br>No data submitted' % name
+
+
+class MapPubSerializer(serializers.ModelSerializer):
+    """
+        Minimal pub payload for the live Leaflet map (loaded in small pages).
+    """
+
+    markerColor = serializers.SerializerMethodField()
+    markerIcon = serializers.SerializerMethodField()
+    popupHtml = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Pub
+        fields = (
+            'id', 'name', 'latitude', 'longitude',
+            'markerColor', 'markerIcon', 'popupHtml',
+        )
+
+    def get_markerColor(self, obj):
+        return map_pub_marker_color(obj)
+
+    def get_markerIcon(self, obj):
+        return map_pub_marker_icon(obj)
+
+    def get_popupHtml(self, obj):
+        return map_pub_popup_html(obj)
+
+
 ################################
 # PubPendingCreate Serializers #
 ################################
@@ -488,14 +572,32 @@ class ContributorSerializer(serializers.ModelSerializer):
                                                   read_only = True,
                                                   source = 'telegramuser.activationKey')
 
+    telegramBotUsername = serializers.SerializerMethodField(
+        help_text = 'Telegram bot username (@handle) for activation.',
+        read_only = True,
+    )
+
+    telegramBotLink = serializers.SerializerMethodField(
+        help_text = 'Telegram deep link (t.me) for the Guindex bot.',
+        read_only = True,
+    )
+
     class Meta:
         model = User
         fields = ('id', 'username', 'is_staff', 'pubsVisited', 'originalPrices',
                   'currentVerifications', 'countyBadges', 'usingEmailAlerts', 'usingTelegramAlerts',
-                  'telegramActivated', 'telegramActivationKey', 'isDeveloper')
+                  'telegramActivated', 'telegramActivationKey', 'telegramBotUsername', 'telegramBotLink',
+                  'isDeveloper')
         # Can only patch alert settings
         read_only_fields = ('id', 'username', 'is_staff', 'pubsVisited', 'originalPrices',
-                            'currentVerifications', 'countyBadges', 'telegramActivated', 'telegramActivationKey')
+                            'currentVerifications', 'countyBadges', 'telegramActivated', 'telegramActivationKey',
+                            'telegramBotUsername', 'telegramBotLink')
+
+    def get_telegramBotUsername(self, obj):
+        return TelegramUserParameters.BOT_NAME
+
+    def get_telegramBotLink(self, obj):
+        return TelegramUserParameters.TELEGRAM_BOT_LINK
 
     def get_countyBadges(self, obj):
         """

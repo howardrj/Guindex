@@ -19,5 +19,6 @@ pubs_router.register(r'prices', views.GuinnessViewSet, base_name = 'pub-prices')
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^', include(pubs_router.urls)),
+    url(r'^api/map/pubs/$', views.MapPubList.as_view()),
     url(r'^api/contact/$', views.Contact.as_view()),
 ]

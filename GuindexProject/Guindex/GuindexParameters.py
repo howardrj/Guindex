@@ -219,6 +219,26 @@ class GuindexParameters:
         "Tyrone": u"\u00a3",
     })
 
+    @staticmethod
+    def get_county_map_viewport(county):
+        """
+            Center and bounding box for map view of a supported county.
+        """
+        county_key = county.upper()
+        min_lat = float(getattr(GuindexParameters, 'GPS_%s_MIN_LATITUDE' % county_key))
+        max_lat = float(getattr(GuindexParameters, 'GPS_%s_MAX_LATITUDE' % county_key))
+        min_lng = float(getattr(GuindexParameters, 'GPS_%s_MIN_LONGITUDE' % county_key))
+        max_lng = float(getattr(GuindexParameters, 'GPS_%s_MAX_LONGITUDE' % county_key))
+
+        return {
+            'centerLat': (min_lat + max_lat) / 2.0,
+            'centerLng': (min_lng + max_lng) / 2.0,
+            'minLat': min_lat,
+            'maxLat': max_lat,
+            'minLng': min_lng,
+            'maxLng': max_lng,
+        }
+
     # Contact Form Parameters
     MAX_CONTACT_FORM_NAME_LEN    = 30
     MAX_CONTACT_FORM_EMAIL_LEN   = 50

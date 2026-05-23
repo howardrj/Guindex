@@ -257,4 +257,10 @@ class Command(BaseCommand):
 
             logger.info("User %d does not have a TelegramUser. Creating one", user.id)
 
-            TelegramUserUtils.createNewTelegramUser(user)
+            try:
+                TelegramUserUtils.createNewTelegramUser(user)
+            except Exception:
+                logger.exception(
+                    "Failed to create TelegramUser for user %d; skipping for this alerts pass",
+                    user.id,
+                )
