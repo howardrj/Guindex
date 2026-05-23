@@ -62,16 +62,33 @@ class GuindexRegisterSerializer(RegisterSerializer):
     Reject signup when any user already holds this email (verified or not).
     """
 
+    def validate_username(self, value):
+        value = (value or '').strip()
+        email = ''
+        if hasattr(self, 'initial_data') and self.initial_data:
+            email = (self.initial_data.get('email') or '').strip()
+        if email and ('@' in value or not value):
+            value = re.sub(r'[^\w.@+-]', '_', email.split('@')[0])[:150] or 'user'
+        return get_adapter().clean_username(value)
+
     def validate(self, data):
-        # Frontend may send username=email; '@' is invalid for Django usernames.
         email = (data.get('email') or '').strip()
         username = (data.get('username') or '').strip()
-        if email and ('@' in username or not username):
-            local = email.split('@')[0]
-            local = re.sub(r'[^\w.@+-]', '_', local)[:150] or 'user'
+        if email and not username:
             data = dict(data)
-            data['username'] = local
+            data['username'] = re.sub(
+                r'[^\w.@+-]', '_', email.split('@')[0]
+            )[:150] or 'user'
         return super(GuindexRegisterSerializer, self).validate(data)
+
+    def get_cleaned_data(self):
+        data = super(GuindexRegisterSerializer, self).get_cleaned_data()
+        email = (data.get('email') or '').strip()
+        if email and not (data.get('username') or '').strip():
+            data['username'] = re.sub(
+                r'[^\w.@+-]', '_', email.split('@')[0]
+            )[:150] or 'user'
+        return data
 
     def validate_email(self, value):
         email = get_adapter().clean_email(value)
@@ -101,10 +118,9 @@ class GuindexRegisterSerializer(RegisterSerializer):
 
 
 class GuindexPasswordResetSerializer(PasswordResetSerializer):
-    @property
-    def password_reset_form_class(self):
-        if "allauth" in settings.INSTALLED_APPS:
-            from UserProfile.forms import GuindexPasswordResetForm
-            return GuindexPasswordResetForm
-        from django.contrib.auth.forms import PasswordResetForm
-        return PasswordResetForm
+    """django-rest-auth 0.9.x: password_reset_form_class must be a class attribute."""
+
+    def __init__(self, *args, **kwargs):
+        from UserProfile.forms import GuindexPasswordResetForm
+        self.password_reset_form_class = GuindexPasswordResetForm
+        super(GuindexPasswordResetSerializer, self).__init__(*args, **kwargs)

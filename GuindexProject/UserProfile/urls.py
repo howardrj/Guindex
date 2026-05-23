@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 from UserProfile import views
-from rest_auth.registration.views import RegisterView, VerifyEmailView
+from rest_auth.registration.views import VerifyEmailView
 from rest_auth.views import LoginView, LogoutView, PasswordResetConfirmView, PasswordResetView
 
 
@@ -17,7 +17,7 @@ urlpatterns = [
 
 # Keep registration endpoint public in all environments.
 urlpatterns.extend([
-    url(r'^api/rest-auth/registration/$', RegisterView.as_view(), name='rest_register'),
+    url(r'^api/rest-auth/registration/$', views.GuindexRegisterView.as_view(), name='rest_register'),
     url(r'^api/rest-auth/registration/verify-email/?$', VerifyEmailView.as_view(), name='rest_verify_email'),
     url(
         r'^api/rest-auth/registration/account-confirm-email/(?P<key>[-:\w]+)/$',
