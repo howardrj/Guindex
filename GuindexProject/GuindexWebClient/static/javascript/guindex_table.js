@@ -2,9 +2,18 @@ var g_guindexDataTable = null;
 
 function populateGuindexDataTable()
 {
-    // No need to redraw table since it's already dynamic
-    if (g_guindexDataTable)
+    if (!document.getElementById('GuindexDataTable')) {
         return;
+    }
+
+    if ($.fn.DataTable.isDataTable('#GuindexDataTable')) {
+        if (g_loggedIn && g_guindexDataTable && g_guindexDataTable.onLogin) {
+            g_guindexDataTable.onLogin();
+        }
+        return;
+    }
+
+    g_guindexDataTable = null;
 
     var data_columns = [
         {

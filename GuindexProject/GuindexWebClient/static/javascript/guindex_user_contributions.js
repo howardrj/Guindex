@@ -112,18 +112,35 @@ function renderBadgesCell(originalPrices, countyBadges) {
 
 // Can only be called if user is logged in
 function populateUserContributionsTable() {
-    if (g_loggedIn) {
-        var contributions_page = document.getElementById('contributions_page');
+    var contributions_page = document.getElementById('contributions_page');
+    var on_logged_in = contributions_page ?
+        contributions_page.getElementsByClassName('on_logged_in')[0] : null;
+    var on_logged_out = contributions_page ?
+        contributions_page.getElementsByClassName('on_logged_out')[0] : null;
 
-        contributions_page.getElementsByClassName('on_logged_in')[0].style.display =
-            'block';
-        contributions_page.getElementsByClassName('on_logged_out')[0].style.display =
-            'none';
-    } else {
+    if (!on_logged_in || !on_logged_out) {
         return;
     }
 
-    if (g_userContributionsTableRendered) return;
+    if (g_loggedIn) {
+        on_logged_in.style.display = 'block';
+        on_logged_out.style.display = 'none';
+    } else {
+        on_logged_in.style.display = 'none';
+        on_logged_out.style.display = 'block';
+        return;
+    }
+
+    if (!document.getElementById('GuindexContributionsTable')) {
+        return;
+    }
+
+    if (g_userContributionsTableRendered && $.fn.DataTable.isDataTable('#GuindexContributionsTable')) {
+        return;
+    }
+
+    g_userContributionsTableRendered = false;
+    g_userContributionsTable = null;
 
     function getUserContributions(callback) {
         if (g_retrievingUserContributions) return;
@@ -180,7 +197,7 @@ function populateUserContributionsTable() {
 
     // Check if table is being drawn from scratch or refreshed
     if (!g_userContributionsTable) {
-        data_columns = [
+        var data_columns = [
             { title: 'Statistic', orderable: false },
             { title: 'Value', orderable: false },
         ];

@@ -1,6 +1,21 @@
 (function () {
 
-    console.log("Here");
+    function guindexDispatchEvent(target, eventName) {
+        if (!target) {
+            return;
+        }
+        if (typeof Event === 'function') {
+            try {
+                target.dispatchEvent(new Event(eventName, { bubbles: true }));
+                return;
+            } catch (e) {
+                // fall through for older browsers
+            }
+        }
+        var evt = document.createEvent('Event');
+        evt.initEvent(eventName, true, true);
+        target.dispatchEvent(evt);
+    }
 
     if (typeof window.guindexLoadMapIframeForCounty !== 'function') {
         window.guindexLoadMapIframeForCounty = function (value) {
@@ -37,6 +52,44 @@
     var page_content_divs = document.getElementsByClassName('page_content');
     var g_firstPage = true;
 
+    /**
+     * Main page already includes full tab markup; avoid async_load replacing it
+     * (that strips inline listeners and breaks DataTables / login UI).
+     */
+    function guindexTabHasServerContent(tabContent) {
+        if (!tabContent || !tabContent.id) {
+            return false;
+        }
+
+        switch (tabContent.id) {
+            case 'data_table_page':
+                return !!tabContent.querySelector('#GuindexDataTable');
+            case 'statistics_page':
+                return !!tabContent.querySelector('#GuindexStatisticsTable') ||
+                    !!tabContent.querySelector('#myChart');
+            case 'contributions_page':
+                return !!tabContent.querySelector('.on_logged_in');
+            case 'settings_page':
+                return !!tabContent.querySelector('#GuindexUserSettingsTable') ||
+                    !!tabContent.querySelector('.on_logged_in');
+            case 'pending_contributions_page':
+                return !!tabContent.querySelector('table');
+            case 'map_page':
+                return !!tabContent.querySelector('#map_county_select');
+            default:
+                return tabContent.children.length > 0;
+        }
+    }
+
+    function guindexShowPreloadedTab(page_content) {
+        page_content.setAttribute('data-content_loaded', '1');
+        page_content.style.display = 'block';
+        if (typeof window.guindexInitTabContent === 'function') {
+            window.guindexInitTabContent(page_content);
+        }
+        guindexDispatchEvent(page_content, 'tab_display');
+    }
+
     $(document).on('click', '.page_content_link', function () {
 
         // Hide all page content
@@ -57,6 +110,10 @@
 
         var page_content = document.getElementById(page_content_id);
 
+        if (!page_content) {
+            return;
+        }
+
         // Update URL
         if (g_firstPage)
         {
@@ -64,14 +121,14 @@
             g_firstPage = false;
 
             history.replaceState(page_content_id,
-                                 'Guindex', 
-                                 location.protocol + '//' + location.hostname + ':' + location.port + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
+                                 'Guindex',
+                                 G_URL_BASE + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
         }
         else
         {
             history.pushState(page_content_id,
-                              'Guindex', 
-                              location.protocol + '//' + location.hostname + ':' + location.port + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
+                              'Guindex',
+                              G_URL_BASE + '/' + page_content_id.slice(0, -5) + '/'); // Remove _page suffix
         }
     
         // Send analytics page view
@@ -80,8 +137,16 @@
         
         if (page_content.hasAttribute('data-content_loaded') && page_content.getAttribute('data-content_loaded') == '1')
         {
-            page_content.style.display = 'block'; 
-            page_content.dispatchEvent(new Event('tab_display'));
+            page_content.style.display = 'block';
+            if (typeof window.guindexInitTabContent === 'function') {
+                window.guindexInitTabContent(page_content);
+            }
+            guindexDispatchEvent(page_content, 'tab_display');
+            return;
+        }
+
+        if (guindexTabHasServerContent(page_content)) {
+            guindexShowPreloadedTab(page_content);
             return;
         }
 
@@ -131,33 +196,90 @@
         if (typeof window.guindexMapOnTabLoaded === 'function') {
             window.guindexMapOnTabLoaded();
         }
+
+        if (typeof window.guindexNotifyMapIframeResize === 'function') {
+            var iframe = document.getElementById('guindex_map_iframe');
+            if (iframe && iframe.getAttribute('src')) {
+                window.setTimeout(window.guindexNotifyMapIframeResize, 100);
+                window.setTimeout(window.guindexNotifyMapIframeResize, 500);
+            }
+        }
     }
+
+    /**
+     * Async tab HTML is injected with innerHTML, so inline <script> tags there
+     * never run. Initialise each tab from the parent page after content loads.
+     */
+    function guindexInitTabContent(tabContent) {
+        if (!tabContent || !tabContent.id) {
+            return;
+        }
+
+        if (tabContent.getAttribute('data-content_loaded') !== '1' &&
+            !guindexTabHasServerContent(tabContent)) {
+            return;
+        }
+
+        switch (tabContent.id) {
+            case 'map_page':
+                guindexOnMapTabReady();
+                break;
+            case 'contributions_page':
+                if (typeof populateUserContributionsTable === 'function') {
+                    populateUserContributionsTable();
+                }
+                break;
+            case 'settings_page':
+                if (typeof populateUserSettingsTable === 'function') {
+                    populateUserSettingsTable();
+                }
+                break;
+            case 'data_table_page':
+                if (typeof populateGuindexDataTable === 'function') {
+                    populateGuindexDataTable();
+                }
+                if (typeof g_loggedIn !== 'undefined' && g_loggedIn &&
+                    typeof g_guindexDataTable !== 'undefined' && g_guindexDataTable &&
+                    typeof g_guindexDataTable.onLogin === 'function') {
+                    g_guindexDataTable.onLogin();
+                }
+                break;
+            case 'statistics_page':
+                if (typeof populateGuindexStatsTable === 'function') {
+                    populateGuindexStatsTable();
+                }
+                break;
+            case 'pending_contributions_page':
+                if (typeof populatePendingContributionsTables === 'function') {
+                    populatePendingContributionsTables();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    window.guindexInitTabContent = guindexInitTabContent;
+    window.guindexDispatchEvent = guindexDispatchEvent;
 
     function onTabLoad(tabContent)
     {
         tabContent.setAttribute('data-content_loaded', '1');
-
-        if (tabContent.id === 'map_page') {
-            guindexOnMapTabReady();
-        }
-
-        tabContent.dispatchEvent(new Event('tab_display'));
+        guindexInitTabContent(tabContent);
+        guindexDispatchEvent(tabContent, 'tab_display');
     }
 
     document.addEventListener('tab_display', function (evt) {
-        if (evt.target && evt.target.id === 'map_page')
-        {
-            guindexOnMapTabReady();
+        if (evt.target && evt.target.classList &&
+            evt.target.classList.contains('page_content')) {
+            guindexInitTabContent(evt.target);
+        }
+    }, true);
 
-            if (typeof window.guindexNotifyMapIframeResize === 'function')
-            {
-                var iframe = document.getElementById('guindex_map_iframe');
-                if (iframe && iframe.getAttribute('src'))
-                {
-                    window.setTimeout(window.guindexNotifyMapIframeResize, 100);
-                    window.setTimeout(window.guindexNotifyMapIframeResize, 500);
-                }
-            }
+    document.addEventListener('on_login', function (evt) {
+        if (evt.target && evt.target.classList &&
+            evt.target.classList.contains('page_content')) {
+            guindexInitTabContent(evt.target);
         }
     }, true);
 
@@ -207,10 +329,10 @@
 
         // Display corresponding page content
         var page_content = document.getElementById(page_content_id);
-        page_content.style.display = 'block';
 
-        if (page_content_id === 'map_page') {
-            guindexOnMapTabReady();
+        if (page_content) {
+            page_content.style.display = 'block';
+            guindexInitTabContent(page_content);
         }
     };
 
