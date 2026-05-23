@@ -238,6 +238,21 @@ LOGGING = {
             'backupCount': 10,
             'formatter': 'verbose'
         },
+        # Auth/API (registration, login, password reset) + unhandled 500 tracebacks
+        'GuindexAuthLogFile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, "/var/log/GuindexAuth.log"),
+            'maxBytes': 1024 * 1024 * 10,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
+        # stderr -> systemd journal (journalctl -u GuindexGunicorn)
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'TelegramUser': {
@@ -279,6 +294,17 @@ LOGGING = {
             'handlers': ['GuindexMapLogFile'],
             'propogate': True,
             'level': 'DEBUG',
+        },
+        'UserProfile': {
+            'handlers': ['GuindexAuthLogFile', 'console'],
+            'propagate': False,
+            'level': 'DEBUG',
+        },
+        # Logs full tracebacks for HTTP 500 when DEBUG=False
+        'django.request': {
+            'handlers': ['GuindexAuthLogFile', 'console'],
+            'propagate': False,
+            'level': 'ERROR',
         },
     }
 }
