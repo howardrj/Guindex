@@ -5,6 +5,7 @@ Password reset form override:
 - send at most one email per submitted address
 """
 import hashlib
+import logging
 
 from allauth.account import app_settings as allauth_account_settings
 from allauth.account.adapter import get_adapter
@@ -14,8 +15,22 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
 from rest_auth.forms import (
     AllAuthPasswordResetForm as RestAuthAllAuthPasswordResetForm,
-    default_url_generator,
 )
+
+logger = logging.getLogger(__name__)
+
+
+def guindex_password_reset_url(request, user, temp_key):
+    """Link to the standalone reset page (not django-admin style URLs)."""
+    site = get_current_site(request)
+    protocol = 'https' if request.is_secure() else 'http'
+    uid = user_pk_to_url_str(user)
+    return '{0}://{1}/password/reset/confirm/{2}/{3}/'.format(
+        protocol,
+        site.domain,
+        uid,
+        temp_key,
+    )
 
 
 class GuindexPasswordResetForm(RestAuthAllAuthPasswordResetForm):
@@ -32,15 +47,13 @@ class GuindexPasswordResetForm(RestAuthAllAuthPasswordResetForm):
     def _filter_users_for_reset(email):
         """
         Support old/new allauth function signatures.
+        Do not use prefer_verified here — legacy accounts may have no verified row.
         """
         from allauth.account.utils import filter_users_by_email
         try:
-            return filter_users_by_email(email, is_active=True, prefer_verified=True)
+            return filter_users_by_email(email, is_active=True)
         except TypeError:
-            try:
-                return filter_users_by_email(email, is_active=True)
-            except TypeError:
-                return filter_users_by_email(email)
+            return filter_users_by_email(email)
 
     @staticmethod
     def _cache_keys(email):
@@ -76,10 +89,13 @@ class GuindexPasswordResetForm(RestAuthAllAuthPasswordResetForm):
         email = self.cleaned_data["email"]
         token_generator = kwargs.get("token_generator", default_token_generator)
 
-        for user in self._single_user_for_reset(self.users):
+        users = self._single_user_for_reset(self.users)
+        if not users:
+            return self.cleaned_data["email"]
+
+        for user in users:
             temp_key = token_generator.make_token(user)
-            url_generator = kwargs.get("url_generator", default_url_generator)
-            url = url_generator(request, user, temp_key)
+            url = guindex_password_reset_url(request, user, temp_key)
             uid = user_pk_to_url_str(user)
 
             context = {
@@ -90,23 +106,23 @@ class GuindexPasswordResetForm(RestAuthAllAuthPasswordResetForm):
                 "token": temp_key,
                 "uid": uid,
             }
-            # Keep legacy fallback for older allauth versions.
-            if (
-                getattr(allauth_account_settings, "LOGIN_METHODS", None)
-                and allauth_account_settings.AuthenticationMethod.EMAIL
-                not in allauth_account_settings.LOGIN_METHODS
-            ):
-                context["username"] = user_username(user)
-            elif (
-                hasattr(allauth_account_settings, "AUTHENTICATION_METHOD")
-                and allauth_account_settings.AUTHENTICATION_METHOD
-                != allauth_account_settings.AuthenticationMethod.EMAIL
-            ):
+            auth_method = getattr(allauth_account_settings, 'AUTHENTICATION_METHOD', None)
+            if auth_method and auth_method != 'email':
                 context["username"] = user_username(user)
 
-            get_adapter(request).send_mail("account/email/password_reset_key", email, context)
+            try:
+                get_adapter(request).send_mail(
+                    "account/email/password_reset_key",
+                    email,
+                    context,
+                )
+            except Exception:
+                logger.exception(
+                    "Password reset email failed for %s",
+                    email,
+                )
+                raise
 
-        if self.users:
-            cd_key, _ = self._cache_keys(email)
-            cache.set(cd_key, 1, self._PW_RESET_COOLDOWN_S)
+        cd_key, _ = self._cache_keys(email)
+        cache.set(cd_key, 1, self._PW_RESET_COOLDOWN_S)
         return self.cleaned_data["email"]

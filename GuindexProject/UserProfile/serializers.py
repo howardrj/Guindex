@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
@@ -5,25 +7,71 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from allauth.account.adapter import get_adapter
+from allauth.account.models import EmailAddress
 from rest_auth.registration.serializers import RegisterSerializer
-from rest_auth.serializers import PasswordResetSerializer
+from rest_auth.serializers import LoginSerializer, PasswordResetSerializer
 
 
 class TokenSerializer(serializers.ModelSerializer):
 
     username = serializers.CharField(source='user.username', read_only=True)
     email = serializers.EmailField(source='user.email', read_only=True)
-    isStaff = serializers.CharField(source='user.is_staff', read_only=True)
+    isStaff = serializers.SerializerMethodField()
 
     class Meta:
         model = Token
         fields = ('key', 'user', 'username', 'email', 'isStaff')
+
+    def get_isStaff(self, obj):
+        return 'True' if obj.user.is_staff else 'False'
+
+
+class GuindexLoginSerializer(LoginSerializer):
+    """
+    django-rest-auth LoginSerializer uses emailaddress_set.get() when verification
+    is mandatory; legacy users (pre-allauth email rows) raise DoesNotExist -> HTTP 500.
+  """
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        try:
+            return super(GuindexLoginSerializer, self).validate(attrs)
+        except EmailAddress.DoesNotExist:
+            user = self.authenticate(email=email, password=password)
+            if not user:
+                raise serializers.ValidationError(
+                    _('Unable to log in with provided credentials.')
+                )
+            if not user.email:
+                raise serializers.ValidationError(_('E-mail is not verified.'))
+
+            EmailAddress.objects.create(
+                user=user,
+                email=user.email,
+                verified=True,
+                primary=True,
+            )
+            attrs['user'] = user
+            return attrs
 
 
 class GuindexRegisterSerializer(RegisterSerializer):
     """
     Reject signup when any user already holds this email (verified or not).
     """
+
+    def validate(self, data):
+        # Frontend may send username=email; '@' is invalid for Django usernames.
+        email = (data.get('email') or '').strip()
+        username = (data.get('username') or '').strip()
+        if email and ('@' in username or not username):
+            local = email.split('@')[0]
+            local = re.sub(r'[^\w.@+-]', '_', local)[:150] or 'user'
+            data = dict(data)
+            data['username'] = local
+        return super(GuindexRegisterSerializer, self).validate(data)
 
     def validate_email(self, value):
         email = get_adapter().clean_email(value)

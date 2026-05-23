@@ -241,10 +241,7 @@ $(document).on('click', '#password_signup_button', function () {
     var email     = document.getElementById('password_signup_email').value;
     var password1 = document.getElementById('password_signup_password1').value;
     var password2 = document.getElementById('password_signup_password2').value;
-    // Backend serializer may still expect username in this legacy stack; derive from email.
-    var username = (email || '').trim();
 
-    // Use REST API to login to guindex.ie
     var request = new XMLHttpRequest();
 
     request.open('POST', G_API_BASE + 'rest-auth/registration/', true);
@@ -253,12 +250,12 @@ $(document).on('click', '#password_signup_button', function () {
     request.setRequestHeader('Accept', 'application/json');
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
+    // Username is optional (ACCOUNT_USERNAME_REQUIRED=False); server derives it from email.
     var signup_data = {
-        'username': username,
         'email': email,
         'password1': password1,
         'password2': password2,
-    }
+    };
 
     request.send(JSON.stringify(signup_data));
 
@@ -320,8 +317,8 @@ function onSignupSuccess ()
     guindexCloseLoginModal();
 
     displayMessage(
-        'Verification email sent',
-        '<p>Please check your email and verify your account before logging in.</p>'
+        'Account created',
+        '<p>Your account was created. If email verification is enabled, check your inbox before logging in; otherwise you can log in now with your email and password.</p>'
     );
 }
 

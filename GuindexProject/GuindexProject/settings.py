@@ -308,7 +308,8 @@ REST_FRAMEWORK = {
 }
 
 # Allauth settings (email sign-up + account activation)
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# optional: legacy users can log in; new signups still get a verification email
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'
 ACCOUNT_UNIQUE_EMAIL = True
@@ -345,6 +346,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER': 'UserProfile.serializers.GuindexLoginSerializer',
     'TOKEN_SERIALIZER': 'UserProfile.serializers.TokenSerializer',
     'PASSWORD_RESET_SERIALIZER': 'UserProfile.serializers.GuindexPasswordResetSerializer',
 }
