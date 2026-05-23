@@ -43,6 +43,18 @@ var g_statsCountyColors = [
 	{county:"Tyrone",colour1:"white", colour2:"red"}
 ];
 
+var g_statsCountyColourFallback = {colour1: 'gray', colour2: 'lightgray'};
+
+function guindexStatsCountyColours(county) {
+    var j;
+    for (j = 0; j < g_statsCountyColors.length; j++) {
+        if (g_statsCountyColors[j].county === county) {
+            return g_statsCountyColors[j];
+        }
+    }
+    return g_statsCountyColourFallback;
+}
+
 function populateGuindexStatsTable ()
 {
     if (!document.getElementById('GuindexStatisticsTable')) {
@@ -477,65 +489,76 @@ function guindexStatsAppendPageToPubsList(pageNumber)
                 }
 
 
-                //console.log(CountryResult);
-
                 var sortedCountryResults = [];
-				Object.keys(CountryResult).forEach(function(key) {
-				    sortedCountryResults.push([key, CountryResult[key].qty,CountryResult[key].visited,CountryResult[key].notvisited,CountryResult[key].averagePrice]);
-				});
+                var sortedCountryPrice = [];
+                var ci;
+                var row;
+                var colours;
+                var visitedData = [];
+                var notVisitedData = [];
+                var visitedColours = [];
+                var notVisitedColours = [];
+                var countyLabels = [];
+                var priceData = [];
+                var priceColours = [];
 
-				sortedCountryResults.sort(function(a, b) {
-				    return b[1] - a[1];
-				});
+                for (ci = 0; ci < CountryResult.length; ci++) {
+                    row = CountryResult[ci];
+                    sortedCountryResults.push([
+                        row.county,
+                        row.qty,
+                        row.visited,
+                        row.notvisited,
+                        row.averagePrice
+                    ]);
+                    sortedCountryPrice.push([
+                        row.county,
+                        row.qty,
+                        row.visited,
+                        row.notvisited,
+                        row.averagePrice
+                    ]);
+                }
 
-				var sortedCountryPrice = [];
-				Object.keys(CountryResult).forEach(function(key) {
-				    sortedCountryPrice.push([key, CountryResult[key].qty,CountryResult[key].visited,CountryResult[key].notvisited,CountryResult[key].averagePrice]);
-				});
+                sortedCountryResults.sort(function (a, b) {
+                    return b[1] - a[1];
+                });
 
-				sortedCountryPrice.sort(function(a, b) {
-				    return b[4] - a[4];
-				});
+                sortedCountryPrice.sort(function (a, b) {
+                    return b[4] - a[4];
+                });
 
-				var m = 0 ;
-                Object.keys(sortedCountryResults).forEach(function(key) {
-					//console.log(key, sortedCountryResults[key],sortedCountryResults[key].qty,sortedCountryResults[key].visited,sortedCountryResults[key].notvisited,sortedCountryResults[key].averagePrice);
+                for (ci = 0; ci < sortedCountryResults.length; ci++) {
+                    row = sortedCountryResults[ci];
+                    colours = guindexStatsCountyColours(row[0]);
+                    countyLabels.push(row[0]);
+                    notVisitedData.push(row[3]);
+                    visitedData.push(row[2]);
+                    notVisitedColours.push(colours.colour1);
+                    visitedColours.push(colours.colour2);
+                }
 
-				    g_myChart.data.datasets[0].data[m] = sortedCountryResults[key][3];
-				    g_myChart.data.datasets[1].data[m] = sortedCountryResults[key][2];
+                g_myChart.data.labels = countyLabels;
+                g_myChart.data.datasets[0].data = notVisitedData;
+                g_myChart.data.datasets[1].data = visitedData;
+                g_myChart.data.datasets[0].backgroundColor = notVisitedColours;
+                g_myChart.data.datasets[1].backgroundColor = visitedColours;
 
-				    g_myChart.data.datasets[0].labels[m] = sortedCountryResults[key][4];
+                countyLabels = [];
+                priceData = [];
+                priceColours = [];
 
-					g_myChart.data.labels[m] = sortedCountryResults[key][0];
+                for (ci = 0; ci < sortedCountryPrice.length; ci++) {
+                    row = sortedCountryPrice[ci];
+                    colours = guindexStatsCountyColours(row[0]);
+                    countyLabels.push(row[0]);
+                    priceData.push(row[4]);
+                    priceColours.push(colours.colour1);
+                }
 
-					for(var j = 0; j < g_statsCountyColors.length; j++){
-						if(sortedCountryResults[key][0] == g_statsCountyColors[j].county){
-							g_myChart.data.datasets[0].backgroundColor[m] = g_statsCountyColors[j].colour1;
-							g_myChart.data.datasets[1].backgroundColor[m] = g_statsCountyColors[j].colour2;
-						}
-					}
-
-					m = m+1;
-
-				});
-
-                var m = 0 ;
-                Object.keys(sortedCountryPrice).forEach(function(key) {
-					//console.log(key, sortedCountryPrice[key],sortedCountryPrice[key].qty,sortedCountryPrice[key].visited,sortedCountryPrice[key].notvisited,sortedCountryPrice[key].averagePrice);
-
-				    g_myPriceChart.data.datasets[0].data[m] = sortedCountryPrice[key][4];
-					g_myPriceChart.data.labels[m] = sortedCountryPrice[key][0];
-
-					for(var j = 0; j < g_statsCountyColors.length; j++){
-						if(sortedCountryPrice[key][0] == g_statsCountyColors[j].county){
-
-							g_myPriceChart.data.datasets[0].backgroundColor[m] = g_statsCountyColors[j].colour1;
-						}
-					}
-
-					m = m+1;
-
-				});
+                g_myPriceChart.data.labels = countyLabels;
+                g_myPriceChart.data.datasets[0].data = priceData;
+                g_myPriceChart.data.datasets[0].backgroundColor = priceColours;
 
 				g_myChart.update();
 				g_myPriceChart.update();
