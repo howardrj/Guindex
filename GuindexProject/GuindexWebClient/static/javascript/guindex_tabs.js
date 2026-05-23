@@ -80,8 +80,11 @@
         
         if (page_content.hasAttribute('data-content_loaded') && page_content.getAttribute('data-content_loaded') == '1')
         {
-            page_content.style.display = 'block'; 
-            page_content.dispatchEvent(new Event('tab_display'));
+            page_content.style.display = 'block';
+            if (typeof window.guindexInitTabContent === 'function') {
+                window.guindexInitTabContent(page_content);
+            }
+            page_content.dispatchEvent(new Event('tab_display', { bubbles: true }));
             return;
         }
 
@@ -131,33 +134,88 @@
         if (typeof window.guindexMapOnTabLoaded === 'function') {
             window.guindexMapOnTabLoaded();
         }
+
+        if (typeof window.guindexNotifyMapIframeResize === 'function') {
+            var iframe = document.getElementById('guindex_map_iframe');
+            if (iframe && iframe.getAttribute('src')) {
+                window.setTimeout(window.guindexNotifyMapIframeResize, 100);
+                window.setTimeout(window.guindexNotifyMapIframeResize, 500);
+            }
+        }
     }
+
+    /**
+     * Async tab HTML is injected with innerHTML, so inline <script> tags there
+     * never run. Initialise each tab from the parent page after content loads.
+     */
+    function guindexInitTabContent(tabContent) {
+        if (!tabContent || !tabContent.id) {
+            return;
+        }
+
+        if (tabContent.getAttribute('data-content_loaded') !== '1') {
+            return;
+        }
+
+        switch (tabContent.id) {
+            case 'map_page':
+                guindexOnMapTabReady();
+                break;
+            case 'contributions_page':
+                if (typeof populateUserContributionsTable === 'function') {
+                    populateUserContributionsTable();
+                }
+                break;
+            case 'settings_page':
+                if (typeof populateUserSettingsTable === 'function') {
+                    populateUserSettingsTable();
+                }
+                break;
+            case 'data_table_page':
+                if (typeof populateGuindexDataTable === 'function') {
+                    populateGuindexDataTable();
+                }
+                if (typeof g_loggedIn !== 'undefined' && g_loggedIn &&
+                    typeof g_guindexDataTable !== 'undefined' && g_guindexDataTable &&
+                    typeof g_guindexDataTable.onLogin === 'function') {
+                    g_guindexDataTable.onLogin();
+                }
+                break;
+            case 'statistics_page':
+                if (typeof populateGuindexStatsTable === 'function') {
+                    populateGuindexStatsTable();
+                }
+                break;
+            case 'pending_contributions_page':
+                if (typeof populatePendingContributionsTables === 'function') {
+                    populatePendingContributionsTables();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    window.guindexInitTabContent = guindexInitTabContent;
 
     function onTabLoad(tabContent)
     {
         tabContent.setAttribute('data-content_loaded', '1');
-
-        if (tabContent.id === 'map_page') {
-            guindexOnMapTabReady();
-        }
-
-        tabContent.dispatchEvent(new Event('tab_display'));
+        guindexInitTabContent(tabContent);
+        tabContent.dispatchEvent(new Event('tab_display', { bubbles: true }));
     }
 
     document.addEventListener('tab_display', function (evt) {
-        if (evt.target && evt.target.id === 'map_page')
-        {
-            guindexOnMapTabReady();
+        if (evt.target && evt.target.classList &&
+            evt.target.classList.contains('page_content')) {
+            guindexInitTabContent(evt.target);
+        }
+    }, true);
 
-            if (typeof window.guindexNotifyMapIframeResize === 'function')
-            {
-                var iframe = document.getElementById('guindex_map_iframe');
-                if (iframe && iframe.getAttribute('src'))
-                {
-                    window.setTimeout(window.guindexNotifyMapIframeResize, 100);
-                    window.setTimeout(window.guindexNotifyMapIframeResize, 500);
-                }
-            }
+    document.addEventListener('on_login', function (evt) {
+        if (evt.target && evt.target.classList &&
+            evt.target.classList.contains('page_content')) {
+            guindexInitTabContent(evt.target);
         }
     }, true);
 
@@ -209,8 +267,8 @@
         var page_content = document.getElementById(page_content_id);
         page_content.style.display = 'block';
 
-        if (page_content_id === 'map_page') {
-            guindexOnMapTabReady();
+        if (page_content) {
+            guindexInitTabContent(page_content);
         }
     };
 

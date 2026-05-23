@@ -6,16 +6,26 @@ var g_userSettingsTableRendered = false;
 // Can only be called if user is logged in
 function populateUserSettingsTable ()
 {
+    var settings_page = document.getElementById('settings_page');
+    var on_logged_in = settings_page ?
+        settings_page.getElementsByClassName('on_logged_in')[0] : null;
+    var on_logged_out = settings_page ?
+        settings_page.getElementsByClassName('on_logged_out')[0] : null;
+
+    if (!on_logged_in || !on_logged_out)
+    {
+        return;
+    }
+
     if (g_loggedIn)
     {
-        // Clear log in warning
-        var settings_page = document.getElementById('settings_page');
-
-        settings_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
-        settings_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
+        on_logged_in.style.display  = 'block';
+        on_logged_out.style.display = 'none';
     }
     else
     {
+        on_logged_in.style.display  = 'none';
+        on_logged_out.style.display = 'block';
         return;
     }
 

@@ -5,18 +5,26 @@ function populatePendingContributionsTables ()
     if (g_isStaffMember == false)
         return;
 
+    var pending_contributions_page = document.getElementById('pending_contributions_page');
+    var on_logged_in = pending_contributions_page ?
+        pending_contributions_page.getElementsByClassName('on_logged_in')[0] : null;
+    var on_logged_out = pending_contributions_page ?
+        pending_contributions_page.getElementsByClassName('on_logged_out')[0] : null;
+
+    if (!on_logged_in || !on_logged_out)
+    {
+        return;
+    }
+
     if (g_loggedIn)
     {
-        // Clear log in warning
-        // Note we have mutliple tables so it's a bit easier to do it here instead of just 
-        // before drawing the table.
-        var pending_contributions_page = document.getElementById('pending_contributions_page');
-
-        pending_contributions_page.getElementsByClassName('on_logged_in')[0].style.display  = 'block';
-        pending_contributions_page.getElementsByClassName('on_logged_out')[0].style.display = 'none';
+        on_logged_in.style.display  = 'block';
+        on_logged_out.style.display = 'none';
     }
     else
     {
+        on_logged_in.style.display  = 'none';
+        on_logged_out.style.display = 'block';
         return;
     }
 
