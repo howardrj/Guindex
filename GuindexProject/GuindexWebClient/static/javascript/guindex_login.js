@@ -225,6 +225,18 @@ function onLoginSuccess ()
         password_login_button.style.display = 'none';
     }
 
+    var password_signup_button = document.getElementById('password_signup_button');
+    if (password_signup_button)
+    {
+        password_signup_button.style.display = 'none';
+    }
+
+    var password_signup_username = document.getElementById('password_signup_username');
+    if (password_signup_username)
+    {
+        password_signup_username.innerHTML = g_username;
+    }
+
     if (logout_button)
     {
         logout_button.style.display = 'inline';
@@ -237,10 +249,13 @@ function onLoginSuccess ()
 /* Signup */
 /**********/
 
-$(document).on('click', '#password_signup_button', function () {
-    var email     = document.getElementById('password_signup_email').value;
-    var password1 = document.getElementById('password_signup_password1').value;
-    var password2 = document.getElementById('password_signup_password2').value;
+function submitPasswordSignup() {
+    var emailEl = document.getElementById('password_signup_email');
+    var password1El = document.getElementById('password_signup_password1');
+    var password2El = document.getElementById('password_signup_password2');
+    var email = emailEl ? emailEl.value : '';
+    var password1 = password1El ? password1El.value : '';
+    var password2 = password2El ? password2El.value : '';
 
     var request = new XMLHttpRequest();
 
@@ -259,7 +274,7 @@ $(document).on('click', '#password_signup_button', function () {
 
     request.send(JSON.stringify(signup_data));
 
-    var button = this;
+    var button = document.getElementById('password_signup_button');
     toggleLoader(button);
 
     request.onreadystatechange = function processRequest()
@@ -309,7 +324,17 @@ $(document).on('click', '#password_signup_button', function () {
                 displayMessage("Error", error_message + error_table);
             }
         }
-    }
+    };
+}
+
+$(document).on('submit', '#password_signup_form', function (e) {
+    e.preventDefault();
+    submitPasswordSignup();
+});
+
+$(document).on('click', '#password_signup_button', function (e) {
+    e.preventDefault();
+    submitPasswordSignup();
 });
 
 function onSignupSuccess ()

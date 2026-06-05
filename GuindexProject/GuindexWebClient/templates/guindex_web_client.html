@@ -285,56 +285,32 @@
         <div class="modal-header">
           <ul class="nav nav-tabs" roles="tablist">
             <li class="nav-item login_state_link">
-                <a class="nav-link active login_state_link" href="#facebook_login" data-toggle="tab">Login with Facebook</a>
+                <a class="nav-link active login_state_link" href="#password_login" data-toggle="tab">Login</a>
             </li>
             <li class="nav-item login_state_link">
-                <a class="nav-link login_state_link" href="#password_login" data-toggle="tab">Login with Password</a>
+                <a class="nav-link login_state_link" href="#password_signup" data-toggle="tab">Sign Up</a>
             </li>
           </ul>
 
-          <button class="close" type="button" data-dismiss="modal" id="login_close_button" aria-label="Close">
+          <button class="close login-modal-close" type="button" data-dismiss="modal" id="login_close_button" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
 
         <div class="tab-content">
-            <div class="tab-pane active" role="tabpanel" id="facebook_login">
-
-                <div class="modal-body" id="facebook_login_modal_body">
-                    <span id="facebook_login_modal_body_default">
-                        Login with Facebook below if you would like to start contributing to the Guindex.
-                    </span>
-                    <span id="facebook_login_modal_body_logged_in_this_way" style="display:none">
-                        You are currently logged in via Facebook as <span id="facebook_login_username"></span>.
-                    </span>
-                    <span id="facebook_login_modal_body_logged_in_other_way" style="display:none">
-                        You are currently logged via password authentication. To login via Facebook
-                        please click the logout button in the next tab and login again using the login with Facebook
-                        button that appears on this tab.  
-                    </span>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <fb:login-button id="login_with_facebook_button" scope="public_profile,email" onlogin="checkLoginState();">
-                    </fb:login-button>
-                </div>
-            </div>
-
-            <div class="tab-pane" role="tabpanel" id="password_login">
+            <div class="tab-pane active" role="tabpanel" id="password_login">
                 <div class="modal-body" id="password_login_modal_body">
-                    
+
                     <span id="password_login_modal_body_default">
                         <p>
-                            Login with your previously created account credentials if you would like to start contributing to the Guindex.
+                            Sign in with your Guindex account email and password.
                         </p>
-
-                        <br>
 
                         <form id="password_login_form" action="#" onsubmit="return false;">
                             <div class="form-group">
                                 <div class="form-row">
                                     <label for="password_login_email">Email</label>
-                                    <input class="form-control" id="password_login_email" type="text" placeholder="Enter email"  autocomplete="username">
+                                    <input class="form-control" id="password_login_email" type="text" placeholder="Enter email" autocomplete="username">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -344,31 +320,6 @@
                                 </div>
                             </div>
                         </form>
-                        <hr>
-                        <p class="mb-2">
-                            New here? Create an account with email:
-                        </p>
-                        <form id="password_signup_form" action="#" onsubmit="return false;">
-                            <div class="form-group">
-                                <div class="form-row">
-                                    <label for="password_signup_email">Email</label>
-                                    <input class="form-control" id="password_signup_email" type="email" placeholder="Enter email" autocomplete="email">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="form-row">
-                                    <label for="password_signup_password1">Password</label>
-                                    <input class="form-control" id="password_signup_password1" type="password" placeholder="Create password" autocomplete="new-password">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="form-row">
-                                    <label for="password_signup_password2">Confirm password</label>
-                                    <input class="form-control" id="password_signup_password2" type="password" placeholder="Confirm password" autocomplete="new-password">
-                                </div>
-                            </div>
-                        </form>
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="password_signup_button">Sign up with email</button>
                         <p class="mt-2 mb-0">
                             <a href="#" id="password_login_forgot_toggle">Forgot your password?</a>
                         </p>
@@ -388,20 +339,55 @@
                         You are currently logged in as <span id="password_login_username"></span>.
                         <span id="logout_modal_username" style="display:none"></span>
                     </span>
-                    <span id="password_login_modal_body_logged_in_other_way" style="display:none">
-                        You are currently logged in via Facebook. To login using a previously created account credentials instead,
-                        please disconnect from the Guindex in your Facebook app settings, refresh this page and submit your email
-                        and password through this tab.
-                    </span>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal" id="login_close_button">Cancel</button>
-                    <button type="submit" form="password_login_form" class="btn btn-primary" id="password_login_button">Submit</button>
+                    <button class="btn btn-secondary login-modal-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button type="submit" form="password_login_form" class="btn btn-primary" id="password_login_button">Log in</button>
                     <a class="btn btn-primary" id="logout_button" style="display:none">Logout</a>
                     <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
                 </div>
-            </div> 
-        </div> 
+            </div>
+
+            <div class="tab-pane" role="tabpanel" id="password_signup">
+                <div class="modal-body" id="password_signup_modal_body">
+
+                    <span id="password_signup_modal_body_default">
+                        <p class="mb-3">
+                            New here? Create an account with email:
+                        </p>
+
+                        <form id="password_signup_form" action="#" onsubmit="return false;">
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <label for="password_signup_email">Email</label>
+                                    <input class="form-control" id="password_signup_email" type="email" placeholder="Enter email" autocomplete="email">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <label for="password_signup_password1">Password</label>
+                                    <input class="form-control" id="password_signup_password1" type="password" placeholder="Create password" autocomplete="new-password">
+                                </div>
+                            </div>
+                            <div class="form-group mb-0">
+                                <div class="form-row">
+                                    <label for="password_signup_password2">Confirm password</label>
+                                    <input class="form-control" id="password_signup_password2" type="password" placeholder="Confirm password" autocomplete="new-password">
+                                </div>
+                            </div>
+                        </form>
+                    </span>
+                    <span id="password_signup_modal_body_logged_in" style="display:none">
+                        You are currently logged in as <span id="password_signup_username"></span>.
+                    </span>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary login-modal-close" type="button" data-dismiss="modal">Cancel</button>
+                    <button type="submit" form="password_signup_form" class="btn btn-primary" id="password_signup_button">Create account</button>
+                    <i class="fa fa-spinner fa-spin guindex_web_client_loader"></i>
+                </div>
+            </div>
+        </div>
      </div>
    </div>
  </div>
