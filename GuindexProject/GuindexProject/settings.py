@@ -238,6 +238,21 @@ LOGGING = {
             'backupCount': 10,
             'formatter': 'verbose'
         },
+        # Auth/API (registration, login, password reset) + unhandled 500 tracebacks
+        'GuindexAuthLogFile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, "/var/log/GuindexAuth.log"),
+            'maxBytes': 1024 * 1024 * 10,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
+        # stderr -> systemd journal (journalctl -u GuindexGunicorn)
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'TelegramUser': {
@@ -280,6 +295,17 @@ LOGGING = {
             'propogate': True,
             'level': 'DEBUG',
         },
+        'UserProfile': {
+            'handlers': ['GuindexAuthLogFile', 'console'],
+            'propagate': False,
+            'level': 'DEBUG',
+        },
+        # Logs full tracebacks for HTTP 500 when DEBUG=False
+        'django.request': {
+            'handlers': ['GuindexAuthLogFile', 'console'],
+            'propagate': False,
+            'level': 'ERROR',
+        },
     }
 }
 
@@ -303,12 +329,19 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_THROTTLE_RATES': {
         'anon': '10000/day',
-        'user': '10000/day'
+        'user': '10000/day',
+        # Per-IP limits on credential endpoints (ScopedRateThrottle on auth views)
+        'auth_login': '20/hour',
+        'auth_register': '10/hour',
     }
 }
 
-# Allauth settings
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+# Allauth settings (email sign-up + account activation)
+# optional: legacy users can log in; new signups still get a verification email
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'
+ACCOUNT_UNIQUE_EMAIL = True
 
 # Telegram API
 BOT_HTTP_API_TOKEN = secrets.BOT_HTTP_API_TOKEN
@@ -331,6 +364,7 @@ GOOGLE_ANALYTICS_KEY = secrets.GOOGLE_ANALYTICS_KEY
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True   
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_ADAPTER = 'GuindexWebClient.adapters.GuindexAccountAdapter'
 
 AUTHENTICATION_BACKENDS = (
  # Needed to login by username in Django admin, regardless of `allauth`
@@ -341,5 +375,14 @@ AUTHENTICATION_BACKENDS = (
 )
 
 REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER': 'UserProfile.serializers.GuindexLoginSerializer',
     'TOKEN_SERIALIZER': 'UserProfile.serializers.TokenSerializer',
+    'PASSWORD_RESET_SERIALIZER': 'UserProfile.serializers.GuindexPasswordResetSerializer',
+    'PASSWORD_RESET_CONFIRM_SERIALIZER': (
+        'UserProfile.serializers.GuindexPasswordResetConfirmSerializer'
+    ),
+}
+
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'UserProfile.serializers.GuindexRegisterSerializer',
 }

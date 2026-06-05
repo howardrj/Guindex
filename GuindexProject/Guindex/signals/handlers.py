@@ -28,13 +28,22 @@ def newUserInit(sender, **kwargs):
 
             logger.info("User %d does not have a TelegramUser. Creating one", user.id)
 
-            TelegramUserUtils.createNewTelegramUser(user)
+            try:
+                TelegramUserUtils.createNewTelegramUser(user)
+            except Exception:
+                logger.exception(
+                    "Failed to create TelegramUser for User %d", user.id
+                )
 
         if not hasattr(user, 'guindexuser'):
 
             logger.info("User %d does not have a GuindexUser. Creating one", user.id)
 
-            guindexuser = GuindexUser()
-
-            guindexuser.user = user
-            guindexuser.save()
+            try:
+                guindexuser = GuindexUser()
+                guindexuser.user = user
+                guindexuser.save()
+            except Exception:
+                logger.exception(
+                    "Failed to create GuindexUser for User %d", user.id
+                )

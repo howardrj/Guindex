@@ -147,6 +147,11 @@ function guindexCloseLoginModal()
     }
 }
 
+$(document).on('click', '#password_login_forgot_toggle', function (e) {
+    e.preventDefault();
+    $('#password_login_forgot_section').toggle();
+});
+
 function onLoginSuccess ()
 {
     if (document.readyState != "complete")
@@ -220,6 +225,18 @@ function onLoginSuccess ()
         password_login_button.style.display = 'none';
     }
 
+    var password_signup_button = document.getElementById('password_signup_button');
+    if (password_signup_button)
+    {
+        password_signup_button.style.display = 'none';
+    }
+
+    var password_signup_username = document.getElementById('password_signup_username');
+    if (password_signup_username)
+    {
+        password_signup_username.innerHTML = g_username;
+    }
+
     if (logout_button)
     {
         logout_button.style.display = 'inline';
@@ -232,14 +249,14 @@ function onLoginSuccess ()
 /* Signup */
 /**********/
 
-$(document).on('click', '#password_signup_button', function () {
-    
-    var username  = document.getElementById('password_signup_username').value;
-    var email     = document.getElementById('password_signup_email').value;
-    var password1 = document.getElementById('password_signup_password1').value;
-    var password2 = document.getElementById('password_signup_password2').value;
+function submitPasswordSignup() {
+    var emailEl = document.getElementById('password_signup_email');
+    var password1El = document.getElementById('password_signup_password1');
+    var password2El = document.getElementById('password_signup_password2');
+    var email = emailEl ? emailEl.value : '';
+    var password1 = password1El ? password1El.value : '';
+    var password2 = password2El ? password2El.value : '';
 
-    // Use REST API to login to guindex.ie
     var request = new XMLHttpRequest();
 
     request.open('POST', G_API_BASE + 'rest-auth/registration/', true);
@@ -248,16 +265,16 @@ $(document).on('click', '#password_signup_button', function () {
     request.setRequestHeader('Accept', 'application/json');
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
+    // Username is optional (ACCOUNT_USERNAME_REQUIRED=False); server derives it from email.
     var signup_data = {
-        'username': username,
         'email': email,
         'password1': password1,
         'password2': password2,
-    }
+    };
 
     request.send(JSON.stringify(signup_data));
 
-    var button = this;
+    var button = document.getElementById('password_signup_button');
     toggleLoader(button);
 
     request.onreadystatechange = function processRequest()
@@ -307,51 +324,94 @@ $(document).on('click', '#password_signup_button', function () {
                 displayMessage("Error", error_message + error_table);
             }
         }
-    }
+    };
+}
+
+$(document).on('submit', '#password_signup_form', function (e) {
+    e.preventDefault();
+    submitPasswordSignup();
+});
+
+$(document).on('click', '#password_signup_button', function (e) {
+    e.preventDefault();
+    submitPasswordSignup();
 });
 
 function onSignupSuccess ()
 {
     guindexCloseLoginModal();
 
-    displayMessage('Account Verificatiom Email Sent', 
-                   "Please check your email and verify your account before logging in");
+    displayMessage(
+        'Account created',
+        '<p>Your account was created. If email verification is enabled, check your inbox before logging in; otherwise you can log in now with your email and password.</p>'
+    );
 }
 
 /*******************/
 /* Forgot Password */
 /*******************/
 
-$(document).on('click', '#forgot_password_button', function () {
-    
-    var email = document.getElementById('forgot_password_email').value;
+$(document).off('click.guindexForgotPassword', '#forgot_password_button').on(
+    'click.guindexForgotPassword',
+    '#forgot_password_button',
+    function () {
+        var emailEl = document.getElementById('forgot_password_email');
+        var email = emailEl ? emailEl.value.trim() : '';
+        var fbClear = document.getElementById('forgot_password_feedback');
+        if (fbClear) {
+            fbClear.style.display = 'none';
+            fbClear.textContent = '';
+            fbClear.className = 'small mt-2 mb-0';
+        }
+        if (!email) {
+            var fb = document.getElementById('forgot_password_feedback');
+            if (fb) {
+                fb.style.display = 'block';
+                fb.className = 'small mt-2 mb-0 text-danger';
+                fb.textContent = 'Please enter your email address.';
+            }
+            return;
+        }
 
-    // Use REST API to login to guindex.ie
-    var request = new XMLHttpRequest();
+        if (window.__guindexForgotPasswordPending) {
+            return;
+        }
+        window.__guindexForgotPasswordPending = true;
 
-    request.open('POST', G_API_BASE + 'rest-auth/password/reset/', true);
+        var request = new XMLHttpRequest();
+        request.open('POST', G_API_BASE + 'rest-auth/password/reset/', true);
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('Accept', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.setRequestHeader('Accept', 'application/json');
-    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        var forgot_password_data = {
+            'email': email
+        };
 
-    var forgot_password_data = {
-        'email': email,
-    }
+        var button = this;
+        button.disabled = true;
+        request.send(JSON.stringify(forgot_password_data));
+        toggleLoader(button);
 
-    request.send(JSON.stringify(forgot_password_data));
-
-    var button = this;
-    toggleLoader(button);
-
-    request.onreadystatechange = function processRequest()
-    {
-        if (request.readyState == 4)
+        request.onreadystatechange = function processRequest()
         {
+            if (request.readyState !== 4) {
+                return;
+            }
+
+            window.__guindexForgotPasswordPending = false;
+            button.disabled = false;
             toggleLoader(button);
 
             var parsed = guindexParseJsonResponse(request.responseText);
             if (!parsed.ok) {
+                var fbErr = document.getElementById('forgot_password_feedback');
+                if (fbErr) {
+                    fbErr.style.display = 'block';
+                    fbErr.className = 'small mt-2 mb-0 text-danger';
+                    fbErr.textContent =
+                        'Something went wrong (HTTP ' + request.status + '). Try again later.';
+                }
                 displayMessage(
                     "Error",
                     "<p>Password reset request failed: the server did not return JSON (HTTP " +
@@ -368,59 +428,94 @@ $(document).on('click', '#forgot_password_button', function () {
             }
             else
             {
-                // Display errors
-                var error_message = '<p>Please fix the following error(s): </p>'
-
-                var error_table = '<table border="1" cellpadding="5" style="margin: 5px auto"><tbody>';
-
-                error_table += '<tr> <th> Field </th> <th> Error </th> </tr>';
-
-                Object.keys(response).forEach(function(key) {
-
-                    error_table += '<tr>';
-
-                    error_table += '<td>' + key + '</td>';
-
-                    error_table += '<td>' + response[key] + '</td>';
-
-                    error_table += '</tr>';
-                });
-
-                error_table += '</tbody></table>';
-
-                displayMessage("Error", error_message + error_table);
+                displayMessage("Error", guindexFormatRestValidationErrors(response));
+                var fbBad = document.getElementById('forgot_password_feedback');
+                if (fbBad) {
+                    fbBad.style.display = 'block';
+                    fbBad.className = 'small mt-2 mb-0 text-danger';
+                    fbBad.textContent = 'Could not send reset email. See the message above.';
+                }
             }
-        }
+        };
     }
-});
+);
 
 function onForgotPasswordSubmitSuccess ()
 {
-    guindexCloseLoginModal();
+    var fb = document.getElementById('forgot_password_feedback');
+    if (fb) {
+        fb.style.display = 'block';
+        fb.className = 'small mt-2 mb-0 text-success';
+        fb.innerHTML =
+            '<strong>Check your email.</strong> If an account exists for that address, we sent a link to choose a new password. ' +
+            'Also check your spam folder. You can close this window when you are done.';
+    }
 
-    displayMessage('Password Reset Sent', 
-                   "Please check your email to reset your password");
+    displayMessage(
+        'Password reset',
+        '<p>If that email is registered with Guindex, we sent a reset link. Check your inbox and spam folder.</p>'
+    );
+
+    setTimeout(function () {
+        var closeBtn = document.getElementById('login_close_button');
+        if (closeBtn) {
+            closeBtn.click();
+        }
+    }, 2500);
 }
 
 /**********/
 /* Logout */
 /**********/
 
-$(document).on('click', '#logout_button', function () {
-
-    toggleLoader(this);
-
-    clearLocalStorage();
-
-    // Reload page (easiest thing to do here)
-    location.reload();
-});
-
-function clearLocalStorage ()
+function clearLocalStorage()
 {
-    // Remove login paremeters from local storage
     localStorage.removeItem('guindexUsername');
     localStorage.removeItem('guindexAccessToken');
     localStorage.removeItem('guindexUserId');
     localStorage.removeItem('guindexIsStaffMember');
+    g_loggedIn = false;
+    g_accessToken = null;
+    g_username = null;
+    g_userId = null;
+    g_isStaffMember = null;
 }
+
+function performServerLogout(reloadAfter)
+{
+    if (reloadAfter !== false) {
+        reloadAfter = true;
+    }
+
+    function finishLogout() {
+        clearLocalStorage();
+        if (reloadAfter) {
+            location.reload();
+        }
+    }
+
+    var token = g_accessToken || localStorage.getItem('guindexAccessToken');
+    if (!token) {
+        finishLogout();
+        return;
+    }
+
+    var request = new XMLHttpRequest();
+    request.open('POST', G_API_BASE + 'rest-auth/logout/', true);
+    request.setRequestHeader('Authorization', 'Token ' + token);
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('Accept', 'application/json');
+    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+            // Always clear client state even if the token was already invalid.
+            finishLogout();
+        }
+    };
+    request.send('{}');
+}
+
+$(document).on('click', '#logout_button', function () {
+    toggleLoader(this);
+    performServerLogout(true);
+});

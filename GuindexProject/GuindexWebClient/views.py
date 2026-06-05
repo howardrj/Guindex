@@ -10,20 +10,7 @@ from django.utils.encoding import force_text
 from django.utils.http import urlquote
 
 from Guindex.GuindexParameters import GuindexParameters
-
-
-def _web_client_context(request, **extra):
-    """Shared template context for the main web client and async tab loads."""
-    context = {
-        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
-        'google_analytics_key': settings.GOOGLE_ANALYTICS_KEY,
-        'facebook_app_id': settings.FACEBOOK_APP_ID,
-        'guindex_counties': GuindexParameters.SUPPORTED_COUNTIES,
-        'debug': settings.DEBUG,
-        'async_template_loading': True,
-    }
-    context.update(extra)
-    return context
+from GuindexWebClient.spa_utils import web_client_template_context
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +85,15 @@ def guindexWebClient(request):
 
     logger.info("Received Guindex web client request from user %s", request.user)
 
-    return render(request, 'guindex_web_client.html', _web_client_context(request))
+    return render(request, 'guindex_web_client.html', web_client_template_context(request))
+
+
+def password_reset_confirm_page(request, uid, token):
+    logger.info("Password reset confirm page for uid prefix=%s", (uid or "")[:8])
+    ctx = web_client_template_context(request)
+    ctx["uid_json"] = json.dumps(uid)
+    ctx["token_json"] = json.dumps(token)
+    return render(request, 'password_reset_confirm_standalone.html', ctx)
 
 
 def guindexWebClientWithTemplate(request, template):
@@ -122,14 +117,17 @@ def guindexWebClientWithTemplate(request, template):
     if template == 'new_guindex_map':
         return serve_new_guindex_map(request)
 
-    return render(request, 'guindex_web_client.html', _web_client_context(request))
+    return render(request, 'guindex_web_client.html', web_client_template_context(request))
 
 
 def asyncLoadTemplate(request, template):
 
     logger.info("Received async load template for template %s request from user %s", template, request.user)
 
-    context_dict = _web_client_context(request, async_template_loading=False)
+    context_dict = web_client_template_context(
+        request,
+        extra={'async_template_loading': False},
+    )
 
 #    if template == "map":
  #       folium_map = create_guindex_map()
@@ -140,4 +138,3 @@ def asyncLoadTemplate(request, template):
         return render(request, template + '.html', context_dict)
     except:
         return HttpResponseNotFound('<h1> Page not found </h1>')
-
