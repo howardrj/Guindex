@@ -11,7 +11,9 @@ from rest_auth.app_settings import TokenSerializer, create_token
 from rest_auth.models import TokenModel
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_auth.registration.views import RegisterView, SocialLoginView, SocialConnectView
+from rest_auth.views import LoginView
 
 logger = logging.getLogger(__name__)
 
@@ -26,11 +28,21 @@ def _email_verification_is_mandatory():
         return False
 
 
+class GuindexLoginView(LoginView):
+    """Login with per-IP rate limiting."""
+
+    throttle_classes = (ScopedRateThrottle,)
+    throttle_scope = 'auth_login'
+
+
 class GuindexRegisterView(RegisterView):
     """
     Registration view safe on django-rest-auth 0.9.x + older allauth:
     avoids EmailVerificationMethod / auth_token edge cases that return HTTP 500.
     """
+
+    throttle_classes = (ScopedRateThrottle,)
+    throttle_scope = 'auth_register'
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

@@ -468,21 +468,54 @@ function onForgotPasswordSubmitSuccess ()
 /* Logout */
 /**********/
 
-$(document).on('click', '#logout_button', function () {
-
-    toggleLoader(this);
-
-    clearLocalStorage();
-
-    // Reload page (easiest thing to do here)
-    location.reload();
-});
-
-function clearLocalStorage ()
+function clearLocalStorage()
 {
-    // Remove login paremeters from local storage
     localStorage.removeItem('guindexUsername');
     localStorage.removeItem('guindexAccessToken');
     localStorage.removeItem('guindexUserId');
     localStorage.removeItem('guindexIsStaffMember');
+    g_loggedIn = false;
+    g_accessToken = null;
+    g_username = null;
+    g_userId = null;
+    g_isStaffMember = null;
 }
+
+function performServerLogout(reloadAfter)
+{
+    if (reloadAfter !== false) {
+        reloadAfter = true;
+    }
+
+    function finishLogout() {
+        clearLocalStorage();
+        if (reloadAfter) {
+            location.reload();
+        }
+    }
+
+    var token = g_accessToken || localStorage.getItem('guindexAccessToken');
+    if (!token) {
+        finishLogout();
+        return;
+    }
+
+    var request = new XMLHttpRequest();
+    request.open('POST', G_API_BASE + 'rest-auth/logout/', true);
+    request.setRequestHeader('Authorization', 'Token ' + token);
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('Accept', 'application/json');
+    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+            // Always clear client state even if the token was already invalid.
+            finishLogout();
+        }
+    };
+    request.send('{}');
+}
+
+$(document).on('click', '#logout_button', function () {
+    toggleLoader(this);
+    performServerLogout(true);
+});

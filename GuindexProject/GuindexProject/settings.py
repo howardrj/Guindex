@@ -329,7 +329,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_THROTTLE_RATES': {
         'anon': '10000/day',
-        'user': '10000/day'
+        'user': '10000/day',
+        # Per-IP limits on credential endpoints (ScopedRateThrottle on auth views)
+        'auth_login': '20/hour',
+        'auth_register': '10/hour',
     }
 }
 

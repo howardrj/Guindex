@@ -3,11 +3,11 @@ from django.views.generic import TemplateView
 
 from UserProfile import views
 from rest_auth.registration.views import VerifyEmailView
-from rest_auth.views import LoginView, LogoutView, PasswordResetConfirmView, PasswordResetView
+from rest_auth.views import LogoutView, PasswordResetConfirmView, PasswordResetView
 
 
 urlpatterns = [
-    url(r'^api/rest-auth/login/$', LoginView.as_view(), name='rest_login'),
+    url(r'^api/rest-auth/login/$', views.GuindexLoginView.as_view(), name='rest_login'),
     url(r'^api/rest-auth/logout/$', LogoutView.as_view(), name='rest_logout'),
     url(r'^api/rest-auth/facebook/$', views.FacebookLogin.as_view(), name='fb_login'),
     url(r'^api/rest-auth/facebook/connect/$', views.FacebookConnect.as_view(), name='fb_connect'),
