@@ -1,6 +1,9 @@
+import fcntl
 import logging
+import os
 import time
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -27,6 +30,29 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        lock_path = os.path.join(settings.BASE_DIR, 'guindex_alerts.lock')
+        lock_fd = open(lock_path, 'w')
+
+        try:
+            fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except (IOError, OSError):
+            logger.error(
+                "Another GuindexAlerts instance already holds %s; exiting to avoid duplicate alerts",
+                lock_path,
+            )
+            lock_fd.close()
+            return
+
+        logger.info("Acquired alerts lock at %s", lock_path)
+
+        try:
+            self._run_alerts_loop()
+        finally:
+            fcntl.flock(lock_fd, fcntl.LOCK_UN)
+            lock_fd.close()
+
+    def _run_alerts_loop(self):
+
         while True:
 
             logger.info("Checking alerts")
@@ -39,30 +65,55 @@ class Command(BaseCommand):
                 alerts.save()
 
             last_check_time = alerts.lastCheckTime
+            now = timezone.now()
+            elapsed = (now - last_check_time).total_seconds()
 
             # Only process alerts if sufficent time has passed
-            if (timezone.now() - last_check_time).total_seconds() > GuindexParameters.ALERTS_CHECK_PERIOD:
+            if elapsed > GuindexParameters.ALERTS_CHECK_PERIOD:
+
+                # Claim this check window BEFORE sending. If the process crashes
+                # mid-send, systemd must not restart into the same window and
+                # redeliver the same digests (that caused 10x duplicate alerts).
+                claimed = AlertsSingleton.objects.filter(
+                    pk=1,
+                    lastCheckTime=last_check_time,
+                ).update(lastCheckTime=now)
+
+                if not claimed:
+                    logger.info(
+                        "Another alerts worker already claimed this check window; skipping send"
+                    )
+                    sleep_time = 60
+                    logger.info("Sleeping for %d seconds", sleep_time)
+                    time.sleep(sleep_time)
+                    continue
+
+                logger.info(
+                    "Claimed alerts window %s -> %s",
+                    last_check_time,
+                    now,
+                )
 
                 alerts_context = {}
 
                 alerts_context['new_prices'] = Guinness.objects.filter(
-                                                   creationDate__range = (last_check_time, timezone.now())
+                                                   creationDate__range = (last_check_time, now)
                                                )
 
                 alerts_context['new_pubs'] = Pub.objects.filter(
-                                                 creationDate__range = (last_check_time, timezone.now())
+                                                 creationDate__range = (last_check_time, now)
                                              )
 
                 alerts_context['new_pending_price_creates'] = GuinnessPendingCreate.objects.filter(
-                                                                  creationDate__range = (last_check_time, timezone.now())
+                                                                  creationDate__range = (last_check_time, now)
                                                               )
 
                 alerts_context['new_pending_pub_creates'] = PubPendingCreate.objects.filter(
-                                                                creationDate__range = (last_check_time, timezone.now())
+                                                                creationDate__range = (last_check_time, now)
                                                             )
 
                 alerts_context['new_pending_pub_patches'] = PubPendingPatch.objects.filter(
-                                                                creationDate__range = (last_check_time, timezone.now())
+                                                                creationDate__range = (last_check_time, now)
                                                             )
 
                 normal_user_alerts_pending = len(alerts_context['new_prices']) or \
@@ -106,41 +157,17 @@ class Command(BaseCommand):
 
                     for user in User.objects.all():
 
-                        self.validateAlertsSettings(user)
-
-                        logger.debug("Checking alerts for user %d", user.id)
-
-                        if not user.is_staff and not normal_user_alerts_pending:
-                            logger.debug("User %d is a normal user and there are no pending normal alerts", user.id)
-                            continue
-
-                        # Send alerts to relevant users
-
-                        alerts_context['user'] = user
-
-                        if getattr(user, 'guindexuser') and user.guindexuser.usingEmailAlerts:
-
-                            logger.debug("Sending email alert for user %d", user.id)
-
-                            try:
-                                html_content = render_to_string('alert_email_template.html', alerts_context)
-                            except:
-                                logger.error("Failed to render email to string")
-                                continue
-
-                            try:
-                                user.email_user('Guindex Alert', html_content, None, html_message = html_content)
-                            except:
-                                logger.error("Failed to send email to user %d", user.id)
-                                continue
-
-                        if getattr(user, 'telegramuser') and user.telegramuser.usingTelegramAlerts:
-
-                            logger.debug("Sending telegram alert for user %d", user.id)
-
-                            self.sendTelegramAlert(alerts_context)
-
-                alerts.save()
+                        try:
+                            self._send_alerts_for_user(
+                                user,
+                                alerts_context,
+                                normal_user_alerts_pending,
+                            )
+                        except Exception:
+                            logger.exception(
+                                "Failed while processing alerts for user %d; continuing",
+                                user.id,
+                            )
 
                 sleep_time = GuindexParameters.ALERTS_CHECK_PERIOD
 
@@ -148,11 +175,55 @@ class Command(BaseCommand):
                 logger.info("Not enough time has passed since last alerts check")
 
                 # Sleep until next check time
-                sleep_time = GuindexParameters.ALERTS_CHECK_PERIOD - (timezone.now() - last_check_time).total_seconds()
+                sleep_time = GuindexParameters.ALERTS_CHECK_PERIOD - elapsed
 
             logger.info("Sleeping for %d seconds", sleep_time)
 
             time.sleep(sleep_time)
+
+    def _send_alerts_for_user(self, user, alerts_context, normal_user_alerts_pending):
+
+        self.validateAlertsSettings(user)
+
+        logger.debug("Checking alerts for user %d", user.id)
+
+        if not user.is_staff and not normal_user_alerts_pending:
+            logger.debug("User %d is a normal user and there are no pending normal alerts", user.id)
+            return
+
+        # Send alerts to relevant users
+
+        alerts_context['user'] = user
+
+        if hasattr(user, 'guindexuser') and user.guindexuser.usingEmailAlerts:
+
+            logger.debug("Sending email alert for user %d", user.id)
+
+            try:
+                html_content = render_to_string('alert_email_template.html', alerts_context)
+            except Exception:
+                logger.exception(
+                    "Failed to render email for user %d (email=%s)",
+                    user.id,
+                    getattr(user, 'email', None),
+                )
+                html_content = None
+
+            if html_content is not None:
+                try:
+                    user.email_user('Guindex Alert', html_content, None, html_message = html_content)
+                except Exception:
+                    logger.exception(
+                        "Failed to send email to user %d (email=%s)",
+                        user.id,
+                        getattr(user, 'email', None),
+                    )
+
+        if hasattr(user, 'telegramuser') and user.telegramuser.usingTelegramAlerts:
+
+            logger.debug("Sending telegram alert for user %d", user.id)
+
+            self.sendTelegramAlert(alerts_context)
 
     def sendTelegramAlert(self, context):
 
@@ -237,8 +308,12 @@ class Command(BaseCommand):
 
         try:
             GuindexBot.sendMessage(message, context['user'].telegramuser.chatId)
-        except:
-            logger.error("Failed to send Telegram to user %d", context['user'].id)
+        except Exception:
+            logger.exception(
+                "Failed to send Telegram to user %d (chatId=%s)",
+                context['user'].id,
+                getattr(context['user'].telegramuser, 'chatId', None),
+            )
 
     def validateAlertsSettings(self, user):
 
@@ -248,10 +323,16 @@ class Command(BaseCommand):
 
             logger.info("User %d does not have a GuindexUser. Creating one", user.id)
 
-            guindexuser = GuindexUser()
+            try:
+                guindexuser = GuindexUser()
 
-            guindexuser.user = user
-            guindexuser.save()
+                guindexuser.user = user
+                guindexuser.save()
+            except Exception:
+                logger.exception(
+                    "Failed to create GuindexUser for user %d; skipping for this alerts pass",
+                    user.id,
+                )
 
         if not hasattr(user, 'telegramuser'):
 

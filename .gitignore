@@ -26,3 +26,5 @@ rpmbuild/SRPMS/
 guindex_*.min.js
 guindex_map.html
 *.bk
+guindex_alerts.lock
+guindex_db_backup.lock

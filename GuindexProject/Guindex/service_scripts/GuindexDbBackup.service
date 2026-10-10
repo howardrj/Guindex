@@ -8,8 +8,9 @@ WorkingDirectory=/var/www/Guindex/GuindexProject
 ExecStart=/usr/bin/python /var/www/Guindex/GuindexProject/manage.py GuindexDbBackup
 User=guindex
 Group=guindex
-Restart=always
-RestartSec=1
+# Restart on crash, but not when the command exits cleanly (e.g. lock already held)
+Restart=on-failure
+RestartSec=5
 StartLimitBurst=0
 
 [Install]
