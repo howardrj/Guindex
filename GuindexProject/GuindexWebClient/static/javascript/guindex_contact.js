@@ -1,4 +1,8 @@
-$('#contact_form_submit_button').on('click', function () {
+// Delegated handler: contact form HTML is async-injected via innerHTML, so a
+// direct $('#contact_form_submit_button').on(...) binding never attaches.
+$(document).on('click', '#contact_form_submit_button', function (e) {
+
+    e.preventDefault();
 
     var name    = document.getElementById('contact_form_name').value;
     var email   = document.getElementById('contact_form_email').value;
@@ -67,4 +71,4 @@ $('#contact_form_submit_button').on('click', function () {
             }
         }   
     }
-}) 
+});
