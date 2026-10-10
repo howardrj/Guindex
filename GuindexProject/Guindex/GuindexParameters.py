@@ -18,6 +18,8 @@ class GuindexParameters:
 
     # Background script run periods (in seconds)
     DB_BACKUP_PERIOD         = 86400
+    # Max dated local DB copies to keep under /usr/share after backup/prune
+    DB_BACKUP_LOCAL_KEEP     = 3
     STATS_CALCULATION_PERIOD = 86400
     ALERTS_CHECK_PERIOD      = 86400 * 7
 
